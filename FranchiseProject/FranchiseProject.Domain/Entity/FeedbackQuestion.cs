@@ -15,6 +15,6 @@ namespace FranchiseProject.Domain.Entity
         public Guid? FeedbackId { get; set; }
         [ForeignKey("FeedbackId")]
         public Feedback? Feedback { get; set; }
-        public virtual ICollection<FeedbackOption> FeedbackQuestions { get; set; }
+        public virtual ICollection<FeedbackOption>? FeedbackQuestions { get; set; }
     }
 }

@@ -9,7 +9,6 @@
   <ItemGroup>
     <Folder Include="DataInitializer\" />
     <Folder Include="Mappers\" />
-    <Folder Include="Repositories\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FranchiseProject.Application\FranchiseProject.Application.csproj" />
     <ProjectReference Include="..\FranchiseProject.Domain\FranchiseProject.Domain.csproj" />
   </ItemGroup>
 

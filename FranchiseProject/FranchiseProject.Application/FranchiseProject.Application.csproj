@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="ViewModels\" />
+    <Folder Include="Utils\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FranchiseProject.Domain\FranchiseProject.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
