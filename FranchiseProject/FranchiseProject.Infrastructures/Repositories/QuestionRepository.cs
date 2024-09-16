@@ -26,8 +26,3 @@ namespace FranchiseProject.Infrastructures.Repositories
         }
     }
 }
-
-
-{
-}
-}

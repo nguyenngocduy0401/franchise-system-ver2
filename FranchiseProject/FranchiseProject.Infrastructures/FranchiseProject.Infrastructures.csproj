@@ -9,6 +9,7 @@
   <ItemGroup>
     <Folder Include="DataInitializer\" />
     <Folder Include="Mappers\" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
   <ItemGroup>
