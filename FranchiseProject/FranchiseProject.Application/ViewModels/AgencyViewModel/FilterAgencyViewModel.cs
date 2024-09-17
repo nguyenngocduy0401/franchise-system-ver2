@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Domain.Enums
+namespace FranchiseProject.Application.ViewModels.AgencyViewModel
 {
-    public enum AgencyStatusEnum
-    { 
+    internal class FilterAgencyViewModel
+    {
     }
 }

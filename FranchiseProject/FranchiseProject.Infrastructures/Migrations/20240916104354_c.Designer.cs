@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FranchiseProject.Infrastructures.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240916083548_inite")]
-    partial class inite
+    [Migration("20240916104354_c")]
+    partial class c
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -644,6 +644,37 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasIndex("FeedbackId");
 
                     b.ToTable("FeedbackQuestions");
+                });
+
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.FranchiseRegistrationRequests", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PhoneNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("FranchiseRegistrationRequests");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Question", b =>
@@ -1495,6 +1526,15 @@ namespace FranchiseProject.Infrastructures.Migrations
                         .HasForeignKey("FeedbackId");
 
                     b.Navigation("Feedback");
+                });
+
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.FranchiseRegistrationRequests", b =>
+                {
+                    b.HasOne("FranchiseProject.Domain.Entity.User", "Consultant")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Consultant");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Question", b =>

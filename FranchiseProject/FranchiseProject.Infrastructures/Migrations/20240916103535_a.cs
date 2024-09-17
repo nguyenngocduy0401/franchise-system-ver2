@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FranchiseProject.Infrastructures.Migrations
 {
     /// <inheritdoc />
-    public partial class inite : Migration
+    public partial class a : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -453,6 +453,27 @@ namespace FranchiseProject.Infrastructures.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FranchiseRegistrationRequests",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<int>(type: "int", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FranchiseRegistrationRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FranchiseRegistrationRequests_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -1042,6 +1063,11 @@ namespace FranchiseProject.Infrastructures.Migrations
                 column: "ClassId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_FranchiseRegistrationRequests_UserId",
+                table: "FranchiseRegistrationRequests",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_QuestionOptions_QuestionId",
                 table: "QuestionOptions",
                 column: "QuestionId");
@@ -1123,6 +1149,9 @@ namespace FranchiseProject.Infrastructures.Migrations
 
             migrationBuilder.DropTable(
                 name: "FeedbackAnswers");
+
+            migrationBuilder.DropTable(
+                name: "FranchiseRegistrationRequests");
 
             migrationBuilder.DropTable(
                 name: "QuizDetails");
