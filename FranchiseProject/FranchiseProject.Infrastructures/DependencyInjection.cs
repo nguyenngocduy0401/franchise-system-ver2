@@ -3,6 +3,7 @@ using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Application.Services;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Infrastructures.Mappers;
 using FranchiseProject.Infrastructures.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +50,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<ISyllabusService, SyllabusService>();
             services.AddScoped<ITermService, TermService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IFranchiseRegistrationRequestService,FranchiseRegistrationRequestService>();
             #endregion
             #region Repository DI
             services.AddScoped<IAgencyRepository, AgencyRepository>();
@@ -79,10 +81,12 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<ISyllabusRepository, SyllabusRepository>();
             services.AddScoped<ITermRepository, TermRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IFranchiseRegistrationRequestRepository, FranchiseRegistrationRequestRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             #endregion
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
             services.AddDbContext<AppDbContext>(option => option.UseSqlServer(appConfiguration));
+            services.AddAutoMapper(typeof(MapperConfigurationsProfile).Assembly);
             return services;
         }
     }
