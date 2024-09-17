@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
@@ -30,7 +29,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FranchiseProject.Application\FranchiseProject.Application.csproj" />
-    <ProjectReference Include="..\FranchiseProject.Domain\FranchiseProject.Domain.csproj" />
   </ItemGroup>
 
 </Project>
