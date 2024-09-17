@@ -52,6 +52,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRedisService, RedisService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IFranchiseRegistrationRequestService,FranchiseRegistrationRequestService>();
             #endregion
             #region Repository DI
             services.AddScoped<IAgencyRepository, AgencyRepository>();
@@ -82,6 +83,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<ISyllabusRepository, SyllabusRepository>();
             services.AddScoped<ITermRepository, TermRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IFranchiseRegistrationRequestRepository, FranchiseRegistrationRequestRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             #endregion

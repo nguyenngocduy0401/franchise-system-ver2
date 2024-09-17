@@ -11,6 +11,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using FranchiseProject.Infrastructures.DataInitializer;
 using FranchiseProject.API.Middlewares;
+using FluentValidation;
+using FranchiseProject.Application.ViewModels.AgencyViewModel;
+using FranchiseProject.API.Validator.AgencyValidation;
 
 namespace FranchiseProject.API
 {
@@ -74,7 +77,7 @@ namespace FranchiseProject.API
             services.AddScoped<AccountInitializer>();
             #endregion
             #region Validator
-            
+            services.AddTransient<IValidator<RegisFranchiseViewModel>, RegisFranchiseViewModelValidator>();
             #endregion
 
             return services;

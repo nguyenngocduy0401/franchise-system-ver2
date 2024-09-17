@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using FranchiseProject.Application.ViewModels.AgencyViewModel;
+using FranchiseProject.Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +9,13 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Infrastructures.Mappers
 {
-    public class MapperConfigurationsProfile : Profile
+    public class MapperConfigurationsProfile : Profile 
     {
-        public MapperConfigurationsProfile()
-        {
+        public MapperConfigurationsProfile() {
+            CreateMap<RegisFranchiseViewModel, FranchiseRegistrationRequests>();
+            CreateMap<FranchiseRegistrationRequests, RegisFranchiseViewModel>().ForMember(dest => dest.CustomerName,otp=>otp.MapFrom(src => src.CusomterName)).ReverseMap();
+            CreateMap<FranchiseRegistrationRequests, FranchiseRegistrationRequestsViewModel>()
+           .ForMember(dest => dest.ConsultantUserName, opt => opt.MapFrom(src => src.User.UserName)).ReverseMap();
         }
     }
 }
