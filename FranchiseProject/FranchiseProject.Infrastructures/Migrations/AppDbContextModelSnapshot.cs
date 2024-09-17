@@ -643,40 +643,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.ToTable("FeedbackQuestions");
                 });
 
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.FranchiseRegistrationRequests", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConsultantUserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CusomterName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PhoneNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("FranchiseRegistrationRequests");
-                });
-
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Question", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1526,15 +1492,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                         .HasForeignKey("FeedbackId");
 
                     b.Navigation("Feedback");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.FranchiseRegistrationRequests", b =>
-                {
-                    b.HasOne("FranchiseProject.Domain.Entity.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Question", b =>

@@ -5,9 +5,6 @@ using FranchiseProject.Infrastructures;
 using Microsoft.OpenApi.Models;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
-using FluentValidation;
-using FranchiseProject.Application.ViewModels.AgencyViewModel;
-using FranchiseProject.API.Validator.AgencyValidation;
 
 namespace FranchiseProject.API
 {
@@ -74,7 +71,7 @@ namespace FranchiseProject.API
             services.AddScoped<AccountInitializer>();*/
             #endregion
             #region Validator
-            services.AddTransient<IValidator<RegisFranchiseViewModel>, RegisFranchiseViewModelValidator>();
+            
             #endregion
 
             return services;

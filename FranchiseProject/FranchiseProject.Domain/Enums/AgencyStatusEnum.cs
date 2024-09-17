@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 namespace FranchiseProject.Domain.Enums
 {
     public enum AgencyStatusEnum
-    { 
+    {
     }
 }

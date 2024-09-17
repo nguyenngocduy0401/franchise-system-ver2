@@ -37,7 +37,6 @@ namespace FranchiseProject.Application
         public ISyllabusRepository SyllabusRepository { get; }
         public ITermRepository TermRepository { get; }
         public IUserRepository UserRepository { get; }
-        public IFranchiseRegistrationRequestRepository FranchiseRegistrationRequestRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }
