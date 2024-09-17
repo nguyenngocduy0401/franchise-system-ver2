@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,4 +33,4 @@ public class CustomJwtBearerEvents : JwtBearerEvents
 
         await base.TokenValidated(context);
     }
-}
+}*/
