@@ -797,6 +797,43 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.ToTable("QuizDetails");
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("IssuedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("JwtId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Report", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1529,6 +1566,17 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("Question");
 
                     b.Navigation("Quiz");
+                });
+
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.RefreshToken", b =>
+                {
+                    b.HasOne("FranchiseProject.Domain.Entity.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Report", b =>

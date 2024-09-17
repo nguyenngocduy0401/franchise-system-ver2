@@ -1,7 +1,9 @@
 using FranchiseProject.API;
+using FranchiseProject.API.Middlewares;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Infrastructures;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -11,25 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration.Get<AppConfiguration>();
 builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
 builder.Services.AddWebAPIService();
-/*builder.Services.AddAuthentication(options => {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options => {
-    options.SaveToken = true;
-    options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidIssuer = configuration.JwtOptions.Issuer,
-        ValidAudience = configuration.JwtOptions.Audience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.JwtOptions.Secret)),
-
-    };
-});*/
+builder.Services.AddAuthenticationServices(configuration);
+builder.Services.AddStackExchangeRedisCache(options => options.Configuration = configuration.RedisConfiguration);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
+builder.Services.AddSingleton(configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -43,6 +31,8 @@ app.UseSwaggerUI();
 app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
 /*app.UseMiddleware<PerformanceMiddleware>();*/
+app.UseMiddleware<RedisAuthenticationMiddleware>();
+
 app.UseAuthorization();
 
 app.MapControllers();

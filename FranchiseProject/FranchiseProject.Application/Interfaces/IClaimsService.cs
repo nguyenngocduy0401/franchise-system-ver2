@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Interfaces
 {
-    public interface IClaimService
+    public interface IClaimsService
     {
         public Guid GetCurrentUserId { get; }
     }

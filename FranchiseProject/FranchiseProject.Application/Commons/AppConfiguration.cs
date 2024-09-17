@@ -9,6 +9,7 @@ namespace FranchiseProject.Application.Commons
     public class AppConfiguration
     {
         public string DatabaseConnection { get; set; }
-        
+        public JwtOptions JwtOptions { get; set; }
+        public string RedisConfiguration { get; set; }
     }
 }
