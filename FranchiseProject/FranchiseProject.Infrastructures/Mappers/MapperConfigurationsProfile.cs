@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Infrastructures.Mappers
 {
-    public class MapperConfigurationsProfile : Profile
+    public class MapperConfigurationsProfile : Profile 
     {
         public MapperConfigurationsProfile() {
 

@@ -1,16 +1,17 @@
 ﻿using FranchiseProject.API.Services;
-using FranchiseProject.Application.Interfaces;
-using FranchiseProject.Application;
-using FranchiseProject.Infrastructures;
 using Microsoft.OpenApi.Models;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
-using FranchiseProject.Application.Commons;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using FranchiseProject.Infrastructures.DataInitializer;
 using FranchiseProject.API.Middlewares;
+using FluentValidation;
+using FranchiseProject.API.Validator.AgencyValidation;
+using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Infrastructures.DataInitializer;
+using FranchiseProject.Application.ViewModels.AgencyViewModel;
 
 namespace FranchiseProject.API
 {
@@ -74,7 +75,7 @@ namespace FranchiseProject.API
             services.AddScoped<AccountInitializer>();
             #endregion
             #region Validator
-            
+            services.AddTransient<IValidator<RegisFranchiseViewModel>, RegisFranchiseViewModelValidator>();
             #endregion
 
             return services;
