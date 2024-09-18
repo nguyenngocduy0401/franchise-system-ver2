@@ -56,6 +56,13 @@ namespace FranchiseProject.Infrastructures
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentClassConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentCourseConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AssignmentSubmitConfiguration).Assembly);
-        } 
+            modelBuilder.Entity<Contract>().HasData(
+                     new Contract
+                     {
+                         Id = Guid.Parse("550EE872-EA09-42A0-B9AC-809890DEBAFB"),
+                         EndTime = DateTime.Now.AddDays(5)
+                     }
+                     );
+        }
     }
 }

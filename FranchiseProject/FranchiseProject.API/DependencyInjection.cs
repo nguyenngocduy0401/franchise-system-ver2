@@ -12,6 +12,8 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Infrastructures.DataInitializer;
 using FranchiseProject.Application.ViewModels.AgencyViewModel;
+using FranchiseProject.API.Validator.AutheticationValidator;
+using FranchiseProject.Application.ViewModels.UserViewModels;
 
 namespace FranchiseProject.API
 {
@@ -76,6 +78,7 @@ namespace FranchiseProject.API
             #endregion
             #region Validator
             services.AddTransient<IValidator<RegisFranchiseViewModel>, RegisFranchiseViewModelValidator>();
+            services.AddTransient<IValidator<UserResetPasswordModel>, UserResetPasswordValidator>();
             #endregion
 
             return services;

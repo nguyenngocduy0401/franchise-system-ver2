@@ -14,6 +14,8 @@ namespace FranchiseProject.Domain.Entity
         public string? FullName { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string? Gender { get; set; }
+        public string? OTPEmail { get; set; }
+        public DateTime? ExpireOTPEmail { get; set; }
         public Guid? AgencyId { get; set; }
         [ForeignKey("AgencyId")]
         public Agency? Agency { get; set; }

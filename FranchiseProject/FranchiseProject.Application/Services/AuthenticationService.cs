@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using FluentValidation;
+using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Utils;
@@ -9,7 +11,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -28,9 +29,10 @@ namespace FranchiseProject.Application.Services
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
         private readonly IRedisService _redisService;
+        private readonly IValidator<UserResetPasswordModel> _validatorResetPassword;
         public AuthenticationService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentTime currentTime,
             SignInManager<User> signInManager, AppConfiguration appConfiguration, UserManager<User> userManager,
-            RoleManager<Role> roleManager, IRedisService redisService)
+            RoleManager<Role> roleManager, IRedisService redisService, IValidator<UserResetPasswordModel> validatorResetPassword)
         {
 
             _signInManager = signInManager;
@@ -41,6 +43,7 @@ namespace FranchiseProject.Application.Services
             _userManager = userManager;
             _roleManager = roleManager;
             _redisService = redisService;
+            _validatorResetPassword = validatorResetPassword;
         }
         public async Task<ApiResponse<UserLoginViewModel>> LoginAsync(UserLoginModel userLoginModel)
         {
@@ -53,9 +56,16 @@ namespace FranchiseProject.Application.Services
                 {
                     var user = await _unitOfWork.UserRepository.GetUserByUserNameAndPassword
                         (userLoginModel.UserName, userLoginModel.Password);
-                    if (user.ContractId != Guid.Empty) 
+                    if (user.ContractId != Guid.Empty && user.ContractId != null) 
                     {
-                           
+                        var checkExpire = await _unitOfWork.ContractRepository.IsExpiringContract((Guid)user.ContractId);
+                        if (checkExpire) 
+                        {
+                            response.Data = null;
+                            response.isSuccess = true;
+                            response.Message = "Tài khoản hoặc mật khẩu không chính xác!";
+                            return response;
+                        }
                     }
                     var userViewModel = _mapper.Map<UserViewModel>(user);
                     var userRole = await _userManager.GetRolesAsync(user);
@@ -90,13 +100,13 @@ namespace FranchiseProject.Application.Services
                     if (isSuccess) {
                         response.Data = userLoginViewModel;
                         response.isSuccess = true;
-                        response.Message = "Login is successful!";
+                        response.Message = "Đăng nhập thành công!";
                     } else throw new Exception("Login is fail!");
                 }
                 else
                 {
-                    response.isSuccess = false;
-                    response.Message = "Username or password is not correct!";
+                    response.isSuccess = true;
+                    response.Message = "Tài khoản hoặc mật khẩu không chính xác!";
                 }
             }
             catch (DbException ex)
@@ -183,6 +193,23 @@ namespace FranchiseProject.Application.Services
                 await _unitOfWork.SaveChangeAsync();
                 var refreshToken = GenerateJsonWebTokenString.GenerateRefreshToken();
                 var user = await _userManager.FindByIdAsync(storedToken.UserId);
+                if (user == null) {
+                    response.Data = null;
+                    response.isSuccess = false;
+                    response.Message = "User does not exist!";
+                    return response;
+                }
+                if (user.ContractId != Guid.Empty && user.ContractId != null)
+                {
+                    var checkExpire = await _unitOfWork.ContractRepository.IsExpiringContract((Guid)user.ContractId);
+                    if (checkExpire)
+                    {
+                        response.Data = null;
+                        response.isSuccess = true;
+                        response.Message = "Tài khoản hoặc mật khẩu không chính xác!";
+                        return response;
+                    }
+                }
                 var userRole = await _userManager.GetRolesAsync(user);
                 var token = user.GenerateJsonWebToken(_appConfiguration,
                         _appConfiguration.JwtOptions.Secret,
@@ -248,7 +275,7 @@ namespace FranchiseProject.Application.Services
                 await _redisService.RemoveUserIfExistsAsync(user.UserName);
                 await _unitOfWork.SaveChangeAsync();
                 response.isSuccess = true;
-                response.Message = "Logout Successful!";
+                response.Message = "Đăng xuất thành công!";
             }
             catch (Exception ex)
             {
@@ -256,6 +283,76 @@ namespace FranchiseProject.Application.Services
                 response.Message = ex.Message;
                 return response;
 
+            }
+            return response;
+        }
+        public async Task<ApiResponse<bool>> ResetPasswordAsync(string userName, UserResetPasswordModel userResetPasswordModel)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                ValidationResult validationResult = await _validatorResetPassword.ValidateAsync(userResetPasswordModel);
+                if (!validationResult.IsValid)
+                {
+                    response.isSuccess = false;
+                    response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
+                    return response;
+                }
+                if (string.IsNullOrEmpty(userName))
+                {
+                    response.Data = false;
+                    response.isSuccess = true;
+                    response.Message = "Username không được bỏ trống!";
+                    return response;
+                }
+                var user = await _userManager.FindByNameAsync(userName);
+                if (user == null)
+                {
+                    response.Data = false;
+                    response.isSuccess = false;
+                    response.Message = "Username không tồn tại!";
+                    return response;
+                }
+                if (user.OTPEmail != userResetPasswordModel.OTP)
+                {
+                    response.Data = false;
+                    response.isSuccess = true;
+                    response.Message = "OTP không tồn tại!";
+                    return response;
+                }
+                if (user.ExpireOTPEmail < DateTime.Now)
+                {
+                    response.Data = false;
+                    response.isSuccess = true;
+                    response.Message = "OTP đã hết hiệu lực!";
+                    return response;
+                }
+                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var checkResetPassword = await _userManager.ResetPasswordAsync(user, resetToken, userResetPasswordModel.NewPassword);
+                if (!checkResetPassword.Succeeded)
+                {
+                    response.Data = false;
+                    response.isSuccess = false;
+                    response.Message = "Reset password is fail!";
+                    return response;
+                }
+                user.ExpireOTPEmail = null;
+                user.OTPEmail = null;
+                var checkUpdateUser = await _userManager.UpdateAsync(user);
+                response.Data = true;
+                response.isSuccess = true;
+                response.Message = "Đổi mật khẩu thành công!";
+                return response;
+            }
+            catch (DbException ex)
+            {
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.Message = ex.Message;
             }
             return response;
         }

@@ -53,6 +53,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IRedisService, RedisService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IFranchiseRegistrationRequestService,FranchiseRegistrationRequestService>();
+            services.AddScoped<IEmailService, EmailService>();
             #endregion
             #region Repository DI
             services.AddScoped<IAgencyRepository, AgencyRepository>();
