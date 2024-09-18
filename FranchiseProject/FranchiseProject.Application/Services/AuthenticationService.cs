@@ -42,9 +42,9 @@ namespace FranchiseProject.Application.Services
             _roleManager = roleManager;
             _redisService = redisService;
         }
-        public async Task<ApiResponse<RefreshTokenModel>> LoginAsync(UserLoginModel userLoginModel)
+        public async Task<ApiResponse<UserLoginViewModel>> LoginAsync(UserLoginModel userLoginModel)
         {
-            var response = new ApiResponse<RefreshTokenModel>();
+            var response = new ApiResponse<UserLoginViewModel>();
             try
             {
                 var result = await _signInManager.PasswordSignInAsync(
@@ -53,8 +53,13 @@ namespace FranchiseProject.Application.Services
                 {
                     var user = await _unitOfWork.UserRepository.GetUserByUserNameAndPassword
                         (userLoginModel.UserName, userLoginModel.Password);
+                    if (user.ContractId != Guid.Empty) 
+                    {
+                           
+                    }
+                    var userViewModel = _mapper.Map<UserViewModel>(user);
                     var userRole = await _userManager.GetRolesAsync(user);
-
+                    userViewModel.Role = userRole.FirstOrDefault();
                     var refreshToken = GenerateJsonWebTokenString.GenerateRefreshToken();
 
                     var token = user.GenerateJsonWebToken(
@@ -76,9 +81,14 @@ namespace FranchiseProject.Application.Services
                     };
                     _unitOfWork.RefreshTokenRepository.UpdateRefreshToken(refreshTokenEntity);
                     var storeRedis = await _redisService.StoreJwtTokenAsync(user.UserName, token.AccessToken);
+                    var userLoginViewModel = new UserLoginViewModel
+                    {
+                        RefreshTokenModel = token,
+                        UserViewModel = userViewModel,
+                    };
                     var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                     if (isSuccess) {
-                        response.Data = token;
+                        response.Data = userLoginViewModel;
                         response.isSuccess = true;
                         response.Message = "Login is successful!";
                     } else throw new Exception("Login is fail!");

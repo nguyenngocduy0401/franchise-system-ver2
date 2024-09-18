@@ -11,7 +11,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IAuthenticationService
     {
-        Task<ApiResponse<RefreshTokenModel>> LoginAsync(UserLoginModel userLoginModel);
+        Task<ApiResponse<UserLoginViewModel>> LoginAsync(UserLoginModel userLoginModel);
         Task<ApiResponse<RefreshTokenModel>> RenewTokenAsync(RefreshTokenModel RefreshTokenModel);
         Task<ApiResponse<string>> LogoutAsync(string refreshToken);
     }

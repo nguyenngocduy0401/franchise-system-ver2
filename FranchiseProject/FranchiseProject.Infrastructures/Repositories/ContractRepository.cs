@@ -24,6 +24,11 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
+        public async Task<bool> IsExpiringContract(Guid contractId)
+        {
+            var contract = await _dbSet.FindAsync(contractId);
+            return contract.EndTime > _timeService.GetCurrentTime();
+        }
     }
 }
 

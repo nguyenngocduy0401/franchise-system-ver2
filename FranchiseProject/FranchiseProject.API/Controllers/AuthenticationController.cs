@@ -21,7 +21,7 @@ namespace FranchiseProject.API.Controllers
         
         [SwaggerOperation(Summary = "đăng nhập bằng UserName và Password")]
         [HttpPost("login")]
-        public async Task<ApiResponse<RefreshTokenModel>> LoginAsync(UserLoginModel userLoginModel)
+        public async Task<ApiResponse<UserLoginViewModel>> LoginAsync(UserLoginModel userLoginModel)
         {
             return await _authenticationService.LoginAsync(userLoginModel);
         }

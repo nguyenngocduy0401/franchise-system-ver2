@@ -9,5 +9,6 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IContractRepository : IGenericRepository<Contract>
     {
+        Task<bool> IsExpiringContract(Guid contractId);
     }
 }
