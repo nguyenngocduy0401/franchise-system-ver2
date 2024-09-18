@@ -20,9 +20,9 @@ namespace FranchiseProject.Application.Services
         private readonly IClaimsService _claimsService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly IValidator<RegisFranchiseViewModel> _validator;
+        private readonly IValidator<RegisterFranchiseViewModel> _validator;
         private readonly UserManager<User> _userManager;
-        public FranchiseRegistrationRequestService(IUnitOfWork unitOfWork,IClaimsService claimsService, IValidator<RegisFranchiseViewModel> validator,
+        public FranchiseRegistrationRequestService(IUnitOfWork unitOfWork,IClaimsService claimsService, IValidator<RegisterFranchiseViewModel> validator,
             IMapper mapper,UserManager<User> userManager)
         {
             _unitOfWork = unitOfWork;
@@ -31,7 +31,7 @@ namespace FranchiseProject.Application.Services
             _mapper = mapper;
             _userManager = userManager;
         }
-        public async Task<ApiResponse<bool>> RegisterFranchiseAsync(RegisFranchiseViewModel regis)
+        public async Task<ApiResponse<bool>> RegisterFranchiseAsync(RegisterFranchiseViewModel regis)
         {
             var response = new ApiResponse<bool>();
             try
@@ -49,14 +49,13 @@ namespace FranchiseProject.Application.Services
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                if (isSuccess > 0)
                 {
+                    response.Data = true;
                     response.isSuccess = true;
                     response.Message = "Tạo Thành Công !";
                 }
                 else
                 {
-                    response.isSuccess = false; 
-                    response.Message = "Đăng kí tư vấn không thành công";
-                    return response;
+                   throw new Exception(
                 }
             }
             catch (DbException ex)
@@ -85,8 +84,9 @@ namespace FranchiseProject.Application.Services
                 var exist = await _unitOfWork.FranchiseRegistrationRequestRepository.GetByIdAsync(id);
                 if (exist == null)
                 {
-                    response.isSuccess = true;
+                 
                     response.Data = false;
+                    response.isSuccess = true;
                     response.Message = "không tìm thấy";
 
                 }

@@ -10,6 +10,9 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IAgencyService
     {
-        
+        Task<ApiResponse<bool>> CreateAgencyAsync(CreateAgencyViewModel create);
+        Task<ApiResponse<bool>> UpdateAgencyAsync(CreateAgencyViewModel update,string id);
+        Task<ApiResponse<Pagination<AgencyViewModel>>> FilterAgencyAsync(FilterAgencyViewModel filter);
+        Task<ApiResponse<AgencyViewModel>> GetAgencyById(string id);
     }
 }

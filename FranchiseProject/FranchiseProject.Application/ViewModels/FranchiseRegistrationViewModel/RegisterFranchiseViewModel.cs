@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.ViewModels.AgencyViewModel
 {
-    public class RegisFranchiseViewModel
+    public class RegisterFranchiseViewModel
     {
         public string? CustomerName { get; set; }
         public string? PhoneNumber { get; set; }

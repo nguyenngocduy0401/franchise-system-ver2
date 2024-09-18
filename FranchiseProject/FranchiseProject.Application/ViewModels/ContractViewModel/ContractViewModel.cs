@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Domain.Entity
+namespace FranchiseProject.Application.ViewModels.ContractViewModel
 {
-    public class Contract : BaseEntity
+    public  class ContractViewModel
     {
-        public string? Title { get; set; }
+        public string? Title {  get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public int Amount { get; set; }
@@ -19,8 +18,5 @@ namespace FranchiseProject.Domain.Entity
         public string? Description { get; set; }
         public string? TermsAndCondition { get; set; }
         public Guid? AgencyId { get; set; }
-        [ForeignKey("AgencyId")]
-        public Agency? Agency { get; set; }
-        public virtual ICollection<User>? Users { get; set; }
     }
 }
