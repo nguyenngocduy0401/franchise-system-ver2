@@ -66,6 +66,15 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Đối tác chưa thể đăng kí nhượng quyền.";
                     return response;
                 }
+                var activeContract = await _unitOfWork.ContractRepository.GetActiveContractByAgencyIdAsync(agencyId);
+
+                if (activeContract != null)
+                {
+                    response.Data = false;
+                    response.isSuccess = true;
+                    response.Message = "Đối tác đã có hợp đồng đang trong thời hạn.";
+                    return response;
+                }
                 var contract = _mapper.Map<Contract>(create);
                 contract.StartTime = DateTime.Now;
                 contract.EndTime = contract.StartTime.AddYears(contract.Duration);
@@ -105,7 +114,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
+   
         public async Task<ApiResponse<bool>> UpdateStatusContractAsync(CreateContractViewModel update, string id)
         {
             var response = new ApiResponse<bool>();

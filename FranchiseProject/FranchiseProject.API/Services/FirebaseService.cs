@@ -9,13 +9,13 @@ namespace FranchiseProject.API.Services
 
         public FirebaseService()
         {
-            _firebaseStorage = new FirebaseStorage("futuretech-b367a.appspot.com"); // Thay thế với ID dự án Firebase của bạn
+            _firebaseStorage = new FirebaseStorage("futuretech-b367a.appspot.com");
         }
 
         public async Task<string> UploadFileAsync(Stream fileStream, string fileName)
         {
             var task = await _firebaseStorage
-                .Child("contracts") // Thư mục chứa các file hợp đồng
+                .Child("contracts") 
                 .Child(fileName)
                 .PutAsync(fileStream);
 
