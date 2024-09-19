@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FranchiseProject.Infrastructures.Migrations
 {
     /// <inheritdoc />
-    public partial class newDb : Migration
+    public partial class ad : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,10 +16,12 @@ namespace FranchiseProject.Infrastructures.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     District = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Ward = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PositionImageURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
@@ -161,12 +163,12 @@ namespace FranchiseProject.Infrastructures.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Amount = table.Column<int>(type: "int", nullable: false),
                     Duration = table.Column<int>(type: "int", nullable: false),
                     ContractDocumentImageURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PositionImageURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TermsAndCondition = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AgencyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -949,8 +951,8 @@ namespace FranchiseProject.Infrastructures.Migrations
 
             migrationBuilder.InsertData(
                 table: "Contracts",
-                columns: new[] { "Id", "AgencyId", "Amount", "ContractDocumentImageURL", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "Duration", "EndTime", "IsDeleted", "ModificationBy", "ModificationDate", "PositionImageURL", "StartTime", "TermsAndCondition" },
-                values: new object[] { new Guid("550ee872-ea09-42a0-b9ac-809890debafb"), null, 0, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, 0, new DateTime(2024, 9, 14, 3, 33, 12, 438, DateTimeKind.Local).AddTicks(4444), false, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null });
+                columns: new[] { "Id", "AgencyId", "Amount", "ContractDocumentImageURL", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "Duration", "EndTime", "IsDeleted", "ModificationBy", "ModificationDate", "StartTime", "TermsAndCondition", "Title" },
+                values: new object[] { new Guid("550ee872-ea09-42a0-b9ac-809890debafb"), null, 0, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, 0, new DateTime(2024, 9, 24, 13, 58, 56, 477, DateTimeKind.Local).AddTicks(9272), false, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

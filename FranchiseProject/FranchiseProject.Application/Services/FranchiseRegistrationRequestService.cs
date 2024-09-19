@@ -22,7 +22,8 @@ namespace FranchiseProject.Application.Services
         private readonly IMapper _mapper;
         private readonly IValidator<RegisterFranchiseViewModel> _validator;
         private readonly UserManager<User> _userManager;
-        public FranchiseRegistrationRequestService(IUnitOfWork unitOfWork,IClaimsService claimsService, IValidator<RegisterFranchiseViewModel> validator,
+        private readonly IEmailService _emailService;
+        public FranchiseRegistrationRequestService(IEmailService emailService,IUnitOfWork unitOfWork,IClaimsService claimsService, IValidator<RegisterFranchiseViewModel> validator,
             IMapper mapper,UserManager<User> userManager)
         {
             _unitOfWork = unitOfWork;
@@ -30,6 +31,7 @@ namespace FranchiseProject.Application.Services
                 _validator = validator;
             _mapper = mapper;
             _userManager = userManager;
+            _emailService = emailService;
         }
         public async Task<ApiResponse<bool>> RegisterFranchiseAsync(RegisterFranchiseViewModel regis)
         {
@@ -49,6 +51,11 @@ namespace FranchiseProject.Application.Services
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                if (isSuccess > 0)
                 {
+                    var emailResponse = await _emailService.SendRegistrationSuccessEmailAsync(regis.Email); 
+                    if (!emailResponse.isSuccess)
+                    {
+                     response.Message = "Tạo Thành Công, nhưng không thể gửi email xác nhận.";
+                    }
                     response.Data = true;
                     response.isSuccess = true;
                     response.Message = "Tạo Thành Công !";

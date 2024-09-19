@@ -24,8 +24,9 @@ namespace FranchiseProject.Application.Services
         private readonly IValidator<CreateContractViewModel> _validator;
         private readonly IPdfService _pdfService;
         private readonly IFirebaseService _firebaseService;
+        private readonly IEmailService _emailService;
 
-        public ContractService(IPdfService pdfService,IFirebaseService firebaseService,IMapper mapper,IUnitOfWork unitOfWork,IValidator<CreateContractViewModel> validator,IClaimsService claimsService)
+        public ContractService(IEmailService emailService,IPdfService pdfService,IFirebaseService firebaseService,IMapper mapper,IUnitOfWork unitOfWork,IValidator<CreateContractViewModel> validator,IClaimsService claimsService)
         {
             _mapper = mapper;
                 _unitOfWork = unitOfWork;
@@ -33,6 +34,7 @@ namespace FranchiseProject.Application.Services
             _clamsService = claimsService;
             _pdfService = pdfService;
               _firebaseService = firebaseService;
+            _emailService = emailService;
         }
 
 
@@ -76,6 +78,11 @@ namespace FranchiseProject.Application.Services
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                 if (isSuccess > 0)
                 {
+                    var emailResponse = await _emailService.SendContractEmailAsync(existAgency.Email, contractDocumentUrl);
+                    if (!emailResponse.isSuccess)
+                    {
+                        response.Message = "Tạo Thành Công, nhưng không thể gửi email đính kèm hợp đồng.";
+                    }
                     response.Data = true;
                     response.isSuccess = true;
                     response.Message = "Tạo Thành Công !";
