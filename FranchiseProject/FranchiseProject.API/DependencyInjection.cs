@@ -85,8 +85,8 @@ namespace FranchiseProject.API
         }
         public static IServiceCollection AddAuthenticationServices(this IServiceCollection services, AppConfiguration configuration)
         {
-            services.AddScoped<RedisAuthenticationMiddleware>();
-           /* services.AddScoped<CustomJwtBearerEvents>();*/
+            /*services.AddScoped<RedisAuthenticationMiddleware>();*/
+            services.AddScoped<CustomJwtBearerEvents>();
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -105,7 +105,7 @@ namespace FranchiseProject.API
                     ValidAudience = configuration.JwtOptions.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.JwtOptions.Secret)),
                 };
-                /*options.EventsType = typeof(CustomJwtBearerEvents);*/
+                options.EventsType = typeof(CustomJwtBearerEvents);
 
             });
 

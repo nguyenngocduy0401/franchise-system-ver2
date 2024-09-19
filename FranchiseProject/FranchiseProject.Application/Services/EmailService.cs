@@ -47,11 +47,17 @@ namespace FranchiseProject.Application.Services
                 response.Message = "Username không tồn tại!";
                 return response;
             }
-
+            if (user.Email == null)
+            {
+                response.Data = false;
+                response.isSuccess = true;
+                response.Message = "Người dùng không có emai!";
+                return response;
+            }
             string otp = new Random().Next(0, 1000000).ToString("D6");
             var emailMessage = new MimeMessage();
             emailMessage.From.Add(new MailboxAddress
-                ("FutureTech", _emailConfiguration.From));
+                ("futuretech-noreply", _emailConfiguration.From));
             emailMessage.To.Add(new MailboxAddress
                 (user.Email, user.Email));
             emailMessage.Subject = "Your OTP Code";
