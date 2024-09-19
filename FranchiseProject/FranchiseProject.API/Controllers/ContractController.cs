@@ -24,7 +24,7 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         public async Task<ApiResponse<bool>> CreateContractAsync([FromBody] CreateContractViewModel create)
         {
-            return await _contractService.CreateContractAsync(create);
+            return await _contractService.RegisterContractAsync(create);
         }
 
         [SwaggerOperation(Summary = "Cập nhật hợp đồng {Authorize = Manager,Admin}")]
