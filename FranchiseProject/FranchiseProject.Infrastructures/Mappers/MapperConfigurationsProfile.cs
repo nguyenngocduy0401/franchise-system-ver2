@@ -29,6 +29,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<CreateContractViewModel, Contract>().ReverseMap();
             CreateMap<Contract, ContractViewModel>();
             #endregion
+
+          
             #region User
             CreateMap<User, UserViewModel>();
             #endregion
