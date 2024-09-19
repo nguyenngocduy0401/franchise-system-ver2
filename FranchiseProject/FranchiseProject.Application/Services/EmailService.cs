@@ -19,12 +19,12 @@ namespace FranchiseProject.Application.Services
 {
     public class EmailService : IEmailService
     {
-        private EmailConfiguration _emailConfiguration;
+        private AppConfiguration _appConfiguration;
         private readonly UserManager<User> _userManager;
         private readonly IValidator<UserResetPasswordModel> _validatorResetPassword;
-        public EmailService(EmailConfiguration emailConfiguration, UserManager<User> userManager, IValidator<UserResetPasswordModel> validatorResetPassword)
+        public EmailService(AppConfiguration appConfiguration, UserManager<User> userManager, IValidator<UserResetPasswordModel> validatorResetPassword)
         {
-            _emailConfiguration = emailConfiguration;
+            _appConfiguration = appConfiguration;
             _userManager = userManager;
             _validatorResetPassword = validatorResetPassword;
         }
@@ -57,7 +57,7 @@ namespace FranchiseProject.Application.Services
             string otp = new Random().Next(0, 1000000).ToString("D6");
             var emailMessage = new MimeMessage();
             emailMessage.From.Add(new MailboxAddress
-                ("futuretech-noreply", _emailConfiguration.From));
+                ("futuretech-noreply", _appConfiguration.EmailConfiguration.From));
             emailMessage.To.Add(new MailboxAddress
                 (user.Email, user.Email));
             emailMessage.Subject = "Your OTP Code";
@@ -79,10 +79,10 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Cannot update OTP email!";
                     return response;
                 }
-                await client.ConnectAsync(_emailConfiguration.SmtpServer, _emailConfiguration.Port, true);
+                await client.ConnectAsync(_appConfiguration.EmailConfiguration.SmtpServer, _appConfiguration.EmailConfiguration.Port, true);
                 // Loại bỏ cơ chế xác thực XOAUTH2  MailKit.Security.SecureSocketOptions.StartTls
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
-                await client.AuthenticateAsync(_emailConfiguration.Username, _emailConfiguration.Password);
+                await client.AuthenticateAsync(_appConfiguration.EmailConfiguration.Username, _appConfiguration.EmailConfiguration.Password);
                 await client.SendAsync(emailMessage);
                 response.Data = true;
                 response.isSuccess = true;

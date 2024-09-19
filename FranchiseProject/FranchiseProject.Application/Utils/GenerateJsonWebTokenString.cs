@@ -52,14 +52,5 @@ namespace FranchiseProject.Application.Utils
             return Convert.ToBase64String(random);
 
         }
-        public static DateTime ConvertUnixTimeToDateTime(long utcExpireDate)
-        {
-            var dateTimeInterval = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            dateTimeInterval.AddSeconds(utcExpireDate).ToUniversalTime();
-
-            return dateTimeInterval;
-        }
-
-
     }
 }
