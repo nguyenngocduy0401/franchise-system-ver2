@@ -50,7 +50,10 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<ISyllabusService, SyllabusService>();
             services.AddScoped<ITermService, TermService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRedisService, RedisService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IFranchiseRegistrationRequestService,FranchiseRegistrationRequestService>();
+            services.AddScoped<IEmailService, EmailService>();
             #endregion
             #region Repository DI
             services.AddScoped<IAgencyRepository, AgencyRepository>();
@@ -83,8 +86,19 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IFranchiseRegistrationRequestRepository, FranchiseRegistrationRequestRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             #endregion
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Set your desired password requirements here
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 6; // Set your desired minimum length
+                options.Password.RequiredUniqueChars = 0; // Set your desired number of unique characters
+            });
             services.AddDbContext<AppDbContext>(option => option.UseSqlServer(appConfiguration));
             services.AddAutoMapper(typeof(MapperConfigurationsProfile).Assembly);
             return services;

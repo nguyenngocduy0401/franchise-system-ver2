@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FranchiseProject.Application.ViewModels.AgencyViewModel;
 using FranchiseProject.Application.ViewModels.ContractViewModel;
+using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Domain.Entity;
 using System;
 using System.Collections.Generic;
@@ -22,9 +23,14 @@ namespace FranchiseProject.Infrastructures.Mappers
             #endregion
             #region Agency
             CreateMap<CreateAgencyViewModel, Agency>().ReverseMap();
+            CreateMap<Agency, AgencyViewModel>();
             #endregion
             #region Contract
             CreateMap<CreateContractViewModel, Contract>().ReverseMap();
+            CreateMap<Contract, ContractViewModel>();
+            #endregion
+            #region User
+            CreateMap<User, UserViewModel>();
             #endregion
         }
     }

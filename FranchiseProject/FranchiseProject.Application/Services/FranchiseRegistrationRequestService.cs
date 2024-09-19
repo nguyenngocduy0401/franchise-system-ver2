@@ -55,7 +55,7 @@ namespace FranchiseProject.Application.Services
                 }
                 else
                 {
-                   throw new Exception(
+                    throw new Exception("Create unsuccessfully");
                 }
             }
             catch (DbException ex)
@@ -122,7 +122,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var filteredRequests = await _unitOfWork.FranchiseRegistrationRequestRepository
-          .GetAllAsync(x => x.Status == filterModel.Status);
+    .GetFilteredRequestsAsync(filterModel.Status);
 
                 if (filteredRequests == null || !filteredRequests.Any())
                 {

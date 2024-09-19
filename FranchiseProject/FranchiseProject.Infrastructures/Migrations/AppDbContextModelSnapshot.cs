@@ -370,6 +370,18 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasIndex("AgencyId");
 
                     b.ToTable("Contracts");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("550ee872-ea09-42a0-b9ac-809890debafb"),
+                            Amount = 0,
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Duration = 0,
+                            EndTime = new DateTime(2024, 9, 14, 3, 33, 12, 438, DateTimeKind.Local).AddTicks(4444),
+                            IsDeleted = false,
+                            StartTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Course", b =>
@@ -643,6 +655,40 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.ToTable("FeedbackQuestions");
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.FranchiseRegistrationRequests", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConsultantUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CusomterName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PhoneNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("FranchiseRegistrationRequests");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Question", b =>
                 {
                     b.Property<Guid>("Id")
@@ -795,6 +841,43 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasIndex("QuestionId");
 
                     b.ToTable("QuizDetails");
+                });
+
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("IssuedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("JwtId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Report", b =>
@@ -1174,6 +1257,9 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("ExpireOTPEmail")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
 
@@ -1193,6 +1279,9 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("OTPEmail")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -1494,6 +1583,15 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("Feedback");
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.FranchiseRegistrationRequests", b =>
+                {
+                    b.HasOne("FranchiseProject.Domain.Entity.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Question", b =>
                 {
                     b.HasOne("FranchiseProject.Domain.Entity.Chapter", "Chapter")
@@ -1529,6 +1627,17 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("Question");
 
                     b.Navigation("Quiz");
+                });
+
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.RefreshToken", b =>
+                {
+                    b.HasOne("FranchiseProject.Domain.Entity.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Report", b =>

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FranchiseProject.Infrastructures.Migrations
 {
     /// <inheritdoc />
-    public partial class inite : Migration
+    public partial class newDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -250,6 +250,8 @@ namespace FranchiseProject.Infrastructures.Migrations
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OTPEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExpireOTPEmail = table.Column<DateTime>(type: "datetime2", nullable: true),
                     AgencyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ContractId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -449,6 +451,53 @@ namespace FranchiseProject.Infrastructures.Migrations
                     table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
                     table.ForeignKey(
                         name: "FK_AspNetUserTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FranchiseRegistrationRequests",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CusomterName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<int>(type: "int", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ConsultantUserName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FranchiseRegistrationRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FranchiseRegistrationRequests_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    JwtId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false),
+                    IsRevoked = table.Column<bool>(type: "bit", nullable: false),
+                    IssuedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpiredAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -898,6 +947,11 @@ namespace FranchiseProject.Infrastructures.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.InsertData(
+                table: "Contracts",
+                columns: new[] { "Id", "AgencyId", "Amount", "ContractDocumentImageURL", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "Duration", "EndTime", "IsDeleted", "ModificationBy", "ModificationDate", "PositionImageURL", "StartTime", "TermsAndCondition" },
+                values: new object[] { new Guid("550ee872-ea09-42a0-b9ac-809890debafb"), null, 0, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, 0, new DateTime(2024, 9, 14, 3, 33, 12, 438, DateTimeKind.Local).AddTicks(4444), false, null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -1042,6 +1096,11 @@ namespace FranchiseProject.Infrastructures.Migrations
                 column: "ClassId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_FranchiseRegistrationRequests_UserId",
+                table: "FranchiseRegistrationRequests",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_QuestionOptions_QuestionId",
                 table: "QuestionOptions",
                 column: "QuestionId");
@@ -1055,6 +1114,11 @@ namespace FranchiseProject.Infrastructures.Migrations
                 name: "IX_QuizDetails_QuestionId",
                 table: "QuizDetails",
                 column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UserId",
+                table: "RefreshTokens",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reports_CourseId",
@@ -1125,7 +1189,13 @@ namespace FranchiseProject.Infrastructures.Migrations
                 name: "FeedbackAnswers");
 
             migrationBuilder.DropTable(
+                name: "FranchiseRegistrationRequests");
+
+            migrationBuilder.DropTable(
                 name: "QuizDetails");
+
+            migrationBuilder.DropTable(
+                name: "RefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "Reports");

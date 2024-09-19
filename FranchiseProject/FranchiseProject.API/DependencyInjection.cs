@@ -1,13 +1,21 @@
 ﻿using FranchiseProject.API.Services;
-using FranchiseProject.Application.Interfaces;
-using FranchiseProject.Application;
-using FranchiseProject.Infrastructures;
 using Microsoft.OpenApi.Models;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using FranchiseProject.API.Middlewares;
 using FluentValidation;
-using FranchiseProject.Application.ViewModels.AgencyViewModel;
 using FranchiseProject.API.Validator.AgencyValidation;
+using FranchiseProject.Application.ViewModels.ContractViewModel;
+using FranchiseProject.API.Validator.ContractValidation;
+using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Infrastructures.DataInitializer;
+using FranchiseProject.Application.ViewModels.AgencyViewModel;
+using FranchiseProject.API.Validator.AutheticationValidator;
+using FranchiseProject.Application.ViewModels.UserViewModels;
 
 namespace FranchiseProject.API
 {
@@ -48,8 +56,7 @@ namespace FranchiseProject.API
                     }
                 });
             });
-           /* services.AddSingleton<PerformanceMiddleware>();*/
-            services.AddSingleton<Stopwatch>();
+            
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy", builder =>
@@ -61,21 +68,52 @@ namespace FranchiseProject.API
                 });
             });
 
-            services.AddHealthChecks();
-            services.AddSingleton<Stopwatch>();
+            
             services.AddScoped<IClaimsService, ClaimsService>();
+            services.AddScoped<IPdfService, PdfService>();
+            services.AddSingleton<IFirebaseService, FirebaseService>();
             services.AddHttpContextAccessor();
-  /*          services.AddHostedService<SetupIdentityDataSeeder>();*/
             services.AddLogging();
 
             #region Seed
-            /*services.AddHostedService<SetupIdentityDataSeeder>();*/
-            /*services.AddScoped<RoleInitializer>();
-            services.AddScoped<AccountInitializer>();*/
+            services.AddHostedService<SetupIdentityDataSeeder>();
+            services.AddScoped<RoleInitializer>();
+            services.AddScoped<AccountInitializer>();
             #endregion
             #region Validator
             services.AddTransient<IValidator<RegisterFranchiseViewModel>, RegisFranchiseViewModelValidator>();
+            services.AddTransient<IValidator<CreateAgencyViewModel>,CreateAgencyValidator>();
+            services.AddTransient<IValidator<CreateContractViewModel>, CreateContractValidator>();
+            services.AddTransient<IValidator<UserResetPasswordModel>, UserResetPasswordValidator>();
             #endregion
+
+            return services;
+        }
+        public static IServiceCollection AddAuthenticationServices(this IServiceCollection services, AppConfiguration configuration)
+        {
+            services.AddScoped<RedisAuthenticationMiddleware>();
+           /* services.AddScoped<CustomJwtBearerEvents>();*/
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = configuration.JwtOptions.Issuer,
+                    ValidAudience = configuration.JwtOptions.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.JwtOptions.Secret)),
+                };
+                /*options.EventsType = typeof(CustomJwtBearerEvents);*/
+
+            });
 
             return services;
         }

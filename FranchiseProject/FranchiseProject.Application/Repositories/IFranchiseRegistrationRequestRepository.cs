@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.AgencyViewModel;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace FranchiseProject.Application.Repositories
     {
         Task AddAsync(FranchiseRegistrationRequests franchiseRequest);
         Task<FranchiseRegistrationRequests> GetByIdAsync(Guid id);
-        Task<List<FranchiseRegistrationRequests>> GetAllAsync(Expression<Func<FranchiseRegistrationRequests, bool>> filter);
+        Task<List<FranchiseRegistrationRequests>> GetFilteredRequestsAsync(FranchiseRegistrationStatusEnum? status);
+
+
     }
 }
