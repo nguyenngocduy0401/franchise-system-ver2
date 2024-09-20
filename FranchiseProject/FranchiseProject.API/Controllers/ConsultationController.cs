@@ -17,7 +17,7 @@ namespace FranchiseProject.API.Controllers
         }
         [SwaggerOperation(Summary = "khách đăng kí nhượng quyền ")]
         [HttpPost("")]
-        public async Task<ApiResponse<bool>> RegisterConsultationAsync([FromBody] RegisterConsultation regis)=> await _franchiseRegistrationRequestService.RegisterConsultationAsync(regis);
+        public async Task<ApiResponse<bool>> RegisterConsultationAsync([FromBody] RegisterConsultationViewModel regis)=> await _franchiseRegistrationRequestService.RegisterConsultationAsync(regis);
         [SwaggerOperation(Summary = "nhân viên tu vấn chuyển trạng thái 'đã tư vấn'")]
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> UpdateConsultationStatusAsync(string id) => await _franchiseRegistrationRequestService.UpdateConsultationStatusAsync(id);
