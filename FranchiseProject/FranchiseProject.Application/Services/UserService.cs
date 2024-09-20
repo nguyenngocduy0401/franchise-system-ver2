@@ -18,7 +18,7 @@ namespace FranchiseProject.Application.Services
 {
     public class UserService : IUserService
     {
-        /*private readonly IUnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IClaimsService _claimsService;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
@@ -40,7 +40,7 @@ namespace FranchiseProject.Application.Services
             _updatePasswordValidator = updatePasswordValidator;
             _createUserValidator = createUserValidator;
             _updateUserValidator = updateUserValidator;
-        }*/
+        }
         /*public async Task<ApiResponse<bool>> CreateUserAsync(CreateUserModel createUserModel)
         {
 
@@ -109,7 +109,7 @@ namespace FranchiseProject.Application.Services
                 response.Message = ex.Message;
             }
             return response;
-        }
+        }*/
         public async Task<ApiResponse<bool>> DeleteUserAsync(string id)
         {
             var response = new ApiResponse<bool>();
@@ -161,15 +161,8 @@ namespace FranchiseProject.Application.Services
                     throw new Exception("User not found!");
                 }
 
-
-                var packageDetail = await _unitOfWork.PackageDetailRepository.GetByUserIdAsync(userId);
-
-                var checkExist = await _unitOfWork.PersonalAnalystRepository.CheckExistPersonalAnalystAsync(userId);
-
                 var userViewModel = _mapper.Map<UserViewModel>(user);
-                userViewModel.PackageDetail = _mapper.Map<PackageDetailViewModel>(packageDetail);
-
-                userViewModel.CheckExistPersonal = checkExist;
+                var userRole = await _userManager.GetRolesAsync(user);
                 userViewModel.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
 
                 response.Data = userViewModel;
@@ -186,12 +179,12 @@ namespace FranchiseProject.Application.Services
             {
                 response.Data = null;
                 response.isSuccess = false;
-                response.Message = "An error occurred while fetching user info.";
+                response.Message = ex.Message;
 
             }
             return response;
         }
-        public async Task<ApiResponse<UserViewModel>> GetUserByIdAsync(string id)
+        /*public async Task<ApiResponse<UserViewModel>> GetUserByIdAsync(string id)
         {
             var response = new ApiResponse<UserViewModel>();
             try
