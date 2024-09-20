@@ -10,5 +10,6 @@ namespace FranchiseProject.Application.Interfaces
     public interface IPdfService
     {
         Stream FillPdfTemplate(CreateContractViewModel contract);
+        Stream FillUpdatePdfTemplate(UpdateContractViewModel contract);
     }
 }

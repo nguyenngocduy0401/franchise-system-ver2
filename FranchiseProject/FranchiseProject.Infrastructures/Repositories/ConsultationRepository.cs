@@ -37,17 +37,14 @@ namespace FranchiseProject.Infrastructures.Repositories
         }
         public async Task<List<FranchiseRegistrationRequests>> GetFilteredRequestsAsync(ConsultationStatusEnum? status)
         {
+            var query = _context.FranchiseRegistrationRequests.AsQueryable();
+
             if (status.HasValue)
             {
-                return await _context.FranchiseRegistrationRequests
-                    .Where(x => x.Status == status.Value)
-                    .ToListAsync();
+                query = query.Where(r => r.Status == status.Value);
             }
-            else
-            {
-                return await _context.FranchiseRegistrationRequests
-                    .ToListAsync();
-            }
+
+            return await query.ToListAsync();
         }
         public async Task Update(FranchiseRegistrationRequests entity)
         {

@@ -140,7 +140,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var filteredRequests = await _unitOfWork.FranchiseRegistrationRequestRepository
-    .GetFilteredRequestsAsync(filterModel.Status);
+                    .GetFilteredRequestsAsync(filterModel.Status.HasValue ? filterModel.Status : null);
 
                 if (filteredRequests == null || !filteredRequests.Any())
                 {
@@ -158,6 +158,7 @@ namespace FranchiseProject.Application.Services
                     .Skip((filterModel.PageIndex - 1) * filterModel.PageSize)
                     .Take(filterModel.PageSize)
                     .ToList();
+
                 var result = _mapper.Map<List<ConsultationViewModel>>(pagedRequests);
 
                 response.isSuccess = true;
@@ -173,7 +174,6 @@ namespace FranchiseProject.Application.Services
             {
                 response.isSuccess = false;
                 response.Message = ex.Message;
-
             }
             catch (Exception ex)
             {

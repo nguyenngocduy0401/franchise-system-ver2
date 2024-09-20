@@ -8,6 +8,7 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModel
 {
     public  class ContractViewModel
     {
+        public Guid? Id { get; set; }
         public string? Title {  get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
@@ -17,6 +18,6 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModel
         public string? PositionImageURL { get; set; }
         public string? Description { get; set; }
         public string? TermsAndCondition { get; set; }
-        public Guid? AgencyId { get; set; }
+        public string? AgencyName { get; set; }
     }
 }

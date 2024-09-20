@@ -6,9 +6,11 @@ using FranchiseProject.Application.ViewModels.AgencyViewModel;
 using FranchiseProject.Application.ViewModels.ContractViewModel;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using Microsoft.AspNetCore.Http.HttpResults;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,11 +24,12 @@ namespace FranchiseProject.Application.Services
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<CreateContractViewModel> _validator;
+        private readonly IValidator<UpdateContractViewModel> _validatorUpdate;
         private readonly IPdfService _pdfService;
         private readonly IFirebaseService _firebaseService;
         private readonly IEmailService _emailService;
 
-        public ContractService(IEmailService emailService,IPdfService pdfService,IFirebaseService firebaseService,IMapper mapper,IUnitOfWork unitOfWork,IValidator<CreateContractViewModel> validator,IClaimsService claimsService)
+        public ContractService(IValidator<UpdateContractViewModel> validatorUpdate,IEmailService emailService,IPdfService pdfService,IFirebaseService firebaseService,IMapper mapper,IUnitOfWork unitOfWork,IValidator<CreateContractViewModel> validator,IClaimsService claimsService)
         {
             _mapper = mapper;
                 _unitOfWork = unitOfWork;
@@ -35,6 +38,7 @@ namespace FranchiseProject.Application.Services
             _pdfService = pdfService;
               _firebaseService = firebaseService;
             _emailService = emailService;
+            _validatorUpdate = validatorUpdate;
         }
 
 
@@ -75,7 +79,7 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Đối tác đã có hợp đồng đang trong thời hạn.";
                     return response;
                 }
-                var contract = _mapper.Map<Contract>(create);
+                var contract = _mapper.Map<FranchiseProject.Domain.Entity.Contract>(create);
                 contract.StartTime = DateTime.Now;
                 contract.EndTime = contract.StartTime.AddYears(contract.Duration);
                 //xu li pdf
@@ -83,6 +87,7 @@ namespace FranchiseProject.Application.Services
                 var fileName = $"Contract_{Guid.NewGuid()}.pdf";
                 var contractDocumentUrl = await _firebaseService.UploadFileAsync(pdfStream, fileName);
                 contract.ContractDocumentImageURL = contractDocumentUrl;
+                //
                 await _unitOfWork.ContractRepository.AddAsync(contract);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                 if (isSuccess > 0)
@@ -115,52 +120,61 @@ namespace FranchiseProject.Application.Services
             return response;
         }
    
-        public async Task<ApiResponse<bool>> UpdateStatusContractAsync(CreateContractViewModel update, string id)
+        public async Task<ApiResponse<bool>> UpdateContractAsync(UpdateContractViewModel update, string id)
         {
             var response = new ApiResponse<bool>();
             try
             {
                 var contractId = Guid.Parse(id);
-                var agencyId = Guid.Parse(update.AgencyId);
-                FluentValidation.Results.ValidationResult validationResult = await _validator.ValidateAsync(update);
+                FluentValidation.Results.ValidationResult validationResult = await _validatorUpdate.ValidateAsync(update);
                 if (!validationResult.IsValid)
                 {
                     response.isSuccess = false;
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
-                var existingAgency = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
-                if (existingAgency == null)
-                {
-                    response.Data = false;
-                    response.isSuccess = false;
-                    response.Message = " không tìm thấy đói tác ";
-                    return response;
-                }
-                var existingContract= await _unitOfWork.ContractRepository.GetByIdAsync(contractId);
+               var existingContract= await _unitOfWork.ContractRepository.GetByIdAsync(contractId);
                 if (existingContract == null)
                 {
                     response.Data = false;
-                    response.isSuccess = false;
+                    response.isSuccess = true;
                     response.Message = " không tìm thấy hợp đồng";
                     return response;
                 }
-                _mapper.Map(update, existingContract);
-
-
-                _unitOfWork.ContractRepository.Update(existingContract);
+                var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(existingContract.AgencyId.Value);
+                existingContract.Amount = update.Amount;
+                existingContract.Duration= update.Duration;
+                existingContract.Description=update.Description;
+                existingContract.TermsAndCondition=update.TermsAndCondition;
+                existingContract.StartTime = DateTime.Now;
+                existingContract.EndTime = existingContract.StartTime.AddYears(update.Duration);
+                //xu li pdf
+                var pdfStream = _pdfService.FillUpdatePdfTemplate(update);
+                var fileName = $"Contract_{Guid.NewGuid()}.pdf";
+                var contractDocumentUrl = await _firebaseService.UploadFileAsync(pdfStream, fileName);
+                existingContract.ContractDocumentImageURL = contractDocumentUrl;
+                //
+                 _unitOfWork.ContractRepository.Update(existingContract);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
+               
                 if (isSuccess > 0)
                 {
+                    var emailResponse = await _emailService.SendContractEmailAsync(agency?.Email, contractDocumentUrl);
+                    if (!emailResponse.isSuccess)
+                    {
+                        response.Message = "Tạo Thành Công, nhưng không thể gửi email đính kèm hợp đồng.";
+                    }
                     response.Data = true;
                     response.isSuccess = true;
-                    response.Message = "Cập nhật thành công!";
+                    response.Message = "Tạo Thành Công !";
                 }
                 else
                 {
-                    throw new Exception("Update unsuccesfully");
+                    throw new Exception("Create unsuccesfully ");
                 }
-            }
+
+
+           }
             catch (DbException ex)
             {
                 response.isSuccess = false;
@@ -206,13 +220,29 @@ namespace FranchiseProject.Application.Services
                     pageIndex: filter.PageIndex,
                     pageSize: filter.PageSize
                 );
-                var contractViewModel = _mapper.Map<List<ContractViewModel>>(paginationResult.Items);
+                var contractViewModels = new List<ContractViewModel>();
+                foreach (var contract in paginationResult.Items)
+                {
+                    if(contract.AgencyId.HasValue) 
+    {
+                        var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(contract.AgencyId.Value); 
+                        var contractViewModel = _mapper.Map<ContractViewModel>(contract);
+                        contractViewModel.AgencyName = agency?.Name;
+                        contractViewModels.Add(contractViewModel);
+                    }
+                    else
+                    {
+                        var contractViewModel = _mapper.Map<ContractViewModel>(contract);
+                        contractViewModel.AgencyName = "Unknown"; 
+                        contractViewModels.Add(contractViewModel);
+                    }
+                }
                 var paginationViewModel = new Pagination<ContractViewModel>
                 {
                     PageIndex = paginationResult.PageIndex,
                     PageSize = paginationResult.PageSize,
                     TotalItemsCount = paginationResult.TotalItemsCount,
-                    Items = contractViewModel
+                    Items = contractViewModels
                 };
                 response.Data = paginationViewModel;
                 response.isSuccess = true;
@@ -238,6 +268,7 @@ namespace FranchiseProject.Application.Services
         try
         {
             var contract = await _unitOfWork.ContractRepository.GetByIdAsync(Guid.Parse(id));
+                var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(contract.AgencyId.Value);
             if (contract == null)
             {
                 response.Data = null;
@@ -248,6 +279,7 @@ namespace FranchiseProject.Application.Services
             }
 
             var contractViewModel = _mapper.Map<ContractViewModel>(contract);
+               contractViewModel.AgencyName = agency?.Name;
             response.Data = contractViewModel;
             response.isSuccess = true;
             response.Message = "Truy xuất thành công ";
