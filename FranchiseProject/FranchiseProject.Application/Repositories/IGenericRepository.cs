@@ -29,6 +29,7 @@ namespace FranchiseProject.Application.Repositories
         void UpdateRange(List<TEntity> entities);
         void SoftRemove(TEntity entity);
         void SoftRemoveRange(List<TEntity> entities);
+        void RestoreSoftRemove(TEntity entity);
         Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate);
     }
 }

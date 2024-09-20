@@ -16,6 +16,9 @@ using FranchiseProject.Infrastructures.DataInitializer;
 using FranchiseProject.Application.ViewModels.AgencyViewModel;
 using FranchiseProject.API.Validator.AutheticationValidator;
 using FranchiseProject.Application.ViewModels.UserViewModels;
+using FranchiseProject.Domain.Entity;
+using FranchiseProject.Application.ViewModels.SlotViewModels;
+using FranchiseProject.API.Validator.SlotValidator;
 
 namespace FranchiseProject.API
 {
@@ -86,6 +89,7 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<CreateContractViewModel>, CreateContractValidator>();
             services.AddTransient<IValidator<UpdateContractViewModel>, UpdateContracValidator>();
             services.AddTransient<IValidator<UserResetPasswordModel>, UserResetPasswordValidator>();
+            services.AddTransient<IValidator<CreateSlotModel>, CreateSlotValidator>();
             #endregion
 
             return services;
