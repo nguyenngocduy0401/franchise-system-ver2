@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace FranchiseProject.Domain.Enums
 {
     public enum AgencyStatusEnum
-    { 
-        1
-        2
-        3
-        4
-        5
-       
+    {
+        Pending = 1,          // Chờ
+        Processing = 2,       // Đang xử lý
+        Approved = 3,         // Xét duyệt thành công
+        Partner = 4,          // Đối tác
+        Expired = 5           // Hết hạn
+
     }
 }

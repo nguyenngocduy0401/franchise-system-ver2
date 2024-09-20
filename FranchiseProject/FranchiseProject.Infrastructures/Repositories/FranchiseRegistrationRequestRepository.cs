@@ -1,5 +1,6 @@
 ﻿using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -27,15 +28,26 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _context.FranchiseRegistrationRequests.FindAsync(id);
         }*/
-        public async Task<List<FranchiseRegistrationRequests>> GetAllAsync(Expression<Func<FranchiseRegistrationRequests, bool>> filter)
-        {
-            return await _context.FranchiseRegistrationRequests.Where(filter).ToListAsync();
-        }
+      
         public async Task<FranchiseRegistrationRequests> GetByIdAsync(Guid id)
         {
             return await _context.FranchiseRegistrationRequests
                 .Include(x => x.User) 
                 .FirstOrDefaultAsync(x => x.Id == id);
+        }
+        public async Task<List<FranchiseRegistrationRequests>> GetFilteredRequestsAsync(FranchiseRegistrationStatusEnum? status)
+        {
+            if (status.HasValue)
+            {
+                return await _context.FranchiseRegistrationRequests
+                    .Where(x => x.Status == status.Value)
+                    .ToListAsync();
+            }
+            else
+            {
+                return await _context.FranchiseRegistrationRequests
+                    .ToListAsync();
+            }
         }
     }
 }

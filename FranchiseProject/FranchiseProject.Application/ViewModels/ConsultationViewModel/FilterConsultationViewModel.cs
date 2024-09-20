@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.ViewModels.AgencyViewModel
 {
-    public  class FilterFranchiseRegistrationRequestsViewModel
+    public  class FilterConsultationViewModel
     {
       public  FranchiseRegistrationStatusEnum Status { get; set; }
         public int PageIndex { get; set; } = 1;

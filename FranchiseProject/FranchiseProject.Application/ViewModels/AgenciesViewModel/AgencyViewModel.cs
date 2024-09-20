@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FranchiseProject.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,5 +17,7 @@ namespace FranchiseProject.Application.ViewModels.AgencyViewModel
         public string? Ward { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Email { get; set; }
+        public string? PositionImageURL { get; set; }
+        public AgencyStatusEnum Status {  get; set; }
     }
 }

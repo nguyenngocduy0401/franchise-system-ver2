@@ -1,6 +1,8 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AgencyViewModel;
+using FranchiseProject.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -8,23 +10,32 @@ namespace FranchiseProject.API.Controllers
 {
     [Route("api/v1/agency")]
     [ApiController]
+    [Authorize]
     public class AgencyController :ControllerBase
     {
         private readonly IAgencyService _agencyService;
         public AgencyController(IAgencyService agencyService )
         {
             _agencyService = agencyService; }
-        [SwaggerOperation(Summary = "tao agency {Authorize = Manager} ")]
+        [SwaggerOperation(Summary = "Đăng kí đối tác {Authorize = Manager,Admin} ")]
         [HttpPost("")]
-        public async Task<ApiResponse<bool>> CreateAgencyAsync(CreateAgencyViewModel create)=> await _agencyService.CreateAgencyAsync(create);
-        [SwaggerOperation(Summary = "cap nhat agency {Authorize = Manager} ")]
+        public async Task<ApiResponse<bool>> RegisterAgencyAsync(CreateAgencyViewModel create)=> await _agencyService.CreateAgencyAsync(create);
+        [SwaggerOperation(Summary = "cập nhật thông tin đối tác {Authorize = Manager,Admin} ")]
         [HttpPut("{id}")]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        
         public async Task<ApiResponse<bool>> UpdateAgencyAsync(CreateAgencyViewModel update, string id)=> await _agencyService.UpdateAgencyAsync(update, id);
-        [SwaggerOperation(Summary = "truy xuat agency by Id {Authorize = Manager} ")]
+        [SwaggerOperation(Summary = "truy xuất thông tin đối tác  bằng Id {Authorize = Manager,Admin} ")]
         [HttpGet("{id}")]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         public async Task<ApiResponse<AgencyViewModel>> GetAgencyById(string id) => await _agencyService.GetAgencyById(id);
-        [SwaggerOperation(Summary = "truy xuat agency {Authorize = Manager} ")]
+        [SwaggerOperation(Summary = "truy xuất thông tin Agency {Authorize = Manager,Admin} ")]
         [HttpGet("")]
-        Task<ApiResponse<Pagination<AgencyViewModel>>> FilterAgencyAsync(FilterAgencyViewModel filter)=> _agencyService.FilterAgencyAsync(filter);
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        public async Task<ApiResponse<Pagination<AgencyViewModel>>> FilterAgencyAsync([FromQuery]FilterAgencyViewModel filter)=> await _agencyService.FilterAgencyAsync(filter);
+        [SwaggerOperation(Summary = "cập nhật trạng thái đối tác {Authorize = Manager,Admin} ")]
+        [HttpPut("")]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        public async Task<ApiResponse<bool>> UpdateAgencyStatusAsync(string id, AgencyStatusEnum newStatus)=> await _agencyService.UpdateAgencyStatusAsync(id, newStatus);
     }
 }

@@ -20,15 +20,10 @@ namespace FranchiseProject.Application.Services
         private readonly IClaimsService _claimsService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-<<<<<<< HEAD:FranchiseProject/FranchiseProject.Application/Services/FranchiseRegistrationRequestService.cs
-        private readonly IValidator<RegisterFranchiseViewModel> _validator;
+        private readonly IValidator<RegisterConsultationViewModel> _validator;
         private readonly UserManager<User> _userManager;
-        public FranchiseRegistrationRequestService(IUnitOfWork unitOfWork,IClaimsService claimsService, IValidator<RegisterFranchiseViewModel> validator,
-=======
-        private readonly IValidator<RegisterConsultation> _validator;
-        private readonly UserManager<User> _userManager;
-        public ConsultationService(IUnitOfWork unitOfWork,IClaimsService claimsService, IValidator<RegisterConsultation> validator,
->>>>>>> fe3ee3b3bca4e0caa1da32b242e99a2c4327a23a:FranchiseProject/FranchiseProject.Application/Services/ConsultationService.cs
+        private readonly IEmailService _emailService;
+        public ConsultationService(IEmailService emailService,IUnitOfWork unitOfWork,IClaimsService claimsService, IValidator<RegisterConsultationViewModel> validator,
             IMapper mapper,UserManager<User> userManager)
         {
             _unitOfWork = unitOfWork;
@@ -36,12 +31,9 @@ namespace FranchiseProject.Application.Services
                 _validator = validator;
             _mapper = mapper;
             _userManager = userManager;
+            _emailService = emailService;
         }
-<<<<<<< HEAD:FranchiseProject/FranchiseProject.Application/Services/FranchiseRegistrationRequestService.cs
-        public async Task<ApiResponse<bool>> RegisterFranchiseAsync(RegisterFranchiseViewModel regis)
-=======
-        public async Task<ApiResponse<bool>> RegisterConsultationAsync(RegisterConsultation regis)
->>>>>>> fe3ee3b3bca4e0caa1da32b242e99a2c4327a23a:FranchiseProject/FranchiseProject.Application/Services/ConsultationService.cs
+        public async Task<ApiResponse<bool>> RegisterConsultationAsync(RegisterConsultationViewModel regis)
         {
             var response = new ApiResponse<bool>();
             try
@@ -59,13 +51,18 @@ namespace FranchiseProject.Application.Services
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                if (isSuccess > 0)
                 {
+                    var emailResponse = await _emailService.SendRegistrationSuccessEmailAsync(regis.Email); 
+                    if (!emailResponse.isSuccess)
+                    {
+                     response.Message = "Tạo Thành Công, nhưng không thể gửi email xác nhận.";
+                    }
                     response.Data = true;
                     response.isSuccess = true;
                     response.Message = "Tạo Thành Công !";
                 }
                 else
                 {
-                   throw new Exception(
+                    throw new Exception("Create unsuccessfully");
                 }
             }
             catch (DbException ex)
@@ -132,7 +129,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var filteredRequests = await _unitOfWork.FranchiseRegistrationRequestRepository
-          .GetAllAsync(x => x.Status == filterModel.Status);
+    .GetFilteredRequestsAsync(filterModel.Status);
 
                 if (filteredRequests == null || !filteredRequests.Any())
                 {

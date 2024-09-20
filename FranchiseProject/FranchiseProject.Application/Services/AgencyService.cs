@@ -45,6 +45,7 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
                 var agency = _mapper.Map<Agency>(create);
+                agency.Status = AgencyStatusEnum.Pending;
                 await _unitOfWork.AgencyRepository.AddAsync(agency);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                 if (isSuccess > 0)
@@ -94,7 +95,7 @@ namespace FranchiseProject.Application.Services
                 };
                 response.Data = paginationViewModel;
                 response.isSuccess = true;
-                response.Message = "Truy xuat thanh cong";
+                response.Message = "Truy xuất thành công";
             }
             catch (Exception ex)
             {
@@ -123,7 +124,7 @@ namespace FranchiseProject.Application.Services
                 {
                     response.isSuccess = true;
                     response.Data = false;
-                    response.Message = "Agency khong tim thay ";
+                    response.Message = "Không tìm thấy đối tác ";
                     return response;
                 }
                 _mapper.Map(update, existingAgency);
@@ -164,7 +165,7 @@ namespace FranchiseProject.Application.Services
                 if (agency == null)
                 {
                     response.isSuccess = false;
-                    response.Message = "khong tim thay Agency";
+                    response.Message = "Không tìm thấy đối tác";
                     return response;
 
                 }
@@ -172,7 +173,7 @@ namespace FranchiseProject.Application.Services
                 var agencyViewModel = _mapper.Map<AgencyViewModel>(agency);
                 response.Data = agencyViewModel;
                 response.isSuccess = true;
-                response.Message = "Truy xuat thanh cong ";
+                response.Message = "Truy xuất thành công ";
             }
             catch (DbException ex)
             {
@@ -186,5 +187,46 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<bool>> UpdateAgencyStatusAsync(string id, AgencyStatusEnum newStatus)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var agencyId = Guid.Parse(id);
+                var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
+                if (agency == null)
+                {
+                    response.Data = false;
+                    response.isSuccess = true;
+                    response.Message = "Không tìm thấy đối tác";
+                    return response;
+                }
+                agency.Status = newStatus;
+                var isSuccess = await _unitOfWork.SaveChangeAsync();
+                if (isSuccess > 0)
+                {
+                    response.Data = true;
+                    response.isSuccess = true;
+                    response.Message = "Cập nhật trạng thái Đối tác thành công!";
+                }
+                else
+                {
+                    throw new Exception("Failed to update agency status.");
+                }
+            }
+            catch (DbException ex)
+            {
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+
     }
 }

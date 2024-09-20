@@ -5,6 +5,7 @@ using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AgencyViewModel;
 using FranchiseProject.Application.ViewModels.ContractViewModel;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -21,12 +22,19 @@ namespace FranchiseProject.Application.Services
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<CreateContractViewModel> _validator;
-        public ContractService(IMapper mapper,IUnitOfWork unitOfWork,IValidator<CreateContractViewModel> validator,IClaimsService claimsService)
+        private readonly IPdfService _pdfService;
+        private readonly IFirebaseService _firebaseService;
+        private readonly IEmailService _emailService;
+
+        public ContractService(IEmailService emailService,IPdfService pdfService,IFirebaseService firebaseService,IMapper mapper,IUnitOfWork unitOfWork,IValidator<CreateContractViewModel> validator,IClaimsService claimsService)
         {
             _mapper = mapper;
                 _unitOfWork = unitOfWork;
                 _validator = validator;
             _clamsService = claimsService;
+            _pdfService = pdfService;
+              _firebaseService = firebaseService;
+            _emailService = emailService;
         }
 
 
@@ -43,21 +51,47 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
                 var agencyId= Guid.Parse(create.AgencyId);
-                var exist = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
-                if(exist == null)
+                var existAgency = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
+                if(existAgency == null)
                 {
                     response.Data=false;
                     response.isSuccess = true;
                     response.Message = "Không tìm thấy đối tác ";
                     return response;
                 }
+                if(existAgency.Status== AgencyStatusEnum.Pending || existAgency.Status == AgencyStatusEnum.Processing )
+                {
+                    response.Data = false;
+                    response.isSuccess=true;
+                    response.Message = "Đối tác chưa thể đăng kí nhượng quyền.";
+                    return response;
+                }
+                var activeContract = await _unitOfWork.ContractRepository.GetActiveContractByAgencyIdAsync(agencyId);
+
+                if (activeContract != null)
+                {
+                    response.Data = false;
+                    response.isSuccess = true;
+                    response.Message = "Đối tác đã có hợp đồng đang trong thời hạn.";
+                    return response;
+                }
                 var contract = _mapper.Map<Contract>(create);
                 contract.StartTime = DateTime.Now;
                 contract.EndTime = contract.StartTime.AddYears(contract.Duration);
+                //xu li pdf
+                var pdfStream = _pdfService.FillPdfTemplate(create);
+                var fileName = $"Contract_{Guid.NewGuid()}.pdf";
+                var contractDocumentUrl = await _firebaseService.UploadFileAsync(pdfStream, fileName);
+                contract.ContractDocumentImageURL = contractDocumentUrl;
                 await _unitOfWork.ContractRepository.AddAsync(contract);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                 if (isSuccess > 0)
                 {
+                    var emailResponse = await _emailService.SendContractEmailAsync(existAgency.Email, contractDocumentUrl);
+                    if (!emailResponse.isSuccess)
+                    {
+                        response.Message = "Tạo Thành Công, nhưng không thể gửi email đính kèm hợp đồng.";
+                    }
                     response.Data = true;
                     response.isSuccess = true;
                     response.Message = "Tạo Thành Công !";
@@ -80,7 +114,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
+   
         public async Task<ApiResponse<bool>> UpdateStatusContractAsync(CreateContractViewModel update, string id)
         {
             var response = new ApiResponse<bool>();
@@ -144,7 +178,7 @@ namespace FranchiseProject.Application.Services
 
       
 
-        public async  Task<ApiResponse<Pagination<ContractViewModel>>> FilterContractViewModel(FilterContractViewModel filter)
+        public async Task<ApiResponse<Pagination<ContractViewModel>>> FilterContractViewModelAsync(FilterContractViewModel filter)
         {
             var response = new ApiResponse<Pagination<ContractViewModel>>();
 
@@ -182,7 +216,7 @@ namespace FranchiseProject.Application.Services
                 };
                 response.Data = paginationViewModel;
                 response.isSuccess = true;
-                response.Message = "Truy xuat thanh cong";
+                response.Message = "Truy Xuất Thành Công ";
             }
             catch (DbException ex)
             {
@@ -198,7 +232,7 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<ApiResponse<ContractViewModel>> GetContractById(string id)
+        public async Task<ApiResponse<ContractViewModel>> GetContractByIdAsync(string id)
         {
         var response = new ApiResponse<ContractViewModel>();
         try
@@ -216,7 +250,7 @@ namespace FranchiseProject.Application.Services
             var contractViewModel = _mapper.Map<ContractViewModel>(contract);
             response.Data = contractViewModel;
             response.isSuccess = true;
-            response.Message = "Truy xuat thanh cong ";
+            response.Message = "Truy xuất thành công ";
         }
         catch (DbException ex)
         {
@@ -230,5 +264,7 @@ namespace FranchiseProject.Application.Services
         }
         return response;
     }
+
+     
     }
 }

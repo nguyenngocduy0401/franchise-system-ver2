@@ -8,6 +8,8 @@ using System.Text;
 using FranchiseProject.API.Middlewares;
 using FluentValidation;
 using FranchiseProject.API.Validator.AgencyValidation;
+using FranchiseProject.Application.ViewModels.ContractViewModel;
+using FranchiseProject.API.Validator.ContractValidation;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Infrastructures.DataInitializer;
@@ -68,6 +70,8 @@ namespace FranchiseProject.API
 
             
             services.AddScoped<IClaimsService, ClaimsService>();
+            services.AddScoped<IPdfService, PdfService>();
+            services.AddSingleton<IFirebaseService, FirebaseService>();
             services.AddHttpContextAccessor();
             services.AddLogging();
 
@@ -77,12 +81,10 @@ namespace FranchiseProject.API
             services.AddScoped<AccountInitializer>();
             #endregion
             #region Validator
-<<<<<<< HEAD
-            services.AddTransient<IValidator<RegisterFranchiseViewModel>, RegisFranchiseViewModelValidator>();
-=======
-            services.AddTransient<IValidator<RegisterConsultation>, RegisFranchiseViewModelValidator>();
+            services.AddTransient<IValidator<RegisterConsultationViewModel>, RegisFranchiseViewModelValidator>();
+            services.AddTransient<IValidator<CreateAgencyViewModel>,CreateAgencyValidator>();
+            services.AddTransient<IValidator<CreateContractViewModel>, CreateContractValidator>();
             services.AddTransient<IValidator<UserResetPasswordModel>, UserResetPasswordValidator>();
->>>>>>> fe3ee3b3bca4e0caa1da32b242e99a2c4327a23a
             #endregion
 
             return services;
