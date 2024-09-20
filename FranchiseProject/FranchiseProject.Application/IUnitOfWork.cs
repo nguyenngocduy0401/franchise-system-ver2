@@ -38,7 +38,7 @@ namespace FranchiseProject.Application
         public ITermRepository TermRepository { get; }
         public IUserRepository UserRepository { get; }
         public IRefreshTokenRepository RefreshTokenRepository { get; }
-        public IFranchiseRegistrationRequestRepository FranchiseRegistrationRequestRepository { get; }
+        public IConsultationRepository FranchiseRegistrationRequestRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

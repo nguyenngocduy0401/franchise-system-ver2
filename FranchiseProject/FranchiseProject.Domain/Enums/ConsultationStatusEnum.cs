@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Enums
 {
-    public enum FranchiseRegistrationStatusEnum
+    public enum ConsultationStatusEnum
     {
         NotConsulted = 0,  
         Consulted = 1     

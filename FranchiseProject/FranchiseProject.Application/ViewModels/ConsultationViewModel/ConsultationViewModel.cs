@@ -16,7 +16,7 @@ namespace FranchiseProject.Application.ViewModels.AgencyViewModel
         public string? Email { get; set; }
         public int? PhoneNumber { get; set; }
         public string? Address { get; set; }
-        public FranchiseRegistrationStatusEnum Status { get; set; }
+        public ConsultationStatusEnum Status { get; set; }
          public string? ConsultantUserName { get; set; }
     }
 }

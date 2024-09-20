@@ -84,7 +84,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<ISyllabusRepository, SyllabusRepository>();
             services.AddScoped<ITermRepository, TermRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IFranchiseRegistrationRequestRepository, FranchiseRegistrationRequestRepository>();
+            services.AddScoped<IConsultationRepository, ConsultationRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             #endregion

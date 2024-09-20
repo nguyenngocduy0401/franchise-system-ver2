@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Repositories
 {
-    public interface IFranchiseRegistrationRequestRepository
+    public interface IConsultationRepository
     {
         Task AddAsync(FranchiseRegistrationRequests franchiseRequest);
         Task<FranchiseRegistrationRequests> GetByIdAsync(Guid id);
-        Task<List<FranchiseRegistrationRequests>> GetFilteredRequestsAsync(FranchiseRegistrationStatusEnum? status);
+        Task<List<FranchiseRegistrationRequests>> GetFilteredRequestsAsync(ConsultationStatusEnum? status);
 
-
+        Task  Update(FranchiseRegistrationRequests entity);
     }
 }

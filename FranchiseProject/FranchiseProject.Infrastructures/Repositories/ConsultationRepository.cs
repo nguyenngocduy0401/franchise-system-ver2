@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Infrastructures.Repositories
 {
-    public class FranchiseRegistrationRequestRepository: IFranchiseRegistrationRequestRepository
+    public class ConsultationRepository: IConsultationRepository
     {
         private readonly AppDbContext _context;
 
-        public FranchiseRegistrationRequestRepository(AppDbContext context)
+        public ConsultationRepository(AppDbContext context)
         {
             _context = context;
         }
@@ -35,7 +35,7 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Include(x => x.User) 
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
-        public async Task<List<FranchiseRegistrationRequests>> GetFilteredRequestsAsync(FranchiseRegistrationStatusEnum? status)
+        public async Task<List<FranchiseRegistrationRequests>> GetFilteredRequestsAsync(ConsultationStatusEnum? status)
         {
             if (status.HasValue)
             {
@@ -48,6 +48,11 @@ namespace FranchiseProject.Infrastructures.Repositories
                 return await _context.FranchiseRegistrationRequests
                     .ToListAsync();
             }
+        }
+        public async Task Update(FranchiseRegistrationRequests entity)
+        {
+            
+            _context.FranchiseRegistrationRequests.Update(entity);
         }
     }
 }

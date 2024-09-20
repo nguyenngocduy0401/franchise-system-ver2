@@ -46,7 +46,7 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
                 var franchiseRequest = _mapper.Map<FranchiseRegistrationRequests>(regis);
-                franchiseRequest.Status = FranchiseRegistrationStatusEnum.NotConsulted;
+                franchiseRequest.Status = ConsultationStatusEnum.NotConsulted;
                 await _unitOfWork.FranchiseRegistrationRequestRepository.AddAsync(franchiseRequest);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                if (isSuccess > 0)
@@ -97,7 +97,7 @@ namespace FranchiseProject.Application.Services
                     response.Message = "không tìm thấy";
 
                 }
-                exist.Status = FranchiseRegistrationStatusEnum.Consulted;
+                exist.Status = ConsultationStatusEnum.Consulted;
                 var currentUser = await _userManager.FindByIdAsync(userId);
                 if (currentUser == null)
                 {
@@ -107,7 +107,18 @@ namespace FranchiseProject.Application.Services
                     
                 }
                 exist.ConsultantUserName = currentUser.FullName;
-
+               await _unitOfWork.FranchiseRegistrationRequestRepository.Update(exist);
+                var result = await _unitOfWork.SaveChangeAsync();
+                if (result > 0)
+                {
+                    response.Data = true;
+                    response.isSuccess = true;
+                    response.Message = "Cập nhật trạng thái thành công.";
+                }
+                else
+                {
+                    throw new Exception("Update failed!");
+                }
             }
             catch (DbException ex)
             {

@@ -15,7 +15,7 @@ namespace FranchiseProject.Domain.Entity
         public string? Email {  get; set; }
         public int? PhoneNumber {  get; set; }
         public string? Address {  get; set; }
-        public FranchiseRegistrationStatusEnum Status { get; set; }
+        public ConsultationStatusEnum Status { get; set; }
         public string? UserId { get; set; }
         [ForeignKey("UserId")]
         public User? User { get; set; }
