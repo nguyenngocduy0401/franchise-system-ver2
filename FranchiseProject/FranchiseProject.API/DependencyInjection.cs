@@ -81,7 +81,7 @@ namespace FranchiseProject.API
             services.AddScoped<AccountInitializer>();
             #endregion
             #region Validator
-            services.AddTransient<IValidator<RegisterFranchiseViewModel>, RegisFranchiseViewModelValidator>();
+            services.AddTransient<IValidator<RegisterConsultationViewModel>, RegisFranchiseViewModelValidator>();
             services.AddTransient<IValidator<CreateAgencyViewModel>,CreateAgencyValidator>();
             services.AddTransient<IValidator<CreateContractViewModel>, CreateContractValidator>();
             services.AddTransient<IValidator<UserResetPasswordModel>, UserResetPasswordValidator>();

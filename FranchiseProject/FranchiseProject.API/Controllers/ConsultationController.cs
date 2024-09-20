@@ -9,16 +9,16 @@ namespace FranchiseProject.API.Controllers
 {
     [Route("api/v1/franchiseRegistrationRequests")]
     [ApiController]
-    public class FranchiseRegistrationRequestController : ControllerBase
+    public class ConsultationController : ControllerBase
     {
-        private readonly IFranchiseRegistrationRequestService _franchiseRegistrationRequestService;
-        public FranchiseRegistrationRequestController(IFranchiseRegistrationRequestService franchiseRegistrationRequestService)
+        private readonly IConsultationService _franchiseRegistrationRequestService;
+        public ConsultationController(IConsultationService franchiseRegistrationRequestService)
         {
             _franchiseRegistrationRequestService = franchiseRegistrationRequestService;
         }
         [SwaggerOperation(Summary = "khách đăng kí nhượng quyền ")]
         [HttpPost("")]
-        public async Task<ApiResponse<bool>> RegisterFranchiseAsync([FromBody] RegisterFranchiseViewModel regis) => await _franchiseRegistrationRequestService.RegisterFranchiseAsync(regis);
+        public async Task<ApiResponse<bool>> RegisterFranchiseAsync([FromBody] RegisterConsultationViewModel regis) => await _franchiseRegistrationRequestService.RegisterConsultationAsync(regis);
         [SwaggerOperation(Summary = "nhân viên tu vấn chuyển trạng thái 'đã tư vấn'")]
         [HttpPut("{id}")]
         [Authorize(Roles = AppRole.Manager)]
@@ -26,7 +26,7 @@ namespace FranchiseProject.API.Controllers
         [SwaggerOperation(Summary = "lấy danh sách đăng kí tư vấn theo trạng thái")]
         [HttpGet("")]
         [Authorize(Roles = AppRole.Manager)]
-        public async Task<ApiResponse<Pagination<FranchiseRegistrationRequestsViewModel>>> FilterFranchiseRegistrationRequestAsync([FromQuery] FilterFranchiseRegistrationRequestsViewModel filterModel) => await _franchiseRegistrationRequestService.FilterFranchiseRegistrationRequestAsync(filterModel);
+        public async Task<ApiResponse<Pagination<ConsultationViewModel>>> FilterFranchiseRegistrationRequestAsync([FromQuery] FilterConsultationViewModel filterModel) => await _franchiseRegistrationRequestService.FilterConsultationAsync(filterModel);
 
     }
 }

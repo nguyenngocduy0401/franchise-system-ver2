@@ -18,7 +18,7 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<RegisterFranchiseViewModel, FranchiseRegistrationRequests>();
 
             CreateMap<FranchiseRegistrationRequests, RegisterFranchiseViewModel>().ForMember(dest => dest.CustomerName,otp=>otp.MapFrom(src => src.CusomterName)).ReverseMap();
-            CreateMap<FranchiseRegistrationRequests, FranchiseRegistrationRequestsViewModel>()
+            CreateMap<FranchiseRegistrationRequests, ConsultationViewModel>()
            .ForMember(dest => dest.ConsultantUserName, opt => opt.MapFrom(src => src.User.UserName)).ReverseMap();
             #endregion
             #region Agency
