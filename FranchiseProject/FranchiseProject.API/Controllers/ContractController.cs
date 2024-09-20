@@ -7,7 +7,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace FranchiseProject.API.Controllers
 {
-    [Route("api/v1/contract")]
+    [Route("api/v1/contracts")]
     [ApiController]
     [Authorize]
     public class ContractController : ControllerBase
