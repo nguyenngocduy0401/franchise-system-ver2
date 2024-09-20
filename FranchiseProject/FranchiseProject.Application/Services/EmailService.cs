@@ -105,7 +105,7 @@ namespace FranchiseProject.Application.Services
         {
             var response = new ApiResponse<bool>();
             var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress("FutureTech", _emailConfiguration.From));
+            emailMessage.From.Add(new MailboxAddress("futuretech-noreply", _appConfiguration.EmailConfiguration.From));
             emailMessage.To.Add(new MailboxAddress(email, email));
             emailMessage.Subject = "No-reply: Registration Successful";
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
@@ -116,9 +116,9 @@ namespace FranchiseProject.Application.Services
             using var client = new SmtpClient();
             try
             {
-                await client.ConnectAsync(_emailConfiguration.SmtpServer, _emailConfiguration.Port, true);
+                await client.ConnectAsync(_appConfiguration.EmailConfiguration.SmtpServer, _appConfiguration.EmailConfiguration.Port, true);
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
-                await client.AuthenticateAsync(_emailConfiguration.Username, _emailConfiguration.Password);
+                await client.AuthenticateAsync(_appConfiguration.EmailConfiguration.Username, _appConfiguration.EmailConfiguration.Password);
                 await client.SendAsync(emailMessage);
                 response.Data = true;
                 response.isSuccess = true;
@@ -140,9 +140,9 @@ namespace FranchiseProject.Application.Services
         {
             var response = new ApiResponse<bool>();
             var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress("FutureTech", _emailConfiguration.From));
+            emailMessage.From.Add(new MailboxAddress("No-reply:FutureTech", _appConfiguration.EmailConfiguration.From));
             emailMessage.To.Add(new MailboxAddress(agencyEmail, agencyEmail));
-            emailMessage.Subject = "No-reply: Your Contract Document";
+            emailMessage.Subject = ": Your Contract Document";
 
             // Create email body with a link to the contract document
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
@@ -153,9 +153,9 @@ namespace FranchiseProject.Application.Services
             using var client = new SmtpClient();
             try
             {
-                await client.ConnectAsync(_emailConfiguration.SmtpServer, _emailConfiguration.Port, true);
+                await client.ConnectAsync(_appConfiguration.EmailConfiguration.SmtpServer, _appConfiguration.EmailConfiguration.Port, true);
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
-                await client.AuthenticateAsync(_emailConfiguration.Username, _emailConfiguration.Password);
+                await client.AuthenticateAsync(_appConfiguration.EmailConfiguration.Username, _appConfiguration.EmailConfiguration.Password);
                 await client.SendAsync(emailMessage);
                 response.Data = true;
                 response.isSuccess = true;

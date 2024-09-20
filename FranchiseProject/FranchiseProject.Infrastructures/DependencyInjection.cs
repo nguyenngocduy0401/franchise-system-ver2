@@ -52,7 +52,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRedisService, RedisService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
-            services.AddScoped<IConsultationService,FranchiseRegistrationRequestService>();
+            services.AddScoped<IConsultationService,ConsultationService>();
             services.AddScoped<IEmailService, EmailService>();
             #endregion
             #region Repository DI

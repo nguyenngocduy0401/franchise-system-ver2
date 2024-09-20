@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.ViewModels.AgencyViewModel
 {
-    public  class FranchiseRegistrationRequestsViewModel
+    public  class ConsultationViewModel
     {
         public Guid Id { get; set; }
         public string? CusomterName { get; set; }
