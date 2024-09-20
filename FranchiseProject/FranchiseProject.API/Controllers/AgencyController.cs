@@ -34,7 +34,7 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         public async Task<ApiResponse<Pagination<AgencyViewModel>>> FilterAgencyAsync([FromQuery]FilterAgencyViewModel filter)=> await _agencyService.FilterAgencyAsync(filter);
         [SwaggerOperation(Summary = "cập nhật trạng thái đối tác {Authorize = Manager,Admin} ")]
-        [HttpPut("")]
+        [HttpPut("{id}/status")]
         [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         public async Task<ApiResponse<bool>> UpdateAgencyStatusAsync(string id, AgencyStatusEnum newStatus)=> await _agencyService.UpdateAgencyStatusAsync(id, newStatus);
     }
