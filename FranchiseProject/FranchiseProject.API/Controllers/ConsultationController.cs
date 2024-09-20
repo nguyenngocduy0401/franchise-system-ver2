@@ -10,19 +10,19 @@ namespace FranchiseProject.API.Controllers
     [Route("api/v1/consultations")]
     public class ConsultationController
     {
-        private readonly IConsultationService _franchiseRegistrationRequestService;
-        public ConsultationController( IConsultationService franchiseRegistrationRequestService)
+        private readonly IConsultationService _consultationService;
+        public ConsultationController( IConsultationService consultationService)
         {
-            _franchiseRegistrationRequestService = franchiseRegistrationRequestService;
+            _consultationService = consultationService;
         }
         [SwaggerOperation(Summary = "khách đăng kí nhượng quyền ")]
         [HttpPost("")]
-        public async Task<ApiResponse<bool>> RegisterConsultationAsync([FromBody] RegisterConsultationViewModel regis)=> await _franchiseRegistrationRequestService.RegisterConsultationAsync(regis);
+        public async Task<ApiResponse<bool>> RegisterConsultationAsync([FromBody] RegisterConsultationViewModel regis)=> await _consultationService.RegisterConsultationAsync(regis);
         [SwaggerOperation(Summary = "nhân viên tu vấn chuyển trạng thái 'đã tư vấn'")]
         [HttpPut("{id}")]
-        public async Task<ApiResponse<bool>> UpdateConsultationStatusAsync(string id) => await _franchiseRegistrationRequestService.UpdateConsultationStatusAsync(id);
+        public async Task<ApiResponse<bool>> UpdateConsultationStatusAsync(string id) => await _consultationService.UpdateConsultationStatusAsync(id);
         [SwaggerOperation(Summary = "lấy danh sách đăng kí tư vấn theo trạng thái")]
         [HttpGet("")]
-        public async Task<ApiResponse<Pagination<ConsultationViewModel>>> FilterConsultationAsync(FilterConsultationViewModel filterModel) => await _franchiseRegistrationRequestService.FilterConsultationAsync(filterModel);
+        public async Task<ApiResponse<Pagination<ConsultationViewModel>>> FilterConsultationAsync(FilterConsultationViewModel filterModel) => await _consultationService.FilterConsultationAsync(filterModel);
     }
 }
