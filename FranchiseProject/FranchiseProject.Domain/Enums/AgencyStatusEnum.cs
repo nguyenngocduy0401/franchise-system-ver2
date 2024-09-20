@@ -11,6 +11,7 @@ namespace FranchiseProject.Domain.Enums
         Pending = 1,          // Chờ
         Processing = 2,       // Đang xử lý
         Approved = 3,         // Xét duyệt thành công
+                               // 
         Partner = 4,          // Đối tác
         Expired = 5           // Hết hạn
 
