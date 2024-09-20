@@ -9,6 +9,7 @@ namespace FranchiseProject.Domain.Entity
 {
     public class Contract : BaseEntity
     {
+        public string? Title { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public int Amount { get; set; }
