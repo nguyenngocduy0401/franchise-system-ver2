@@ -47,6 +47,7 @@ namespace FranchiseProject.Application.Services
                 }
                 var franchiseRequest = _mapper.Map<FranchiseRegistrationRequests>(regis);
                 franchiseRequest.Status = ConsultationStatusEnum.NotConsulted;
+                franchiseRequest.CusomterName = regis.CustomerName;
                 await _unitOfWork.FranchiseRegistrationRequestRepository.AddAsync(franchiseRequest);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                if (isSuccess > 0)
