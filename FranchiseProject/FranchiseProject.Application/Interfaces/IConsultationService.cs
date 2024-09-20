@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Interfaces
 {
-    public interface IFranchiseRegistrationRequestService
+    public interface IConsultationService
     {
-        Task<ApiResponse<bool>> RegisterFranchiseAsync(RegisFranchiseViewModel regisFranchiseViewModel);
+        Task<ApiResponse<bool>> RegisterConsultationAsync(RegisFranchiseViewModel regisFranchiseViewModel);
         Task<ApiResponse<bool>> UpdateConsultationStatusAsync(string requestId);
-        Task<ApiResponse<Pagination<FranchiseRegistrationRequestsViewModel>>> FilterFranchiseRegistrationRequestAsync(FilterFranchiseRegistrationRequestsViewModel filterModel);
+        Task<ApiResponse<Pagination<FranchiseRegistrationRequestsViewModel>>> FilterConsultationAsync(FilterFranchiseRegistrationRequestsViewModel filterModel);
     }
 }

@@ -3,7 +3,7 @@ using FranchiseProject.Application.ViewModels.AgencyViewModel;
 
 namespace FranchiseProject.API.Validator.AgencyValidation
 {
-    public class RegisFranchiseViewModelValidator : AbstractValidator<RegisFranchiseViewModel>
+    public class RegisFranchiseViewModelValidator : AbstractValidator<RegisterConsultation>
     {
         public RegisFranchiseViewModelValidator()
         {
