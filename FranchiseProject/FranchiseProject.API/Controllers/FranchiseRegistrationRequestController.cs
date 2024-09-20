@@ -20,7 +20,7 @@ namespace FranchiseProject.API.Controllers
         [HttpPost("")]
         public async Task<ApiResponse<bool>> RegisterFranchiseAsync([FromBody] RegisterFranchiseViewModel regis) => await _franchiseRegistrationRequestService.RegisterFranchiseAsync(regis);
         [SwaggerOperation(Summary = "nhân viên tu vấn chuyển trạng thái 'đã tư vấn'")]
-        [HttpPut("id")]
+        [HttpPut("{id}")]
         [Authorize(Roles = AppRole.Manager)]
         public async Task<ApiResponse<bool>> UpdateConsultationStatusAsync(string id) => await _franchiseRegistrationRequestService.UpdateConsultationStatusAsync(id);
         [SwaggerOperation(Summary = "lấy danh sách đăng kí tư vấn theo trạng thái")]
