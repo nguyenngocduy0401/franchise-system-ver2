@@ -16,7 +16,6 @@ builder.Services.AddWebAPIService();
 builder.Services.AddAuthenticationServices(configuration);
 builder.Services.AddStackExchangeRedisCache(options => options.Configuration = configuration.RedisConfiguration);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddSingleton(configuration.EmailConfiguration);
 builder.Services.AddSingleton(configuration);
 var app = builder.Build();
 
@@ -32,7 +31,7 @@ app.UseSwaggerUI();
 app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
 /*app.UseMiddleware<PerformanceMiddleware>();*/
-app.UseMiddleware<RedisAuthenticationMiddleware>();
+/*app.UseMiddleware<RedisAuthenticationMiddleware>();*/
 
 app.UseAuthorization();
 

@@ -75,7 +75,7 @@ namespace FranchiseProject.Application.Services
                     var token = user.GenerateJsonWebToken(
                         _appConfiguration,
                         _appConfiguration.JwtOptions.Secret,
-                        _currentTime.GetCurrentTime(),
+                        DateTime.UtcNow,
                         userRole,
                         refreshToken
                         );
@@ -153,7 +153,7 @@ namespace FranchiseProject.Application.Services
                     }
                 }
                 var utcExpireDate = long.Parse(tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
-                var expireDate = GenerateJsonWebTokenString.ConvertUnixTimeToDateTime(utcExpireDate);
+                var expireDate = DateTimeOffset.FromUnixTimeSeconds(utcExpireDate).DateTime;
                 if (expireDate > DateTime.UtcNow)
                 {
                     response.isSuccess = false;

@@ -1,4 +1,4 @@
-﻿/*using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FranchiseProject.Application.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 public class CustomJwtBearerEvents : JwtBearerEvents
 {
@@ -18,19 +19,18 @@ public class CustomJwtBearerEvents : JwtBearerEvents
 
     public override async Task TokenValidated(TokenValidatedContext context)
     {
-        var token = context.SecurityToken as JwtSecurityToken;
+        //Net 8
+        var token = context.SecurityToken as JsonWebToken;
         if (token != null)
         {
-            var tokenString = token.RawData;
-            Console.WriteLine($"Checking token: {tokenString}");
+            var tokenString = token.EncodedToken;
 
             if (!await _redisService.CheckJwtTokenExistsAsync(tokenString))
-            {
-                Console.WriteLine("Token no longer valid.");
+            { 
                 context.Fail("Token is no longer valid.");
             }
         }
 
         await base.TokenValidated(context);
     }
-}*/
+}
