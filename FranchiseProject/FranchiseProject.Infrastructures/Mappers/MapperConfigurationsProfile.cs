@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.AgencyViewModel;
+using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Domain.Entity;
 using System;
@@ -21,6 +23,12 @@ namespace FranchiseProject.Infrastructures.Mappers
 
             #region User
             CreateMap<User, UserViewModel>();
+            #endregion
+
+            #region Slot
+            CreateMap<CreateSlotModel, Slot>();
+            CreateMap<Slot, SlotViewModel>();
+            CreateMap<Pagination<Slot>, Pagination<SlotViewModel>>().ReverseMap();
             #endregion
         }
     }

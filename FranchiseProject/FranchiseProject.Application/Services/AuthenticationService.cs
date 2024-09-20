@@ -148,7 +148,7 @@ namespace FranchiseProject.Application.Services
                     if (!result)
                     {
                         response.isSuccess = false;
-                        response.Message = "Refresh token does not exist";
+                        response.Message = "Access token is not valid";
                         return response;
                     }
                 }
