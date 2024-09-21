@@ -29,7 +29,7 @@ namespace FranchiseProject.Application.Services
             _unitOfWork = unitOfWork;
                 _claimsService = claimsService;
                 _validator = validator;
-            _mapper = mapper;
+            _mapper = mapper; 
             _userManager = userManager;
             _emailService = emailService;
         }

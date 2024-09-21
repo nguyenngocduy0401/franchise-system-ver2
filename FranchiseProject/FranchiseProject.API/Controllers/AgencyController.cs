@@ -17,7 +17,7 @@ namespace FranchiseProject.API.Controllers
         public AgencyController(IAgencyService agencyService )
         {
             _agencyService = agencyService; }
-        [SwaggerOperation(Summary = "Đăng kí đối tác {Authorize = Manager,Admin} ")]
+        [SwaggerOperation(Summary = "Đăng kí đối tác {Authorize = Vistor} ")]
         [HttpPost("")]
         public async Task<ApiResponse<bool>> RegisterAgencyAsync(CreateAgencyViewModel create)=> await _agencyService.CreateAgencyAsync(create);
         [SwaggerOperation(Summary = "cập nhật thông tin đối tác {Authorize = Manager,Admin} ")]
