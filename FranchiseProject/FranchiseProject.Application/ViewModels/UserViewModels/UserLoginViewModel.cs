@@ -9,7 +9,7 @@ namespace FranchiseProject.Application.ViewModels.UserViewModels
 {
     public class UserLoginViewModel
     {
-        public RefreshTokenModel RefreshTokenModel { get; set; }
-        public UserViewModel UserViewModel { get; set; }
+        public RefreshTokenModel? RefreshTokenModel { get; set; }
+        public UserViewModel? UserViewModel { get; set; }
     }
 }

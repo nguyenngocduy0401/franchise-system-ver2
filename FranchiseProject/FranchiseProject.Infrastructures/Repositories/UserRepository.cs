@@ -2,10 +2,12 @@
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -44,11 +46,27 @@ namespace FranchiseProject.Infrastructures.Repositories
          int? pageIndex = null,
          int? pageSize = null,
          string? role = null,
+         IsActiveEnum? isActive = null,
          string? foreignKey = null,
          object? foreignKeyId = null)
         {
             IQueryable<User> query = _dbContext.Users;
-
+            if (isActive.HasValue)
+            {
+                switch (isActive)
+                {
+                    case IsActiveEnum.Active:
+                        query = query.Where(u => 
+                        (u.LockoutEnd <= DateTimeOffset.UtcNow || u.LockoutEnd == null) &&
+                        (u.Contract == null || u.Contract.EndTime < _currentTime.GetCurrentTime()));
+                        break;
+                    case IsActiveEnum.Inactive:
+                       
+                        query = query.Where(u => (u.LockoutEnd > DateTimeOffset.UtcNow) || 
+                        u.Contract != null && u.Contract.EndTime > _currentTime.GetCurrentTime());
+                        break;
+                }
+            }
             if (filter != null)
             {
                 query = query.Where(filter);

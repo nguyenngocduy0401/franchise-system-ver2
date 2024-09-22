@@ -18,20 +18,22 @@ namespace FranchiseProject.API.Controllers
         {
             _slotService = slotService;
         }
-        /*[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]*/
-        [SwaggerOperation(Summary = "xóa slot bằng id (Admin, Manager, AgencyManager)")]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
+        [SwaggerOperation(Summary = "xóa slot bằng id {Authorize = Admin, Manager, AgencyManager}")]
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteSlotAsync(Guid id)
         {
             return await _slotService.DeleteSlotByIdAsync(id);
         }
-        [SwaggerOperation(Summary = "tạo mới slot (Admin, Manager, AgencyManager)")]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
+        [SwaggerOperation(Summary = "tạo mới slot {Authorize = Admin, Manager, AgencyManager}")]
         [HttpPost()]
         public async Task<ApiResponse<bool>> CreateSlotAsync(CreateSlotModel createSlotModel)
         {
             return await _slotService.CreateSlotAsync(createSlotModel);
         }
-        [SwaggerOperation(Summary = "cập nhật slot (Admin, Manager, AgencyManager)")]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
+        [SwaggerOperation(Summary = "cập nhật slot {Authorize = Admin, Manager, AgencyManager}")]
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> UpdateSlotAsync(Guid id, CreateSlotModel updateSlotModel)
         {

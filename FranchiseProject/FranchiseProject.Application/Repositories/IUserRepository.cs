@@ -1,5 +1,6 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace FranchiseProject.Application.Repositories
            int? pageIndex = null,
            int? pageSize = null,
            string? role = null,
+           IsActiveEnum? isActive = null,
            string? foreignKey = null,
            object? foreignKeyId = null);
         Task<bool> CheckUserAttributeExisted(string attributeValue, string attributeType);

@@ -19,7 +19,7 @@ namespace FranchiseProject.Infrastructures.DataInitializer
         }
         public async Task RoleInitializeAsync()
         {
-            string[] roleNames = { AppRole.Admin, AppRole.Student, AppRole.Intructor, AppRole.Manager, AppRole.AgencyManager };
+            string[] roleNames = { AppRole.Admin, AppRole.Student, AppRole.Instructor, AppRole.Manager, AppRole.AgencyManager };
 
 
             IdentityResult roleResult;

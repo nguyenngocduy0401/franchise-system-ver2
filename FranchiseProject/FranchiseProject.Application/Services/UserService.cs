@@ -5,10 +5,13 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -24,13 +27,13 @@ namespace FranchiseProject.Application.Services
         private readonly RoleManager<Role> _roleManager;
         private readonly IMapper _mapper;
         private readonly IValidator<UpdatePasswordModel> _updatePasswordValidator;
-        private readonly IValidator<CreateUserModel> _createUserValidator;
-        private readonly IValidator<UpdateUserModel> _updateUserValidator;
+        private readonly IValidator<CreateUserByAdminModel> _createUserValidator;
+        private readonly IValidator<UpdateUserByAdminModel> _updateUserValidator;
 
         public UserService(IClaimsService claimsService, IUnitOfWork unitOfWork,
             UserManager<User> userManager, RoleManager<Role> roleManager,
             IMapper mapper, IValidator<UpdatePasswordModel> updatePasswordValidator,
-            IValidator<CreateUserModel> createUserValidator, IValidator<UpdateUserModel> updateUserValidator)
+            IValidator<CreateUserByAdminModel> createUserValidator, IValidator<UpdateUserByAdminModel> updateUserValidator)
         {
             _claimsService = claimsService;
             _unitOfWork = unitOfWork;
@@ -41,7 +44,59 @@ namespace FranchiseProject.Application.Services
             _createUserValidator = createUserValidator;
             _updateUserValidator = updateUserValidator;
         }
-        /*public async Task<ApiResponse<bool>> CreateUserAsync(CreateUserModel createUserModel)
+        public async Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAdminAsync(FilterUserByAdminModel filterUserByAdminModel)
+        {
+            var response = new ApiResponse<Pagination<UserViewModel>>();
+            try
+            {
+                var filter = (Expression<Func<User, bool>>)(e =>
+                    (string.IsNullOrEmpty(filterUserByAdminModel.Search) || e.UserName.Contains(filterUserByAdminModel.Search)
+                    || e.Email.Contains(filterUserByAdminModel.Search) || e.PhoneNumber.Contains(filterUserByAdminModel.Search)) &&
+                    (!filterUserByAdminModel.AgencyId.HasValue || e.AgencyId == filterUserByAdminModel.AgencyId) &&
+                    (!filterUserByAdminModel.ContractId.HasValue || e.ContractId == filterUserByAdminModel.ContractId)
+                );
+                var rolee = filterUserByAdminModel.Role.ToString();
+                var usersPagination = await _unitOfWork.UserRepository.GetFilterAsync(
+                    filter: filter,
+                    role: filterUserByAdminModel.Role.ToString(),
+                    isActive: filterUserByAdminModel.IsActive,
+                    pageIndex: filterUserByAdminModel.PageIndex,
+                    pageSize: filterUserByAdminModel.PageSize
+                );
+
+                if (usersPagination.Items.IsNullOrEmpty())
+                {
+                    response.Data = null;
+                    response.isSuccess = true;
+                    response.Message = "Không tìm thấy người dùng phù hợp!";
+                }
+                else
+                {
+                    var userViewModels = _mapper.Map<List<UserViewModel>>(usersPagination.Items);
+                    
+
+                    var result = new Pagination<UserViewModel>
+                    {
+                        PageIndex = usersPagination.PageIndex,
+                        PageSize = usersPagination.PageSize,
+                        TotalItemsCount = usersPagination.TotalItemsCount,
+                        Items = userViewModels
+                    };
+
+                    response.Data = result;
+                    response.isSuccess = true;
+                    response.Message = "Successful!";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Data = null;
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+        public async Task<ApiResponse<bool>> CreateUserByAdminAsync(CreateUserByAdminModel createUserModel)
         {
 
             var response = new ApiResponse<bool>();
@@ -55,51 +110,16 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
-                var attributesToCheck = new List<(string AttributeValue, string AttributeType, string ErrorMessage)>
-                {
-                    (createUserModel.UserName!, "UserName", "UserName is existed!"),
-                    (createUserModel.Email!, "Email", "Email is existed!"),
-                    (createUserModel.PhoneNumber!, "PhoneNumber", "PhoneNumber is existed!")
-                };
-                foreach (var (attributeValue, attributeType, errorMessage) in attributesToCheck)
-                {
-                    if (await _unitOfWork.UserRepository.CheckUserAttributeExisted(attributeValue, attributeType))
-                    {
-                        response.Data = false;
-                        response.isSuccess = true;
-                        response.Message = errorMessage;
-                        return response;
-                    }
-                }
+                if (string.IsNullOrEmpty(createUserModel.Role) || !(await _roleManager.RoleExistsAsync(createUserModel.Role))) 
+                    throw new Exception("Role does not exist!");
+
                 var user = _mapper.Map<User>(createUserModel);
-                user.Wallet = 0;
                 var identityResult = await _userManager.CreateAsync(user, user.PasswordHash);
-                if (identityResult.Succeeded == false) throw new Exception(identityResult.Errors.ToString());
-
-                if (string.IsNullOrEmpty(createUserModel.Roles))
-                {
-                    if (!await _roleManager.RoleExistsAsync(RolesEnum.Customer.ToString()))
-                    {
-                        await _roleManager.CreateAsync(new Role { Name = RolesEnum.Customer.ToString() });
-                    }
-                    await _userManager.AddToRoleAsync(user, RolesEnum.Customer.ToString());
-                }
-                else
-                {
-                    if (!await _roleManager.RoleExistsAsync(createUserModel.Roles))
-                    {
-                        await _userManager.AddToRoleAsync(user, RolesEnum.Customer.ToString());
-                        response.Data = false;
-                        response.isSuccess = true;
-                        response.Message = "Chọn vai trò không hợp lệ hệ tự động đưa về vai trò khách hàng";
-                        return response;
-                    }
-                    await _userManager.AddToRoleAsync(user, createUserModel.Roles.ToString());
-                }
-
+                if (!identityResult.Succeeded) throw new Exception(identityResult.Errors.ToString());
+                await _userManager.AddToRoleAsync(user, createUserModel.Role);
                 response.Data = true;
                 response.isSuccess = true;
-                response.Message = "Register is successful!";
+                response.Message = "Tạo người dùng thành công";
 
             }
             catch (Exception ex)
@@ -109,8 +129,48 @@ namespace FranchiseProject.Application.Services
                 response.Message = ex.Message;
             }
             return response;
-        }*/
-        public async Task<ApiResponse<bool>> DeleteUserAsync(string id)
+        }
+        public async Task<ApiResponse<bool>> UpdateUserByAdminAsync(string id, UpdateUserByAdminModel updateUserByAdminModel)
+        {
+
+            var response = new ApiResponse<bool>();
+            try
+            {
+                ValidationResult validationResult = await _updateUserValidator.ValidateAsync(updateUserByAdminModel);
+                if (!validationResult.IsValid)
+                {
+                    response.Data = false;
+                    response.isSuccess = false;
+                    response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
+                    return response;
+                }
+                var user =await _userManager.FindByIdAsync(id);
+                if (user == null) throw new Exception("Not find user!");
+                user.UserName = updateUserByAdminModel.UserName;
+                user.PhoneNumber = updateUserByAdminModel.PhoneNumber;
+                user.Email = updateUserByAdminModel.Email;
+                user.FullName = updateUserByAdminModel.FullName;
+                user.DateOfBirth = updateUserByAdminModel.DateOfBirth;
+                user.URLImage = updateUserByAdminModel.URLImage;
+                user.Gender = updateUserByAdminModel.Gender;
+                user.ContractId = string.IsNullOrEmpty(updateUserByAdminModel.ContractId) ? (Guid?)null : Guid.Parse(updateUserByAdminModel.ContractId);
+                user.AgencyId = string.IsNullOrEmpty(updateUserByAdminModel.AgencyId) ? (Guid?)null : Guid.Parse(updateUserByAdminModel.AgencyId);
+                var isSuccess = await _userManager.UpdateAsync(user);
+                if (!isSuccess.Succeeded) throw new Exception("Update fail!");
+                response.Data = true;
+                response.isSuccess = true;
+                response.Message = "Cập nhật người dùng thành công";
+
+            }
+            catch (Exception ex)
+            {
+                response.Data = false;
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+        public async Task<ApiResponse<bool>> DeleteUserByAdminAsync(string id)
         {
             var response = new ApiResponse<bool>();
             try
@@ -118,7 +178,7 @@ namespace FranchiseProject.Application.Services
                 var user = await _userManager.FindByIdAsync(id);
 
                 if (user == null) throw new Exception("User not found!");
-                if (await _userManager.IsInRoleAsync(user, AppRole.Admin))
+                if (await _userManager.IsInRoleAsync(user, RolesEnum.Administrator.ToString()))
                 {
                     response.Data = false;
                     response.isSuccess = true;
@@ -147,7 +207,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
         public async Task<ApiResponse<UserViewModel>> GetInfoByLoginAsync()
         {
             var response = new ApiResponse<UserViewModel>();
@@ -184,16 +243,14 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        /*public async Task<ApiResponse<UserViewModel>> GetUserByIdAsync(string id)
+        public async Task<ApiResponse<UserViewModel>> GetUserByIdAsync(string id)
         {
             var response = new ApiResponse<UserViewModel>();
             try
             {
                 var user = await _userManager.FindByIdAsync(id);
                 if (user == null) throw new Exception("Not found!");
-                var packageDetail = await _unitOfWork.PackageDetailRepository.GetByUserIdAsync(id);
                 UserViewModel userViewModel = _mapper.Map<UserViewModel>(user);
-                userViewModel.PackageDetail = _mapper.Map<PackageDetailViewModel>(packageDetail);
                 response.Data = userViewModel;
                 response.isSuccess = true;
                 response.Message = "Successful!";
@@ -205,6 +262,6 @@ namespace FranchiseProject.Application.Services
                 response.Message = ex.Message;
             }
             return response;
-        }*/
+        }
     }
 }
