@@ -8,13 +8,12 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Entity
 {
-    public  class FranchiseRegistrationRequests
+    public  class Consultation
     {
         public Guid Id {  get; set; }
         public string? CusomterName { get; set; }
         public string? Email {  get; set; }
         public int? PhoneNumber {  get; set; }
-        public string? Address {  get; set; }
         public ConsultationStatusEnum Status { get; set; }
         public string? UserId { get; set; }
         [ForeignKey("UserId")]

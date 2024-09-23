@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.AgencyViewModel;
 using FranchiseProject.Application.ViewModels.ContractViewModel;
@@ -16,11 +16,11 @@ namespace FranchiseProject.Infrastructures.Mappers
     public class MapperConfigurationsProfile : Profile 
     {
         public MapperConfigurationsProfile() {
-            #region FranchiseRegister
-            CreateMap<ConsultationViewModel, FranchiseRegistrationRequests>().ReverseMap();
-            CreateMap<RegisterConsultationViewModel, FranchiseRegistrationRequests>();
-            CreateMap<FranchiseRegistrationRequests, ConsultationViewModel>().ForMember(dest => dest.CusomterName,otp=>otp.MapFrom(src => src.CusomterName)).ReverseMap();
-            CreateMap<FranchiseRegistrationRequests, ConsultationViewModel>()
+            #region FranchiseRegist
+            CreateMap<ConsultationViewModel, Consultation>();
+            CreateMap<RegisterConsultationViewModel, Consultation>();
+            CreateMap<Consultation, ConsultationViewModel>().ForMember(dest => dest.CusomterName,otp=>otp.MapFrom(src => src.CusomterName)).ReverseMap();
+            CreateMap<Consultation, ConsultationViewModel>()
            .ForMember(dest => dest.ConsultantUserName, opt => opt.MapFrom(src => src.User.UserName)).ReverseMap();
             #endregion
             #region Agency

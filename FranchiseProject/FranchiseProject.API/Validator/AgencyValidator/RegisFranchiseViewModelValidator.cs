@@ -8,9 +8,7 @@ namespace FranchiseProject.API.Validator.AgencyValidation
         public RegisFranchiseViewModelValidator()
         {
           
-            RuleFor(x => x.Address)
-                .MaximumLength(100)
-                .WithMessage("Address cannot exceed 100 characters.");
+         
 
             RuleFor(x => x.CustomerName)
                 .MaximumLength(50)

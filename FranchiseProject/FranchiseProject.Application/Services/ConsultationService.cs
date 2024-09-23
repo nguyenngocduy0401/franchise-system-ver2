@@ -45,7 +45,7 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
-                var franchiseRequest = _mapper.Map<FranchiseRegistrationRequests>(regis);
+                var franchiseRequest = _mapper.Map<Consultation>(regis);
                 franchiseRequest.Status = ConsultationStatusEnum.NotConsulted;
                 franchiseRequest.CusomterName = regis.CustomerName;
                 await _unitOfWork.FranchiseRegistrationRequestRepository.AddAsync(franchiseRequest);

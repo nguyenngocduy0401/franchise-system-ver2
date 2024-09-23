@@ -20,24 +20,24 @@ namespace FranchiseProject.Infrastructures.Repositories
             _context = context;
         }
 
-        public async Task AddAsync(FranchiseRegistrationRequests franchiseRequest)
+        public async Task AddAsync(Consultation franchiseRequest)
         {
-            await _context.FranchiseRegistrationRequests.AddAsync(franchiseRequest);
+            await _context.Consultations.AddAsync(franchiseRequest);
         }
        /* public async Task<FranchiseRegistrationRequests> GetByIdAsync(Guid id)
         {
             return await _context.FranchiseRegistrationRequests.FindAsync(id);
         }*/
       
-        public async Task<FranchiseRegistrationRequests> GetByIdAsync(Guid id)
+        public async Task<Consultation> GetByIdAsync(Guid id)
         {
-            return await _context.FranchiseRegistrationRequests
+            return await _context.Consultations
                 .Include(x => x.User) 
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
-        public async Task<List<FranchiseRegistrationRequests>> GetFilteredRequestsAsync(ConsultationStatusEnum? status)
+        public async Task<List<Consultation>> GetFilteredRequestsAsync(ConsultationStatusEnum? status)
         {
-            var query = _context.FranchiseRegistrationRequests.AsQueryable();
+            var query = _context.Consultations.AsQueryable();
 
             if (status.HasValue)
             {
@@ -46,10 +46,10 @@ namespace FranchiseProject.Infrastructures.Repositories
 
             return await query.ToListAsync();
         }
-        public async Task Update(FranchiseRegistrationRequests entity)
+        public async Task Update(Consultation entity)
         {
             
-            _context.FranchiseRegistrationRequests.Update(entity);
+            _context.Consultations.Update(entity);
         }
     }
 }

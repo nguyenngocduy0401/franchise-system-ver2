@@ -42,7 +42,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<StudentCourse> StudentCourses { get; set; }
         public DbSet<Syllabus> Syllabuses { get; set; }
         public DbSet<Term> Terms { get; set; }
-        public DbSet<FranchiseRegistrationRequests> FranchiseRegistrationRequests { get; set; }
+        public DbSet<Consultation> Consultations { get; set; }
         /*public DbSet<User> Users { get; set; }*/
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         #endregion
