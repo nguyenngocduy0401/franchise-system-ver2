@@ -19,9 +19,9 @@ namespace FranchiseProject.Infrastructures.Mappers
             #region FranchiseRegist
             CreateMap<ConsultationViewModel, Consultation>();
             CreateMap<RegisterConsultationViewModel, Consultation>();
-            CreateMap<Consultation, ConsultationViewModel>().ForMember(dest => dest.CusomterName,otp=>otp.MapFrom(src => src.CusomterName)).ReverseMap();
+            CreateMap<Consultation, ConsultationViewModel>().ReverseMap();
             CreateMap<Consultation, ConsultationViewModel>()
-           .ForMember(dest => dest.ConsultantUserName, opt => opt.MapFrom(src => src.User.UserName)).ReverseMap();
+            .ForMember(dest => dest.ConsultantUserName, opt => opt.MapFrom(src => src.User != null ? src.User.UserName : string.Empty));
             #endregion
             #region Agency
             CreateMap<CreateAgencyViewModel, Agency>().ReverseMap();

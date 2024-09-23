@@ -107,8 +107,8 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Current user not found.";
                     
                 }
-                exist.ConsultantUserName = currentUser.FullName;
-               await _unitOfWork.FranchiseRegistrationRequestRepository.Update(exist);
+               exist.UserId = userId;
+               _unitOfWork.FranchiseRegistrationRequestRepository.Update(exist);
                 var result = await _unitOfWork.SaveChangeAsync();
                 if (result > 0)
                 {
@@ -140,36 +140,25 @@ namespace FranchiseProject.Application.Services
 
             try
             {
-                var filteredRequests = await _unitOfWork.FranchiseRegistrationRequestRepository
-                    .GetFilteredRequestsAsync(filterModel.Status.HasValue ? filterModel.Status : null);
+                var paginationResult = await _unitOfWork.FranchiseRegistrationRequestRepository.GetFilterAsync(
+                       filter: s =>
+                     (!filterModel.Status.HasValue || s.Status == filterModel.Status), includeProperties: "User",
 
-                if (filteredRequests == null || !filteredRequests.Any())
+
+                     pageIndex: filterModel.PageIndex,
+                     pageSize: filterModel.PageSize
+                 );
+                var consultationViewModel = _mapper.Map<List<ConsultationViewModel>>(paginationResult.Items);
+                var paginationViewModel = new Pagination<ConsultationViewModel>
                 {
-                    response.isSuccess = true;
-                    response.Data = new Pagination<ConsultationViewModel>
-                    {
-                        Items = new List<ConsultationViewModel>(),
-                        TotalItemsCount = 0,
-                        PageIndex = filterModel.PageIndex,
-                        PageSize = filterModel.PageSize
-                    };
-                    return response;
-                }
-                var pagedRequests = filteredRequests
-                    .Skip((filterModel.PageIndex - 1) * filterModel.PageSize)
-                    .Take(filterModel.PageSize)
-                    .ToList();
-
-                var result = _mapper.Map<List<ConsultationViewModel>>(pagedRequests);
-
-                response.isSuccess = true;
-                response.Data = new Pagination<ConsultationViewModel>
-                {
-                    Items = result,
-                    TotalItemsCount = filteredRequests.Count,
-                    PageIndex = filterModel.PageIndex,
-                    PageSize = filterModel.PageSize
+                    PageIndex = paginationResult.PageIndex,
+                    PageSize = paginationResult.PageSize,
+                    TotalItemsCount = paginationResult.TotalItemsCount,
+                    Items = consultationViewModel
                 };
+                response.Data = paginationViewModel;
+                response.isSuccess = true;
+                response.Message = "Truy xuất thành công";
             }
             catch (DbException ex)
             {
@@ -181,7 +170,7 @@ namespace FranchiseProject.Application.Services
                 response.isSuccess = false;
                 response.Message = ex.Message;
             }
-            return response;
+            return response; 
         }
         public async Task<ApiResponse<ConsultationViewModel>> GetByIdAsync(Guid id)
         {

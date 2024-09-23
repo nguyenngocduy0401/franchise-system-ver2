@@ -11,12 +11,8 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Repositories
 {
-    public interface IConsultationRepository
+    public interface IConsultationRepository :IGenericRepository<Consultation>
     {
-        Task AddAsync(Consultation franchiseRequest);
-        Task<Consultation> GetByIdAsync(Guid id);
-        Task<List<Consultation>> GetFilteredRequestsAsync(ConsultationStatusEnum? status);
 
-        Task  Update(Consultation entity);
     }
 }
