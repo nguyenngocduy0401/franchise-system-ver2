@@ -10,14 +10,14 @@ namespace FranchiseProject.API.Controllers
 {
     [Route("api/v1/agencies")]
     [ApiController]
-    [Authorize]
+ 
     public class AgencyController :ControllerBase
     {
         private readonly IAgencyService _agencyService;
         public AgencyController(IAgencyService agencyService )
         {
             _agencyService = agencyService; }
-        [SwaggerOperation(Summary = "Đăng kí đối tác {Authorize = Vistor} ")]
+        [SwaggerOperation(Summary = "Đăng kí đối tác  ")]
         [HttpPost("")]
         public async Task<ApiResponse<bool>> RegisterAgencyAsync(CreateAgencyViewModel create)=> await _agencyService.CreateAgencyAsync(create);
         [SwaggerOperation(Summary = "cập nhật thông tin đối tác {Authorize = Manager,Admin} ")]
