@@ -13,10 +13,10 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IConsultationRepository
     {
-        Task AddAsync(FranchiseRegistrationRequests franchiseRequest);
-        Task<FranchiseRegistrationRequests> GetByIdAsync(Guid id);
-        Task<List<FranchiseRegistrationRequests>> GetFilteredRequestsAsync(ConsultationStatusEnum? status);
+        Task AddAsync(Consultation franchiseRequest);
+        Task<Consultation> GetByIdAsync(Guid id);
+        Task<List<Consultation>> GetFilteredRequestsAsync(ConsultationStatusEnum? status);
 
-        Task  Update(FranchiseRegistrationRequests entity);
+        Task  Update(Consultation entity);
     }
 }
