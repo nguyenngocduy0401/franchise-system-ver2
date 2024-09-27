@@ -90,7 +90,7 @@ namespace FranchiseProject.Application.Services
                         ExpiredAt = DateTime.UtcNow.AddMonths(1)
                     };
                     _unitOfWork.RefreshTokenRepository.UpdateRefreshToken(refreshTokenEntity);
-                    var storeRedis = await _redisService.StoreJwtTokenAsync(user.UserName, token.AccessToken);
+                    /*var storeRedis = await _redisService.StoreJwtTokenAsync(user.UserName, token.AccessToken);*/
                     var userLoginViewModel = new UserLoginViewModel
                     {
                         RefreshTokenModel = token,
@@ -229,7 +229,7 @@ namespace FranchiseProject.Application.Services
                     ExpiredAt = DateTime.UtcNow.AddMonths(1)
                 };
                 _unitOfWork.RefreshTokenRepository.UpdateRefreshToken(refreshTokenEntity);
-                var storeRedis = await _redisService.StoreJwtTokenAsync(user.UserName, token.AccessToken);
+                /*var storeRedis = await _redisService.StoreJwtTokenAsync(user.UserName, token.AccessToken);*/
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
 
                 if (!isSuccess)
@@ -272,7 +272,7 @@ namespace FranchiseProject.Application.Services
                 storedToken.IsUsed = true;
                 _unitOfWork.RefreshTokenRepository.UpdateRefreshToken(storedToken);
                 var user = await _userManager.FindByIdAsync(storedToken.UserId);
-                await _redisService.RemoveUserIfExistsAsync(user.UserName);
+                /*await _redisService.RemoveUserIfExistsAsync(user.UserName);*/
                 await _unitOfWork.SaveChangeAsync();
                 response.isSuccess = true;
                 response.Message = "Đăng xuất thành công!";
