@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FranchiseProject.Infrastructures.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240920132944_newDb")]
+    [Migration("20240924154655_newDb")]
     partial class newDb
     {
         /// <inheritdoc />
@@ -82,6 +82,15 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Agencies");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("be37023d-6a58-4b4b-92e5-39dcece45473"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Status = 4
+                        });
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Assignment", b =>
@@ -387,7 +396,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                             Amount = 0,
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Duration = 0,
-                            EndTime = new DateTime(2024, 9, 25, 20, 29, 41, 185, DateTimeKind.Local).AddTicks(9374),
+                            EndTime = new DateTime(2024, 9, 29, 22, 46, 55, 126, DateTimeKind.Local).AddTicks(1366),
                             IsDeleted = false,
                             StartTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
@@ -1255,6 +1264,9 @@ namespace FranchiseProject.Infrastructures.Migrations
 
                     b.Property<Guid?>("ContractId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreateAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");

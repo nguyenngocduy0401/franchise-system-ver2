@@ -60,7 +60,8 @@ namespace FranchiseProject.API
                     }
                 });
             });
-            
+            services.AddSingleton<PerformanceMiddleware>();
+            services.AddSingleton<Stopwatch>();
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy", builder =>
@@ -94,6 +95,8 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<CreateUserByAdminModel>,CreateUserValidator>();
             services.AddTransient<IValidator<UpdateUserByAdminModel>, UpdateUserValidator>();
             services.AddTransient<IValidator<UpdatePasswordModel>, UpdatePasswordValidator>();
+            services.AddTransient<IValidator<UpdateUserByAgencyModel>, UpdateUserByAgencyValidator>();
+            services.AddTransient<IValidator<CreateUserByAgencyModel>, CreateUserByAgencyValidator>();
             #endregion
 
             return services;

@@ -41,7 +41,26 @@ namespace FranchiseProject.Infrastructures.Mappers
             .MapFrom(src => string.IsNullOrEmpty(src.AgencyId) ? (Guid?)null : Guid.Parse(src.AgencyId)))
             .ForMember(dest => dest.ContractId, opt => opt
             .MapFrom(src => string.IsNullOrEmpty(src.ContractId) ? (Guid?)null : Guid.Parse(src.ContractId)))
-            .ForMember(dest => dest.PasswordHash, src => src.MapFrom(x => x.Password)); 
+            .ForMember(dest => dest.PasswordHash, src => src.MapFrom(x => x.Password));
+            CreateMap<CreateUserByAdminModel, User>()
+            .ForMember(dest => dest.AgencyId, opt => opt
+            .MapFrom(src => string.IsNullOrEmpty(src.AgencyId) ? (Guid?)null : Guid.Parse(src.AgencyId)))
+            .ForMember(dest => dest.ContractId, opt => opt
+            .MapFrom(src => string.IsNullOrEmpty(src.ContractId) ? (Guid?)null : Guid.Parse(src.ContractId)))
+            .ForMember(dest => dest.PasswordHash, src => src.MapFrom(x => x.Password));
+            CreateMap<CreateUserByAdminModel, User>()
+            .ForMember(dest => dest.AgencyId, opt => opt
+            .MapFrom(src => string.IsNullOrEmpty(src.AgencyId) ? (Guid?)null : Guid.Parse(src.AgencyId)))
+            .ForMember(dest => dest.ContractId, opt => opt
+            .MapFrom(src => string.IsNullOrEmpty(src.ContractId) ? (Guid?)null : Guid.Parse(src.ContractId)))
+            .ForMember(dest => dest.PasswordHash, src => src.MapFrom(x => x.Password));
+            CreateMap<CreateUserByAdminModel, User>()
+            .ForMember(dest => dest.AgencyId, opt => opt.MapFrom(src =>
+                string.IsNullOrEmpty(src.AgencyId) ? (Guid?)null : Guid.Parse(src.AgencyId)))
+            .ForMember(dest => dest.ContractId, opt => opt.MapFrom(src =>
+                string.IsNullOrEmpty(src.ContractId) ? (Guid?)null : Guid.Parse(src.ContractId)))
+            .ForMember(dest => dest.PasswordHash, src => src.MapFrom(x => x.Password));
+            CreateMap<UpdateUserByAgencyModel, User>();
             #endregion
 
             #region Slot

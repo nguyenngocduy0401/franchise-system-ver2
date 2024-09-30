@@ -30,7 +30,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
-/*app.UseMiddleware<PerformanceMiddleware>();*/
+app.UseMiddleware<PerformanceMiddleware>();
 /*app.UseMiddleware<RedisAuthenticationMiddleware>();*/
 
 app.UseAuthorization();

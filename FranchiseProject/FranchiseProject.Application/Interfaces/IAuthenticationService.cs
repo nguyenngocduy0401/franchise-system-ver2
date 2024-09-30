@@ -14,6 +14,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<UserLoginViewModel>> LoginAsync(UserLoginModel userLoginModel);
         Task<ApiResponse<RefreshTokenModel>> RenewTokenAsync(RefreshTokenModel RefreshTokenModel);
         Task<ApiResponse<string>> LogoutAsync(string refreshToken);
-        Task<ApiResponse<bool>> ResetPasswordAsync(string userName, UserResetPasswordModel userResetPasswordModel);
+        Task<ApiResponse<bool>> ResetPasswordAsync(UserResetPasswordModel userResetPasswordModel);
     }
 }

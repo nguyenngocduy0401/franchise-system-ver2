@@ -11,10 +11,11 @@ namespace FranchiseProject.Application.Interfaces
     public interface IUserService
     {
         Task<ApiResponse<UserViewModel>> GetInfoByLoginAsync();
-        Task<ApiResponse<bool>> CreateUserByAdminAsync(CreateUserByAdminModel createUserModel);
+        Task<ApiResponse<CreateUserByAdminModel>> CreateUserByAdminAsync(CreateUserByAdminModel createUserModel);
         Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAdminAsync(FilterUserByAdminModel filterUserByAdminModel);
         Task<ApiResponse<bool>> UpdateUserByAdminAsync(string id, UpdateUserByAdminModel updateUserByAdminModel);
         Task<ApiResponse<bool>> DeleteUserByAdminAsync(string id);
         Task<ApiResponse<UserViewModel>> GetUserByIdAsync(string id);
+        Task<ApiResponse<bool>> ChangePasswordAsync(UpdatePasswordModel updatePasswordModel);
     }
 }

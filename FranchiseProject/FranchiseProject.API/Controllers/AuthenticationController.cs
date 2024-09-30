@@ -47,11 +47,11 @@ namespace FranchiseProject.API.Controllers
         {
             return await _emailService.SendOTPEmailAsync(otpEmailModel);
         }
-        [HttpPut("reset-password/{username}")]
+        [HttpPost("reset-password")]
         [SwaggerOperation(Summary = "dùng otp để đổi mật khẩu mới")]
-        public async Task<ApiResponse<bool>> ResetPasswordAsync(string username, UserResetPasswordModel userResetPasswordModel)
+        public async Task<ApiResponse<bool>> ResetPasswordAsync(UserResetPasswordModel userResetPasswordModel)
         {
-            return await _authenticationService.ResetPasswordAsync(username, userResetPasswordModel);
+            return await _authenticationService.ResetPasswordAsync(userResetPasswordModel);
         }
     }
 }
