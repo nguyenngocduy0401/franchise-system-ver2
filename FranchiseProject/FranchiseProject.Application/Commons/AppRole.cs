@@ -12,6 +12,6 @@ namespace FranchiseProject.Application.Commons
         public const string Manager = "Manager";
         public const string AgencyManager = "AgencyManager";
         public const string Student = "Student";
-        public const string Intructor = "Intructor";
+        public const string Instructor = "Instructor";
     }
 }

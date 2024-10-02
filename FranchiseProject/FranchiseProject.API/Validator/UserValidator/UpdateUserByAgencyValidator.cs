@@ -3,11 +3,10 @@ using FranchiseProject.Application.ViewModels.UserViewModels;
 
 namespace FranchiseProject.API.Validator.UserValidator
 {
-    public class UpdateUserValidator : AbstractValidator<UpdateUserByAdminModel>
+    public class UpdateUserByAgencyValidator : AbstractValidator<UpdateUserByAgencyModel>
     {
-        public UpdateUserValidator()
+        public UpdateUserByAgencyValidator()
         {
-            RuleFor(x => x.UserName).NotEmpty();
             RuleFor(x => x.FullName).NotEmpty();
             RuleFor(x => x.Email).NotEmpty().EmailAddress()
                 .WithMessage("Email is invalid format!");

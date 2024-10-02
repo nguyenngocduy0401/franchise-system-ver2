@@ -132,8 +132,7 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
                 var slot = await _unitOfWork.SlotRepository.GetByIdAsync(slotId);
-                slot.StartTime = updateSlotModel.StartTime;
-                slot.EndTime =updateSlotModel.EndTime;
+                _mapper.Map(updateSlotModel, slot);
                 _unitOfWork.SlotRepository.Update(slot);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Udpate fail!");

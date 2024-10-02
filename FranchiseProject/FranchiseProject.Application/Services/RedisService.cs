@@ -26,8 +26,6 @@ namespace FranchiseProject.Application.Services
 
             await RemoveUserIfExistsAsync(userName);
             await _cache.SetStringAsync(userName, jwtToken, options);
-
-
             await _cache.SetStringAsync($"jwt:{jwtToken}", userName, options);
 
             return true;

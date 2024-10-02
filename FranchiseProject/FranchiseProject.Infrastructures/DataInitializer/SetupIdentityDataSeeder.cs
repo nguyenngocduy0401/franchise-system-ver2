@@ -1,6 +1,12 @@
-﻿using FranchiseProject.Infrastructures.DataInitializer;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace FranchiseProject.API.Services
+namespace FranchiseProject.Infrastructures.DataInitializer
 {
     public class SetupIdentityDataSeeder : IHostedService
     {

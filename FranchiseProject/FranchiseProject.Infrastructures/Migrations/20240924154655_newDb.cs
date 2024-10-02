@@ -255,6 +255,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                     URLImage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OTPEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ExpireOTPEmail = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     AgencyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ContractId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -951,9 +952,14 @@ namespace FranchiseProject.Infrastructures.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Agencies",
+                columns: new[] { "Id", "Address", "City", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "District", "Email", "IsDeleted", "ModificationBy", "ModificationDate", "Name", "PhoneNumber", "PositionImageURL", "Status", "Ward" },
+                values: new object[] { new Guid("be37023d-6a58-4b4b-92e5-39dcece45473"), null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, null, false, null, null, null, null, null, 4, null });
+
+            migrationBuilder.InsertData(
                 table: "Contracts",
                 columns: new[] { "Id", "AgencyId", "Amount", "ContractDocumentImageURL", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "Duration", "EndTime", "IsDeleted", "ModificationBy", "ModificationDate", "StartTime", "TermsAndCondition", "Title" },
-                values: new object[] { new Guid("550ee872-ea09-42a0-b9ac-809890debafb"), null, 0, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, 0, new DateTime(2024, 9, 25, 20, 29, 41, 185, DateTimeKind.Local).AddTicks(9374), false, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null });
+                values: new object[] { new Guid("550ee872-ea09-42a0-b9ac-809890debafb"), null, 0, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, 0, new DateTime(2024, 9, 29, 22, 46, 55, 126, DateTimeKind.Local).AddTicks(1366), false, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

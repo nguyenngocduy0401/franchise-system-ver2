@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.ViewModels.UserViewModels
+namespace FranchiseProject.Domain.Enums
 {
-    public class CreateUserModel
+    public enum IsActiveEnum
     {
+        Inactive,
+        Active
     }
 }

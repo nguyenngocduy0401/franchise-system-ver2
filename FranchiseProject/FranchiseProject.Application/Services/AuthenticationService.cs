@@ -54,8 +54,8 @@ namespace FranchiseProject.Application.Services
                     userLoginModel.UserName, userLoginModel.Password, false, false);
                 if (result.Succeeded)
                 {
-                    var user = await _unitOfWork.UserRepository.GetUserByUserNameAndPassword
-                        (userLoginModel.UserName, userLoginModel.Password);
+                    var user = await _unitOfWork.UserRepository.GetUserByUserName
+                        (userLoginModel.UserName);
                     if (user.ContractId != Guid.Empty && user.ContractId != null) 
                     {
                         var checkExpire = await _unitOfWork.ContractRepository.IsExpiringContract((Guid)user.ContractId);
@@ -121,7 +121,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
         public async Task<ApiResponse<RefreshTokenModel>> RenewTokenAsync(RefreshTokenModel refreshTokenModel)
         {
             var response = new ApiResponse<RefreshTokenModel>();
@@ -286,7 +285,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> ResetPasswordAsync(string userName, UserResetPasswordModel userResetPasswordModel)
+        public async Task<ApiResponse<bool>> ResetPasswordAsync(UserResetPasswordModel userResetPasswordModel)
         {
             var response = new ApiResponse<bool>();
             try
@@ -298,14 +297,8 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
-                if (string.IsNullOrEmpty(userName))
-                {
-                    response.Data = false;
-                    response.isSuccess = true;
-                    response.Message = "Username không được bỏ trống!";
-                    return response;
-                }
-                var user = await _userManager.FindByNameAsync(userName);
+                if (userResetPasswordModel.UserName == null) throw new Exception("User must not empty!");
+                    var user = await _userManager.FindByNameAsync(userResetPasswordModel.UserName);
                 if (user == null)
                 {
                     response.Data = false;
@@ -356,5 +349,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        
     }
 }

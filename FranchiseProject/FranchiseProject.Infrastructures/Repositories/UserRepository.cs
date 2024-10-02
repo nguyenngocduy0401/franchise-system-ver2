@@ -2,10 +2,12 @@
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -33,10 +35,6 @@ namespace FranchiseProject.Infrastructures.Repositories
         }
 
 
-        public async Task<User> GetByPhoneNumberAsync(string phoneNumber) =>
-            await _dbContext.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
-
-
         public virtual async Task<Pagination<User>> GetFilterAsync(
          Expression<Func<User, bool>>? filter = null,
          Func<IQueryable<User>, IOrderedQueryable<User>>? orderBy = null,
@@ -44,11 +42,27 @@ namespace FranchiseProject.Infrastructures.Repositories
          int? pageIndex = null,
          int? pageSize = null,
          string? role = null,
+         IsActiveEnum? isActive = null,
          string? foreignKey = null,
          object? foreignKeyId = null)
         {
             IQueryable<User> query = _dbContext.Users;
-
+            if (isActive.HasValue)
+            {
+                switch (isActive)
+                {
+                    case IsActiveEnum.Active:
+                        query = query.Where(u => 
+                        (u.LockoutEnd <= DateTimeOffset.UtcNow || u.LockoutEnd == null) &&
+                        (u.Contract == null || u.Contract.EndTime < _currentTime.GetCurrentTime()));
+                        break;
+                    case IsActiveEnum.Inactive:
+                       
+                        query = query.Where(u => (u.LockoutEnd > DateTimeOffset.UtcNow) || 
+                        u.Contract != null && u.Contract.EndTime > _currentTime.GetCurrentTime());
+                        break;
+                }
+            }
             if (filter != null)
             {
                 query = query.Where(filter);
@@ -108,67 +122,37 @@ namespace FranchiseProject.Infrastructures.Repositories
             return result;
         }
 
-
-        public async Task AddAsync(User user)
-        {
-            await _dbContext.AddAsync(user);
-        }
-        public async Task<bool> CheckUserAttributeExisted(string attributeValue, string attributeType)
-        {
-            if (string.IsNullOrEmpty(attributeValue))
-            {
-                throw new ArgumentException("Attribute value cannot be null or empty", nameof(attributeValue));
-            }
-
-            return attributeType switch
-            {
-                "Email" => await _dbContext.Users.AnyAsync(u => u.Email == attributeValue),
-                "PhoneNumber" => await _dbContext.Users.AnyAsync(u => u.PhoneNumber == attributeValue),
-                "UserName" => await _dbContext.Users.AnyAsync(u => u.UserName == attributeValue),
-                _ => throw new ArgumentException("Invalid attribute type", nameof(attributeType)),
-            };
-        }
-
-        public async Task<User> GetUserByUserNameAndPassword(string username, string password)
+        public async Task<User> GetUserByUserName(string username)
         {
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == username);
-            bool invalid = await _userManager.CheckPasswordAsync(user, password);
-            if (user is null && invalid is false)
-            {
-                throw new Exception("Username or password is not correct!");
-            }
+            if (user is null)throw new Exception("Username or password is not correct!");
+            
             return user;
         }
-
-        public async Task<List<string>> GetRolesByUserId(string userId)
+        public async Task<User> GetUserByLogin(string username, string password)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-            return (List<string>)(user != null ? await _userManager.GetRolesAsync(user) : new List<string>());
+
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == username
+            && (u.LockoutEnd == null || u.LockoutEnd < _currentTime.GetCurrentTime()) &&
+            (u.Contract == null || u.Contract.EndTime < _currentTime.GetCurrentTime()));
+            if (user is null) throw new Exception("Username or password is not correct!");
+            bool invalid = await _userManager.CheckPasswordAsync(user, password);
+            if (invalid is false) throw new Exception("Username or password is not correct!");
+            return user;
+        }
+        public async Task CreateUserAndAssignRoleAsync(User user, string role)
+        {
+            user.CreateAt = _currentTime.GetCurrentTime();
+            var identityResult = await _userManager.CreateAsync(user, user.PasswordHash);
+            if (!identityResult.Succeeded) throw new Exception(identityResult.Errors.ToString());
+            identityResult = await _userManager.AddToRoleAsync(user, role);
+            if(!identityResult.Succeeded) throw new Exception(identityResult.Errors.ToString());
         }
 
-        public Task<string> GetUserByUserId(string userId)
+        public async Task<bool> CheckUserNameExistAsync(string username)
         {
-            throw new NotImplementedException();
-        }
 
-        public async Task<string> GetCurrentUserRoleAsync(string userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                throw new Exception("User not found");
-            }
-
-            var roles = await _userManager.GetRolesAsync(user);
-            if (roles == null || roles.Count == 0)
-            {
-                throw new Exception("User does not have any roles");
-            }
-
-            // Assuming the user has only one role, if the user has multiple roles, you may need to handle it differently
-            var currentRole = roles.First();
-
-            return currentRole;
+            return await _dbContext.Users.AnyAsync(u => u.UserName == username);
         }
     }
 }

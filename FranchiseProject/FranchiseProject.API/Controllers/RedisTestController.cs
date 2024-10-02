@@ -44,5 +44,25 @@ namespace FranchiseProject.API.Controllers
                 return StatusCode(500, "Redis not responding.");
             }
         }
+        [HttpPost("import-excel")]
+        public async Task<IActionResult> ImportExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+
+            // Mở stream để đọc file
+            using (var stream = file.OpenReadStream())
+            {
+                // Đọc dữ liệu từ file Excel và ánh xạ nó vào một model
+
+
+                // Sau khi đọc xong, bạn có thể thực hiện xử lý hoặc lưu dữ liệu
+                // Ví dụ: Lưu dữ liệu vào database thông qua một service khác.
+
+                return Ok(); // Trả về dữ liệu đã đọc được (hoặc thông báo đã lưu thành công)
+            }
+        }
     }
 }
