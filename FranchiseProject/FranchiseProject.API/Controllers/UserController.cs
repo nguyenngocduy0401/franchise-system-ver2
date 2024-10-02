@@ -56,7 +56,16 @@ namespace FranchiseProject.API.Controllers
         [HttpPost("change-password")]
         public async Task<ApiResponse<bool>> ChangePasswordAsync(UpdatePasswordModel updatePasswordModel)
             => await _userService.ChangePasswordAsync(updatePasswordModel);
-
+        /*[Authorize(Roles = AppRole.AgencyManager)]*/
+        [SwaggerOperation(Summary = "tạo người dùng {Authorize = AgencyManager}")]
+        [HttpPost("~/agency-manager/api/v1/users")]
+        public async Task<ApiResponse<CreateUserViewModel>> CreateUserByAgencyAsync(CreateUserByAgencyModel createUserByAgencyModel)
+            => await _userService.CreateUserByAgencyAsync(createUserByAgencyModel);
+        /*[Authorize(Roles = AppRole.AgencyManager)]*/
+        [SwaggerOperation(Summary = "tạo người dùng {Authorize = AgencyManager}")]
+        [HttpPost("~/agency-manager/api/v1/users/files")]
+        public async Task<ApiResponse<List<CreateUserByAgencyModel>>> CreateListUserByAgencyAsync(IFormFile file)
+            => await _userService.CreateListUserByAgencyAsync(file);
 
     }
 }

@@ -61,6 +61,8 @@ namespace FranchiseProject.Infrastructures.Mappers
                 string.IsNullOrEmpty(src.ContractId) ? (Guid?)null : Guid.Parse(src.ContractId)))
             .ForMember(dest => dest.PasswordHash, src => src.MapFrom(x => x.Password));
             CreateMap<UpdateUserByAgencyModel, User>();
+            CreateMap<CreateUserByAgencyModel, User>();
+            CreateMap<User, CreateUserViewModel>();
             #endregion
 
             #region Slot

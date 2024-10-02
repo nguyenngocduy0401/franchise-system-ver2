@@ -148,5 +148,11 @@ namespace FranchiseProject.Infrastructures.Repositories
             identityResult = await _userManager.AddToRoleAsync(user, role);
             if(!identityResult.Succeeded) throw new Exception(identityResult.Errors.ToString());
         }
+
+        public async Task<bool> CheckUserNameExistAsync(string username)
+        {
+
+            return await _dbContext.Users.AnyAsync(u => u.UserName == username);
+        }
     }
 }

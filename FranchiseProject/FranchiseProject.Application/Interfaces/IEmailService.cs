@@ -11,6 +11,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IEmailService
     {
+        Task<bool> SendEmailCreateAccountAsync(CreateUserViewModel user);
         Task<ApiResponse<bool>> SendOTPEmailAsync(OTPEmailModel otpEmailModel);
         Task<ApiResponse<bool>> SendRegistrationSuccessEmailAsync(string email);
         Task<ApiResponse<bool>> SendContractEmailAsync(string agencyEmail, string contractUrl);

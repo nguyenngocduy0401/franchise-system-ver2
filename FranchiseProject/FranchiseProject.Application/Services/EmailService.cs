@@ -28,7 +28,43 @@ namespace FranchiseProject.Application.Services
             _userManager = userManager;
             _validatorResetPassword = validatorResetPassword;
         }
+        public async Task<bool> SendEmailCreateAccountAsync(CreateUserViewModel user)
+        {
+            using var client = new SmtpClient();
+            try
+            {
+                var emailMessage = new MimeMessage();
+                emailMessage.From.Add(new MailboxAddress
+                    ("futuretech-noreply", _appConfiguration.EmailConfiguration.From));
+                emailMessage.To.Add(new MailboxAddress
+                    (user.Email, user.Email));
+                emailMessage.Subject = "Tài khoản và mật khẩu để đăng nhập vào hệ thống Futuretech";
+                emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                {
+                    Text = $"Chào {user.FullName}\n" +
+                       $"Đây là tài khoản để bạn có thể đăng nhập hệ thống\n" +
+                       $"UserName: {user.UserName}\n" +
+                       $"Password: {user.Password}"
+                };
 
+                await client.ConnectAsync(_appConfiguration.EmailConfiguration.SmtpServer, _appConfiguration.EmailConfiguration.Port, true);
+                // Loại bỏ cơ chế xác thực XOAUTH2  MailKit.Security.SecureSocketOptions.StartTls
+                client.AuthenticationMechanisms.Remove("XOAUTH2");
+                await client.AuthenticateAsync(_appConfiguration.EmailConfiguration.Username, _appConfiguration.EmailConfiguration.Password);
+                await client.SendAsync(emailMessage);
+                
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            finally
+            {
+                await client.DisconnectAsync(true);
+                client.Dispose();
+            }
+            return true;
+        }
         public async Task<ApiResponse<bool>> SendOTPEmailAsync(OTPEmailModel otpEmailModel)
         {
             var response = new ApiResponse<bool>();

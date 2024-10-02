@@ -1,17 +1,21 @@
 ﻿using AutoMapper;
+using ClosedXML.Excel;
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.Utils;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -21,24 +25,26 @@ namespace FranchiseProject.Application.Services
 {
     public class UserService : IUserService
     {
+        #region DI
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClaimsService _claimsService;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
         private readonly ICurrentTime _currentTime;
         private readonly IMapper _mapper;
+        private readonly IEmailService _emailService;
         private readonly IValidator<UpdatePasswordModel> _updatePasswordValidator;
         private readonly IValidator<CreateUserByAdminModel> _createUserValidator;
         private readonly IValidator<UpdateUserByAdminModel> _updateUserValidator;
         private readonly IValidator<UpdateUserByAgencyModel> _updateUserByAgencyValidator;
         private readonly IValidator<CreateUserByAgencyModel> _createUserByAgencyModel;
-
+        #endregion
         public UserService(IClaimsService claimsService, IUnitOfWork unitOfWork,
             UserManager<User> userManager, RoleManager<Role> roleManager,
             IMapper mapper, IValidator<UpdatePasswordModel> updatePasswordValidator,
             IValidator<CreateUserByAdminModel> createUserValidator, IValidator<UpdateUserByAdminModel> updateUserValidator,
             IValidator<UpdateUserByAgencyModel> updateUserByAgencyValidator, ICurrentTime currentTime,
-            IValidator<CreateUserByAgencyModel> createUserByAgencyModel)
+            IValidator<CreateUserByAgencyModel> createUserByAgencyModel, IEmailService emailService)
         {
             _claimsService = claimsService;
             _unitOfWork = unitOfWork;
@@ -51,17 +57,82 @@ namespace FranchiseProject.Application.Services
             _updateUserByAgencyValidator = updateUserByAgencyValidator;
             _currentTime = currentTime;
             _createUserByAgencyModel = createUserByAgencyModel;
+            _emailService = emailService;
         }
-        public async Task<ApiResponse<bool>> CreateUserByAgencyAsync(CreateUserByAgencyModel createUserModel)
+        public async Task<ApiResponse<List<CreateUserByAgencyModel>>> CreateListUserByAgencyAsync(IFormFile file)
+        {
+            var response = new ApiResponse<List<CreateUserByAgencyModel>>();
+            try
+            {
+
+                if (file == null || file.Length == 0) throw new Exception("File is empty.");
+                var userList = new List<CreateUserByAgencyModel>();
+
+                var data = new List<Dictionary<string, string>>();
+
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+                    stream.Position = 0;
+
+                    using (var workbook = new XLWorkbook(stream))
+                    {
+                        var worksheet = workbook.Worksheets.First();
+                        var rows = worksheet.RangeUsed().RowsUsed();
+
+                        var headerRow = rows.First();
+                        var headers = headerRow.Cells().Select(c => c.Value.ToString()).ToList();
+
+                        
+                        foreach (var row in rows.Skip(1))
+                        {
+                            var user = new CreateUserByAgencyModel();
+                            foreach (var cell in row.Cells())
+                            {
+                                var columnIndex = cell.Address.ColumnNumber - 1;  
+
+                                switch (columnIndex)
+                                {
+                                    case 0:  
+                                        user.FullName = cell.Value.ToString();
+                                        break;
+                                    case 1:  
+                                        user.Email = cell.Value.ToString();
+                                        break;
+                                    case 2:  
+                                        user.PhoneNumber = cell.Value.ToString();
+                                        break;
+                                    case 3:
+                                        user.Address = cell.Value.ToString();
+                                        break;
+                                }
+                            }
+                            userList.Add(user);
+                        }
+                    }
+                }
+                response.Data = userList;
+                response.isSuccess = true;
+                response.Message = "OK";
+            }
+            catch (Exception ex)
+            {
+                response.Data = null;
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+        public async Task<ApiResponse<CreateUserViewModel>> CreateUserByAgencyAsync(CreateUserByAgencyModel createUserModel)
         {
 
-            var response = new ApiResponse<bool>();
+            var response = new ApiResponse<CreateUserViewModel>();
             try
             {
                 ValidationResult validationResult = await _createUserByAgencyModel.ValidateAsync(createUserModel);
                 if (!validationResult.IsValid)
                 {
-                    response.Data = false;
+                    response.Data = null;
                     response.isSuccess = false;
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
@@ -70,17 +141,25 @@ namespace FranchiseProject.Application.Services
                     throw new Exception("Role does not exist!");
 
                 var user = _mapper.Map<User>(createUserModel);
-                var identityResult = await _userManager.CreateAsync(user, user.PasswordHash);
-                if (!identityResult.Succeeded) throw new Exception(identityResult.Errors.ToString());
-                await _userManager.AddToRoleAsync(user, createUserModel.Role);
-                response.Data = true;
+
+                var userAccount = await GenerateUserCredentials(user.FullName);
+                user.UserName = userAccount.UserName;
+                user.PasswordHash = userAccount.Password;
+
+                await _unitOfWork.UserRepository.CreateUserAndAssignRoleAsync(user, createUserModel.Role);
+
+                var userModel = _mapper.Map<CreateUserViewModel>(user);
+                userModel.Password = userAccount.Password;
+                var check = await _emailService.SendEmailCreateAccountAsync(userModel);
+                if (!check) throw new Exception("Send email fail!");
+                response.Data = userModel;
                 response.isSuccess = true;
                 response.Message = "Tạo người dùng thành công";
 
             }
             catch (Exception ex)
             {
-                response.Data = false;
+                response.Data = null;
                 response.isSuccess = false;
                 response.Message = ex.Message;
             }
@@ -112,6 +191,7 @@ namespace FranchiseProject.Application.Services
                     response.isSuccess = true;
                     response.Message = "Không thể cập nhật tài khoản nằm ngoài phạm vi trung tâm!";
                 }
+
                 user = _mapper.Map(updateUserByAgencyModel, user);
                 var isSuccess = await _userManager.UpdateAsync(user);
                 if (!isSuccess.Succeeded) throw new Exception("Update fail!");
@@ -140,7 +220,7 @@ namespace FranchiseProject.Application.Services
                 if (user == null) throw new Exception("Not found user");
                 if (userAgency == null) throw new Exception("Login fail!");
 
-                if((user.AgencyId != userAgency.AgencyId) || user.AgencyId != null)
+                if ((user.AgencyId != userAgency.AgencyId) || user.AgencyId != null)
                 {
                     response.Data = false;
                     response.isSuccess = true;
@@ -205,7 +285,7 @@ namespace FranchiseProject.Application.Services
                 else
                 {
                     var userViewModels = _mapper.Map<List<UserViewModel>>(usersPagination.Items);
-                    
+
 
                     var result = new Pagination<UserViewModel>
                     {
@@ -238,11 +318,11 @@ namespace FranchiseProject.Application.Services
 
                 if (!validationResult.IsValid) throw new Exception(string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage)));
 
-                if (string.IsNullOrEmpty(createUserModel.Role) || !(await _roleManager.RoleExistsAsync(createUserModel.Role))) 
+                if (string.IsNullOrEmpty(createUserModel.Role) || !(await _roleManager.RoleExistsAsync(createUserModel.Role)))
                     throw new Exception("Role does not exist!");
                 var user = _mapper.Map<User>(createUserModel);
-                await  _unitOfWork.UserRepository.CreateUserAndAssignRoleAsync(user, createUserModel.Role);
-                
+                await _unitOfWork.UserRepository.CreateUserAndAssignRoleAsync(user, createUserModel.Role);
+
                 response.Data = createUserModel;
                 response.isSuccess = true;
                 response.Message = "Tạo người dùng thành công";
@@ -270,7 +350,7 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
-                var user =await _userManager.FindByIdAsync(id);
+                var user = await _userManager.FindByIdAsync(id);
                 if (user == null) throw new Exception("Not found user!");
                 user = _mapper.Map(updateUserByAdminModel, user);
                 var isSuccess = await _userManager.UpdateAsync(user);
@@ -424,5 +504,41 @@ namespace FranchiseProject.Application.Services
                 response.Message = ex.Message;
             }
             return response;
-        }    }
+        } 
+        private async Task<UserLoginModel> GenerateUserCredentials(string fullname)
+    {
+        var normalizedString = fullname.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder();
+
+        foreach (var c in normalizedString)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+        fullname = stringBuilder.ToString();
+        var words = fullname.Split(' ');
+        string lastName = words.Last();
+
+
+        var initials = string.Concat(words.Take(words.Length - 1).Select(n => n[0]));
+        var year = DateTime.Now.Year.ToString().Substring(2);
+        var month = DateTime.Now.Month.ToString();
+        var username = lastName + initials + year + month;
+        var counter = 1;
+        while (await _unitOfWork.UserRepository.CheckUserNameExistAsync(username))
+        {
+            username = lastName + initials + year + month + counter;
+            counter++;
+        }
+        var random = new Random();
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        var password = new string(Enumerable.Repeat(chars, 6)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
+
+        return new UserLoginModel { Password = password, UserName = username };
+    }
+    }
 }

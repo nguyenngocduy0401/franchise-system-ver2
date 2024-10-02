@@ -14,11 +14,10 @@ namespace FranchiseProject.Application.Utils
 {
     public static class GenerateUserCredentialsString
     {
-        public static UserLoginModel GenerateUserCredentials(this User user, int number)
+        
+        public static UserLoginModel GenerateUserCredentials(this User user)
         {
-            var words = user.FullName.Split(' ');
-            string lastName = words.Last();
-            var normalizedString = lastName.Normalize(NormalizationForm.FormD);
+            var normalizedString = user.FullName.Normalize(NormalizationForm.FormD);
             var stringBuilder = new StringBuilder();
 
             foreach (var c in normalizedString)
@@ -29,16 +28,21 @@ namespace FranchiseProject.Application.Utils
                     stringBuilder.Append(c);
                 }
             }
+            var fullname = stringBuilder.ToString();    
+            var words = fullname.Split(' ');
+            string lastName = words.Last();
+            
+            
             var initials = string.Concat(words.Take(words.Length - 1).Select(n => n[0]));
             var year  = DateTime.Now.Year.ToString().Substring(2);
             var month = DateTime.Now.Month.ToString();
-            var userName = lastName + initials + year + month + '0'+ number;
+            var username = lastName + initials + year + month;
             var random = new Random();
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             var password = new string(Enumerable.Repeat(chars, 6)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
-
-            return new UserLoginModel{UserName=userName, Password=password };
+            
+            return new UserLoginModel { Password = password, UserName =username };
         }
     }
 }
