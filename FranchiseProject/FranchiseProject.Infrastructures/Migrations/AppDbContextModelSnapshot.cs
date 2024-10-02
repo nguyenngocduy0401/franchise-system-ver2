@@ -267,6 +267,37 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasIndex("TermId");
 
                     b.ToTable("Classes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a2a94ddc-ff9e-484c-8d2a-6f9d5dd21279"),
+                            Capacity = 30,
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CurrentEnrollment = 1,
+                            IsDeleted = false,
+                            Name = "JAVA_TEST_SU25",
+                            TermId = new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a")
+                        },
+                        new
+                        {
+                            Id = new Guid("99129374-30f6-4f57-978f-583353684ca5"),
+                            Capacity = 30,
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CurrentEnrollment = 1,
+                            IsDeleted = false,
+                            Name = "OOP_TEST_SU25",
+                            TermId = new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a")
+                        },
+                        new
+                        {
+                            Id = new Guid("99e3af58-64b4-4304-ae6a-2d8782e9caed"),
+                            Capacity = 30,
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CurrentEnrollment = 1,
+                            IsDeleted = false,
+                            TermId = new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a")
+                        });
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.ClassSchedule", b =>
@@ -315,6 +346,55 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasIndex("SlotId");
 
                     b.ToTable("ClassSchedules");
+                });
+
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Consultation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CusomterName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("DeleteBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Consultations");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Contract", b =>
@@ -384,7 +464,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                             Amount = 0,
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Duration = 0,
-                            EndTime = new DateTime(2024, 9, 25, 20, 29, 41, 185, DateTimeKind.Local).AddTicks(9374),
+                            EndTime = new DateTime(2024, 10, 7, 16, 57, 8, 989, DateTimeKind.Local).AddTicks(310),
                             IsDeleted = false,
                             StartTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
@@ -659,40 +739,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasIndex("FeedbackId");
 
                     b.ToTable("FeedbackQuestions");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.FranchiseRegistrationRequests", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConsultantUserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CusomterName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PhoneNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("FranchiseRegistrationRequests");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Question", b =>
@@ -1088,6 +1134,24 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Slots");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("849116fa-dd9c-49a4-a019-7616b7447ae9"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new TimeSpan(0, 15, 0, 0, 0),
+                            IsDeleted = false,
+                            StartTime = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            Id = new Guid("a994e524-943d-4022-b258-de37662055c9"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new TimeSpan(0, 21, 0, 0, 0),
+                            IsDeleted = false,
+                            StartTime = new TimeSpan(0, 15, 0, 0, 0)
+                        });
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.StudentAnswer", b =>
@@ -1233,6 +1297,35 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Terms");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndDate = new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Name = "SP25",
+                            StartDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("97b016ea-591f-4198-8251-5ab4ae8e88ec"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndDate = new DateTime(2025, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Name = "SU25",
+                            StartDate = new DateTime(2025, 4, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("c60e3315-6c8b-4855-b1cb-fa92c7e4b593"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndDate = new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Name = "FA25",
+                            StartDate = new DateTime(2025, 8, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.User", b =>
@@ -1520,6 +1613,15 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("Slot");
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Consultation", b =>
+                {
+                    b.HasOne("FranchiseProject.Domain.Entity.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Contract", b =>
                 {
                     b.HasOne("FranchiseProject.Domain.Entity.Agency", "Agency")
@@ -1590,15 +1692,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                         .HasForeignKey("FeedbackId");
 
                     b.Navigation("Feedback");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.FranchiseRegistrationRequests", b =>
-                {
-                    b.HasOne("FranchiseProject.Domain.Entity.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Question", b =>

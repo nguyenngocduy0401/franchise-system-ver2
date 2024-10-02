@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace FranchiseProject.Infrastructures.Migrations
 {
     /// <inheritdoc />
-    public partial class newDb : Migration
+    public partial class ac : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -461,23 +463,28 @@ namespace FranchiseProject.Infrastructures.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FranchiseRegistrationRequests",
+                name: "Consultations",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CusomterName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<int>(type: "int", nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    ConsultantUserName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModificationBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FranchiseRegistrationRequests", x => x.Id);
+                    table.PrimaryKey("PK_Consultations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FranchiseRegistrationRequests_AspNetUsers_UserId",
+                        name: "FK_Consultations_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
@@ -953,7 +960,36 @@ namespace FranchiseProject.Infrastructures.Migrations
             migrationBuilder.InsertData(
                 table: "Contracts",
                 columns: new[] { "Id", "AgencyId", "Amount", "ContractDocumentImageURL", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "Duration", "EndTime", "IsDeleted", "ModificationBy", "ModificationDate", "StartTime", "TermsAndCondition", "Title" },
-                values: new object[] { new Guid("550ee872-ea09-42a0-b9ac-809890debafb"), null, 0, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, 0, new DateTime(2024, 9, 25, 20, 29, 41, 185, DateTimeKind.Local).AddTicks(9374), false, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null });
+                values: new object[] { new Guid("550ee872-ea09-42a0-b9ac-809890debafb"), null, 0, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, 0, new DateTime(2024, 10, 7, 16, 57, 8, 989, DateTimeKind.Local).AddTicks(310), false, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null });
+
+            migrationBuilder.InsertData(
+                table: "Slots",
+                columns: new[] { "Id", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "EndTime", "IsDeleted", "ModificationBy", "ModificationDate", "StartTime" },
+                values: new object[,]
+                {
+                    { new Guid("849116fa-dd9c-49a4-a019-7616b7447ae9"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new TimeSpan(0, 15, 0, 0, 0), false, null, null, new TimeSpan(0, 8, 0, 0, 0) },
+                    { new Guid("a994e524-943d-4022-b258-de37662055c9"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new TimeSpan(0, 21, 0, 0, 0), false, null, null, new TimeSpan(0, 15, 0, 0, 0) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Terms",
+                columns: new[] { "Id", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "EndDate", "IsDeleted", "ModificationBy", "ModificationDate", "Name", "StartDate" },
+                values: new object[,]
+                {
+                    { new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, null, null, "SP25", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { new Guid("97b016ea-591f-4198-8251-5ab4ae8e88ec"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new DateTime(2025, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, null, null, "SU25", new DateTime(2025, 4, 2, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { new Guid("c60e3315-6c8b-4855-b1cb-fa92c7e4b593"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, null, null, "FA25", new DateTime(2025, 8, 2, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Classes",
+                columns: new[] { "Id", "Capacity", "CourseId", "CreatedBy", "CreationDate", "CurrentEnrollment", "DeleteBy", "DeletionDate", "IsDeleted", "ModificationBy", "ModificationDate", "Name", "TermId" },
+                values: new object[,]
+                {
+                    { new Guid("99129374-30f6-4f57-978f-583353684ca5"), 30, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, null, false, null, null, "OOP_TEST_SU25", new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a") },
+                    { new Guid("99e3af58-64b4-4304-ae6a-2d8782e9caed"), 30, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, null, false, null, null, null, new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a") },
+                    { new Guid("a2a94ddc-ff9e-484c-8d2a-6f9d5dd21279"), 30, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, null, false, null, null, "JAVA_TEST_SU25", new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a") }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -1045,6 +1081,11 @@ namespace FranchiseProject.Infrastructures.Migrations
                 column: "SlotId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Consultations_UserId",
+                table: "Consultations",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Contracts_AgencyId",
                 table: "Contracts",
                 column: "AgencyId");
@@ -1097,11 +1138,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                 name: "IX_Feedbacks_ClassId",
                 table: "Feedbacks",
                 column: "ClassId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FranchiseRegistrationRequests_UserId",
-                table: "FranchiseRegistrationRequests",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_QuestionOptions_QuestionId",
@@ -1189,10 +1225,10 @@ namespace FranchiseProject.Infrastructures.Migrations
                 name: "Attendances");
 
             migrationBuilder.DropTable(
-                name: "FeedbackAnswers");
+                name: "Consultations");
 
             migrationBuilder.DropTable(
-                name: "FranchiseRegistrationRequests");
+                name: "FeedbackAnswers");
 
             migrationBuilder.DropTable(
                 name: "QuizDetails");

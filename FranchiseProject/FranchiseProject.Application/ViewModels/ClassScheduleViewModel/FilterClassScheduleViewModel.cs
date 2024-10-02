@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.ViewModels.ClassScheduleViewModel
 {
-    public class FilterClassScheduleViewModelClass1
+    public class FilterClassScheduleViewModel
     {
         public string? Date {  get; set; }
         public string? Slot { get; set; }
