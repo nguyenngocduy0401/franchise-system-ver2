@@ -271,7 +271,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a2a94ddc-ff9e-484c-8d2a-6f9d5dd21279"),
+                            Id = new Guid("99e3af58-64b4-4304-ae6a-2d8782e9caed"),
                             Capacity = 30,
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CurrentEnrollment = 1,
@@ -291,11 +291,12 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("99e3af58-64b4-4304-ae6a-2d8782e9caed"),
+                            Id = new Guid("a2a94ddc-ff9e-484c-8d2a-6f9d5dd21279"),
                             Capacity = 30,
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CurrentEnrollment = 1,
                             IsDeleted = false,
+                            Name = "MLN131_TEST_SU25",
                             TermId = new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a")
                         });
                 });
@@ -464,7 +465,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                             Amount = 0,
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Duration = 0,
-                            EndTime = new DateTime(2024, 10, 7, 16, 57, 8, 989, DateTimeKind.Local).AddTicks(310),
+                            EndTime = new DateTime(2024, 10, 8, 15, 31, 57, 39, DateTimeKind.Local).AddTicks(6434),
                             IsDeleted = false,
                             StartTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
@@ -1128,6 +1129,9 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<TimeSpan?>("StartTime")
                         .HasColumnType("time");
 
@@ -1142,6 +1146,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EndTime = new TimeSpan(0, 15, 0, 0, 0),
                             IsDeleted = false,
+                            Name = "SLot 1",
                             StartTime = new TimeSpan(0, 8, 0, 0, 0)
                         },
                         new
@@ -1150,6 +1155,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EndTime = new TimeSpan(0, 21, 0, 0, 0),
                             IsDeleted = false,
+                            Name = "SLot 2",
                             StartTime = new TimeSpan(0, 15, 0, 0, 0)
                         });
                 });

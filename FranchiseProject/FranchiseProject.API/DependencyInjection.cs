@@ -20,6 +20,10 @@ using FranchiseProject.Domain.Entity;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.API.Validator.SlotValidator;
 using FranchiseProject.API.Validator.UserValidator;
+using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
+using FranchiseProject.API.Validator.ClassScheduleValidator;
+using FranchiseProject.Application.ViewModels.TermViewModel;
+using FranchiseProject.API.Validator.TermValidator;
 
 namespace FranchiseProject.API
 {
@@ -83,6 +87,7 @@ namespace FranchiseProject.API
             services.AddHostedService<SetupIdentityDataSeeder>();
             services.AddScoped<RoleInitializer>();
             services.AddScoped<AccountInitializer>();
+
             #endregion
             #region Validator
             services.AddTransient<IValidator<RegisterConsultationViewModel>, RegisFranchiseViewModelValidator>();
@@ -94,6 +99,9 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<CreateUserModel>,CreateUserValidator>();
             services.AddTransient<IValidator<UpdateUserModel>, UpdateUserValidator>();
             services.AddTransient<IValidator<UpdatePasswordModel>, UpdatePasswordValidator>();
+            services.AddTransient<IValidator<CreateClassScheduleViewModel>, CreateClassScheduleValidor>();
+            services.AddTransient<IValidator<CreateClassScheduleDateRangeViewModel>, CreateClassScheduleDateRangeValidator>();
+            services.AddTransient<IValidator<CreateTermViewModel>,CreateTermValidator>();
             #endregion
 
             return services;

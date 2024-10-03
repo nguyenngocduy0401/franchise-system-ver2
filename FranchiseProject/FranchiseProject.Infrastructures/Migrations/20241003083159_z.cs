@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FranchiseProject.Infrastructures.Migrations
 {
     /// <inheritdoc />
-    public partial class ac : Migration
+    public partial class z : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -101,6 +101,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StartTime = table.Column<TimeSpan>(type: "time", nullable: true),
                     EndTime = table.Column<TimeSpan>(type: "time", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -960,15 +961,15 @@ namespace FranchiseProject.Infrastructures.Migrations
             migrationBuilder.InsertData(
                 table: "Contracts",
                 columns: new[] { "Id", "AgencyId", "Amount", "ContractDocumentImageURL", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "Duration", "EndTime", "IsDeleted", "ModificationBy", "ModificationDate", "StartTime", "TermsAndCondition", "Title" },
-                values: new object[] { new Guid("550ee872-ea09-42a0-b9ac-809890debafb"), null, 0, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, 0, new DateTime(2024, 10, 7, 16, 57, 8, 989, DateTimeKind.Local).AddTicks(310), false, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null });
+                values: new object[] { new Guid("550ee872-ea09-42a0-b9ac-809890debafb"), null, 0, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, 0, new DateTime(2024, 10, 8, 15, 31, 57, 39, DateTimeKind.Local).AddTicks(6434), false, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null });
 
             migrationBuilder.InsertData(
                 table: "Slots",
-                columns: new[] { "Id", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "EndTime", "IsDeleted", "ModificationBy", "ModificationDate", "StartTime" },
+                columns: new[] { "Id", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "EndTime", "IsDeleted", "ModificationBy", "ModificationDate", "Name", "StartTime" },
                 values: new object[,]
                 {
-                    { new Guid("849116fa-dd9c-49a4-a019-7616b7447ae9"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new TimeSpan(0, 15, 0, 0, 0), false, null, null, new TimeSpan(0, 8, 0, 0, 0) },
-                    { new Guid("a994e524-943d-4022-b258-de37662055c9"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new TimeSpan(0, 21, 0, 0, 0), false, null, null, new TimeSpan(0, 15, 0, 0, 0) }
+                    { new Guid("849116fa-dd9c-49a4-a019-7616b7447ae9"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new TimeSpan(0, 15, 0, 0, 0), false, null, null, "SLot 1", new TimeSpan(0, 8, 0, 0, 0) },
+                    { new Guid("a994e524-943d-4022-b258-de37662055c9"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new TimeSpan(0, 21, 0, 0, 0), false, null, null, "SLot 2", new TimeSpan(0, 15, 0, 0, 0) }
                 });
 
             migrationBuilder.InsertData(
@@ -987,8 +988,8 @@ namespace FranchiseProject.Infrastructures.Migrations
                 values: new object[,]
                 {
                     { new Guid("99129374-30f6-4f57-978f-583353684ca5"), 30, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, null, false, null, null, "OOP_TEST_SU25", new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a") },
-                    { new Guid("99e3af58-64b4-4304-ae6a-2d8782e9caed"), 30, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, null, false, null, null, null, new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a") },
-                    { new Guid("a2a94ddc-ff9e-484c-8d2a-6f9d5dd21279"), 30, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, null, false, null, null, "JAVA_TEST_SU25", new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a") }
+                    { new Guid("99e3af58-64b4-4304-ae6a-2d8782e9caed"), 30, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, null, false, null, null, "JAVA_TEST_SU25", new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a") },
+                    { new Guid("a2a94ddc-ff9e-484c-8d2a-6f9d5dd21279"), 30, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, null, false, null, null, "MLN131_TEST_SU25", new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a") }
                 });
 
             migrationBuilder.CreateIndex(

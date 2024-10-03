@@ -9,6 +9,7 @@ namespace FranchiseProject.Application.ViewModels.SlotViewModels
 {
     public class CreateSlotModel 
     {
+        public string Name { get; set; }
         public TimeSpan? StartTime { get; set; }
         public TimeSpan? EndTime { get; set; }
     }

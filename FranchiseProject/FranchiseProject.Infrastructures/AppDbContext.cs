@@ -68,6 +68,7 @@ namespace FranchiseProject.Infrastructures
                 new Slot
                 {
                     Id = Guid.Parse("849116FA-DD9C-49A4-A019-7616B7447AE9"),
+                    Name="SLot 1",
                     StartTime = new TimeSpan(8, 0, 0),
                     EndTime = new TimeSpan(15, 0, 0)
 
@@ -75,6 +76,7 @@ namespace FranchiseProject.Infrastructures
                 new Slot
                 {
                     Id = Guid.Parse("A994E524-943D-4022-B258-DE37662055C9"),
+                    Name ="SLot 2",
                     StartTime = new TimeSpan(15, 0, 0),
                     EndTime = new TimeSpan (21, 0, 0)
                 }

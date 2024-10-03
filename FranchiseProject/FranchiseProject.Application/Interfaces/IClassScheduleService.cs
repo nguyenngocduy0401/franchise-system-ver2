@@ -10,11 +10,11 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IClassScheduleService
     {
-        public Task<ApiResponse<bool>> CreateClassScheduleAsync(CreateClassScheduleViewModel createClassScheduleViewModel);
-        public Task<ApiResponse<bool>> UpdateClassScheduleAsync(CreateClassScheduleViewModel updateClassScheduleViewModel);
-        public Task<ApiResponse<ClassScheduleViewModel>> FilterClassScheduleAsync(FilterClassScheduleViewModel filterClassScheduleViewModel);
-        public Task<ApiResponse<bool>> DeleteClassScheduleAsync(string id);
-        public Task<ApiResponse<ClassScheduleViewModel>> GetClassScheduleAsync(string id);
-        public Task<ApiResponse<bool>> CreateClassScheduleDateRangeAsync(CreateClassScheduleDateRangeViewModel createClassScheduleDateRangeViewModel);
+        Task<ApiResponse<bool>> CreateClassScheduleAsync(CreateClassScheduleViewModel createClassScheduleViewModel);
+        Task<ApiResponse<bool>> CreateClassScheduleDateRangeAsync(CreateClassScheduleDateRangeViewModel createClassScheduleDateRangeViewModel);
+        Task<ApiResponse<bool>> DeleteClassScheduleByIdAsync(string id);
+        Task<ApiResponse<Pagination<ClassScheduleViewModel>>> FilterClassScheduleAsync(FilterClassScheduleViewModel filterClassScheduleViewModel);
+        Task<ApiResponse<ClassScheduleViewModel>> GetClassScheduleByIdAsync(string id);
+        Task<ApiResponse<bool>> UpdateClassScheduleAsync(CreateClassScheduleViewModel updateClassScheduleViewModel, string id);
     }
 }

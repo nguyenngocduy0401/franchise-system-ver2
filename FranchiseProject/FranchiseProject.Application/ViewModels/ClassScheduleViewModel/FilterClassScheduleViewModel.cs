@@ -8,8 +8,9 @@ namespace FranchiseProject.Application.ViewModels.ClassScheduleViewModel
 {
     public class FilterClassScheduleViewModel
     {
-        public string? Date {  get; set; }
-        public string? Slot { get; set; }
+        public string? StartDate { get; set; }
+        public string? EndDate { get; set; }
+     
         public int PageIndex { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }

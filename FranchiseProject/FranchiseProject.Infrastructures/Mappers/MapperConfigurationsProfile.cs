@@ -1,6 +1,7 @@
 using AutoMapper;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.AgencyViewModel;
+using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
 using FranchiseProject.Application.ViewModels.ContractViewModel;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
@@ -42,6 +43,16 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<CreateSlotModel, Slot>();
             CreateMap<Slot, SlotViewModel>();
             CreateMap<Pagination<Slot>, Pagination<SlotViewModel>>().ReverseMap();
+            #endregion
+            #region ClassSchedule
+            CreateMap<ClassSchedule, ClassScheduleViewModel>()
+              .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
+            .ForMember(dest => dest.SlotName, opt => opt.MapFrom(src => src.Slot.Name)).ReverseMap();
+            CreateMap<ClassSchedule, ClassScheduleViewModel>()
+          .ReverseMap();
+
+            CreateMap<Pagination<ClassSchedule>, Pagination<ClassScheduleViewModel>>()
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
             #endregion
         }
     }
