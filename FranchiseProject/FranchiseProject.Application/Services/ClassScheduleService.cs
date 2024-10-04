@@ -89,21 +89,7 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
 
-                // Kiểm tra tính hợp lệ của các thứ trong tuần
-                var validDaysOfWeek = Enum.GetNames(typeof(DayOfWeek)); // Lấy danh sách các thứ trong tuần từ enum DayOfWeek
-                var invalidDays = createClassScheduleDateRangeViewModel.dayOfWeeks
-                    ?.Where(day => !validDaysOfWeek.Contains(day, StringComparer.OrdinalIgnoreCase))
-                    .ToList();
-
-                if (invalidDays != null && invalidDays.Any())
-                {
-                    response.Data = false;
-                    response.isSuccess = false;
-                    response.Message = $"Các ngày không hợp lệ: {string.Join(", ", invalidDays)}";
-                    return response;
-                }
-
-                // Lấy term theo ID
+                // Get the term
                 var term = await _unitOfWork.TermRepository.GetByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.TermId));
                 if (term == null)
                 {
@@ -118,7 +104,8 @@ namespace FranchiseProject.Application.Services
                 DateTime currentDate = term.StartDate.Value;
                 while (currentDate <= term.EndDate)
                 {
-                    if (createClassScheduleDateRangeViewModel.dayOfWeeks!.Contains(currentDate.DayOfWeek.ToString(), StringComparer.OrdinalIgnoreCase))
+                    // Chỉ thêm vào nếu ngày nằm trong danh sách các thứ đã chọn
+                    if (createClassScheduleDateRangeViewModel.dayOfWeeks!.Contains((DayOfWeekEnum)currentDate.DayOfWeek))
                     {
                         selectedDates.Add(currentDate);
                     }

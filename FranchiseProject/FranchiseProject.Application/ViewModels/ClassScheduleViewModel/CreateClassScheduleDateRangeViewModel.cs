@@ -16,6 +16,6 @@ namespace FranchiseProject.Application.ViewModels.ClassScheduleViewModel
         public string? ClassId { get; set; }
         public string? SlotId { get; set; }
      
-        public List<String>? dayOfWeeks;
+        public List<DayOfWeekEnum>? dayOfWeeks { get; set; }
     }
 }
