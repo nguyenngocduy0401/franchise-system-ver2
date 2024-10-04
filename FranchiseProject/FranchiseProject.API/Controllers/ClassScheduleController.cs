@@ -36,7 +36,7 @@ namespace FranchiseProject.API.Controllers
 
             [SwaggerOperation(Summary = "tạo mới lịch học theo khoảng thời gian (FranchiseManager)")]
             [HttpPost("date-range")]
-            public async Task<ApiResponse<bool>> CreateClassScheduleDateRangeAsync(CreateClassScheduleDateRangeViewModel createClassScheduleDateRangeViewModel)
+            public async Task<ApiResponse<bool>> CreateClassScheduleDateRangeAsync( CreateClassScheduleDateRangeViewModel createClassScheduleDateRangeViewModel)
             {
                 return await _classScheduleService.CreateClassScheduleDateRangeAsync(createClassScheduleDateRangeViewModel);
             }

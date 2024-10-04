@@ -9,5 +9,7 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface ITermRepository : IGenericRepository<Term>
     {
+        Task<Term?> GetOverlappingTermsAsync(DateTime startDate, DateTime endDate);
+        Task<Term?> GetByNameAsync(string name);
     }
 }

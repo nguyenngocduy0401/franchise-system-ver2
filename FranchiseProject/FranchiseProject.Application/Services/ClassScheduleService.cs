@@ -5,6 +5,7 @@ using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace FranchiseProject.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<CreateClassScheduleViewModel> _validator1;
         private readonly IValidator<CreateClassScheduleDateRangeViewModel> _validator2;
-        private readonly ITermService _termService;
+       
         public ClassScheduleService(IValidator<CreateClassScheduleDateRangeViewModel> validator2,IMapper mapper, IUnitOfWork unitOfWork, IValidator<CreateClassScheduleViewModel> validator1)
         {
             _mapper = mapper;
@@ -78,7 +79,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-                
+                // Validate input
                 FluentValidation.Results.ValidationResult validationResult = await _validator2.ValidateAsync(createClassScheduleDateRangeViewModel);
                 if (!validationResult.IsValid)
                 {
@@ -87,46 +88,77 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
-                var term =await _unitOfWork.TermRepository.GetByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.TermId));
+
+                // Kiểm tra tính hợp lệ của các thứ trong tuần
+                var validDaysOfWeek = Enum.GetNames(typeof(DayOfWeek)); // Lấy danh sách các thứ trong tuần từ enum DayOfWeek
+                var invalidDays = createClassScheduleDateRangeViewModel.dayOfWeeks
+                    ?.Where(day => !validDaysOfWeek.Contains(day, StringComparer.OrdinalIgnoreCase))
+                    .ToList();
+
+                if (invalidDays != null && invalidDays.Any())
+                {
+                    response.Data = false;
+                    response.isSuccess = false;
+                    response.Message = $"Các ngày không hợp lệ: {string.Join(", ", invalidDays)}";
+                    return response;
+                }
+
+                // Lấy term theo ID
+                var term = await _unitOfWork.TermRepository.GetByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.TermId));
                 if (term == null)
                 {
                     response.Data = false;
                     response.isSuccess = true;
-                    response.Message = "Không tìm thấy kỳ học !";
+                    response.Message = "Không tìm thấy kỳ học!";
                     return response;
                 }
 
-                int totalDays = (term.EndDate-term.StartDate).Value.Days + 1;
-                DateTime currentDate = (DateTime)term.StartDate;
-                for (int i = 0; i < totalDays; i++)
-                { // check classSchedule nào đã tồn tại với ngày, phòng và slot
+                // Lọc ngày dựa trên các ngày trong tuần đã chọn
+                var selectedDates = new List<DateTime>();
+                DateTime currentDate = term.StartDate.Value;
+                while (currentDate <= term.EndDate)
+                {
+                    if (createClassScheduleDateRangeViewModel.dayOfWeeks!.Contains(currentDate.DayOfWeek.ToString(), StringComparer.OrdinalIgnoreCase))
+                    {
+                        selectedDates.Add(currentDate);
+                    }
+                    currentDate = currentDate.AddDays(1);
+                }
+
+                // Tạo lịch học cho mỗi ngày đã chọn
+                foreach (var date in selectedDates)
+                {
+                    // Check nếu đã có lớp vào ngày đó, phòng đó, slot đó
                     var existingSchedule = await _unitOfWork.ClassScheduleRepository
-                        .GetExistingScheduleAsync(currentDate,createClassScheduleDateRangeViewModel.Room,Guid.Parse(createClassScheduleDateRangeViewModel.SlotId));
+                        .GetExistingScheduleAsync(date, createClassScheduleDateRangeViewModel.Room, Guid.Parse(createClassScheduleDateRangeViewModel.SlotId));
 
                     if (existingSchedule != null)
                     {
                         response.Data = false;
                         response.isSuccess = false;
-                        response.Message = $"Đã tồn tại lớp học đã chọn.";
+                        response.Message = $"Lịch học đã tồn tại vào ngày {date.ToString("yyyy-MM-dd")}, phòng {createClassScheduleDateRangeViewModel.Room}, slot {createClassScheduleDateRangeViewModel.SlotId}!";
                         return response;
                     }
-                    var classSchedule = new ClassSchedule()
+
+                    // Tạo lịch học mới
+                    var classSchedule = new ClassSchedule
                     {
                         Room = createClassScheduleDateRangeViewModel.Room,
-                        ClassId=Guid.Parse(createClassScheduleDateRangeViewModel.ClassId),
-                        SlotId=Guid.Parse(createClassScheduleDateRangeViewModel.SlotId ),
-                         Date = currentDate.AddDays(1),
-
+                        ClassId = Guid.Parse(createClassScheduleDateRangeViewModel.ClassId),
+                        SlotId = Guid.Parse(createClassScheduleDateRangeViewModel.SlotId),
+                        Date = date,
                     };
+
                     await _unitOfWork.ClassScheduleRepository.AddAsync(classSchedule);
-                    currentDate = currentDate.AddDays(1);
                 }
+
+                // Lưu thay đổi vào database
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Create fail!");
+                if (!isSuccess) throw new Exception("Tạo lịch học thất bại!");
+
                 response.Data = true;
                 response.isSuccess = true;
-                response.Message = "Tạo  thành công!";
-
+                response.Message = "Tạo lịch học thành công!";
             }
             catch (Exception ex)
             {
