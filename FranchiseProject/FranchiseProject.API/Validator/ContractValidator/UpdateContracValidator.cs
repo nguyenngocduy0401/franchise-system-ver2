@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using FranchiseProject.Application.ViewModels.ContractViewModel;
 
-namespace FranchiseProject.API.Validator.ContractValidation
+namespace FranchiseProject.API.Validator.ContractValidator
 {
     public class UpdateContracValidator: AbstractValidator<UpdateContractViewModel>
     {

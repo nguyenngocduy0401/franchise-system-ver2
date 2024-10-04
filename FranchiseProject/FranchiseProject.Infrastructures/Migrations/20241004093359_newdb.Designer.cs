@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FranchiseProject.Infrastructures.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240924154655_newDb")]
-    partial class newDb
+    [Migration("20241004093359_newdb")]
+    partial class newdb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -91,6 +91,61 @@ namespace FranchiseProject.Infrastructures.Migrations
                             IsDeleted = false,
                             Status = 4
                         });
+                });
+
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Assessment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeleteBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Duration")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Part")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("QuestionType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Weight")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("Assessments");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Assignment", b =>
@@ -329,6 +384,55 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.ToTable("ClassSchedules");
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Consultation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CusomterName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("DeleteBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Consultations");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Contract", b =>
                 {
                     b.Property<Guid>("Id")
@@ -396,7 +500,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                             Amount = 0,
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Duration = 0,
-                            EndTime = new DateTime(2024, 9, 29, 22, 46, 55, 126, DateTimeKind.Local).AddTicks(1366),
+                            EndTime = new DateTime(2024, 10, 9, 16, 33, 59, 593, DateTimeKind.Local).AddTicks(8212),
                             IsDeleted = false,
                             StartTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
@@ -438,11 +542,17 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("NumberOfSession")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<Guid?>("SyllabusId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("URLImage")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -671,40 +781,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasIndex("FeedbackId");
 
                     b.ToTable("FeedbackQuestions");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.FranchiseRegistrationRequests", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConsultantUserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CusomterName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PhoneNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("FranchiseRegistrationRequests");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Question", b =>
@@ -1449,6 +1525,15 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Assessment", b =>
+                {
+                    b.HasOne("FranchiseProject.Domain.Entity.Course", "Course")
+                        .WithMany("Assessments")
+                        .HasForeignKey("CourseId");
+
+                    b.Navigation("Course");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Assignment", b =>
                 {
                     b.HasOne("FranchiseProject.Domain.Entity.Class", "Class")
@@ -1535,6 +1620,15 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("Slot");
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Consultation", b =>
+                {
+                    b.HasOne("FranchiseProject.Domain.Entity.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Contract", b =>
                 {
                     b.HasOne("FranchiseProject.Domain.Entity.Agency", "Agency")
@@ -1605,15 +1699,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                         .HasForeignKey("FeedbackId");
 
                     b.Navigation("Feedback");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.FranchiseRegistrationRequests", b =>
-                {
-                    b.HasOne("FranchiseProject.Domain.Entity.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Question", b =>
@@ -1864,6 +1949,8 @@ namespace FranchiseProject.Infrastructures.Migrations
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Course", b =>
                 {
+                    b.Navigation("Assessments");
+
                     b.Navigation("Chapters");
 
                     b.Navigation("Classes");

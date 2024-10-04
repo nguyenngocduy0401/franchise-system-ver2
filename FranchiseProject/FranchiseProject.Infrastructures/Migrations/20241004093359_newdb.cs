@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FranchiseProject.Infrastructures.Migrations
 {
     /// <inheritdoc />
-    public partial class newDb : Migration
+    public partial class newdb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -218,6 +218,8 @@ namespace FranchiseProject.Infrastructures.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    URLImage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NumberOfSession = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     SyllabusId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CourseCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -285,6 +287,36 @@ namespace FranchiseProject.Infrastructures.Migrations
                         name: "FK_AspNetUsers_Contracts_ContractId",
                         column: x => x.ContractId,
                         principalTable: "Contracts",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Assessments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Part = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Weight = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Duration = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    QuestionType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModificationBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Assessments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Assessments_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
                         principalColumn: "Id");
                 });
 
@@ -462,23 +494,28 @@ namespace FranchiseProject.Infrastructures.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FranchiseRegistrationRequests",
+                name: "Consultations",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CusomterName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<int>(type: "int", nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    ConsultantUserName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModificationBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FranchiseRegistrationRequests", x => x.Id);
+                    table.PrimaryKey("PK_Consultations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FranchiseRegistrationRequests_AspNetUsers_UserId",
+                        name: "FK_Consultations_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
@@ -959,7 +996,7 @@ namespace FranchiseProject.Infrastructures.Migrations
             migrationBuilder.InsertData(
                 table: "Contracts",
                 columns: new[] { "Id", "AgencyId", "Amount", "ContractDocumentImageURL", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "Duration", "EndTime", "IsDeleted", "ModificationBy", "ModificationDate", "StartTime", "TermsAndCondition", "Title" },
-                values: new object[] { new Guid("550ee872-ea09-42a0-b9ac-809890debafb"), null, 0, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, 0, new DateTime(2024, 9, 29, 22, 46, 55, 126, DateTimeKind.Local).AddTicks(1366), false, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null });
+                values: new object[] { new Guid("550ee872-ea09-42a0-b9ac-809890debafb"), null, 0, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, 0, new DateTime(2024, 10, 9, 16, 33, 59, 593, DateTimeKind.Local).AddTicks(8212), false, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -1011,6 +1048,11 @@ namespace FranchiseProject.Infrastructures.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Assessments_CourseId",
+                table: "Assessments",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Assignments_ClassId",
                 table: "Assignments",
                 column: "ClassId");
@@ -1049,6 +1091,11 @@ namespace FranchiseProject.Infrastructures.Migrations
                 name: "IX_ClassSchedules_SlotId",
                 table: "ClassSchedules",
                 column: "SlotId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Consultations_UserId",
+                table: "Consultations",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Contracts_AgencyId",
@@ -1103,11 +1150,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                 name: "IX_Feedbacks_ClassId",
                 table: "Feedbacks",
                 column: "ClassId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FranchiseRegistrationRequests_UserId",
-                table: "FranchiseRegistrationRequests",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_QuestionOptions_QuestionId",
@@ -1189,16 +1231,19 @@ namespace FranchiseProject.Infrastructures.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Assessments");
+
+            migrationBuilder.DropTable(
                 name: "AssignmentSubmits");
 
             migrationBuilder.DropTable(
                 name: "Attendances");
 
             migrationBuilder.DropTable(
-                name: "FeedbackAnswers");
+                name: "Consultations");
 
             migrationBuilder.DropTable(
-                name: "FranchiseRegistrationRequests");
+                name: "FeedbackAnswers");
 
             migrationBuilder.DropTable(
                 name: "QuizDetails");

@@ -2,7 +2,7 @@
 using FranchiseProject.Application.ViewModels.ContractViewModel;
 using System.Diagnostics.Contracts;
 
-namespace FranchiseProject.API.Validator.ContractValidation
+namespace FranchiseProject.API.Validator.ContractValidator
 {
     public class CreateContractValidator :AbstractValidator<CreateContractViewModel>
     {

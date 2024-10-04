@@ -3,9 +3,9 @@ using FranchiseProject.Application.ViewModels.AgencyViewModel;
 
 namespace FranchiseProject.API.Validator.AgencyValidation
 {
-    public class RegisFranchiseViewModelValidator : AbstractValidator<RegisterConsultationViewModel>
+    public class RegisterFranchiseViewModelValidator : AbstractValidator<RegisterConsultationViewModel>
     {
-        public RegisFranchiseViewModelValidator()
+        public RegisterFranchiseViewModelValidator()
         {
           
          

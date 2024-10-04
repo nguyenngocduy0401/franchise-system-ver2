@@ -2,6 +2,7 @@ using AutoMapper;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.AgencyViewModel;
 using FranchiseProject.Application.ViewModels.ContractViewModel;
+using FranchiseProject.Application.ViewModels.CourseCategoryViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Domain.Entity;
@@ -69,6 +70,13 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<CreateSlotModel, Slot>();
             CreateMap<Slot, SlotViewModel>();
             CreateMap<Pagination<Slot>, Pagination<SlotViewModel>>().ReverseMap();
+            #endregion
+
+            #region CourseCategory
+            CreateMap<Pagination<CourseCategory>, Pagination<CourseCategoryViewModel>>();
+            CreateMap<CreateCourseCategoryModel, CourseCategory>();
+            CreateMap<UpdateCourseCategoryModel, CourseCategory>();
+            CreateMap<CourseCategory, CourseCategoryViewModel>();
             #endregion
         }
     }

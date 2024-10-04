@@ -47,6 +47,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<Consultation> Consultations { get; set; }
         /*public DbSet<User> Users { get; set; }*/
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Assessment> Assessments { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

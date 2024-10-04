@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.UserViewModels;
+using FranchiseProject.Domain.Enums;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace FranchiseProject.API.Validator.UserValidator
 {
@@ -10,7 +12,8 @@ namespace FranchiseProject.API.Validator.UserValidator
         {
             RuleFor(x => x.UserName).NotEmpty();
             RuleFor(x => x.FullName).NotEmpty();
-            RuleFor(x => x.Role).NotEmpty().NotEqual(AppRole.Admin);
+            RuleFor(x => x.Role).NotEmpty().NotEqual(RolesEnum.Administrator.ToString())
+                .WithMessage("Role must not be Administrator."); ;
             RuleFor(x => x.Email).NotEmpty().EmailAddress()
                 .WithMessage("Email is invalid format!");
             RuleFor(x => x.PhoneNumber).NotEmpty().Matches(@"^0[0-9]{9}$")

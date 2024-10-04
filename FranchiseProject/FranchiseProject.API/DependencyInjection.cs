@@ -9,7 +9,7 @@ using FranchiseProject.API.Middlewares;
 using FluentValidation;
 using FranchiseProject.API.Validator.AgencyValidation;
 using FranchiseProject.Application.ViewModels.ContractViewModel;
-using FranchiseProject.API.Validator.ContractValidation;
+using FranchiseProject.API.Validator.ContractValidator;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Infrastructures.DataInitializer;
@@ -20,6 +20,8 @@ using FranchiseProject.Domain.Entity;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.API.Validator.SlotValidator;
 using FranchiseProject.API.Validator.UserValidator;
+using FranchiseProject.Application.ViewModels.CourseCategoryViewModels;
+using FranchiseProject.API.Validator.CourseCategoryValidator;
 
 namespace FranchiseProject.API
 {
@@ -86,7 +88,7 @@ namespace FranchiseProject.API
             services.AddScoped<AccountInitializer>();
             #endregion
             #region Validator
-            services.AddTransient<IValidator<RegisterConsultationViewModel>, RegisFranchiseViewModelValidator>();
+            services.AddTransient<IValidator<RegisterConsultationViewModel>, RegisterFranchiseViewModelValidator>();
             services.AddTransient<IValidator<CreateAgencyViewModel>,CreateAgencyValidator>();
             services.AddTransient<IValidator<CreateContractViewModel>, CreateContractValidator>();
             services.AddTransient<IValidator<UpdateContractViewModel>, UpdateContracValidator>();
@@ -97,6 +99,8 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<UpdatePasswordModel>, UpdatePasswordValidator>();
             services.AddTransient<IValidator<UpdateUserByAgencyModel>, UpdateUserByAgencyValidator>();
             services.AddTransient<IValidator<CreateUserByAgencyModel>, CreateUserByAgencyValidator>();
+            services.AddTransient<IValidator<CreateCourseCategoryModel>, CreateCourseCategoryValidator>();
+            services.AddTransient<IValidator<UpdateCourseCategoryModel>, UpdateCourseCategoryValidator>();
             #endregion
 
             return services;

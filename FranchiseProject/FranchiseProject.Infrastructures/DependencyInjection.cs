@@ -87,6 +87,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IConsultationRepository, ConsultationRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            services.AddScoped<IAssessmentRepository, AssessmentRepository>();
             #endregion
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>
