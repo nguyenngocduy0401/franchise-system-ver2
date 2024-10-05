@@ -24,14 +24,14 @@ namespace FranchiseProject.API.Controllers
         {
             return await _courseCategoryService.DeleteCourseCategoryByIdAsync(id);
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo mới category {Authorize = Admin, Manager}")]
         [HttpPost()]
         public async Task<ApiResponse<bool>> CreateCourseCategoryAsync(CreateCourseCategoryModel createCourseCategoryModel)
         {
             return await _courseCategoryService.CreateCourseCategoryAsync(createCourseCategoryModel);
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "cập nhật category {Authorize = Admin, Manager}")]
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> UpdateCourseCategoryAsync(Guid id, UpdateCourseCategoryModel updateCourseCategoryModel)
@@ -44,7 +44,7 @@ namespace FranchiseProject.API.Controllers
         {
             return await _courseCategoryService.GetCourseCategoryByIdAsync(id);
         }
-        [SwaggerOperation(Summary = "tìm kiếm slot")]
+        [SwaggerOperation(Summary = "tìm kiếm category")]
         [HttpGet()]
         public async Task<ApiResponse<Pagination<CourseCategoryViewModel>>> FilterCourseCategoryAsync([FromQuery] FilterCourseCategoryModel filterCourseCategoryModel)
         {

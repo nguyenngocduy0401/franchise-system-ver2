@@ -49,6 +49,7 @@ namespace FranchiseProject.Application.Services
                 if (!isSuccess) throw new Exception("Create fail!");
                 response.Data = true;
                 response.isSuccess = true;
+                response.Message = "Tạo loại của khóa học thành công!";
             }
             catch (Exception ex)
             {
@@ -113,7 +114,7 @@ namespace FranchiseProject.Application.Services
                      pageSize: filterCourseCategoryModel.PageSize
                     );
                 var courseCategoryModel = _mapper.Map<Pagination<CourseCategoryViewModel>>(courseCategory);
-                response.Data = null;
+                response.Data = courseCategoryModel;
                 response.isSuccess = false;
                 response.Message = "Successful!";
             }
@@ -135,7 +136,7 @@ namespace FranchiseProject.Application.Services
                 if (courseCategory == null) throw new Exception("Category does not exist!");
                 var courseCategoryModel = _mapper.Map<CourseCategoryViewModel>(courseCategory);
                 response.Data = courseCategoryModel;
-                response.isSuccess = false;
+                response.isSuccess = true;
                 response.Message = "Successful!";
             }
             catch (Exception ex)
@@ -168,6 +169,7 @@ namespace FranchiseProject.Application.Services
                 if (!isSuccess) throw new Exception("Create fail!");
                 response.Data = true;
                 response.isSuccess = true;
+                response.Message = "Cập nhật loại của khóa học thành công!";
             }
             catch (Exception ex)
             {
