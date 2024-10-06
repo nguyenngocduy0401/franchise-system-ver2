@@ -153,7 +153,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-                var courseCategory = await _unitOfWork.CourseCategoryRepository.GetByIdAsync(courseCategoryId);
+                var courseCategory = await _unitOfWork.CourseCategoryRepository.GetExistByIdAsync(courseCategoryId);
                 if (courseCategory == null) throw new Exception("Category does not exist!");
                 ValidationResult validationResult = await _updateCourseCategoryValidator.ValidateAsync(updateCourseCategoryModel);
                 if (!validationResult.IsValid)

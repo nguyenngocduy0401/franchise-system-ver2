@@ -131,7 +131,7 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
-                var slot = await _unitOfWork.SlotRepository.GetByIdAsync(slotId);
+                var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync(slotId);
                 _mapper.Map(updateSlotModel, slot);
                 _unitOfWork.SlotRepository.Update(slot);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;

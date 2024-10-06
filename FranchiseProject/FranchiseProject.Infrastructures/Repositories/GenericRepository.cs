@@ -93,13 +93,16 @@ namespace FranchiseProject.Infrastructures.Repositories
 
             return result;
         }
-        public Task<List<TEntity>> GetAllAsync() => _dbSet.ToListAsync();
+        public async Task<List<TEntity>> GetAllAsync() => await _dbSet.ToListAsync();
 
         public async Task<TEntity> GetByIdAsync(Guid id)
         {
             return await _dbSet.FindAsync(id);
         }
-
+        public async Task<TEntity> GetExistByIdAsync(Guid id)
+        {
+            return await _dbSet.FirstOrDefaultAsync(u => u.Id == id && u.IsDeleted != true);
+        }
         public async Task AddAsync(TEntity entity)
         {
             entity.CreationDate = _timeService.GetCurrentTime();

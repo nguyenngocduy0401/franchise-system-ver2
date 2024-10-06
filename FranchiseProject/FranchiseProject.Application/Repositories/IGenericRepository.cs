@@ -25,6 +25,7 @@ namespace FranchiseProject.Application.Repositories
         Task<TEntity> GetByIdAsync(Guid id);
         Task AddAsync(TEntity entity);
         Task AddRangeAsync(List<TEntity> entities);
+        Task<TEntity> GetExistByIdAsync(Guid id);
         void Update(TEntity entity);
         void UpdateRange(List<TEntity> entities);
         void SoftRemove(TEntity entity);
