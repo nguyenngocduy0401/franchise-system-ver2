@@ -24,6 +24,7 @@ using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
 using FranchiseProject.API.Validator.ClassScheduleValidator;
 using FranchiseProject.Application.ViewModels.TermViewModel;
 using FranchiseProject.API.Validator.TermValidator;
+using Microsoft.AspNetCore.SignalR;
 
 namespace FranchiseProject.API
 {
@@ -80,6 +81,7 @@ namespace FranchiseProject.API
             services.AddScoped<IClaimsService, ClaimsService>();
             services.AddScoped<IPdfService, PdfService>();
             services.AddSingleton<IFirebaseService, FirebaseService>();
+          
             services.AddHttpContextAccessor();
             services.AddLogging();
 

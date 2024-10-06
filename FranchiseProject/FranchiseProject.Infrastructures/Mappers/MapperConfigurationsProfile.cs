@@ -3,6 +3,7 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.AgencyViewModel;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
 using FranchiseProject.Application.ViewModels.ContractViewModel;
+using FranchiseProject.Application.ViewModels.NotificationViewModel;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Domain.Entity;
@@ -53,6 +54,11 @@ namespace FranchiseProject.Infrastructures.Mappers
 
             CreateMap<Pagination<ClassSchedule>, Pagination<ClassScheduleViewModel>>()
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
+            #endregion
+            #region Notification
+            CreateMap<Notification, NotificationViewModel>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.Message)).ReverseMap();
             #endregion
         }
     }

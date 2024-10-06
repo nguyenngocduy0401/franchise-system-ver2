@@ -39,6 +39,7 @@ namespace FranchiseProject.Application
         public IUserRepository UserRepository { get; }
         public IRefreshTokenRepository RefreshTokenRepository { get; }
         public IConsultationRepository FranchiseRegistrationRequestRepository { get; }
+        public INotificationRepository NotificationRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

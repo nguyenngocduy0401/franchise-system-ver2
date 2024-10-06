@@ -43,6 +43,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<Syllabus> Syllabuses { get; set; }
         public DbSet<Term> Terms { get; set; }
         public DbSet<Consultation> Consultations { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
         /*public DbSet<User> Users { get; set; }*/
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         #endregion

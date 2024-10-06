@@ -42,6 +42,7 @@ namespace FranchiseProject.Infrastructures
         private readonly IUserRepository _userRepository;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IConsultationRepository _fanchiseRegistrationRequestRepository;
+        private readonly INotificationRepository _notificationRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -51,7 +52,7 @@ namespace FranchiseProject.Infrastructures
             IScoreRepository scoreRepository, ISessionRepository sessionRepository, ISlotRepository slotRepository, IStudentAnswerRepository studentAnswerRepository,
             IStudentClassRepository studentClassRepository, IStudentCourseRepository studentCourseRepository, ISyllabusRepository syllabusRepository,
             ITermRepository termRepository, IUserRepository userRepository, IAssignmentSubmitRepository assignmentSubmitRepository, IRefreshTokenRepository refreshTokenRepository,
-            IConsultationRepository franchiseRegistrationRequestRepository)
+            IConsultationRepository franchiseRegistrationRequestRepository,INotificationRepository notificationRepository)
         {
             _dbContext = appDbContext;
             _agencyRepository = agencyRepository;
@@ -84,6 +85,7 @@ namespace FranchiseProject.Infrastructures
             _userRepository = userRepository;
             _refreshTokenRepository = refreshTokenRepository;
             _fanchiseRegistrationRequestRepository = franchiseRegistrationRequestRepository;
+            _notificationRepository = notificationRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -144,6 +146,7 @@ namespace FranchiseProject.Infrastructures
         public IRefreshTokenRepository RefreshTokenRepository => _refreshTokenRepository;
 
         public IConsultationRepository FranchiseRegistrationRequestRepository=> _fanchiseRegistrationRequestRepository;
+        public INotificationRepository NotificationRepository => _notificationRepository;
         
         public async Task<int> SaveChangeAsync()
         {
