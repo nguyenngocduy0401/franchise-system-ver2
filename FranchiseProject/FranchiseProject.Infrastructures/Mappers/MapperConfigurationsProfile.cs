@@ -79,6 +79,7 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<CreateCourseCategoryModel, CourseCategory>();
             CreateMap<UpdateCourseCategoryModel, CourseCategory>();
             CreateMap<CourseCategory, CourseCategoryViewModel>();
+            #endregion
             #region ClassSchedule
             CreateMap<ClassSchedule, ClassScheduleViewModel>()
               .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
