@@ -40,6 +40,7 @@ namespace FranchiseProject.Application
         public IRefreshTokenRepository RefreshTokenRepository { get; }
         public IConsultationRepository FranchiseRegistrationRequestRepository { get; }
         public IAssessmentRepository AssessmentRepository { get; }
+        public INotificationRepository NotificationRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }
