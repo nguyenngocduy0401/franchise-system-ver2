@@ -1,9 +1,11 @@
 ﻿using FranchiseProject.API;
+using FranchiseProject.API.CustomUserIdProvider;
 using FranchiseProject.API.Middlewares;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Hubs; // Thêm dòng này để sử dụng NotificationHub
 using FranchiseProject.Infrastructures;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -16,7 +18,7 @@ builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
 builder.Services.AddWebAPIService();
 builder.Services.AddAuthenticationServices(configuration);
 builder.Services.AddStackExchangeRedisCache(options => options.Configuration = configuration.RedisConfiguration);
-
+builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 // Đăng ký SignalR
 builder.Services.AddSignalR();
 
