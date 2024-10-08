@@ -6,6 +6,7 @@ using FranchiseProject.Application.ViewModels.ContractViewModel;
 using FranchiseProject.Application.ViewModels.CourseCategoryViewModels;
 using FranchiseProject.Application.ViewModels.NotificationViewModel;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
+using FranchiseProject.Application.ViewModels.TermViewModel;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Domain.Entity;
 using System;
@@ -94,6 +95,11 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Notification, NotificationViewModel>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.Message)).ReverseMap();
+            #endregion
+            #region term
+            CreateMap<Term, TermViewModel>();
+            CreateMap<CreateTermViewModel, Term>();
+            CreateMap(typeof(Pagination<>), typeof(Pagination<>));
             #endregion
         }
     }

@@ -89,8 +89,7 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
 
-                // Get the term
-                var term = await _unitOfWork.TermRepository.GetByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.TermId));
+                var term = await _unitOfWork.TermRepository.GetExistByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.TermId));
                 if (term == null)
                 {
                     response.Data = false;
@@ -98,8 +97,6 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Không tìm thấy kỳ học!";
                     return response;
                 }
-
-                // Lọc ngày dựa trên các ngày trong tuần đã chọn
                 var selectedDates = new List<DateTime>();
                 DateTime currentDate = term.StartDate.Value;
                 while (currentDate <= term.EndDate)
@@ -111,11 +108,10 @@ namespace FranchiseProject.Application.Services
                     }
                     currentDate = currentDate.AddDays(1);
                 }
-
-                // Tạo lịch học cho mỗi ngày đã chọn
+            
                 foreach (var date in selectedDates)
                 {
-                    // Check nếu đã có lớp vào ngày đó, phòng đó, slot đó
+  
                     var existingSchedule = await _unitOfWork.ClassScheduleRepository
                         .GetExistingScheduleAsync(date, createClassScheduleDateRangeViewModel.Room, Guid.Parse(createClassScheduleDateRangeViewModel.SlotId));
 
@@ -123,7 +119,7 @@ namespace FranchiseProject.Application.Services
                     {
                         response.Data = false;
                         response.isSuccess = false;
-                        response.Message = $"Lịch học đã tồn tại vào ngày {date.ToString("yyyy-MM-dd")}, phòng {createClassScheduleDateRangeViewModel.Room}, slot {createClassScheduleDateRangeViewModel.SlotId}!";
+                        response.Message = $"Lịch học đã tồn tại ";
                         return response;
                     }
 
@@ -161,7 +157,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-                var classSchedule = await _unitOfWork.ClassScheduleRepository.GetByIdAsync(Guid.Parse(id));
+                var classSchedule = await _unitOfWork.ClassScheduleRepository.GetExistByIdAsync(Guid.Parse(id));
                 if (classSchedule == null)
                 {
                     response.Data = false;
@@ -169,6 +165,7 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Không tìm thấy slot!";
                     return response;
                 }
+               
                 switch (classSchedule.IsDeleted)
                 {
                     case false:

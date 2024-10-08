@@ -14,8 +14,8 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> CreateTermAsync(CreateTermViewModel createTermViewModel);
        
         Task<ApiResponse<bool>> DeleteTermByIdAsync(string id);
-        Task<ApiResponse<Pagination<ClassScheduleViewModel>>> FilterTermAsync(FilterTermViewModel filterTermViewModel);
-        Task<ApiResponse<ClassScheduleViewModel>> GetTermByIdAsync(string id);
+        Task<ApiResponse<Pagination<TermViewModel>>> FilterTermAsync(FilterTermViewModel filterTermViewModel);
+        Task<ApiResponse<TermViewModel>> GetTermByIdAsync(string id);
         Task<ApiResponse<bool>> UpdateTermAsync(CreateTermViewModel createTermViewModel, string id);
     }
 }
