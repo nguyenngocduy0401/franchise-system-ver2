@@ -9,9 +9,10 @@ namespace FranchiseProject.Domain.Entity
 {
     public class Session : BaseEntity
     {
+        public string? Number { get; set; }
+        public string? Chapter { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
-        public double? Duration { get; set; }
         public Guid? CourseId { get; set; }
         [ForeignKey("CourseId")]
         public Course? Course { get; set; }
