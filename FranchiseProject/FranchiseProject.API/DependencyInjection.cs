@@ -22,6 +22,11 @@ using FranchiseProject.API.Validator.SlotValidator;
 using FranchiseProject.API.Validator.UserValidator;
 using FranchiseProject.Application.ViewModels.CourseCategoryViewModels;
 using FranchiseProject.API.Validator.CourseCategoryValidator;
+using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
+using FranchiseProject.API.Validator.ClassScheduleValidator;
+using FranchiseProject.Application.ViewModels.TermViewModel;
+using FranchiseProject.API.Validator.TermValidator;
+using Microsoft.AspNetCore.SignalR;
 
 namespace FranchiseProject.API
 {
@@ -79,6 +84,7 @@ namespace FranchiseProject.API
             services.AddScoped<IClaimsService, ClaimsService>();
             services.AddScoped<IPdfService, PdfService>();
             services.AddSingleton<IFirebaseService, FirebaseService>();
+          
             services.AddHttpContextAccessor();
             services.AddLogging();
 
@@ -86,6 +92,7 @@ namespace FranchiseProject.API
             services.AddHostedService<SetupIdentityDataSeeder>();
             services.AddScoped<RoleInitializer>();
             services.AddScoped<AccountInitializer>();
+
             #endregion
             #region Validator
             services.AddTransient<IValidator<RegisterConsultationViewModel>, RegisterFranchiseViewModelValidator>();
@@ -101,6 +108,9 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<CreateUserByAgencyModel>, CreateUserByAgencyValidator>();
             services.AddTransient<IValidator<CreateCourseCategoryModel>, CreateCourseCategoryValidator>();
             services.AddTransient<IValidator<UpdateCourseCategoryModel>, UpdateCourseCategoryValidator>();
+            services.AddTransient<IValidator<CreateClassScheduleViewModel>, CreateClassScheduleValidor>();
+            services.AddTransient<IValidator<CreateClassScheduleDateRangeViewModel>, CreateClassScheduleDateRangeValidator>();
+            services.AddTransient<IValidator<CreateTermViewModel>,CreateTermValidator>();
             #endregion
 
             return services;

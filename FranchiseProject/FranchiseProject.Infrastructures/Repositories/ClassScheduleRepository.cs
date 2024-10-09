@@ -24,5 +24,12 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
+        public async Task<ClassSchedule?> GetExistingScheduleAsync(DateTime date, string room, Guid slotId)
+        {
+            return  _dbContext.ClassSchedules
+                .FirstOrDefault(cs => cs.Date == date &&
+                                            cs.Room == room &&
+                                            cs.SlotId == slotId);
+        }
     }
 }

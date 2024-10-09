@@ -8,6 +8,7 @@ namespace FranchiseProject.API.Validator.SlotValidator
     {
         public CreateSlotValidator()
         {
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required.");
             RuleFor(x => x.StartTime)
                 .NotEmpty().WithMessage("Start time is required.");
 

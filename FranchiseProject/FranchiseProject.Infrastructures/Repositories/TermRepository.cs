@@ -24,5 +24,17 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
+        public async Task<Term?> GetOverlappingTermsAsync(DateTime startDate, DateTime endDate)
+        {
+            return  _dbContext.Set<Term>()
+                .FirstOrDefault(t =>
+                    (startDate <= t.EndDate && endDate >= t.StartDate));
+        }
+
+        public async Task<Term?> GetByNameAsync(string name)
+        {
+            return  _dbContext.Set<Term>()
+                .FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
     }
 }
