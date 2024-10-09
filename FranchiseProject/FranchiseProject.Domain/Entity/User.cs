@@ -21,9 +21,6 @@ namespace FranchiseProject.Domain.Entity
         public Guid? AgencyId { get; set; }
         [ForeignKey("AgencyId")]
         public Agency? Agency { get; set; }
-        public Guid? ContractId { get; set; }
-        [ForeignKey("ContractId")]
-        public Contract? Contract { get; set; }
         public virtual ICollection<Score>? Scores { get; set; } 
         public virtual ICollection<Report>? Reports { get; set; }
         public virtual ICollection<StudentCourse>? StudentCourses { get; set; }
@@ -31,5 +28,7 @@ namespace FranchiseProject.Domain.Entity
         public virtual ICollection<AssignmentSubmit>? AssignmentSubmits { get; set; }
         public virtual ICollection<Attendance>? Attendances { get; set; }
         public virtual ICollection<StudentAnswer>? StudentAnswers { get; set; }
+        public virtual ICollection<TaskDetail>? TaskDetails { get; set; }
+        public virtual ICollection<AppointmentDetail>? AppointmentDetails { get; set; }
     }
 }
