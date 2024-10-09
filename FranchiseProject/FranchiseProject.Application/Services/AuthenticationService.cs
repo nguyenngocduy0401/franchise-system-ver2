@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Office2010.PowerPoint;
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
@@ -56,10 +57,10 @@ namespace FranchiseProject.Application.Services
                 {
                     var user = await _unitOfWork.UserRepository.GetUserByUserName
                         (userLoginModel.UserName);
-                    if (user.ContractId != Guid.Empty && user.ContractId != null) 
+                    if (false) 
                     {
-                        var checkExpire = await _unitOfWork.ContractRepository.IsExpiringContract((Guid)user.ContractId);
-                        if (checkExpire) 
+                       // var checkExpire = await _unitOfWork.ContractRepository.IsExpiringContract((Guid)user.ContractId);
+                        if (false) 
                         {
                             response.Data = null;
                             response.isSuccess = true;
@@ -198,10 +199,10 @@ namespace FranchiseProject.Application.Services
                     response.Message = "User does not exist!";
                     return response;
                 }
-                if (user.ContractId != Guid.Empty && user.ContractId != null)
+                if (false)
                 {
-                    var checkExpire = await _unitOfWork.ContractRepository.IsExpiringContract((Guid)user.ContractId);
-                    if (checkExpire)
+                    //var checkExpire = await _unitOfWork.ContractRepository.IsExpiringContract(false);
+                    if (false)
                     {
                         response.Data = null;
                         response.isSuccess = true;

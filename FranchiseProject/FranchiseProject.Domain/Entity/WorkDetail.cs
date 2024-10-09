@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Entity
 {
-    public class TaskDetail
+    public class WorkDetail
     {
-        public Guid? TaskId { get; set; }
-        [ForeignKey("TaskId")]
-        public Task? Task { get; set; }
+        public Guid? WorkId { get; set; }
+        [ForeignKey("WorkId")]
+        public Work? Work { get; set; }
         public string? UserId { get; set; }
         [ForeignKey("UserId")]
         public User? User { get; set; }

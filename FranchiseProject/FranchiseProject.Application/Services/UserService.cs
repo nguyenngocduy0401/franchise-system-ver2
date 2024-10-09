@@ -59,6 +59,8 @@ namespace FranchiseProject.Application.Services
             _createUserByAgencyModel = createUserByAgencyModel;
             _emailService = emailService;
         }
+
+
         public async Task<ApiResponse<List<CreateUserByAgencyModel>>> CreateListUserByAgencyAsync(IFormFile file)
         {
             var response = new ApiResponse<List<CreateUserByAgencyModel>>();
@@ -264,8 +266,7 @@ namespace FranchiseProject.Application.Services
                 var filter = (Expression<Func<User, bool>>)(e =>
                     (string.IsNullOrEmpty(filterUserByAdminModel.Search) || e.UserName.Contains(filterUserByAdminModel.Search)
                     || e.Email.Contains(filterUserByAdminModel.Search) || e.PhoneNumber.Contains(filterUserByAdminModel.Search)) &&
-                    (!filterUserByAdminModel.AgencyId.HasValue || e.AgencyId == filterUserByAdminModel.AgencyId) &&
-                    (!filterUserByAdminModel.ContractId.HasValue || e.ContractId == filterUserByAdminModel.ContractId)
+                    (!filterUserByAdminModel.AgencyId.HasValue || e.AgencyId == filterUserByAdminModel.AgencyId)
                 );
                 var rolee = filterUserByAdminModel.Role.ToString();
                 var usersPagination = await _unitOfWork.UserRepository.GetFilterAsync(
@@ -540,5 +541,10 @@ namespace FranchiseProject.Application.Services
 
         return new UserLoginModel { Password = password, UserName = username };
     }
+
+        public Task<ApiResponse<Pagination<FilterUserByAgencyModel>>> FilterUserByAgency()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

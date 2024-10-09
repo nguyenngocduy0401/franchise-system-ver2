@@ -53,13 +53,13 @@ namespace FranchiseProject.Infrastructures.Repositories
                 {
                     case IsActiveEnum.Active:
                         query = query.Where(u => 
-                        (u.LockoutEnd <= DateTimeOffset.UtcNow || u.LockoutEnd == null) &&
-                        (u.Contract == null || u.Contract.EndTime < _currentTime.GetCurrentTime()));
+                        (u.LockoutEnd <= DateTimeOffset.UtcNow || u.LockoutEnd == null)
+                        );
                         break;
                     case IsActiveEnum.Inactive:
                        
-                        query = query.Where(u => (u.LockoutEnd > DateTimeOffset.UtcNow) || 
-                        u.Contract != null && u.Contract.EndTime > _currentTime.GetCurrentTime());
+                        query = query.Where(u => (u.LockoutEnd > DateTimeOffset.UtcNow)
+                        );
                         break;
                 }
             }
@@ -133,8 +133,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
 
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == username
-            && (u.LockoutEnd == null || u.LockoutEnd < _currentTime.GetCurrentTime()) &&
-            (u.Contract == null || u.Contract.EndTime < _currentTime.GetCurrentTime()));
+            && (u.LockoutEnd == null || u.LockoutEnd < _currentTime.GetCurrentTime()));
             if (user is null) throw new Exception("Username or password is not correct!");
             bool invalid = await _userManager.CheckPasswordAsync(user, password);
             if (invalid is false) throw new Exception("Username or password is not correct!");

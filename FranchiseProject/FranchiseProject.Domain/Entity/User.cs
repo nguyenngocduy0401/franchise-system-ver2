@@ -28,7 +28,7 @@ namespace FranchiseProject.Domain.Entity
         public virtual ICollection<AssignmentSubmit>? AssignmentSubmits { get; set; }
         public virtual ICollection<Attendance>? Attendances { get; set; }
         public virtual ICollection<StudentAnswer>? StudentAnswers { get; set; }
-        public virtual ICollection<TaskDetail>? TaskDetails { get; set; }
+        public virtual ICollection<WorkDetail>? WorkDetails { get; set; }
         public virtual ICollection<AppointmentDetail>? AppointmentDetails { get; set; }
     }
 }
