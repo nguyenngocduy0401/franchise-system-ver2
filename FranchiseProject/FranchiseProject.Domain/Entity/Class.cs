@@ -22,5 +22,6 @@ namespace FranchiseProject.Domain.Entity
         public virtual ICollection<Assignment>? Assignments { get; set; }
         public virtual ICollection<ClassSchedule>? ClassSchedules { get; set; }
         public virtual ICollection<Feedback>? Feedbacks { get; set; }
+        public virtual ICollection<Quiz>? Quizzes { get; set; }
     }
 }
