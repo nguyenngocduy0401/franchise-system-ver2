@@ -93,7 +93,7 @@ namespace FranchiseProject.Infrastructures.Repositories
 
             return result;
         }
-        public async Task<List<TEntity>> GetAllAsync() => await _dbSet.ToListAsync();
+        public async Task<List<TEntity>> GetAllAsync() => await _dbSet.Where(e => e.IsDeleted != true).ToListAsync();
 
         public async Task<TEntity> GetByIdAsync(Guid id)
         {

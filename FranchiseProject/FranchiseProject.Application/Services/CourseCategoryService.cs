@@ -29,6 +29,26 @@ namespace FranchiseProject.Application.Services
             _updateCourseCategoryValidator = updateCourseCategoryValidator;
             _createCourseCategoryValidator = createCourseCategoryValidator;
         }
+        public async Task<ApiResponse<List<CourseCategoryViewModel>>> GetAllCourseCategoryAsync()
+        {
+            var response = new ApiResponse<List<CourseCategoryViewModel>>();
+            try
+            {
+
+                var courseCategory = await _unitOfWork.CourseCategoryRepository.GetAllAsync();
+                var courseCategoryModel = _mapper.Map<List<CourseCategoryViewModel>>(courseCategory);
+                response.Data = courseCategoryModel;
+                response.isSuccess = true;
+                response.Message = "Successful!";
+            }
+            catch (Exception ex)
+            {
+                response.Data = null;
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
 
         public async Task<ApiResponse<bool>> CreateCourseCategoryAsync(CreateCourseCategoryModel createCourseCategoryModel)
         {
@@ -60,7 +80,7 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public  async Task<ApiResponse<bool>> DeleteCourseCategoryByIdAsync(Guid courseCategoryId)
+        public async Task<ApiResponse<bool>> DeleteCourseCategoryByIdAsync(Guid courseCategoryId)
         {
             var response = new ApiResponse<bool>();
             try
@@ -115,7 +135,7 @@ namespace FranchiseProject.Application.Services
                     );
                 var courseCategoryModel = _mapper.Map<Pagination<CourseCategoryViewModel>>(courseCategory);
                 response.Data = courseCategoryModel;
-                response.isSuccess = false;
+                response.isSuccess = true;
                 response.Message = "Successful!";
             }
             catch(Exception ex)
