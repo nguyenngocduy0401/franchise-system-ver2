@@ -11,6 +11,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface ICourseCategoryService
     {
+        Task<ApiResponse<List<CourseCategoryViewModel>>> GetAllCourseCategoryAsync();
         Task<ApiResponse<Pagination<CourseCategoryViewModel>>> FilterCourseCategoryAsync(FilterCourseCategoryModel filterCourseCategoryModel);
         Task<ApiResponse<bool>> DeleteCourseCategoryByIdAsync(Guid courseCategoryId);
         Task<ApiResponse<CourseCategoryViewModel>> GetCourseCategoryByIdAsync(Guid courseCategoryId);
