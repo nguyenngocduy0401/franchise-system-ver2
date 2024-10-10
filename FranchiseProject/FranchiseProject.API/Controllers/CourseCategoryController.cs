@@ -24,7 +24,7 @@ namespace FranchiseProject.API.Controllers
         {
             return await _courseCategoryService.DeleteCourseCategoryByIdAsync(id);
         }
-        
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo mới category {Authorize = Admin, Manager}")]
         [HttpPost()]
         public async Task<ApiResponse<bool>> CreateCourseCategoryAsync(CreateCourseCategoryModel createCourseCategoryModel)
@@ -44,13 +44,14 @@ namespace FranchiseProject.API.Controllers
         {
             return await _courseCategoryService.GetCourseCategoryByIdAsync(id);
         }
+        [SwaggerOperation(Summary = "lấy tất cả category")]
         [HttpGet()]
         public async Task<ApiResponse<List<CourseCategoryViewModel>>> GetAllCourseCategoryAsync()
         {
             return await _courseCategoryService.GetAllCourseCategoryAsync();
         }
-        [SwaggerOperation(Summary = "tìm kiếm category")]
-        [HttpGet("~/admin/api/v1/course-categories")]
+        [SwaggerOperation(Summary = "tìm kiếm category {Authorize = Admin, Manager}")]
+        [HttpGet("~/manager/api/v1/course-categories")]
         public async Task<ApiResponse<Pagination<CourseCategoryViewModel>>> FilterCourseCategoryAsync([FromQuery] FilterCourseCategoryModel filterCourseCategoryModel)
         {
             return await _courseCategoryService.FilterCourseCategoryAsync(filterCourseCategoryModel);
