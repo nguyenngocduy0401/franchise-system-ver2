@@ -90,6 +90,79 @@ namespace FranchiseProject.Infrastructures.Migrations
                         });
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Appointment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeleteBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Report")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReportImageURL")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Appointments");
+                });
+
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.AppointmentDetail", b =>
+                {
+                    b.Property<Guid?>("AppointmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid?>("AgencyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("AppointmentId", "UserId");
+
+                    b.HasIndex("AgencyId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AppointmentDetails");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Assessment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -257,9 +330,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FileType")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("FileURL")
                         .HasColumnType("nvarchar(max)");
 
@@ -272,7 +342,13 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VideoURL")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -331,6 +407,38 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasIndex("TermId");
 
                     b.ToTable("Classes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("99e3af58-64b4-4304-ae6a-2d8782e9caed"),
+                            Capacity = 30,
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CurrentEnrollment = 1,
+                            IsDeleted = false,
+                            Name = "JAVA_TEST_SU25",
+                            TermId = new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a")
+                        },
+                        new
+                        {
+                            Id = new Guid("99129374-30f6-4f57-978f-583353684ca5"),
+                            Capacity = 30,
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CurrentEnrollment = 1,
+                            IsDeleted = false,
+                            Name = "OOP_TEST_SU25",
+                            TermId = new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a")
+                        },
+                        new
+                        {
+                            Id = new Guid("a2a94ddc-ff9e-484c-8d2a-6f9d5dd21279"),
+                            Capacity = 30,
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CurrentEnrollment = 1,
+                            IsDeleted = false,
+                            Name = "MLN131_TEST_SU25",
+                            TermId = new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a")
+                        });
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.ClassSchedule", b =>
@@ -484,6 +592,9 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Total")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AgencyId");
@@ -497,9 +608,10 @@ namespace FranchiseProject.Infrastructures.Migrations
                             Amount = 0,
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Duration = 0,
-                            EndTime = new DateTime(2024, 10, 9, 16, 33, 59, 593, DateTimeKind.Local).AddTicks(8212),
+                            EndTime = new DateTime(2024, 10, 14, 22, 13, 4, 715, DateTimeKind.Local).AddTicks(7788),
                             IsDeleted = false,
-                            StartTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            StartTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Total = 0
                         });
                 });
 
@@ -778,6 +890,54 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasIndex("FeedbackId");
 
                     b.ToTable("FeedbackQuestions");
+                });
+
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeleteBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReceiverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SenderId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Question", b =>
@@ -1097,6 +1257,9 @@ namespace FranchiseProject.Infrastructures.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Chapter")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid?>("CourseId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1115,9 +1278,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double?>("Duration")
-                        .HasColumnType("float");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -1128,6 +1288,9 @@ namespace FranchiseProject.Infrastructures.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Number")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -1167,12 +1330,35 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<TimeSpan?>("StartTime")
                         .HasColumnType("time");
 
                     b.HasKey("Id");
 
                     b.ToTable("Slots");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("849116fa-dd9c-49a4-a019-7616b7447ae9"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new TimeSpan(0, 15, 0, 0, 0),
+                            IsDeleted = false,
+                            Name = "SLot 1",
+                            StartTime = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            Id = new Guid("a994e524-943d-4022-b258-de37662055c9"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new TimeSpan(0, 21, 0, 0, 0),
+                            IsDeleted = false,
+                            Name = "SLot 2",
+                            StartTime = new TimeSpan(0, 15, 0, 0, 0)
+                        });
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.StudentAnswer", b =>
@@ -1268,6 +1454,12 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double?>("Scale")
+                        .HasColumnType("float");
+
+                    b.Property<string>("StudentTask")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<double?>("TimeAllocation")
                         .HasColumnType("float");
 
@@ -1318,6 +1510,35 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Terms");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndDate = new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Name = "SP25",
+                            StartDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("97b016ea-591f-4198-8251-5ab4ae8e88ec"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndDate = new DateTime(2025, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Name = "SU25",
+                            StartDate = new DateTime(2025, 4, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("c60e3315-6c8b-4855-b1cb-fa92c7e4b593"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndDate = new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Name = "FA25",
+                            StartDate = new DateTime(2025, 8, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.User", b =>
@@ -1334,9 +1555,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("ContractId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("CreateAt")
                         .HasColumnType("datetime2");
@@ -1403,8 +1621,6 @@ namespace FranchiseProject.Infrastructures.Migrations
 
                     b.HasIndex("AgencyId");
 
-                    b.HasIndex("ContractId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -1414,6 +1630,77 @@ namespace FranchiseProject.Infrastructures.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Work", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeleteBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Report")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReportImageURL")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Works");
+                });
+
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.WorkDetail", b =>
+                {
+                    b.Property<Guid?>("WorkId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("WorkId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("WorkDetails");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1520,6 +1807,31 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.AppointmentDetail", b =>
+                {
+                    b.HasOne("FranchiseProject.Domain.Entity.Agency", "Agency")
+                        .WithMany()
+                        .HasForeignKey("AgencyId");
+
+                    b.HasOne("FranchiseProject.Domain.Entity.Appointment", "Appointment")
+                        .WithMany("Appointments")
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FranchiseProject.Domain.Entity.User", "User")
+                        .WithMany("AppointmentDetails")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Agency");
+
+                    b.Navigation("Appointment");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Assessment", b =>
@@ -1698,6 +2010,21 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("Feedback");
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Notification", b =>
+                {
+                    b.HasOne("FranchiseProject.Domain.Entity.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId");
+
+                    b.HasOne("FranchiseProject.Domain.Entity.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId");
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Question", b =>
                 {
                     b.HasOne("FranchiseProject.Domain.Entity.Chapter", "Chapter")
@@ -1848,13 +2175,26 @@ namespace FranchiseProject.Infrastructures.Migrations
                         .WithMany()
                         .HasForeignKey("AgencyId");
 
-                    b.HasOne("FranchiseProject.Domain.Entity.Contract", "Contract")
-                        .WithMany("Users")
-                        .HasForeignKey("ContractId");
-
                     b.Navigation("Agency");
+                });
 
-                    b.Navigation("Contract");
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.WorkDetail", b =>
+                {
+                    b.HasOne("FranchiseProject.Domain.Entity.User", "User")
+                        .WithMany("WorkDetails")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FranchiseProject.Domain.Entity.Work", "Work")
+                        .WithMany("WorkDetails")
+                        .HasForeignKey("WorkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Work");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1913,6 +2253,11 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("Contracts");
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Appointment", b =>
+                {
+                    b.Navigation("Appointments");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Assignment", b =>
                 {
                     b.Navigation("AssignmentSubmits");
@@ -1937,11 +2282,6 @@ namespace FranchiseProject.Infrastructures.Migrations
             modelBuilder.Entity("FranchiseProject.Domain.Entity.ClassSchedule", b =>
                 {
                     b.Navigation("Attendances");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.Contract", b =>
-                {
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Course", b =>
@@ -2017,6 +2357,8 @@ namespace FranchiseProject.Infrastructures.Migrations
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.User", b =>
                 {
+                    b.Navigation("AppointmentDetails");
+
                     b.Navigation("AssignmentSubmits");
 
                     b.Navigation("Attendances");
@@ -2030,6 +2372,13 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("StudentClasses");
 
                     b.Navigation("StudentCourses");
+
+                    b.Navigation("WorkDetails");
+                });
+
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Work", b =>
+                {
+                    b.Navigation("WorkDetails");
                 });
 #pragma warning restore 612, 618
         }

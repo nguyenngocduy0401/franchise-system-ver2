@@ -20,6 +20,5 @@ namespace FranchiseProject.Application.ViewModels.UserViewModels
         public DateTime? CreateAt { get; set; }
         public string? Gender { get; set; }
         public Guid? AgencyId { get; set; }
-        public Guid? ContractId { get; set; }
     }
 }
