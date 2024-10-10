@@ -10,6 +10,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface ISlotService
     {
+        Task<ApiResponse<List<SlotViewModel>>> GetAllSlotAsync();
         Task<ApiResponse<Pagination<SlotViewModel>>> FilterSlotAsync(FilterSlotModel filterSlotModel);
         Task<ApiResponse<bool>> DeleteSlotByIdAsync(Guid slotId);
         Task<ApiResponse<SlotViewModel>> GetSlotByIdAsync(Guid slotId);

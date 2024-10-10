@@ -52,7 +52,7 @@ namespace FranchiseProject.API.Controllers
         }
         [SwaggerOperation(Summary = "tìm kiếm category {Authorize = Admin, Manager}")]
         [HttpGet("~/manager/api/v1/course-categories")]
-        public async Task<ApiResponse<Pagination<CourseCategoryViewModel>>> FilterCourseCategoryAsync([FromQuery] FilterCourseCategoryModel filterCourseCategoryModel)
+        public async Task<ApiResponse<Pagination<CourseCategoryViewModel>>> FilterCourseCategoryAsync([FromQuery]FilterCourseCategoryModel filterCourseCategoryModel)
         {
             return await _courseCategoryService.FilterCourseCategoryAsync(filterCourseCategoryModel);
         }

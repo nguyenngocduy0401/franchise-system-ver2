@@ -18,22 +18,22 @@ namespace FranchiseProject.API.Controllers
         {
             _slotService = slotService;
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
-        [SwaggerOperation(Summary = "xóa slot bằng id {Authorize = Admin, Manager, AgencyManager}")]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        [SwaggerOperation(Summary = "xóa slot bằng id {Authorize = Admin, Manager}")]
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteSlotAsync(Guid id)
         {
             return await _slotService.DeleteSlotByIdAsync(id);
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
-        [SwaggerOperation(Summary = "tạo mới slot {Authorize = Admin, Manager, AgencyManager}")]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        [SwaggerOperation(Summary = "tạo mới slot {Authorize = Admin, Manager}")]
         [HttpPost()]
         public async Task<ApiResponse<bool>> CreateSlotAsync(CreateSlotModel createSlotModel)
         {
             return await _slotService.CreateSlotAsync(createSlotModel);
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
-        [SwaggerOperation(Summary = "cập nhật slot {Authorize = Admin, Manager, AgencyManager}")]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        [SwaggerOperation(Summary = "cập nhật slot {Authorize = Admin, Manager}")]
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> UpdateSlotAsync(Guid id, CreateSlotModel updateSlotModel)
         {
@@ -46,10 +46,16 @@ namespace FranchiseProject.API.Controllers
             return await _slotService.GetSlotByIdAsync(id);
         }
         [SwaggerOperation(Summary = "tìm kiếm slot")]
-        [HttpGet()]
+        [HttpGet("~/manager/api/v1/slots")]
         public async Task<ApiResponse<Pagination<SlotViewModel>>> FilterSlotAsync([FromQuery]FilterSlotModel filterSlotModel)
         {
             return await _slotService.FilterSlotAsync(filterSlotModel);
+        }
+        [SwaggerOperation(Summary = "lấy tất cả slot")]
+        [HttpGet()]
+        public async Task<ApiResponse<List<SlotViewModel>>> GetAllSlotAsync()
+        {
+            return await _slotService.GetAllSlotAsync();
         }
     }
 }

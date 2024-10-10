@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Wordprocessing;
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
@@ -174,6 +175,26 @@ namespace FranchiseProject.Application.Services
             catch (Exception ex)
             {
                 response.Data = false;
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+        public async Task<ApiResponse<List<SlotViewModel>>> GetAllSlotAsync()
+        {
+            var response = new ApiResponse<List<SlotViewModel>>();
+            try
+            {
+                var slot = await _unitOfWork.SlotRepository.GetAllAsync();
+                var slotViewModel = _mapper.Map<List<SlotViewModel>>(slot);
+                response.Data = slotViewModel;
+                response.isSuccess = true;
+                response.Message = "cập nhật slot học thành công!";
+
+            }
+            catch (Exception ex)
+            {
+                response.Data = null;
                 response.isSuccess = false;
                 response.Message = ex.Message;
             }
