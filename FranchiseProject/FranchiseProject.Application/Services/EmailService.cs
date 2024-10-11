@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentValidation.Results;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace FranchiseProject.Application.Services
 {
@@ -28,31 +29,25 @@ namespace FranchiseProject.Application.Services
             _userManager = userManager;
             _validatorResetPassword = validatorResetPassword;
         }
+        
         public async Task<bool> SendEmailCreateAccountAsync(CreateUserViewModel user)
         {
             using var client = new SmtpClient();
             try
             {
-                var emailMessage = new MimeMessage();
-                emailMessage.From.Add(new MailboxAddress
-                    ("futuretech-noreply", _appConfiguration.EmailConfiguration.From));
-                emailMessage.To.Add(new MailboxAddress
-                    (user.Email, user.Email));
-                emailMessage.Subject = "Tài khoản và mật khẩu để đăng nhập vào hệ thống Futuretech";
-                emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                await ConnectAndAuthenticateAsync(client);
+                await SendMessageAsync(client, new MessageModel
                 {
-                    Text = $"Chào {user.FullName}\n" +
-                       $"Đây là tài khoản để bạn có thể đăng nhập hệ thống\n" +
-                       $"UserName: {user.UserName}\n" +
-                       $"Password: {user.Password}"
-                };
-
-                await client.ConnectAsync(_appConfiguration.EmailConfiguration.SmtpServer, _appConfiguration.EmailConfiguration.Port, true);
-                // Loại bỏ cơ chế xác thực XOAUTH2  MailKit.Security.SecureSocketOptions.StartTls
-                client.AuthenticationMechanisms.Remove("XOAUTH2");
-                await client.AuthenticateAsync(_appConfiguration.EmailConfiguration.Username, _appConfiguration.EmailConfiguration.Password);
-                await client.SendAsync(emailMessage);
-                
+                    To = user.Email,
+                    Subject = "Tài khoản và mật khẩu để đăng nhập vào hệ thống Futuretech",
+                    Body = $"<p>Chào {user.FullName},</p>" +
+                   $"<p>Đây là tài khoản để bạn có thể đăng nhập hệ thống:</p>" +
+                   $"<ul>" +
+                   $"<li><strong>Username:</strong> {user.UserName}</li>" +
+                   $"<li><strong>Password:</strong> {user.Password}</li>" +
+                   $"</ul>" +
+                   $"<p>Vui lòng bảo mật thông tin đăng nhập này.</p>"
+                });
             }
             catch (Exception ex)
             {
@@ -208,6 +203,26 @@ namespace FranchiseProject.Application.Services
                 await client.DisconnectAsync(true);
             }
             return response;
+        }
+        private async Task ConnectAndAuthenticateAsync(SmtpClient client)
+        {
+            await client.ConnectAsync(_appConfiguration.EmailConfiguration.SmtpServer, _appConfiguration.EmailConfiguration.Port, true);
+            client.AuthenticationMechanisms.Remove("XOAUTH2");
+            await client.AuthenticateAsync(_appConfiguration.EmailConfiguration.Username, _appConfiguration.EmailConfiguration.Password);
+        }
+        private async Task SendMessageAsync(SmtpClient client, MessageModel messageModel)
+        {
+            var emailMessage = new MimeMessage();
+            emailMessage.From.Add(new MailboxAddress
+                ("futuretech-noreply", _appConfiguration.EmailConfiguration.From));
+            emailMessage.To.Add(new MailboxAddress
+                (messageModel.To, messageModel.To));
+            emailMessage.Subject = messageModel.Subject;
+            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
+            {
+                Text = messageModel.Body
+            };
+            await client.SendAsync(emailMessage);
         }
     }
 }
