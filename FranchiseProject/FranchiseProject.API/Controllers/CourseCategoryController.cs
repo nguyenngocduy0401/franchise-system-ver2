@@ -44,9 +44,15 @@ namespace FranchiseProject.API.Controllers
         {
             return await _courseCategoryService.GetCourseCategoryByIdAsync(id);
         }
-        [SwaggerOperation(Summary = "tìm kiếm category")]
+        [SwaggerOperation(Summary = "lấy tất cả category")]
         [HttpGet()]
-        public async Task<ApiResponse<Pagination<CourseCategoryViewModel>>> FilterCourseCategoryAsync([FromQuery] FilterCourseCategoryModel filterCourseCategoryModel)
+        public async Task<ApiResponse<List<CourseCategoryViewModel>>> GetAllCourseCategoryAsync()
+        {
+            return await _courseCategoryService.GetAllCourseCategoryAsync();
+        }
+        [SwaggerOperation(Summary = "tìm kiếm category {Authorize = Admin, Manager}")]
+        [HttpGet("~/manager/api/v1/course-categories")]
+        public async Task<ApiResponse<Pagination<CourseCategoryViewModel>>> FilterCourseCategoryAsync([FromQuery]FilterCourseCategoryModel filterCourseCategoryModel)
         {
             return await _courseCategoryService.FilterCourseCategoryAsync(filterCourseCategoryModel);
         }

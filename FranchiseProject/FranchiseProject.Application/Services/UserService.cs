@@ -59,6 +59,63 @@ namespace FranchiseProject.Application.Services
             _createUserByAgencyModel = createUserByAgencyModel;
             _emailService = emailService;
         }
+
+
+        public async Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAgency(FilterUserByAgencyModel filterUserByAgencyModel)
+        {
+            var response = new ApiResponse<Pagination<UserViewModel>>();
+            try
+            {
+                var userAgencyId = _claimsService.GetCurrentUserId.ToString();
+                var userAgency = await _userManager.FindByIdAsync(userAgencyId);
+                if (userAgency == null) throw new Exception("Login fail!");
+
+                var filter = (Expression<Func<User, bool>>)(e =>
+                    (string.IsNullOrEmpty(filterUserByAgencyModel.Search) || e.UserName.Contains(filterUserByAgencyModel.Search)
+                    || e.Email.Contains(filterUserByAgencyModel.Search) || e.PhoneNumber.Contains(filterUserByAgencyModel.Search)) &&
+                    e.AgencyId == userAgency.AgencyId
+                );
+                var rolee = filterUserByAgencyModel.Role.ToString();
+                var usersPagination = await _unitOfWork.UserRepository.GetFilterAsync(
+                    filter: filter,
+                    role: filterUserByAgencyModel.Role.ToString(),
+                    isActive: filterUserByAgencyModel.IsActive,
+                    pageIndex: filterUserByAgencyModel.PageIndex,
+                    pageSize: filterUserByAgencyModel.PageSize
+                );
+
+                if (usersPagination.Items.IsNullOrEmpty())
+                {
+                    response.Data = null;
+                    response.isSuccess = true;
+                    response.Message = "Không tìm thấy người dùng phù hợp!";
+                }
+                else
+                {
+                    var userViewModels = _mapper.Map<List<UserViewModel>>(usersPagination.Items);
+
+
+                    var result = new Pagination<UserViewModel>
+                    {
+                        PageIndex = usersPagination.PageIndex,
+                        PageSize = usersPagination.PageSize,
+                        TotalItemsCount = usersPagination.TotalItemsCount,
+                        Items = userViewModels
+                    };
+
+                    response.Data = result;
+                    response.isSuccess = true;
+                    response.Message = "Successful!";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Data = null;
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
         public async Task<ApiResponse<List<CreateUserByAgencyModel>>> CreateListUserByAgencyAsync(IFormFile file)
         {
             var response = new ApiResponse<List<CreateUserByAgencyModel>>();
@@ -137,15 +194,21 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
+
+
                 if (string.IsNullOrEmpty(createUserModel.Role) || !(await _roleManager.RoleExistsAsync(createUserModel.Role)))
                     throw new Exception("Role does not exist!");
+
+                var userAgencyId = _claimsService.GetCurrentUserId.ToString();
+                var userAgency = await _userManager.FindByIdAsync(userAgencyId);
+                if (userAgency == null) throw new Exception("Login fail!");
 
                 var user = _mapper.Map<User>(createUserModel);
 
                 var userAccount = await GenerateUserCredentials(user.FullName);
                 user.UserName = userAccount.UserName;
                 user.PasswordHash = userAccount.Password;
-
+                user.AgencyId = userAgency.AgencyId;
                 await _unitOfWork.UserRepository.CreateUserAndAssignRoleAsync(user, createUserModel.Role);
 
                 var userModel = _mapper.Map<CreateUserViewModel>(user);
@@ -264,8 +327,7 @@ namespace FranchiseProject.Application.Services
                 var filter = (Expression<Func<User, bool>>)(e =>
                     (string.IsNullOrEmpty(filterUserByAdminModel.Search) || e.UserName.Contains(filterUserByAdminModel.Search)
                     || e.Email.Contains(filterUserByAdminModel.Search) || e.PhoneNumber.Contains(filterUserByAdminModel.Search)) &&
-                    (!filterUserByAdminModel.AgencyId.HasValue || e.AgencyId == filterUserByAdminModel.AgencyId) &&
-                    (!filterUserByAdminModel.ContractId.HasValue || e.ContractId == filterUserByAdminModel.ContractId)
+                    (!filterUserByAdminModel.AgencyId.HasValue || e.AgencyId == filterUserByAdminModel.AgencyId)
                 );
                 var rolee = filterUserByAdminModel.Role.ToString();
                 var usersPagination = await _unitOfWork.UserRepository.GetFilterAsync(
@@ -506,39 +568,39 @@ namespace FranchiseProject.Application.Services
             return response;
         } 
         private async Task<UserLoginModel> GenerateUserCredentials(string fullname)
-    {
-        var normalizedString = fullname.Normalize(NormalizationForm.FormD);
-        var stringBuilder = new StringBuilder();
-
-        foreach (var c in normalizedString)
         {
-            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
-            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            var normalizedString = fullname.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
+
+            foreach (var c in normalizedString)
             {
-                stringBuilder.Append(c);
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
             }
+            fullname = stringBuilder.ToString();
+            var words = fullname.Split(' ');
+            string lastName = words.Last();
+
+
+            var initials = string.Concat(words.Take(words.Length - 1).Select(n => n[0]));
+            var year = DateTime.Now.Year.ToString().Substring(2);
+            var month = DateTime.Now.Month.ToString();
+            var username = lastName + initials + year + month;
+            var counter = 1;
+            while (await _unitOfWork.UserRepository.CheckUserNameExistAsync(username))
+            {
+                username = lastName + initials + year + month + counter;
+                counter++;
+            }
+            var random = new Random();
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var password = new string(Enumerable.Repeat(chars, 6)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+
+            return new UserLoginModel { Password = password, UserName = username };
         }
-        fullname = stringBuilder.ToString();
-        var words = fullname.Split(' ');
-        string lastName = words.Last();
-
-
-        var initials = string.Concat(words.Take(words.Length - 1).Select(n => n[0]));
-        var year = DateTime.Now.Year.ToString().Substring(2);
-        var month = DateTime.Now.Month.ToString();
-        var username = lastName + initials + year + month;
-        var counter = 1;
-        while (await _unitOfWork.UserRepository.CheckUserNameExistAsync(username))
-        {
-            username = lastName + initials + year + month + counter;
-            counter++;
-        }
-        var random = new Random();
-        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        var password = new string(Enumerable.Repeat(chars, 6)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
-
-        return new UserLoginModel { Password = password, UserName = username };
-    }
     }
 }

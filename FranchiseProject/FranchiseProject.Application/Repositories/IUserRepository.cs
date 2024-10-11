@@ -25,7 +25,7 @@ namespace FranchiseProject.Application.Repositories
            object? foreignKeyId = null);
         Task<User> GetUserByUserName(string username);
         Task<User> GetUserByLogin(string username, string password);
-        Task CreateUserAndAssignRoleAsync(User user, string role);
+        System.Threading.Tasks.Task CreateUserAndAssignRoleAsync(User user, string role);
         Task<bool> CheckUserNameExistAsync(string username);
 
 

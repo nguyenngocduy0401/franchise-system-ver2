@@ -16,6 +16,5 @@ namespace FranchiseProject.Application.ViewModels.UserViewModels
         public string? Gender { get; set; }
         public string? URLImage { get; set; }
         public string? AgencyId { get; set; }
-        public string? ContractId { get; set; }
     }
 }

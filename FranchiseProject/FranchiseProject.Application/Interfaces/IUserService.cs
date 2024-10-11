@@ -11,7 +11,8 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IUserService
     {
-        public Task<ApiResponse<List<CreateUserByAgencyModel>>> CreateListUserByAgencyAsync(IFormFile file);
+        Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAgency(FilterUserByAgencyModel filterUserByAgencyModel);
+        Task<ApiResponse<List<CreateUserByAgencyModel>>> CreateListUserByAgencyAsync(IFormFile file);
         Task<ApiResponse<UserViewModel>> GetInfoByLoginAsync();
         Task<ApiResponse<CreateUserByAdminModel>> CreateUserByAdminAsync(CreateUserByAdminModel createUserModel);
         Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAdminAsync(FilterUserByAdminModel filterUserByAdminModel);
