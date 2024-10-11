@@ -131,6 +131,17 @@ namespace FranchiseProject.Application.Services
 
              
                 _unitOfWork.AgencyRepository.Update(existingAgency);
+                var notification = new Notification
+                {
+                    CreatedBy = _claimsService.GetCurrentUserId,
+                    CreationDate = DateTime.Now,
+                    IsRead=false,
+                    ReceiverId=_claimsService.GetCurrentUserId.ToString(),
+                   
+
+
+
+                };
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                 if (isSuccess > 0)
                 {
