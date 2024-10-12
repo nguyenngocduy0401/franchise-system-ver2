@@ -17,5 +17,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<Pagination<TermViewModel>>> FilterTermAsync(FilterTermViewModel filterTermViewModel);
         Task<ApiResponse<TermViewModel>> GetTermByIdAsync(string id);
         Task<ApiResponse<bool>> UpdateTermAsync(CreateTermViewModel createTermViewModel, string id);
+        Task<ApiResponse<Pagination<TermViewModel>>> GetAllTermAsync(int pageSize,int pageIndex);
     }
 }

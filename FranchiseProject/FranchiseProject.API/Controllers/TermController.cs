@@ -50,11 +50,17 @@ namespace FranchiseProject.API.Controllers
             return await _termService.GetTermByIdAsync(id.ToString());
         }
 
-        [SwaggerOperation(Summary = "truy xuất term")]
-        [HttpGet()]
+        [SwaggerOperation(Summary = "truy xuất học kỳ")]
+        [HttpGet("filter")]
         public async Task<ApiResponse<Pagination<TermViewModel>>> FilterTermAsync([FromQuery] FilterTermViewModel filterTermViewModel)
         {
             return await _termService.FilterTermAsync(filterTermViewModel);
+        }
+        [SwaggerOperation(Summary = "truy xuất tất cả  học kỳ")]
+        [HttpGet()]
+        public async Task<ApiResponse<Pagination<TermViewModel>>> GetAllTermAsync(int pageSize, int pageIndex)
+        {
+            return await _termService.GetAllTermAsync(pageSize, pageIndex);
         }
     }
 }

@@ -3,6 +3,7 @@ using FluentValidation;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
+using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Application.ViewModels.TermViewModel;
 using FranchiseProject.Domain.Entity;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -156,6 +157,28 @@ namespace FranchiseProject.Application.Services
                 response.Message = ex.Message;
             }
 
+            return response;
+        }
+
+        public async Task<ApiResponse<Pagination<TermViewModel>>> GetAllTermAsync(int pageSize, int pageIndex)
+        {
+
+            var response = new ApiResponse<Pagination<TermViewModel>>();
+            try
+            {
+                var term = await _unitOfWork.TermRepository.GetAllAsync();
+                var termViewModel = _mapper.Map<Pagination<TermViewModel>>(term);
+                response.Data = termViewModel;
+                response.isSuccess = true;
+                response.Message = "truy xuất học kỳ thành công!";
+
+            }
+            catch (Exception ex)
+            {
+                response.Data = null;
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
             return response;
         }
 

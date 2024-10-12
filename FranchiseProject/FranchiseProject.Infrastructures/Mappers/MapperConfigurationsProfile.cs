@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.AgencyViewModel;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
@@ -92,6 +92,18 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Term, TermViewModel>();
             CreateMap<CreateTermViewModel, Term>();
             CreateMap(typeof(Pagination<>), typeof(Pagination<>));
+            CreateMap<List<Term>, Pagination<TermViewModel>>()
+            .ConvertUsing((source, destination, context) =>
+            {
+                var pagedResult = new Pagination<TermViewModel>
+                {
+                    Items = context.Mapper.Map<List<TermViewModel>>(source),
+                    TotalItemsCount = source.Count, // Có thể điều chỉnh dựa trên cơ sở dữ liệu
+                    PageIndex = 1, // Điều chỉnh theo tham số thực tế
+                    PageSize = source.Count // Hoặc thay bằng giá trị pageSize
+                };
+                return pagedResult;
+            });
             #endregion
         }
     }
