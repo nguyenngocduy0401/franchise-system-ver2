@@ -27,7 +27,7 @@ namespace FranchiseProject.Application.Repositories
         Task<User> GetUserByLogin(string username, string password);
         System.Threading.Tasks.Task CreateUserAndAssignRoleAsync(User user, string role);
         Task<bool> CheckUserNameExistAsync(string username);
-
+        Task<User> GetByAgencyIdAsync(Guid agencyId);
 
     }
 }

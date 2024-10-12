@@ -567,7 +567,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         } 
-        private async Task<UserLoginModel> GenerateUserCredentials(string fullname)
+        public async Task<UserLoginModel> GenerateUserCredentials(string fullname)
         {
             var normalizedString = fullname.Normalize(NormalizationForm.FormD);
             var stringBuilder = new StringBuilder();

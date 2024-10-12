@@ -15,5 +15,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> SendOTPEmailAsync(OTPEmailModel otpEmailModel);
         Task<ApiResponse<bool>> SendRegistrationSuccessEmailAsync(string email);
         Task<ApiResponse<bool>> SendContractEmailAsync(string agencyEmail, string contractUrl);
+        Task<bool> SendEmailAsync(MessageModel message);
     }
 }

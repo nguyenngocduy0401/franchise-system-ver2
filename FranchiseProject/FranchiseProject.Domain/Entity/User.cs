@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FranchiseProject.Domain.Enums;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -21,6 +22,7 @@ namespace FranchiseProject.Domain.Entity
         public Guid? AgencyId { get; set; }
         [ForeignKey("AgencyId")]
         public Agency? Agency { get; set; }
+        public UserStatusEnum? Status { get; set; }
         public virtual ICollection<Score>? Scores { get; set; } 
         public virtual ICollection<Report>? Reports { get; set; }
         public virtual ICollection<StudentCourse>? StudentCourses { get; set; }

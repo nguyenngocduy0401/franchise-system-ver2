@@ -153,5 +153,9 @@ namespace FranchiseProject.Infrastructures.Repositories
 
             return await _dbContext.Users.AnyAsync(u => u.UserName == username);
         }
+        public async Task<User> GetByAgencyIdAsync(Guid agencyId)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(u => u.AgencyId == agencyId);
+        }
     }
 }
