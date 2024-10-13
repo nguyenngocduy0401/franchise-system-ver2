@@ -2,6 +2,7 @@
 using FranchiseProject.Domain.Enums;
 using FranchiseProject.Infrastructures.FluentAPIs;
 using iText.StyledXmlParser.Jsoup.Parser;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,7 +13,8 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Infrastructures
 {
-    public class AppDbContext : IdentityDbContext<User, Role, string>
+    public class AppDbContext : IdentityDbContext<User, Role, string, IdentityUserClaim<string>, UserRole, IdentityUserLogin<string>,
+        IdentityRoleClaim<string>, IdentityUserToken<string>>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         #region Dbset
@@ -53,6 +55,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<WorkDetail> WorkDetails { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<AppointmentDetail> AppointmentDetails { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

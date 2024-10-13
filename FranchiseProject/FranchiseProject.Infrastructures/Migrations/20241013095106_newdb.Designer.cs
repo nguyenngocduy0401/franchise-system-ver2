@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FranchiseProject.Infrastructures.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241009151305_newDb")]
-    partial class newDb
+    [Migration("20241013095106_newdb")]
+    partial class newdb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -611,7 +611,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                             Amount = 0,
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Duration = 0,
-                            EndTime = new DateTime(2024, 10, 14, 22, 13, 4, 715, DateTimeKind.Local).AddTicks(7788),
+                            EndTime = new DateTime(2024, 10, 18, 16, 51, 6, 272, DateTimeKind.Local).AddTicks(3616),
                             IsDeleted = false,
                             StartTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Total = 0
@@ -1041,6 +1041,9 @@ namespace FranchiseProject.Infrastructures.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ClassId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -1075,6 +1078,8 @@ namespace FranchiseProject.Infrastructures.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
 
                     b.ToTable("Quizs");
                 });
@@ -1635,6 +1640,21 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.UserRole", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Work", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1776,21 +1796,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AspNetUserLogins", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -2046,6 +2051,15 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("Question");
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Quiz", b =>
+                {
+                    b.HasOne("FranchiseProject.Domain.Entity.Class", "Class")
+                        .WithMany("Quizzes")
+                        .HasForeignKey("ClassId");
+
+                    b.Navigation("Class");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.QuizDetail", b =>
                 {
                     b.HasOne("FranchiseProject.Domain.Entity.Question", "Question")
@@ -2181,6 +2195,25 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("Agency");
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.UserRole", b =>
+                {
+                    b.HasOne("FranchiseProject.Domain.Entity.Role", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FranchiseProject.Domain.Entity.User", "User")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.WorkDetail", b =>
                 {
                     b.HasOne("FranchiseProject.Domain.Entity.User", "User")
@@ -2227,21 +2260,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.HasOne("FranchiseProject.Domain.Entity.Role", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FranchiseProject.Domain.Entity.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.HasOne("FranchiseProject.Domain.Entity.User", null)
@@ -2278,6 +2296,8 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("ClassSchedules");
 
                     b.Navigation("Feedbacks");
+
+                    b.Navigation("Quizzes");
 
                     b.Navigation("StudentClasses");
                 });
@@ -2343,6 +2363,11 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("Scores");
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Role", b =>
+                {
+                    b.Navigation("UserRoles");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Slot", b =>
                 {
                     b.Navigation("ClassSchedules");
@@ -2375,6 +2400,8 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("StudentClasses");
 
                     b.Navigation("StudentCourses");
+
+                    b.Navigation("UserRoles");
 
                     b.Navigation("WorkDetails");
                 });

@@ -46,7 +46,9 @@ namespace FranchiseProject.Infrastructures.Repositories
          string? foreignKey = null,
          object? foreignKeyId = null)
         {
-            IQueryable<User> query = _dbContext.Users;
+            IQueryable<User> query = _dbContext.Users
+                .Include(u => u.UserRoles) 
+                .ThenInclude(ur => ur.Role);
             if (isActive.HasValue)
             {
                 switch (isActive)
@@ -124,7 +126,10 @@ namespace FranchiseProject.Infrastructures.Repositories
 
         public async Task<User> GetUserByUserName(string username)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == username);
+            var user = await _dbContext.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.UserName == username);
             if (user is null)throw new Exception("Username or password is not correct!");
             
             return user;
