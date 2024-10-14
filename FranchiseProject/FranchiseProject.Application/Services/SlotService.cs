@@ -185,7 +185,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<List<SlotViewModel>>();
             try
             {
-                var slot = await _unitOfWork.SlotRepository.GetAllAsync();
+                var slot = await _unitOfWork.SlotRepository.GetAllAsync(query => query.OrderBy(p => p.Name));
                 var slotViewModel = _mapper.Map<List<SlotViewModel>>(slot);
                 response.Data = slotViewModel;
                 response.isSuccess = true;
