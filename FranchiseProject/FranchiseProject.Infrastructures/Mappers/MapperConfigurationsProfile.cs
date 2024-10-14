@@ -1,10 +1,10 @@
 using AutoMapper;
 using FranchiseProject.Application.Commons;
-using FranchiseProject.Application.ViewModels.AgencyViewModel;
-using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
-using FranchiseProject.Application.ViewModels.ContractViewModel;
+using FranchiseProject.Application.ViewModels.ConsultationViewModels;
+using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
+using FranchiseProject.Application.ViewModels.ContractViewModels;
 using FranchiseProject.Application.ViewModels.CourseCategoryViewModels;
-using FranchiseProject.Application.ViewModels.NotificationViewModel;
+using FranchiseProject.Application.ViewModels.NotificationViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Domain.Entity;

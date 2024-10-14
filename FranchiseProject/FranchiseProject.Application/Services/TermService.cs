@@ -2,8 +2,8 @@
 using FluentValidation;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
-using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
-using FranchiseProject.Application.ViewModels.TermViewModel;
+using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
+using FranchiseProject.Application.ViewModels.TermViewModels;
 using FranchiseProject.Domain.Entity;
 using System;
 using System.Collections.Generic;

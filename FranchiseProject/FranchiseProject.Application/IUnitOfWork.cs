@@ -41,6 +41,7 @@ namespace FranchiseProject.Application
         public IConsultationRepository FranchiseRegistrationRequestRepository { get; }
         public IAssessmentRepository AssessmentRepository { get; }
         public INotificationRepository NotificationRepository { get; }
+        public IMaterialRepository MaterialRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

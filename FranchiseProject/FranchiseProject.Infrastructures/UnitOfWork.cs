@@ -44,6 +44,7 @@ namespace FranchiseProject.Infrastructures
         private readonly IConsultationRepository _fanchiseRegistrationRequestRepository;
         private readonly IAssessmentRepository _assessmentRepository;
         private readonly INotificationRepository _notificationRepository;
+        private readonly IMaterialRepository _materialRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -53,7 +54,8 @@ namespace FranchiseProject.Infrastructures
             IScoreRepository scoreRepository, ISessionRepository sessionRepository, ISlotRepository slotRepository, IStudentAnswerRepository studentAnswerRepository,
             IStudentClassRepository studentClassRepository, IStudentCourseRepository studentCourseRepository, ISyllabusRepository syllabusRepository,
             ITermRepository termRepository, IUserRepository userRepository, IAssignmentSubmitRepository assignmentSubmitRepository, IRefreshTokenRepository refreshTokenRepository,
-            IConsultationRepository franchiseRegistrationRequestRepository, IAssessmentRepository assessmentRepository,INotificationRepository notificationRepository)
+            IConsultationRepository franchiseRegistrationRequestRepository, IAssessmentRepository assessmentRepository,INotificationRepository notificationRepository,
+            IMaterialRepository materialRepository)
            
         {
             _dbContext = appDbContext;
@@ -89,6 +91,7 @@ namespace FranchiseProject.Infrastructures
             _fanchiseRegistrationRequestRepository = franchiseRegistrationRequestRepository;
             _assessmentRepository = assessmentRepository;
             _notificationRepository = notificationRepository;
+            _materialRepository = materialRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -149,9 +152,12 @@ namespace FranchiseProject.Infrastructures
         public IRefreshTokenRepository RefreshTokenRepository => _refreshTokenRepository;
 
         public IConsultationRepository FranchiseRegistrationRequestRepository=> _fanchiseRegistrationRequestRepository;
+
         public INotificationRepository NotificationRepository => _notificationRepository;
         
         public IAssessmentRepository AssessmentRepository => _assessmentRepository;
+
+        public IMaterialRepository MaterialRepository => _materialRepository;   
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

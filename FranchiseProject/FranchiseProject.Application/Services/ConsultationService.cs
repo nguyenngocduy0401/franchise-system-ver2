@@ -2,7 +2,7 @@
 using FluentValidation;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
-using FranchiseProject.Application.ViewModels.AgencyViewModel;
+using FranchiseProject.Application.ViewModels.ConsultationViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;

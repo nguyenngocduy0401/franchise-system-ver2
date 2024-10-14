@@ -1,5 +1,5 @@
 ﻿using FranchiseProject.Application.Commons;
-using FranchiseProject.Application.ViewModels.NotificationViewModel;
+using FranchiseProject.Application.ViewModels.NotificationViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

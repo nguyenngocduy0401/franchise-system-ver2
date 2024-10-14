@@ -1,7 +1,7 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Hubs;
 using FranchiseProject.Application.Interfaces;
-using FranchiseProject.Application.ViewModels.NotificationViewModel;
+using FranchiseProject.Application.ViewModels.NotificationViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;

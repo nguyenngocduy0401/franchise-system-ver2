@@ -57,16 +57,11 @@ namespace FranchiseProject.Application.Services
                 {
                     var user = await _unitOfWork.UserRepository.GetUserByUserName
                         (userLoginModel.UserName);
-                    if (false) 
-                    {
-                       // var checkExpire = await _unitOfWork.ContractRepository.IsExpiringContract((Guid)user.ContractId);
-                        if (false) 
-                        {
-                            response.Data = null;
-                            response.isSuccess = true;
-                            response.Message = "Tài khoản hoặc mật khẩu không chính xác!";
-                            return response;
-                        }
+                    if (CheckUserInActive(user)) 
+                    { 
+                        response.isSuccess = true; 
+                        response.Message = "Tài khoản hoặc mật khẩu không chính xác!"; 
+                        return response; 
                     }
                     var userViewModel = _mapper.Map<UserViewModel>(user);
                     var refreshToken = GenerateJsonWebTokenString.GenerateRefreshToken();
@@ -196,16 +191,11 @@ namespace FranchiseProject.Application.Services
                     response.Message = "User does not exist!";
                     return response;
                 }
-                if (false)
+                if (CheckUserInActive(user))
                 {
-                    //var checkExpire = await _unitOfWork.ContractRepository.IsExpiringContract(false);
-                    if (false)
-                    {
-                        response.Data = null;
-                        response.isSuccess = true;
-                        response.Message = "Tài khoản hoặc mật khẩu không chính xác!";
-                        return response;
-                    }
+                    response.isSuccess = true;
+                    response.Message = "Tài khoản hoặc mật khẩu không chính xác!";
+                    return response;
                 }
                 var userRole = await _userManager.GetRolesAsync(user);
                 var token = user.GenerateJsonWebToken(_appConfiguration,
@@ -346,6 +336,15 @@ namespace FranchiseProject.Application.Services
                 response.Message = ex.Message;
             }
             return response;
+        }
+        private bool CheckUserInActive(User user) 
+        {
+            var response = new ApiResponse<UserViewModel>();
+            if ((user.Expire.HasValue && user.Expire < _currentTime.GetCurrentTime()) 
+                || (user.LockoutEnd.HasValue && user.LockoutEnd > _currentTime.GetCurrentTime())) 
+                return true;
+             
+            return false;
         }
         
     }

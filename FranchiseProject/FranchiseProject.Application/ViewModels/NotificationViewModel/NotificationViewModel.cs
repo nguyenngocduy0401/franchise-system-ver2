@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.ViewModels.NotificationViewModel
+namespace FranchiseProject.Application.ViewModels.NotificationViewModels
 {
     public class NotificationViewModel
     {

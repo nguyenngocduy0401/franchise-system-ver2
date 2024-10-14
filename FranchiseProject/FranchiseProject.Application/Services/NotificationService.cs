@@ -4,7 +4,7 @@ using FranchiseProject.Application.Hubs;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Application.ViewModels.EmailViewModels;
-using FranchiseProject.Application.ViewModels.NotificationViewModel;
+using FranchiseProject.Application.ViewModels.NotificationViewModels;
 using FranchiseProject.Domain.Entity;
 using Microsoft.AspNetCore.SignalR;
 using System;

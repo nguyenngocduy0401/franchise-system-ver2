@@ -73,7 +73,7 @@ namespace FranchiseProject.Application.Services
                 var filter = (Expression<Func<User, bool>>)(e =>
                     (string.IsNullOrEmpty(filterUserByAgencyModel.Search) || e.UserName.Contains(filterUserByAgencyModel.Search)
                     || e.Email.Contains(filterUserByAgencyModel.Search) || e.PhoneNumber.Contains(filterUserByAgencyModel.Search)) &&
-                    e.AgencyId == userAgency.AgencyId
+                    e.AgencyId == userAgency.AgencyId && (e.Expire == null || e.Expire > _currentTime.GetCurrentTime())
                 );
                 var role = filterUserByAgencyModel.Role.ToString();
                 var usersPagination = await _unitOfWork.UserRepository.GetFilterAsync(

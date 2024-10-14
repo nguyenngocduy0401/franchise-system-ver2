@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using FranchiseProject.Application.ViewModels.AgencyViewModel;
+using FranchiseProject.Application.ViewModels.ConsultationViewModels;
 
 namespace FranchiseProject.API.Validator.AgencyValidation
 {

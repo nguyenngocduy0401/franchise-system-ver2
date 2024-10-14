@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.ViewModels.ContractViewModel
+namespace FranchiseProject.Application.ViewModels.ContractViewModels
 {
     public class UpdateContractViewModel
     {
