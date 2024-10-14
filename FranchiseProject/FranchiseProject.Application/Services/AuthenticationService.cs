@@ -69,15 +69,12 @@ namespace FranchiseProject.Application.Services
                         }
                     }
                     var userViewModel = _mapper.Map<UserViewModel>(user);
-                    var userRole = await _userManager.GetRolesAsync(user);
-                    userViewModel.Role = userRole.FirstOrDefault();
                     var refreshToken = GenerateJsonWebTokenString.GenerateRefreshToken();
-
                     var token = user.GenerateJsonWebToken(
                         _appConfiguration,
                         _appConfiguration.JwtOptions.Secret,
                         DateTime.UtcNow,
-                        userRole,
+                        new List<string> { userViewModel.Role },
                         refreshToken
                         );
                     var refreshTokenEntity = new RefreshToken

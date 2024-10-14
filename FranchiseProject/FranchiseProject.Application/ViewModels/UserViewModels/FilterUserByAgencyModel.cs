@@ -11,7 +11,7 @@ namespace FranchiseProject.Application.ViewModels.UserViewModels
     {
         public string? Search { get; set; }
         public IsActiveEnum? IsActive { get; set; }
-        public RolesEnum? Role { get; set; }
+        public AgencyRolesEnum? Role { get; set; }
         public int PageIndex { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }

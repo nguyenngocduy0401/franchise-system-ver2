@@ -75,7 +75,7 @@ namespace FranchiseProject.Application.Services
                     || e.Email.Contains(filterUserByAgencyModel.Search) || e.PhoneNumber.Contains(filterUserByAgencyModel.Search)) &&
                     e.AgencyId == userAgency.AgencyId
                 );
-                var rolee = filterUserByAgencyModel.Role.ToString();
+                var role = filterUserByAgencyModel.Role.ToString();
                 var usersPagination = await _unitOfWork.UserRepository.GetFilterAsync(
                     filter: filter,
                     role: filterUserByAgencyModel.Role.ToString(),
@@ -481,7 +481,6 @@ namespace FranchiseProject.Application.Services
                 }
 
                 var userViewModel = _mapper.Map<UserViewModel>(user);
-                var userRole = await _userManager.GetRolesAsync(user);
                 userViewModel.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
 
                 response.Data = userViewModel;
@@ -511,6 +510,7 @@ namespace FranchiseProject.Application.Services
                 var user = await _userManager.FindByIdAsync(id);
                 if (user == null) throw new Exception("Not found!");
                 UserViewModel userViewModel = _mapper.Map<UserViewModel>(user);
+                userViewModel.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
                 response.Data = userViewModel;
                 response.isSuccess = true;
                 response.Message = "Successful!";

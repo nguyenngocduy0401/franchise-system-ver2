@@ -10,6 +10,7 @@ using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Application.ViewModels.TermViewModel;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Domain.Entity;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,9 +39,11 @@ namespace FranchiseProject.Infrastructures.Mappers
 
             #endregion
 
-          
+
             #region User
-            CreateMap<User, UserViewModel>();
+            CreateMap<User, UserViewModel>()
+            .ForMember(dest => dest.Role, opt => opt.MapFrom(src =>
+            src.UserRoles == null ? null: src.UserRoles.Select(ur => ur.Role.Name).FirstOrDefault()));
             CreateMap<CreateUserByAdminModel, User>()
             .ForMember(dest => dest.AgencyId, opt => opt
             .MapFrom(src => string.IsNullOrEmpty(src.AgencyId) ? (Guid?)null : Guid.Parse(src.AgencyId)))

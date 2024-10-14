@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Entity
 {
-    public class Role : IdentityRole
+    public class UserRole : IdentityUserRole<string>
     {
-        public virtual ICollection<UserRole>? UserRoles { get; set; }
+        public virtual User? User { get; set; }
+        public virtual Role? Role { get; set; }
     }
 }
