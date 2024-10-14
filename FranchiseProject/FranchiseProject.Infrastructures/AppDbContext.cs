@@ -41,7 +41,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<Slot> Slots { get; set; }
         public DbSet<StudentAnswer> StudentAnswers { get; set; }
         public DbSet<StudentClass> StudentClasses { get; set; }
-        public DbSet<StudentCourse> StudentCourses { get; set; }
+     //   public DbSet<StudentCourse> StudentCourses { get; set; }
         public DbSet<Syllabus> Syllabuses { get; set; }
         public DbSet<Term> Terms { get; set; }
         public DbSet<Consultation> Consultations { get; set; }
@@ -62,7 +62,7 @@ namespace FranchiseProject.Infrastructures
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(QuizDetailConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentAnswerConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentClassConfiguration).Assembly);
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentCourseConfiguration).Assembly);
+        //    modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentCourseConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AssignmentSubmitConfiguration).Assembly);
             modelBuilder.Entity<Contract>().HasData(
                      new Contract
@@ -148,9 +148,27 @@ namespace FranchiseProject.Infrastructures
                     StartDate= new DateTime(2025,08,02),
                     EndDate= new DateTime(2025,12,01),
                 });
-           
-            
-            #endregion 
+
+
+            #endregion
+            #region Course
+            modelBuilder.Entity<Course>().HasData(
+                new Course
+                {
+                    Id=Guid.Parse("BE37023D-6A58-4B4B-92E5-39DCECE45412"),
+                    Name="C# basic"
+
+                },
+                new Course
+                {
+                    Id=Guid.Parse("BE37023D-6A58-4B4B-92E5-39DCE1231313"),
+                    Name="JAVA"
+                });
+
+            #endregion
+            #region
+       
+            #endregion
         }
     }
 }

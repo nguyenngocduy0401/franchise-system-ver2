@@ -79,7 +79,6 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-                // Validate input
                 FluentValidation.Results.ValidationResult validationResult = await _validator2.ValidateAsync(createClassScheduleDateRangeViewModel);
                 if (!validationResult.IsValid)
                 {
@@ -101,7 +100,6 @@ namespace FranchiseProject.Application.Services
                 DateTime currentDate = term.StartDate.Value;
                 while (currentDate <= term.EndDate)
                 {
-                    // Chỉ thêm vào nếu ngày nằm trong danh sách các thứ đã chọn
                     if (createClassScheduleDateRangeViewModel.dayOfWeeks!.Contains((DayOfWeekEnum)currentDate.DayOfWeek))
                     {
                         selectedDates.Add(currentDate);
@@ -122,8 +120,6 @@ namespace FranchiseProject.Application.Services
                         response.Message = $"Lịch học đã tồn tại ";
                         return response;
                     }
-
-                    // Tạo lịch học mới
                     var classSchedule = new ClassSchedule
                     {
                         Room = createClassScheduleDateRangeViewModel.Room,
@@ -134,8 +130,6 @@ namespace FranchiseProject.Application.Services
 
                     await _unitOfWork.ClassScheduleRepository.AddAsync(classSchedule);
                 }
-
-                // Lưu thay đổi vào database
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Tạo lịch học thất bại!");
 

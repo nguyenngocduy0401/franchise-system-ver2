@@ -9,5 +9,6 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IClassRepository : IGenericRepository<Class>
     {
+        Task<bool> CheckNameExistAsync(string name);
     }
 }

@@ -2,6 +2,7 @@
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.AgencyViewModel;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
+using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Application.ViewModels.ContractViewModel;
 using FranchiseProject.Application.ViewModels.CourseCategoryViewModels;
 using FranchiseProject.Application.ViewModels.NotificationViewModel;
@@ -59,6 +60,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<UpdateUserByAgencyModel, User>();
             CreateMap<CreateUserByAgencyModel, User>();
             CreateMap<User, CreateUserViewModel>();
+
+
             #endregion
 
             #region Slot
@@ -98,12 +101,29 @@ namespace FranchiseProject.Infrastructures.Mappers
                 var pagedResult = new Pagination<TermViewModel>
                 {
                     Items = context.Mapper.Map<List<TermViewModel>>(source),
-                    TotalItemsCount = source.Count, // Có thể điều chỉnh dựa trên cơ sở dữ liệu
-                    PageIndex = 1, // Điều chỉnh theo tham số thực tế
-                    PageSize = source.Count // Hoặc thay bằng giá trị pageSize
+                    TotalItemsCount = source.Count, 
+                    PageIndex = 1, 
+                    PageSize = source.Count 
                 };
                 return pagedResult;
             });
+            #endregion
+
+            #region Class
+            CreateMap<CreateClassViewModel, Class>();
+
+        
+            CreateMap<Class, ClassViewModel>()
+                .ForMember(dest => dest.TermName, opt => opt.MapFrom(src => src.Term.Name))
+                .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Course.Name));
+
+            CreateMap<Class, ClassStudentViewModel>()
+                .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Name));    
+            
+            CreateMap<StudentClass, StudentClassViewModel>()
+                .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.User.DateOfBirth))
+                .ForMember(dest => dest.URLImage, opt => opt.MapFrom(src => src.User.URLImage));
             #endregion
         }
     }

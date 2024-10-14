@@ -77,7 +77,7 @@ namespace FranchiseProject.Application.Services
                         Subject = "Đăng ký thành công  [futuretech-noreply]",
                         Body = $"<p>Chào {create.Name},</p>" +
                       $"<p>Cảm ơn bạn đã đăng ký trở thành đối tác của chúng tôi.</p>" +
-                      $"<p>Thông tin của bạn đang được xử lý và chúng tôi sẽ liên hệ với bạn sớm nhất có thể.</p>" +
+                      $"<p>Thông tin của bạn đã được ghi nhận thành công.</p>" +
                       $"<p>Trân trọng,</p>" +
                       $"<p>Đội ngũ Futuretech</p>"
                     };
@@ -302,7 +302,20 @@ namespace FranchiseProject.Application.Services
                         var agencyregister = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
                         if(agencyregister != null)
                         {
-                            // gui mail
+                            var emailMessage = new MessageModel
+                            {
+                                To = agency.Email,
+                                Subject = "Đăng ký thành công  [futuretech-noreply]",
+                                Body = $"<p>Chào {agency.Name},</p>" +
+                                 $"<p>Thông tin của bạn đang được xử lý và chúng tôi sẽ liên hệ với bạn sớm nhất có thể.</p>" +
+                                 $"<p>Trân trọng,</p>" +
+                                 $"<p>Đội ngũ Futuretech</p>"
+                            };
+                            bool emailSent = await _emailService.SendEmailAsync(emailMessage);
+                            if (!emailSent)
+                            {
+                                response.Message += " (Lỗi khi gửi email)";
+                            }
                         }
 
                     break;

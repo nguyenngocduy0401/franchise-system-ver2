@@ -25,5 +25,10 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
+
+        public async Task<bool> CheckNameExistAsync(string name)
+        {
+            return await _dbContext.Classes.AnyAsync(c => c.Name.ToLower() == name.ToLower());
+        }
     }
 }
