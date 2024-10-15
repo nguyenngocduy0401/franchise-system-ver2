@@ -552,7 +552,7 @@ namespace FranchiseProject.Application.Services
                 {
                     response.Data = false;
                     response.isSuccess = false;
-                    response.Message = "Change password is fail!";
+                    response.Message = "Password change failed!";
                     return response;
                 }
                 user.ExpireOTPEmail = null;
