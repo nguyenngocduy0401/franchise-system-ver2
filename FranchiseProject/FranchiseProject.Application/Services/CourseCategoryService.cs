@@ -67,7 +67,7 @@ namespace FranchiseProject.Application.Services
                 var createCourse = _mapper.Map<CourseCategory>(createCourseCategoryModel);
                 await _unitOfWork.CourseCategoryRepository.AddAsync(createCourse);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Create fail!");
+                if (!isSuccess) throw new Exception("Create failed!");
                 response.Data = true;
                 response.isSuccess = true;
                 response.Message = "Tạo loại của khóa học thành công!";
@@ -106,7 +106,7 @@ namespace FranchiseProject.Application.Services
                         break;
                 }
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Delete fail!");
+                if (!isSuccess) throw new Exception("Delete failed!");
                 response.Data = true;
                 response.isSuccess = true;
             }
@@ -187,7 +187,7 @@ namespace FranchiseProject.Application.Services
                 courseCategory = _mapper.Map(updateCourseCategoryModel, courseCategory);
                 _unitOfWork.CourseCategoryRepository.Update(courseCategory);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Create fail!");
+                if (!isSuccess) throw new Exception("Update failed!");
                 response.Data = true;
                 response.isSuccess = true;
                 response.Message = "Cập nhật loại của khóa học thành công!";

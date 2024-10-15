@@ -27,6 +27,12 @@ using FranchiseProject.API.Validator.ClassScheduleValidator;
 using FranchiseProject.Application.ViewModels.TermViewModels;
 using FranchiseProject.API.Validator.TermValidator;
 using Microsoft.AspNetCore.SignalR;
+using FranchiseProject.Application.ViewModels.MaterialViewModels;
+using FranchiseProject.API.Validator.MaterialValidator;
+using FranchiseProject.Application.ViewModels.ChapterViewModels;
+using FranchiseProject.API.Validator.ChapterValidator;
+using FranchiseProject.API.Validator.SessionValidator;
+using FranchiseProject.Application.ViewModels.SessionViewModels;
 
 namespace FranchiseProject.API
 {
@@ -111,6 +117,12 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<CreateClassScheduleViewModel>, CreateClassScheduleValidor>();
             services.AddTransient<IValidator<CreateClassScheduleDateRangeViewModel>, CreateClassScheduleDateRangeValidator>();
             services.AddTransient<IValidator<CreateTermViewModel>,CreateTermValidator>();
+            services.AddTransient<IValidator<CreateMaterialModel>, CreateMaterialValidator>();
+            services.AddTransient<IValidator<UpdateMaterialModel>, UpdateMaterialValidator>();
+            services.AddTransient<IValidator<CreateChapterModel>, CreateChapterValidator>();
+            services.AddTransient<IValidator<UpdateChapterModel>, UpdateChapterValidator>();
+            services.AddTransient<IValidator<CreateSessionModel>, CreateSessionValidator>();
+            services.AddTransient<IValidator<UpdateSessionModel>, UpdateSessionValidator>();
             #endregion
 
             return services;

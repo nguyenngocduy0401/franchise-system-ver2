@@ -14,6 +14,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FranchiseProject.Application.ViewModels.MaterialViewModels;
+using FranchiseProject.Application.ViewModels.ChapterViewModels;
+using FranchiseProject.Application.ViewModels.SessionViewModels;
 
 namespace FranchiseProject.Infrastructures.Mappers
 {
@@ -36,8 +39,6 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Contract, ContractViewModel>().ForMember(dest => dest.AgencyName,otp => otp.MapFrom(src=>src.Agency.Name));
 
             #endregion
-
-
             #region User
             CreateMap<User, UserViewModel>()
             .ForMember(dest => dest.Role, opt => opt.MapFrom(src =>
@@ -62,13 +63,11 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<CreateUserByAgencyModel, User>();
             CreateMap<User, CreateUserViewModel>();
             #endregion
-
             #region Slot
             CreateMap<CreateSlotModel, Slot>();
             CreateMap<Slot, SlotViewModel>();
             CreateMap<Pagination<Slot>, Pagination<SlotViewModel>>().ReverseMap();
             #endregion
-
             #region CourseCategory
             CreateMap<Pagination<CourseCategory>, Pagination<CourseCategoryViewModel>>();
             CreateMap<CreateCourseCategoryModel, CourseCategory>();
@@ -89,6 +88,21 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Notification, NotificationViewModel>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.Message)).ReverseMap();
+            #endregion
+            #region Material
+            CreateMap<Material, MaterialViewModel>();
+            CreateMap<CreateMaterialModel, Material>();
+            CreateMap<UpdateMaterialModel, Material>();
+            #endregion
+            #region Chapter
+            CreateMap<Chapter, ChapterViewModel>();
+            CreateMap<CreateChapterModel, Chapter>();
+            CreateMap<UpdateChapterModel, Chapter>();
+            #endregion
+            #region Session
+            CreateMap<Session, SessionViewModel>();
+            CreateMap<CreateSessionModel, Session>();
+            CreateMap<UpdateSessionModel, Session>();
             #endregion
         }
     }

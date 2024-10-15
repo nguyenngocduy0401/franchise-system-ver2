@@ -82,7 +82,7 @@ namespace FranchiseProject.Application.Services
                         break;
                 }
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Delete fail!");
+                if (!isSuccess) throw new Exception("Delete failed!");
                 response.Data = true;
                 response.isSuccess = true;
             }
@@ -133,10 +133,10 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
                 var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync(slotId);
-                _mapper.Map(updateSlotModel, slot);
+                slot = _mapper.Map(updateSlotModel, slot);
                 _unitOfWork.SlotRepository.Update(slot);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Udpate fail!");
+                if (!isSuccess) throw new Exception("Update failed!");
                 response.Data = true;
                 response.isSuccess = true;
                 response.Message = "cập nhật slot học thành công!";
@@ -166,7 +166,7 @@ namespace FranchiseProject.Application.Services
                 var slot = _mapper.Map<Slot>(createSlotModel);
                 await _unitOfWork.SlotRepository.AddAsync(slot);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Create fail!");
+                if (!isSuccess) throw new Exception("Create failed!");
                 response.Data = true;
                 response.isSuccess = true;
                 response.Message = "Tạo slot học thành công!";
