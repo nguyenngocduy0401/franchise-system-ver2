@@ -10,9 +10,11 @@ namespace FranchiseProject.Domain.Entity
     public class Assessment : BaseEntity
     {
         public string? Type { get; set; }
-        public string? Category { get; set; }
-        public string? Part {get; set; }
-        public string? Weight { get; set; }
+        public string? Content { get; set; }
+        public int Quatity { get; set; }
+        public double? Weight { get; set; }
+        public string? CompletionCriteria { get; set; }
+        public string? Method { get; set; }
         public string? Duration { get; set; }
         public string? QuestionType { get; set; }
         public Guid? CourseId { get; set; }
