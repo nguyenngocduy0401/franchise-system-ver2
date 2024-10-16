@@ -10,7 +10,7 @@ namespace FranchiseProject.Application.ViewModels.StudentViewModel
 {
     public class CreateStudentViewModel
     {
-        public string? AgencyId { get; set; }
+     /*   public string? AgencyId { get; set; }*/
         public string? StudentName { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public string? PhoneNumber { get; set; }

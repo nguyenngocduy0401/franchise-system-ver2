@@ -27,6 +27,8 @@ using FranchiseProject.API.Validator.ClassScheduleValidator;
 using FranchiseProject.Application.ViewModels.TermViewModels;
 using FranchiseProject.API.Validator.TermValidator;
 using Microsoft.AspNetCore.SignalR;
+using FranchiseProject.Application.ViewModels.StudentViewModel;
+using FranchiseProject.API.Validator.StudentValidator;
 
 namespace FranchiseProject.API
 {
@@ -111,6 +113,7 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<CreateClassScheduleViewModel>, CreateClassScheduleValidor>();
             services.AddTransient<IValidator<CreateClassScheduleDateRangeViewModel>, CreateClassScheduleDateRangeValidator>();
             services.AddTransient<IValidator<CreateTermViewModel>,CreateTermValidator>();
+            services.AddScoped<IValidator<CreateStudentViewModel>, CreateStudentValidator>();
             #endregion
 
             return services;

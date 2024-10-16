@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Entity
 {
-    public class Payments : BaseEntity
+    public class Payment : BaseEntity
     {
         public string? Title { get; set; }
         public string? Description { get; set; }

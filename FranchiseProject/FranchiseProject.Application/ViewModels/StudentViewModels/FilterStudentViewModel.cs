@@ -9,6 +9,7 @@ namespace FranchiseProject.Application.ViewModels.StudentViewModel
 {
     public class FilterStudentViewModel
     {
+        StudentPaymentStatusEnum? StatusPayment {  get; set; }
         public StudentStatusEnum? Status {  get; set; } 
         public bool? IsDeleted { get; set; }
         public int PageIndex { get; set; } = 1;

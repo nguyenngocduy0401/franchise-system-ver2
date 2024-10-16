@@ -16,6 +16,7 @@ namespace FranchiseProject.Domain.Entity
         public string? Email {  get; set; }
         public string? Address {  get; set; }
        public StudentStatusEnum? Status { get; set; }
+        public StudentPaymentStatusEnum? StatusPayment { get; set; }
         public Guid? AgencyId { get; set; }
         [ForeignKey("AgencyId")]
         public Agency? Agency { get; set; }
