@@ -76,7 +76,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             }
             else
             {
-                query = query.OrderByDescending(e => EF.Property<DateTime>(e, "CreationDate"));
+                query = query.OrderByDescending(e => e.CreationDate);
             }
 
             if (pageIndex.HasValue && pageSize.HasValue)

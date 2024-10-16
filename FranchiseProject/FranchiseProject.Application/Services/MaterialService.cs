@@ -46,7 +46,7 @@ namespace FranchiseProject.Application.Services
                 if (course == null) throw new Exception("Course does not exist!");
 
                 var material = _mapper.Map<Material>(createMaterialModel);
-                _unitOfWork.MaterialRepository.Update(material);
+                await _unitOfWork.MaterialRepository.AddAsync(material);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");

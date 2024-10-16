@@ -14,7 +14,7 @@ namespace FranchiseProject.Application.Interfaces
     {
         Task<ApiResponse<List<CourseViewModel>>> GetAllCourseAsync();
         Task<ApiResponse<bool>> DeleteCourseByIdAsync(Guid courseId);
-        Task<ApiResponse<MaterialViewModel>> GetCourseByIdAsync(Guid courseId);
+        Task<ApiResponse<CourseDetailViewModel>> GetCourseByIdAsync(Guid courseId);
         Task<ApiResponse<bool>> UpdateCourseAsync(Guid materialId, CreateSlotModel updateCourseModel);
         Task<ApiResponse<bool>> CreateCourseAsync(CreateSlotModel createCourseModel);
     }

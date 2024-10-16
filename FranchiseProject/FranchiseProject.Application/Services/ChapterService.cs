@@ -45,7 +45,7 @@ namespace FranchiseProject.Application.Services
                 if (course == null) throw new Exception("Course does not exist!");
 
                 var chapter = _mapper.Map<Chapter>(createChapterModel);
-                _unitOfWork.ChapterRepository.Update(chapter);
+                await _unitOfWork.ChapterRepository.AddAsync(chapter);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
@@ -136,6 +136,7 @@ namespace FranchiseProject.Application.Services
                 }
                 var chapter = await _unitOfWork.ChapterRepository.GetExistByIdAsync(chapterId);
                 chapter = _mapper.Map(updateChapterModel, chapter);
+
                 _unitOfWork.ChapterRepository.Update(chapter);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Update failed!");

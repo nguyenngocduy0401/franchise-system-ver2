@@ -45,7 +45,7 @@ namespace FranchiseProject.Application.Services
                 if (course == null) throw new Exception("Course does not exist!");
 
                 var session = _mapper.Map<Session>(createSessionModel);
-                _unitOfWork.SessionRepository.Update(session);
+                await _unitOfWork.SessionRepository.AddAsync(session);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");

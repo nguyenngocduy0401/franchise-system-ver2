@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.ViewModels.CourseViewModels;
 using FranchiseProject.Application.ViewModels.MaterialViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
@@ -66,19 +67,19 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public Task<ApiResponse<List<MaterialViewModel>>> GetAllCourseAsync()
+        public Task<ApiResponse<List<CourseViewModel>>> GetAllCourseAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task<ApiResponse<MaterialViewModel>> GetCourseByIdAsync(Guid courseId)
+        public async Task<ApiResponse<CourseDetailViewModel>> GetCourseByIdAsync(Guid courseId)
         {
-            var response = new ApiResponse<MaterialViewModel>();
+            var response = new ApiResponse<CourseDetailViewModel>();
             try 
             {
-                var material = await _unitOfWork.MaterialRepository.GetByIdAsync(materialId);
-                var matertialModel = _mapper.Map<MaterialViewModel>(material);
-                response.Data = matertialModel;
+                var course = await _unitOfWork.CourseRepository.GetByIdAsync(courseId);
+                var courseModel = _mapper.Map<CourseDetailViewModel>(course);
+                response.Data = courseModel;
                 response.isSuccess = true;
                 response.Message = "Successful!";
             }
