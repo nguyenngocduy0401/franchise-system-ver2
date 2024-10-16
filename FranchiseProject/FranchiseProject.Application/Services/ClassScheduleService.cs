@@ -97,12 +97,12 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
                 var selectedDates = new List<DateTime>();
-                DateTime currentDate = term.StartDate.Value;
+                DateTime currentDate = term.StartDate.Value.Date;
                 while (currentDate <= term.EndDate)
                 {
                     if (createClassScheduleDateRangeViewModel.dayOfWeeks!.Contains((DayOfWeekEnum)currentDate.DayOfWeek))
                     {
-                        selectedDates.Add(currentDate);
+                        selectedDates.Add(currentDate.Date);
                     }
                     currentDate = currentDate.AddDays(1);
                 }
@@ -211,14 +211,16 @@ namespace FranchiseProject.Application.Services
         
                 var schedules = await _unitOfWork.ClassScheduleRepository.GetFilterAsync(
                     filter: filter,
-                    includeProperties: "Class,Slot",
-                    pageIndex: filterClassScheduleViewModel.PageIndex,
-                    pageSize: filterClassScheduleViewModel.PageSize
+                    includeProperties: "Class,Slot"
+               
                 );
 
                 var scheduleViewModels = _mapper.Map<Pagination<ClassScheduleViewModel>>(schedules);
+              /*  foreach (var schedule in scheduleViewModels.Items)
+                {
+                    schedule.Date = DateTime.Parse(schedule.Date).ToString("d/M/yyyy"); // Định dạng lại ngày
+                }*/
 
-        
                 response.Data = scheduleViewModels;
                 response.isSuccess = true;
                 response.Message = "Lấy danh sách ClassSchedule thành công!";
@@ -249,8 +251,9 @@ namespace FranchiseProject.Application.Services
                 var slot =await _unitOfWork.SlotRepository.GetByIdAsync(classSchedule.SlotId.Value);
                 var class1 =await _unitOfWork.ClassRepository.GetByIdAsync(classSchedule.ClassId.Value);
                 var clasScheduleViewModel =  _mapper.Map<ClassScheduleViewModel>(classSchedule);
-                clasScheduleViewModel.SlotName=slot.Name;
+         /*       clasScheduleViewModel.SlotName=slot.Name;
                 clasScheduleViewModel.ClassName = class1.Name;
+                clasScheduleViewModel.Date = classSchedule.Date.Value.ToString("d/M/yyyy");*/
 
                 response.Data = clasScheduleViewModel;
                 response.isSuccess = true;

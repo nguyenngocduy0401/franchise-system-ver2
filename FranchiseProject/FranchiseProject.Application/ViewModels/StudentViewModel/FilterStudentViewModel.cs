@@ -5,15 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.ViewModels.ClassViewModel
+namespace FranchiseProject.Application.ViewModels.StudentViewModel
 {
-    public class FilterClassViewModel
+    public class FilterStudentViewModel
     {
-        public string? Name { get; set; }
-        public ClassStatusEnum? Status {  get; set; }     
-
-        public string? TermId { get; set; }
-        public string? CourseId { get; set; }
+        public StudentStatusEnum? Status {  get; set; } 
         public bool? IsDeleted { get; set; }
         public int PageIndex { get; set; } = 1;
         public int PageSize { get; set; } = 10;

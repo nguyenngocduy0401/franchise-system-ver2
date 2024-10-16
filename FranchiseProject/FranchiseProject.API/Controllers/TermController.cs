@@ -20,7 +20,7 @@ namespace FranchiseProject.API.Controllers
             _termService = termService;
         }
       //  [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
-        [SwaggerOperation(Summary = "Tạo học kỳ {Authorize = FrachiseManager}")]
+        [SwaggerOperation(Summary = "Tạo học kỳ {Authorize = AgencyManager}")]
         [HttpPost()]
         public async Task<ApiResponse<bool>> CreateTermAsync(CreateTermViewModel createTermViewModel)
         {
@@ -28,7 +28,7 @@ namespace FranchiseProject.API.Controllers
         }
 
        
-        [SwaggerOperation(Summary = "xóa học kỳ by Id {Authorize = FrachiseManager}")]
+        [SwaggerOperation(Summary = "xóa học kỳ by Id {Authorize = AgencyManager}")]
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteTermAsync(Guid id)
         {
@@ -36,27 +36,27 @@ namespace FranchiseProject.API.Controllers
         }
 
         
-        [SwaggerOperation(Summary = "Cập nhật học kỳ {Authorize = FrachiseManager}}")]
+        [SwaggerOperation(Summary = "Cập nhật học kỳ {Authorize = AgencyManager}")]
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> UpdateTermAsync(Guid id, CreateTermViewModel updateTermViewModel)
         {
             return await _termService.UpdateTermAsync(updateTermViewModel, id.ToString());
         }
 
-        [SwaggerOperation(Summary = "truy xuất học kỳ by Id ")]
+        [SwaggerOperation(Summary = "truy xuất học kỳ by Id {Authorize = AgencyManager}")]
         [HttpGet("{id}")]
         public async Task<ApiResponse<TermViewModel>> GetTermByIdAsync(Guid id)
         {
             return await _termService.GetTermByIdAsync(id.ToString());
         }
 
-        [SwaggerOperation(Summary = "truy xuất học kỳ")]
+        [SwaggerOperation(Summary = "truy xuất học kỳ{Authorize = AgencyManager}")]
         [HttpGet("filter")]
         public async Task<ApiResponse<Pagination<TermViewModel>>> FilterTermAsync([FromQuery] FilterTermViewModel filterTermViewModel)
         {
             return await _termService.FilterTermAsync(filterTermViewModel);
         }
-        [SwaggerOperation(Summary = "truy xuất tất cả  học kỳ")]
+        [SwaggerOperation(Summary = "truy xuất tất cả  học kỳ{Authorize = AgencyManager}")]
         [HttpGet()]
         public async Task<ApiResponse<Pagination<TermViewModel>>> GetAllTermAsync(int pageSize, int pageIndex)
         {

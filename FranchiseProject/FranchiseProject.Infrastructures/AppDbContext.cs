@@ -43,7 +43,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<Slot> Slots { get; set; }
         public DbSet<StudentAnswer> StudentAnswers { get; set; }
         public DbSet<StudentClass> StudentClasses { get; set; }
-     //   public DbSet<StudentCourse> StudentCourses { get; set; }
+        public DbSet<StudentCourse> StudentCourses { get; set; }
         public DbSet<Syllabus> Syllabuses { get; set; }
         public DbSet<Term> Terms { get; set; }
         public DbSet<Consultation> Consultations { get; set; }
@@ -56,6 +56,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<AppointmentDetail> AppointmentDetails { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<Payments> Payments { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -65,7 +66,7 @@ namespace FranchiseProject.Infrastructures
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(QuizDetailConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentAnswerConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentClassConfiguration).Assembly);
-        //    modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentCourseConfiguration).Assembly);
+             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentCourseConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AssignmentSubmitConfiguration).Assembly);
             modelBuilder.Entity<Contract>().HasData(
                      new Contract
@@ -169,8 +170,11 @@ namespace FranchiseProject.Infrastructures
                 });
 
             #endregion
-            #region
-       
+            #region ClassUser
+       modelBuilder.Entity<StudentClass>().HasData(
+           
+              
+            );
             #endregion
         }
     }

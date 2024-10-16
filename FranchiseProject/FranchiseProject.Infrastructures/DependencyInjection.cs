@@ -55,6 +55,8 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IConsultationService,ConsultationService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<IPaymentService, PaymentService>();
             
             #endregion
             #region Repository DI
@@ -91,6 +93,8 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IAssessmentRepository, AssessmentRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<IStudentRepository, StudentRepository>();
             #endregion
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>

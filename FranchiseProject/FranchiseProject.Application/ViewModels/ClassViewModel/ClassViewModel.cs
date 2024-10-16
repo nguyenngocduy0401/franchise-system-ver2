@@ -1,4 +1,5 @@
 ﻿using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -17,5 +18,6 @@ namespace FranchiseProject.Application.ViewModels.ClassViewModel
         public string? InstructorName { get; set; }
         public string? TermName { get; set; }
         public string? CourseName { get; set; }
+        public ClassStatusEnum Status { get; set; }
     }
 }

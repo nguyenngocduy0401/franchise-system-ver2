@@ -3,15 +3,18 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using iText.Kernel.Geom;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -65,7 +68,8 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Học kỳ không tồn tại. Không thể tạo mới.";
                     return response;
                 }
-                var user = _claimsService.GetCurrentUserId.ToString();
+
+               var user = _claimsService.GetCurrentUserId.ToString();
                 var agency = _unitOfWork.UserRepository.GetAgencyIdByUserIdAsync(user);
                 if (agency == null)
                 {
@@ -82,8 +86,18 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Khóa học không tồn tại. Không thể tạo mới.";
                     return response;
                 }
+            //    var existingClass = await _unitOfWork.ClassRepository.GetFirstOrDefaultAsync(c =>
+            //c.Room == model.RoomName && c.SlotId == model. && c.TermId == model.TermId);
+            //    if (existingClass != null)
+            //    {
+            //        response.Data = false;
+            //        response.isSuccess = true;
+            //        response.Message = "Lớp học đã tồn tại trong cùng một phòng, slot và học kỳ.";
+            //        return response;
+            //    }
                 var class1 = _mapper.Map<Class>(model);
                 class1.AgencyId = agency.Result;
+                class1.Status = ClassStatusEnum.Inactive;
                 await _unitOfWork.ClassRepository.AddAsync(class1);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create fail!");
@@ -106,11 +120,25 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<Pagination<ClassViewModel>>();
             try
             {
+                var userId = _claimsService.GetCurrentUserId.ToString();
+                Guid? termId = string.IsNullOrEmpty(filter.TermId) ? (Guid?)null : Guid.Parse(filter.TermId);
+                Guid? courseId = string.IsNullOrEmpty(filter.CourseId) ? (Guid?)null : Guid.Parse(filter.CourseId);
+
+                var agencyId = await _unitOfWork.UserRepository.GetAgencyIdByUserIdAsync(userId);
+                if (!agencyId.HasValue)
+                {
+                    response.Data = null;
+                    response.isSuccess = false;
+                    response.Message = "Người dùng không thuộc về bất kỳ agency nào.";
+                    return response;
+                }
                 Expression<Func<Class, bool>> filterExpression = c =>
                     (string.IsNullOrEmpty(filter.Name) || c.Name.Contains(filter.Name)) &&
                     (!filter.Status.HasValue || c.Status == filter.Status) &&
-                    (filter.TermName == null || !filter.TermName.Any() || filter.TermName.Contains(c.Term.Name)) &&
-                    (filter.CourseName == null || !filter.CourseName.Any() || filter.CourseName.Contains(c.Course.Name));
+                     (filter.TermId == null || c.TermId == termId) && 
+            (filter.CourseId == null || c.CourseId == courseId) && 
+                    (c.AgencyId == agencyId)&&
+                    (!filter.IsDeleted.HasValue || c.IsDeleted == filter.IsDeleted);
 
                 var classes = await _unitOfWork.ClassRepository.GetFilterAsync(
                     filter: filterExpression,
@@ -120,6 +148,11 @@ namespace FranchiseProject.Application.Services
                 );
 
                 var classViewModels = _mapper.Map<Pagination<ClassViewModel>>(classes);
+                foreach (var classViewModel in classViewModels.Items)
+                {
+                    var enrollCount = await _unitOfWork.StudentClassRepository.CountStudentsByClassIdAsync(classViewModel.Id);
+                    classViewModel.CurrentEnrollment = enrollCount; 
+                }
                 response.Data = classViewModels;
                 response.isSuccess = true;
                 response.Message = "Lấy danh sách lớp thành công!";
@@ -151,6 +184,8 @@ namespace FranchiseProject.Application.Services
                 var clasViewModel = _mapper.Map<ClassViewModel>(class1);
                 clasViewModel.CourseName = course.Name;
                 clasViewModel.TermName= term.Name;
+                var enrollcount = await _unitOfWork.StudentClassRepository.CountStudentsByClassIdAsync(Guid.Parse(id));
+                clasViewModel.CurrentEnrollment = enrollcount;
                 response.Data = clasViewModel;
                 response.isSuccess = true;
                 response.Message = "tìm slot học thành công!";
@@ -314,6 +349,141 @@ namespace FranchiseProject.Application.Services
             catch (Exception ex)
             {
                 response.Data = false;
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+        public async Task<ApiResponse<Pagination<StudentClassScheduleViewModel>>> GetClassSchedulesForCurrentUserByTermAsync(string termId,int pageIndex, int pageSize)
+        {
+            var response = new ApiResponse<Pagination<StudentClassScheduleViewModel>>();
+            try
+            {
+                var userId = _claimsService.GetCurrentUserId.ToString();
+                var classSchedules = await _unitOfWork.StudentClassRepository.GetClassSchedulesByUserIdAndTermIdAsync(userId, Guid.Parse(termId));
+
+                if (classSchedules == null || !classSchedules.Any())
+                {
+                    response.Data = new Pagination<StudentClassScheduleViewModel>
+                    {
+                        Items = new List<StudentClassScheduleViewModel>(),
+                        PageIndex = pageIndex,
+                        PageSize = pageSize,
+                        TotalItemsCount = 0
+                    };
+                    response.isSuccess = true; 
+                    response.Message = "Không có lịch học nào trong kỳ đã chọn.";
+                    return response;
+                }
+                var classScheduleViewModels = new List<StudentClassScheduleViewModel>();
+                foreach (var cs in classSchedules)
+                {
+                    var slot = await _unitOfWork.SlotRepository.GetByIdAsync(cs.SlotId.Value);
+                    var classScheduleViewModel = new StudentClassScheduleViewModel
+                    {
+                          Id = cs.Id != null ? cs.Id.ToString() : Guid.Empty.ToString(),
+                        Room = cs.Room,
+                        ClassName = cs.Class?.Name,
+                        SlotName = slot?.Name,
+                        Date = cs.Date?.ToString("dd/MM/yyyy"),
+                        StartTime = slot?.StartTime.ToString(),
+                        EndTime = slot?.EndTime.ToString(),
+                    };
+
+                    classScheduleViewModels.Add(classScheduleViewModel);
+                }
+
+                var pagination = new Pagination<StudentClassScheduleViewModel>
+                {
+                    Items = classScheduleViewModels,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    TotalItemsCount = await _unitOfWork.StudentClassRepository.CountClassSchedulesByUserIdAndTermIdAsync(userId, Guid.Parse(termId))
+                };
+                response.Data = pagination;
+                response.isSuccess = true;
+                response.Message = "Lấy lịch học theo kỳ thành công!";
+            }
+            catch (Exception ex)
+            {
+                response.Data = null;
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public async Task<ApiResponse<bool>> DeleteClassAsync(string id)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var class1 = await _unitOfWork.ClassRepository.GetByIdAsync(Guid.Parse(id));
+                if (class1 == null)
+                {
+                    response.Data = false;
+                    response.isSuccess = true;
+                    response.Message = "Không tìm thấy lớp học!";
+                    return response;
+                }
+                switch (class1.IsDeleted)
+                {
+                    case false:
+                        _unitOfWork.ClassRepository.SoftRemove(class1);
+                        response.Message = "Xoá lớp học thành công!";
+                        break;
+                    case true:
+                        _unitOfWork.ClassRepository.RestoreSoftRemove(class1);
+                        response.Message = "Phục hồi lớp học thành công!";
+                        break;
+                }
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Delete fail!");
+                response.Data = true;
+                response.isSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Data = false;
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+        //----- Api lấy các lớp học chưa lịch học 
+        public async Task<ApiResponse<Pagination<ClassViewModel>>> GetClassesWithoutScheduleAsync(int pageIndex, int pageSize)
+        {
+            var response = new ApiResponse<Pagination<ClassViewModel>>();
+            try
+            {
+                var userId = _claimsService.GetCurrentUserId;
+                var agencyId = await _unitOfWork.UserRepository.GetAgencyIdByUserIdAsync(userId.ToString());
+                if (!agencyId.HasValue)
+                {
+                    response.Data = null;
+                    response.isSuccess = false;
+                    response.Message = "Người dùng không thuộc về bất kỳ agency nào.";
+                    return response;
+                }
+                var totalItemsCount = await _unitOfWork.ClassRepository.CountAsync(
+             c => c.AgencyId == agencyId && !c.ClassSchedules.Any()
+         );
+                var classesWithoutSchedule = await _unitOfWork.ClassRepository.GetFilterAsync(
+                    filter: c => c.AgencyId == agencyId && !c.ClassSchedules.Any(),
+                    includeProperties: "Term,Course",
+                    pageIndex: pageIndex,
+                    pageSize: pageSize
+                );
+                var pagination = _mapper.Map<Pagination<ClassViewModel>>(classesWithoutSchedule);
+                pagination.TotalItemsCount = totalItemsCount;
+
+                response.Data = pagination;
+                response.isSuccess = true;
+                response.Message = "Lấy danh sách lớp không có lịch học thành công!";
+            }
+            catch (Exception ex)
+            {
+                response.Data = null;
                 response.isSuccess = false;
                 response.Message = ex.Message;
             }

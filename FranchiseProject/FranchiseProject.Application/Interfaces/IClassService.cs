@@ -1,4 +1,5 @@
 ﻿using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Domain.Enums;
 using System;
@@ -17,5 +18,8 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<ClassViewModel>> GetClassByIdAsync(string id);
         Task<ApiResponse<bool>> UpdateClassStatusAsync(ClassStatusEnum status,string id);
         Task<ApiResponse<Pagination<ClassStudentViewModel>>> GetListStudentInClassAsync(string id);
+        Task<ApiResponse<Pagination<StudentClassScheduleViewModel>>> GetClassSchedulesForCurrentUserByTermAsync(string termId, int pageIndex, int pageSize);
+        Task<ApiResponse<bool>> DeleteClassAsync(string id);
+        Task<ApiResponse<Pagination<ClassViewModel>>> GetClassesWithoutScheduleAsync(int pageIndex, int pageSize);
     }
 }

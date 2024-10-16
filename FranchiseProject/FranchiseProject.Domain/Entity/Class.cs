@@ -11,6 +11,7 @@ namespace FranchiseProject.Domain.Entity
     public class Class : BaseEntity
     {
         public int Capacity { get; set; }
+        public int MinimumCapacity { get; set; }
         public int CurrentEnrollment { get; set; }
         public string? Name { get; set; }
         public Guid? TermId { get; set; }

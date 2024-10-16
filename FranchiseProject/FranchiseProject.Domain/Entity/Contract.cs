@@ -21,5 +21,6 @@ namespace FranchiseProject.Domain.Entity
         public Guid? AgencyId { get; set; }
         [ForeignKey("AgencyId")]
         public Agency? Agency { get; set; }
+        public virtual ICollection<Payments>? Payments { get; set; }
     }
 }

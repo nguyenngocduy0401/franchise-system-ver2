@@ -11,5 +11,9 @@ namespace FranchiseProject.Application.Repositories
     public interface IStudentClassRepository
     {
         Task<IEnumerable<StudentClass>> GetFilterAsync(Expression<Func<StudentClass, bool>> filter);
+        Task<int> CountStudentsByClassIdAsync(Guid classId);
+        Task<List<StudentClass>> GetAllAsync(Expression<Func<StudentClass, bool>> predicate);
+        Task<List<ClassSchedule>> GetClassSchedulesByUserIdAndTermIdAsync(string userId, Guid termId);
+        Task<int> CountClassSchedulesByUserIdAndTermIdAsync(string userId, Guid termId);
     }
 }

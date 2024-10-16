@@ -31,5 +31,6 @@ namespace FranchiseProject.Infrastructures.Repositories
                                             cs.Room == room &&
                                             cs.SlotId == slotId);
         }
+      
     }
 }

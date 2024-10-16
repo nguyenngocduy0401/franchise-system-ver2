@@ -1,5 +1,6 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,9 +14,11 @@ namespace FranchiseProject.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService)
+        private readonly IClassService _classService;
+        public UserController(IUserService userService, IClassService classService)
         {
             _userService = userService;
+            _classService = classService;
         }
 
         [SwaggerOperation(Summary = "lấy thông tin User bằng đăng nhập")]
@@ -66,5 +69,9 @@ namespace FranchiseProject.API.Controllers
         public async Task<ApiResponse<List<CreateUserByAgencyModel>>> CreateListUserByAgencyAsync(IFormFile file)
             => await _userService.CreateListUserByAgencyAsync(file);
 
+
+        [SwaggerOperation(Summary = "Người dùng lấy lịch học bằng TermId")]
+        [HttpGet("mine/class-schedules/{id}")]
+        public async Task<ApiResponse<Pagination<StudentClassScheduleViewModel>>> GetClassSchedulesForCurrentUserByTermAsync(string id, int pageIndex, int pageSize) => await _classService.GetClassSchedulesForCurrentUserByTermAsync(id, pageIndex, pageSize);
     }
 }
