@@ -1,5 +1,5 @@
 ﻿using FranchiseProject.Application.Interfaces;
-using FranchiseProject.Application.ViewModels.ContractViewModel;
+using FranchiseProject.Application.ViewModels.ContractViewModels;
 using iTextSharp.text.pdf;
 using System.IO;
 

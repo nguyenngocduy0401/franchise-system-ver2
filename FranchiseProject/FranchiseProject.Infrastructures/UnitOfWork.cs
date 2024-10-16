@@ -46,6 +46,7 @@ namespace FranchiseProject.Infrastructures
         private readonly INotificationRepository _notificationRepository;
         private readonly IStudentRepository _studentRepository;
         private readonly IPaymentRepository _paymentRepository;
+        private readonly IMaterialRepository _materialRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -56,7 +57,8 @@ namespace FranchiseProject.Infrastructures
             IStudentClassRepository studentClassRepository, IStudentCourseRepository studentCourseRepository, ISyllabusRepository syllabusRepository,
             ITermRepository termRepository, IUserRepository userRepository, IAssignmentSubmitRepository assignmentSubmitRepository, IRefreshTokenRepository refreshTokenRepository,
             IConsultationRepository franchiseRegistrationRequestRepository, IAssessmentRepository assessmentRepository,INotificationRepository notificationRepository,
-            IPaymentRepository paymentRepository,IStudentRepository studentRepository)
+            IPaymentRepository paymentRepository,IStudentRepository studentRepository,
+            IMaterialRepository materialRepository)
            
         {
             _dbContext = appDbContext;
@@ -94,6 +96,7 @@ namespace FranchiseProject.Infrastructures
             _notificationRepository = notificationRepository;
             _paymentRepository = paymentRepository;
             _studentRepository = studentRepository;
+            _materialRepository = materialRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -154,11 +157,15 @@ namespace FranchiseProject.Infrastructures
         public IRefreshTokenRepository RefreshTokenRepository => _refreshTokenRepository;
 
         public IConsultationRepository FranchiseRegistrationRequestRepository=> _fanchiseRegistrationRequestRepository;
+
         public INotificationRepository NotificationRepository => _notificationRepository;
         
         public IAssessmentRepository AssessmentRepository => _assessmentRepository;
         public IStudentRepository StudentRepository => _studentRepository;
         public IPaymentRepository PaymentRepository=>_paymentRepository;
+
+
+        public IMaterialRepository MaterialRepository => _materialRepository;   
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

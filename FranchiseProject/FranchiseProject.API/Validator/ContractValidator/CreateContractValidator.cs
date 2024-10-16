@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using FranchiseProject.Application.ViewModels.ContractViewModel;
+using FranchiseProject.Application.ViewModels.ContractViewModels;
 using System.Diagnostics.Contracts;
 
 namespace FranchiseProject.API.Validator.ContractValidator

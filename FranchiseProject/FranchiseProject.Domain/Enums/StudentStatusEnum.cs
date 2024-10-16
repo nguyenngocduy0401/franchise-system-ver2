@@ -8,5 +8,6 @@ namespace FranchiseProject.Domain.Enums
 {
     public enum StudentStatusEnum
     {
+        pending=0, Waitlisted = 1, Enrolled = 2,
     }
 }

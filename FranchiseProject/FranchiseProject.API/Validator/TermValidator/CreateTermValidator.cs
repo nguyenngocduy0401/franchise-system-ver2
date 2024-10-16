@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
-using FranchiseProject.Application.ViewModels.TermViewModel;
+using FranchiseProject.Application.ViewModels.TermViewModels;
 
 namespace FranchiseProject.API.Validator.TermValidator
 {

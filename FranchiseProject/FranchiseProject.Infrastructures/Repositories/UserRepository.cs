@@ -86,6 +86,10 @@ namespace FranchiseProject.Infrastructures.Repositories
             {
                 query = orderBy(query);
             }
+            else
+            {
+                query = query.OrderByDescending(e => EF.Property<DateTime>(e, "CreateAt"));
+            }
 
             if (!string.IsNullOrEmpty(foreignKey) && foreignKeyId != null)
             {

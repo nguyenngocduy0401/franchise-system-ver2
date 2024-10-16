@@ -74,6 +74,10 @@ namespace FranchiseProject.Infrastructures.Repositories
             {
                 query = orderBy(query);
             }
+            else
+            {
+                query = query.OrderByDescending(e => EF.Property<DateTime>(e, "CreationDate"));
+            }
 
             if (pageIndex.HasValue && pageSize.HasValue)
             {
@@ -93,7 +97,15 @@ namespace FranchiseProject.Infrastructures.Repositories
 
             return result;
         }
-        public async Task<List<TEntity>> GetAllAsync() => await _dbSet.Where(e => e.IsDeleted != true).ToListAsync();
+        public async Task<List<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null) 
+        {
+            IQueryable<TEntity> query = _dbSet.Where(e => e.IsDeleted != true);
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+            return await query.ToListAsync(); 
+        }
 
         public async Task<TEntity> GetByIdAsync(Guid id)
         {

@@ -1,5 +1,5 @@
 ﻿using FranchiseProject.Application.Commons;
-using FranchiseProject.Application.ViewModels.AgencyViewModel;
+using FranchiseProject.Application.ViewModels.ConsultationViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -4,15 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.ViewModels.ContractViewModel
+namespace FranchiseProject.Application.ViewModels.ContractViewModels
 {
-    public class CreateContractViewModel
+    public class UpdateContractViewModel
     {
-        public string? Title { get; set; }
         public int Amount { get; set; }
         public int Duration { get; set; }
         public string? Description { get; set; }
         public string? TermsAndCondition { get; set; }
-        public string? AgencyId { get; set; }
     }
 }

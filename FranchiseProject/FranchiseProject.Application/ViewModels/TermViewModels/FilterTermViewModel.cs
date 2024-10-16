@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.ViewModels.TermViewModel
+namespace FranchiseProject.Application.ViewModels.TermViewModels
 {
     public class FilterTermViewModel
     {

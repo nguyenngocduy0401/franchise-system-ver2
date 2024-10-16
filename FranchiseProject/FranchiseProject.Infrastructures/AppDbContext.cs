@@ -57,6 +57,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<AppointmentDetail> AppointmentDetails { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<Payments> Payments { get; set; }
+        public DbSet<Material> Materials { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

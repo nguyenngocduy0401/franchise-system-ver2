@@ -1,6 +1,6 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
-using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
+using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;

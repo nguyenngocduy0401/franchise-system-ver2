@@ -1,5 +1,5 @@
 ﻿using FranchiseProject.Application.Commons;
-using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
+using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

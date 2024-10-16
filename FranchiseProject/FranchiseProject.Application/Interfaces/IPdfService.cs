@@ -1,4 +1,4 @@
-﻿using FranchiseProject.Application.ViewModels.ContractViewModel;
+﻿using FranchiseProject.Application.ViewModels.ContractViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

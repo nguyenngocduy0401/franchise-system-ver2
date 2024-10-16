@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
 using FranchiseProject.Application.Commons;
-using FranchiseProject.Application.ViewModels.AgencyViewModel;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
-using FranchiseProject.Application.ViewModels.ContractViewModel;
+using FranchiseProject.Application.ViewModels.ConsultationViewModels;
+using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
+using FranchiseProject.Application.ViewModels.ContractViewModels;
 using FranchiseProject.Application.ViewModels.CourseCategoryViewModels;
-using FranchiseProject.Application.ViewModels.NotificationViewModel;
+using FranchiseProject.Application.ViewModels.NotificationViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
-using FranchiseProject.Application.ViewModels.TermViewModel;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Domain.Entity;
 using Microsoft.IdentityModel.Tokens;
@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FranchiseProject.Application.ViewModels.TermViewModels;
 
 namespace FranchiseProject.Infrastructures.Mappers
 {

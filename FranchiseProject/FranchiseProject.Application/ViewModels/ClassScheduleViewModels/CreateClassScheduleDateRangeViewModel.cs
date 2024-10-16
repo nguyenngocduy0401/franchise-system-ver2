@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.ViewModels.ClassScheduleViewModel
+namespace FranchiseProject.Application.ViewModels.ClassScheduleViewModels
 {
     public class CreateClassScheduleDateRangeViewModel
     {

@@ -1,6 +1,6 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
-using FranchiseProject.Application.ViewModels.TermViewModel;
+using FranchiseProject.Application.ViewModels.TermViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;

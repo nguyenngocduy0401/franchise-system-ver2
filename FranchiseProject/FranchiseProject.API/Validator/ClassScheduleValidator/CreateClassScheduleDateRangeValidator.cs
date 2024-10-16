@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
+using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 
 namespace FranchiseProject.API.Validator.ClassScheduleValidator
 {

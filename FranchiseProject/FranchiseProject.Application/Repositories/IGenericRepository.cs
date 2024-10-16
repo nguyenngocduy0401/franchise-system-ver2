@@ -21,7 +21,7 @@ namespace FranchiseProject.Application.Repositories
            string? foreignKey = null,
            object? foreignKeyId = null);
 
-        Task<List<TEntity>> GetAllAsync();
+        Task<List<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null);
         Task<TEntity> GetByIdAsync(Guid id);
         Task AddAsync(TEntity entity);
         Task AddRangeAsync(List<TEntity> entities);

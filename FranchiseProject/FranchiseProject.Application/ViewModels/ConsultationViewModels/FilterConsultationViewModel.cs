@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.ViewModels.AgencyViewModel
+namespace FranchiseProject.Application.ViewModels.ConsultationViewModels
 {
     public  class FilterConsultationViewModel
     {

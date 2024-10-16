@@ -36,6 +36,7 @@ namespace FranchiseProject.Application.Services
             {
 
                 var courseCategory = await _unitOfWork.CourseCategoryRepository.GetAllAsync();
+
                 var courseCategoryModel = _mapper.Map<List<CourseCategoryViewModel>>(courseCategory);
                 response.Data = courseCategoryModel;
                 response.isSuccess = true;

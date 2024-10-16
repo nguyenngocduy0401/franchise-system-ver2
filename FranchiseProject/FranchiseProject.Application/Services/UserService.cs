@@ -73,7 +73,7 @@ namespace FranchiseProject.Application.Services
                 var filter = (Expression<Func<User, bool>>)(e =>
                     (string.IsNullOrEmpty(filterUserByAgencyModel.Search) || e.UserName.Contains(filterUserByAgencyModel.Search)
                     || e.Email.Contains(filterUserByAgencyModel.Search) || e.PhoneNumber.Contains(filterUserByAgencyModel.Search)) &&
-                    e.AgencyId == userAgency.AgencyId
+                    e.AgencyId == userAgency.AgencyId && (e.Expire == null || e.Expire > _currentTime.GetCurrentTime())
                 );
                 var role = filterUserByAgencyModel.Role.ToString();
                 var usersPagination = await _unitOfWork.UserRepository.GetFilterAsync(
@@ -538,13 +538,21 @@ namespace FranchiseProject.Application.Services
                 var userId = _claimsService.GetCurrentUserId.ToString();
                 var user = await _userManager.FindByIdAsync(userId);
                 if (user == null) throw new Exception("User does not exist!");
+                var checkOldPassword = await _userManager.CheckPasswordAsync(user, updatePasswordModel.OldPassword);
+                if (!checkOldPassword) 
+                {
+                    response.Data = false;
+                    response.isSuccess = true;
+                    response.Message = "Mật khẩu cũ không chính xác!";
+                    return response;
+                }
                 var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var checkResetPassword = await _userManager.ResetPasswordAsync(user, resetToken, updatePasswordModel.NewPassword);
                 if (!checkResetPassword.Succeeded)
                 {
                     response.Data = false;
                     response.isSuccess = false;
-                    response.Message = "Reset password is fail!";
+                    response.Message = "Password change failed!";
                     return response;
                 }
                 user.ExpireOTPEmail = null;
