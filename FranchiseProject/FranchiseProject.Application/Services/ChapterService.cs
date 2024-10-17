@@ -7,6 +7,7 @@ using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.MaterialViewModels;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +45,7 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
-                var checkCourse = await _courseService.CheckCourseAvailableAsync((Guid)createChapterModel.CourseId);
+                var checkCourse = await _courseService.CheckCourseAvailableAsync(createChapterModel.CourseId, CourseStatusEnum.Draft);
                 if (!checkCourse.isSuccess) return checkCourse;
 
                 var chapter = _mapper.Map<Chapter>(createChapterModel);
@@ -79,8 +80,8 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Không tìm thấy chương học!";
                     return response;
                 }
-                var checkCourse = await _courseService.CheckCourseAvailableAsync((Guid)chapter.CourseId);
-                if (!checkCourse.isSuccess) return checkCourse;
+                var checkCourse = await _courseService.CheckCourseAvailableAsync(chapter.CourseId, CourseStatusEnum.Draft);
+                if (!checkCourse.isSuccess) return checkCourse; 
 
                 _unitOfWork.ChapterRepository.SoftRemove(chapter);
                 response.Message = "Xoá tài nguyên học thành công!";
@@ -143,7 +144,7 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
 
-                var checkCourse = await _courseService.CheckCourseAvailableAsync((Guid)chapter.CourseId);
+                var checkCourse = await _courseService.CheckCourseAvailableAsync(chapter.CourseId, CourseStatusEnum.Draft);
                 if (!checkCourse.isSuccess) return checkCourse;
 
                 chapter = _mapper.Map(updateChapterModel, chapter);

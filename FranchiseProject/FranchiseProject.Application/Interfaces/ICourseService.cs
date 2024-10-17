@@ -18,6 +18,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<CourseDetailViewModel>> GetCourseByIdAsync(Guid courseId);
         Task<ApiResponse<bool>> UpdateCourseAsync(Guid materialId, CreateSlotModel updateCourseModel);
         Task<ApiResponse<bool>> CreateCourseAsync(CreateSlotModel createCourseModel);
-        Task<ApiResponse<bool>> CheckCourseAvailableAsync(Guid courseId, CourseStatusEnum courseStatus);
+        Task<ApiResponse<bool>> CheckCourseAvailableAsync(Guid? courseId, CourseStatusEnum courseStatus);
     }
 }

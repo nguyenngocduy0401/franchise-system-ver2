@@ -47,13 +47,13 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(
-                    (Guid)createAssessmentModel.CourseId, 
+                    createAssessmentModel.CourseId,
                     CourseStatusEnum.Draft
                     );
-                if (!checkCourse.isSuccess) return checkCourse;
+                if (!checkCourse.Data) return checkCourse;
 
-                var assessment = _mapper.Map<Material>(createAssessmentModel);
-                await _unitOfWork.MaterialRepository.AddAsync(assessment);
+                var assessment = _mapper.Map<Assessment>(createAssessmentModel);
+                await _unitOfWork.AssessmentRepository.AddAsync(assessment);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
@@ -84,7 +84,7 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Không tìm thấy đánh giá của khóa học!";
                     return response;
                 }
-                var checkCourse = await _courseService.CheckCourseAvailableAsync((Guid)assessment.CourseId,
+                var checkCourse = await _courseService.CheckCourseAvailableAsync(assessment.CourseId,
                     CourseStatusEnum.Draft);
 
                 if (!checkCourse.isSuccess) return checkCourse;
@@ -138,7 +138,7 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
                 var assessment = await _unitOfWork.AssessmentRepository.GetExistByIdAsync(assessmentId);
-                var checkCourse = await _courseService.CheckCourseAvailableAsync((Guid)assessment.CourseId, CourseStatusEnum.Draft);
+                var checkCourse = await _courseService.CheckCourseAvailableAsync(assessment.CourseId, CourseStatusEnum.Draft);
                 if (!checkCourse.isSuccess) return checkCourse;
                 assessment = _mapper.Map(updateAssessmentModel, assessment);
                 await _unitOfWork.AssessmentRepository.AddAsync(assessment);

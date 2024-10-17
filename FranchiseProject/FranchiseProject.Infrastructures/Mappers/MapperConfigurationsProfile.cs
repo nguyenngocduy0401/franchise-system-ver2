@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using FranchiseProject.Application.ViewModels.MaterialViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.SessionViewModels;
+using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 
 namespace FranchiseProject.Infrastructures.Mappers
 {
@@ -103,6 +104,11 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Session, SessionViewModel>();
             CreateMap<CreateSessionModel, Session>();
             CreateMap<UpdateSessionModel, Session>();
+            #endregion
+            #region Assessment
+            CreateMap<Assessment, AssessmentViewModel>();
+            CreateMap<CreateAssessmentModel, Assessment>();
+            CreateMap<UpdateAssessmentModel, Assessment>();
             #endregion
         }
     }

@@ -8,15 +8,12 @@ namespace FranchiseProject.API.Validator.SessionValidator
         public UpdateSessionValidator()
         {
             RuleFor(x => x.Number)
-                .GreaterThan(0)
-                .WithMessage("Number must be greater than 0");
+                .GreaterThan(0);
             RuleFor(x => x.Topic)
                 .NotEmpty()
-                .MaximumLength(150)
-                .WithMessage("Topic must be not empty and less than 150 characters");
+                .MaximumLength(150);
             RuleFor(x => x.Description)
-                .MaximumLength(500)
-                .WithMessage("Description must be less than 500 characters");
+                .MaximumLength(500);
         }
     }
 }

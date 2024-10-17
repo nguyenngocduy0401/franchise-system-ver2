@@ -24,14 +24,15 @@ namespace FranchiseProject.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ApiResponse<bool>> CheckCourseAvailableAsync(Guid courseId, CourseStatusEnum status)
+        public async Task<ApiResponse<bool>> CheckCourseAvailableAsync(Guid? courseId, CourseStatusEnum status)
         {
             var response = new ApiResponse<bool>();
             var courseNoAvalable = "Khóa học không khả dụng!";
             var courseCanOnlyBeEditedInDraftState = "Chỉ có thể sửa đổi thông tin của khóa học ở trạng thái nháp!";
             try
             {
-                var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(courseId);
+                if (courseId == null) throw new ArgumentNullException(nameof(courseId));
+                var course = await _unitOfWork.CourseRepository.GetExistByIdAsync((Guid)courseId);
                 if (course == null)
                 {
                     response.Data = false;

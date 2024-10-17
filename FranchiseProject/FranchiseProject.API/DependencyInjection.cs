@@ -33,6 +33,10 @@ using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.API.Validator.ChapterValidator;
 using FranchiseProject.API.Validator.SessionValidator;
 using FranchiseProject.Application.ViewModels.SessionViewModels;
+using FranchiseProject.Application.ViewModels.SyllabusViewModels;
+using FranchiseProject.API.Validator.SyllabusValidator;
+using FranchiseProject.Application.ViewModels.AssessmentViewModels;
+using FranchiseProject.API.Validator.AssessmentValidator;
 
 namespace FranchiseProject.API
 {
@@ -123,6 +127,10 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<UpdateChapterModel>, UpdateChapterValidator>();
             services.AddTransient<IValidator<CreateSessionModel>, CreateSessionValidator>();
             services.AddTransient<IValidator<UpdateSessionModel>, UpdateSessionValidator>();
+            services.AddTransient<IValidator<CreateSyllabusModel>, CreateSyllabusValidator>();
+            services.AddTransient<IValidator<UpdateSyllabusModel>, UpdateSyllabusValidator>();
+            services.AddTransient<IValidator<CreateAssessmentModel>, CreateAssessmentValidator>();
+            services.AddTransient<IValidator<UpdateAssessmentModel>, UpdateAssessmentValidator>();
             #endregion
 
             return services;

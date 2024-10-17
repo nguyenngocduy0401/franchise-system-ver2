@@ -9,21 +9,16 @@ namespace FranchiseProject.API.Validator.AssessmentValidator
         {
             RuleFor(x => x.Type)
                 .NotEmpty()
-                .MaximumLength(100)
-                .WithMessage("Type must be not empty and less than 100 characters");
+                .MaximumLength(10);
             RuleFor(x => x.Content)
                 .NotEmpty()
-                .MaximumLength(100)
-                .WithMessage("Content must be not empty and less than 100 characters");
+                .MaximumLength(100);
             RuleFor(x => x.Quantity)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("Quantity must be greater than 0");
+                .GreaterThanOrEqualTo(0);
             RuleFor(x => x.Weight)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("Weight must be greater than 0");
+                .GreaterThanOrEqualTo(0);
             RuleFor(x => x.CompletionCriteria)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("CompletionCriteria must be greater than 0");
+                .GreaterThanOrEqualTo(0);
         }
     }
 }
