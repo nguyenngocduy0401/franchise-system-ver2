@@ -35,9 +35,8 @@ namespace FranchiseProject.Application.Services
             try
             {
                 Expression<Func<Slot, bool>> filter = s =>
-                ((!filterSlotModel.StartTime.HasValue || filterSlotModel.StartTime <= s.StartTime) &&
-                (!filterSlotModel.StartTime.HasValue || filterSlotModel.EndTime >= s.EndTime) &&
-                (!filterSlotModel.IsDeleted.HasValue || s.IsDeleted == filterSlotModel.IsDeleted));
+                (!filterSlotModel.StartTime.HasValue || filterSlotModel.StartTime <= s.StartTime) &&
+                (!filterSlotModel.StartTime.HasValue || filterSlotModel.EndTime >= s.EndTime);
                 var slots = await _unitOfWork.SlotRepository.GetFilterAsync(
                     filter: filter,
                     pageIndex: filterSlotModel.PageIndex,
@@ -70,17 +69,10 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Không tìm thấy slot!";
                     return response;
                 }
-                switch (slot.IsDeleted) 
-                {
-                    case false:
-                        _unitOfWork.SlotRepository.SoftRemove(slot);
-                        response.Message = "Xoá slot học thành công!";
-                        break;
-                    case true:
-                        _unitOfWork.SlotRepository.RestoreSoftRemove(slot);
-                        response.Message = "Phục hồi slot học thành công!";
-                        break;
-                }
+
+                _unitOfWork.SlotRepository.SoftRemove(slot);
+                response.Message = "Xoá slot học thành công!";
+                  
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete failed!");
                 response.Data = true;

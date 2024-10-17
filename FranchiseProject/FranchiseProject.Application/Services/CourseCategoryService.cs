@@ -94,17 +94,9 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Không tìm thấy loại của khóa học!";
                     return response;
                 }
-                switch (courseCategory.IsDeleted)
-                {
-                    case false:
-                        _unitOfWork.CourseCategoryRepository.SoftRemove(courseCategory);
-                        response.Message = "Xoá loại của khóa học thành công!";
-                        break;
-                    case true:
-                        _unitOfWork.CourseCategoryRepository.RestoreSoftRemove(courseCategory);
-                        response.Message = "Phục hồi loại của khóa học học thành công!";
-                        break;
-                }
+                _unitOfWork.CourseCategoryRepository.SoftRemove(courseCategory);
+                response.Message = "Xoá loại của khóa học thành công!";
+                        
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete failed!");
                 response.Data = true;
@@ -125,9 +117,8 @@ namespace FranchiseProject.Application.Services
             try 
             {
                 Expression<Func<CourseCategory, bool>> filter = e =>
-                ((string.IsNullOrEmpty(filterCourseCategoryModel.Search) || e.Name.Contains(filterCourseCategoryModel.Search) ||
-                e.Description.Contains(filterCourseCategoryModel.Search)) &&
-                (!filterCourseCategoryModel.IsDeleted.HasValue || e.IsDeleted == filterCourseCategoryModel.IsDeleted));
+                (string.IsNullOrEmpty(filterCourseCategoryModel.Search) || e.Name.Contains(filterCourseCategoryModel.Search) ||
+                e.Description.Contains(filterCourseCategoryModel.Search));
 
                 var courseCategory = await _unitOfWork.CourseCategoryRepository.GetFilterAsync
                     (filter : filter,

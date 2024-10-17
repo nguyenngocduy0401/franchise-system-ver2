@@ -271,7 +271,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> DeleteUserByAgencyAsync(string id)
+        public async Task<ApiResponse<bool>> BanAndUnbanUserByAgencyAsync(string id)
         {
             var response = new ApiResponse<bool>();
             try
@@ -430,7 +430,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> DeleteUserByAdminAsync(string id)
+        public async Task<ApiResponse<bool>> BanAndUnbanUserByAdminAsync(string id)
         {
             var response = new ApiResponse<bool>();
             try

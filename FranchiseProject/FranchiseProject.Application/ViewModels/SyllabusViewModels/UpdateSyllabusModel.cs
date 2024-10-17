@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Domain.Entity
+namespace FranchiseProject.Application.ViewModels.SyllabusViewModels
 {
-    public class Syllabus : BaseEntity
+    public class UpdateSyllabusModel
     {
         public string? Description { get; set; }
         public string? StudentTask { get; set; }
@@ -14,6 +15,5 @@ namespace FranchiseProject.Domain.Entity
         public string? ToolsRequire { get; set; }
         public double Scale { get; set; }
         public double MinAvgMarkToPass { get; set; }
-        public virtual ICollection<Course>? Courses { get; set; }
     }
 }

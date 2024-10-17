@@ -3,6 +3,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.MaterialViewModels;
 using FranchiseProject.Domain.Entity;
@@ -18,11 +19,13 @@ namespace FranchiseProject.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ICourseService _courseService;
         private readonly IValidator<UpdateChapterModel> _updateChapterValidator;
         private readonly IValidator<CreateChapterModel> _createChapterValidator;
-        public ChapterService(IUnitOfWork unitOfWork, IMapper mapper, IValidator<UpdateChapterModel> updateChapterValidator,
-            IValidator<CreateChapterModel> createChapterValidator)
+        public ChapterService(IUnitOfWork unitOfWork, IMapper mapper, ICourseService courseService
+            , IValidator<UpdateChapterModel> updateChapterValidator, IValidator<CreateChapterModel> createChapterValidator)
         {
+            _courseService = courseService;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _updateChapterValidator = updateChapterValidator;
@@ -41,8 +44,8 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
-                var course = await _unitOfWork.CourseRepository.GetExistByIdAsync((Guid)createChapterModel.CourseId);
-                if (course == null) throw new Exception("Course does not exist!");
+                var checkCourse = await _courseService.CheckCourseAvailableAsync((Guid)createChapterModel.CourseId);
+                if (!checkCourse.isSuccess) return checkCourse;
 
                 var chapter = _mapper.Map<Chapter>(createChapterModel);
                 await _unitOfWork.ChapterRepository.AddAsync(chapter);
@@ -76,19 +79,15 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Không tìm thấy chương học!";
                     return response;
                 }
-                switch (chapter.IsDeleted)
-                {
-                    case false:
-                        _unitOfWork.ChapterRepository.SoftRemove(chapter);
-                        response.Message = "Xoá tài nguyên học thành công!";
-                        break;
-                    case true:
-                        _unitOfWork.ChapterRepository.RestoreSoftRemove(chapter);
-                        response.Message = "Phục hồi tài nguyên học thành công!";
-                        break;
-                }
+                var checkCourse = await _courseService.CheckCourseAvailableAsync((Guid)chapter.CourseId);
+                if (!checkCourse.isSuccess) return checkCourse;
+
+                _unitOfWork.ChapterRepository.SoftRemove(chapter);
+                response.Message = "Xoá tài nguyên học thành công!";
+
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete failed!");
+
                 response.Data = true;
                 response.isSuccess = true;
             }
@@ -134,7 +133,19 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
+
                 var chapter = await _unitOfWork.ChapterRepository.GetExistByIdAsync(chapterId);
+                if (chapter == null)
+                {
+                    response.Data = false;
+                    response.isSuccess = true;
+                    response.Message = "Không tìm thấy chương học!";
+                    return response;
+                }
+
+                var checkCourse = await _courseService.CheckCourseAvailableAsync((Guid)chapter.CourseId);
+                if (!checkCourse.isSuccess) return checkCourse;
+
                 chapter = _mapper.Map(updateChapterModel, chapter);
 
                 _unitOfWork.ChapterRepository.Update(chapter);

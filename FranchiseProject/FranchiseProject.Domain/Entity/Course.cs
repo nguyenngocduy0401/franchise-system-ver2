@@ -13,7 +13,9 @@ namespace FranchiseProject.Domain.Entity
         public string? Name {get; set;}
         public string? Description {get; set;}
         public string? URLImage {get; set;}
-        public string? NumberOfSession {get; set;}
+        public int NumberOfLession {get; set;}
+        public double Price { get; set; }
+        public int Version { get; set; }
         public CourseStatusEnum Status {get; set;}
         public Guid? SyllabusId {get; set;}
         [ForeignKey("SyllabusId")]

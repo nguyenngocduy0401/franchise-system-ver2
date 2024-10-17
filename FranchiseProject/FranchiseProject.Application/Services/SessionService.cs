@@ -76,17 +76,9 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Không tìm thấy buổi học!";
                     return response;
                 }
-                switch (session.IsDeleted)
-                {
-                    case false:
-                        _unitOfWork.SessionRepository.SoftRemove(session);
-                        response.Message = "Xoá buổi học thành công!";
-                        break;
-                    case true:
-                        _unitOfWork.SessionRepository.RestoreSoftRemove(session);
-                        response.Message = "Phục hồi buổi học thành công!";
-                        break;
-                }
+                _unitOfWork.SessionRepository.SoftRemove(session);
+                response.Message = "Xoá buổi học thành công!";
+                    
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete failed!");
                 response.Data = true;

@@ -8,6 +8,7 @@ using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.Application.ViewModels.MaterialViewModels;
 using FranchiseProject.Application.ViewModels.SessionViewModels;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,15 +19,17 @@ namespace FranchiseProject.Application.Services
 {
     public class AssessmentService : IAssessmentService
     {
+        private readonly ICourseService _courseService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IValidator<CreateAssessmentModel> _createAssessmentValidator;
         private readonly IValidator<UpdateAssessmentModel> _updateAssessmentvalidator;
-        public AssessmentService(IUnitOfWork unitOfWork, IMapper mapper,
+        public AssessmentService(IUnitOfWork unitOfWork, IMapper mapper, ICourseService courseService,
             IValidator<UpdateAssessmentModel> updateAssessmentValidator, IValidator<CreateAssessmentModel> createAssessmentValidator)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _courseService = courseService;
             _updateAssessmentvalidator = updateAssessmentValidator;
             _createAssessmentValidator = createAssessmentValidator;
         }
@@ -43,8 +46,11 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
-                var course = await _unitOfWork.CourseRepository.GetExistByIdAsync((Guid)createAssessmentModel.CourseId);
-                if (course == null) throw new Exception("Assessment does not exist!");
+                var checkCourse = await _courseService.CheckCourseAvailableAsync(
+                    (Guid)createAssessmentModel.CourseId, 
+                    CourseStatusEnum.Draft
+                    );
+                if (!checkCourse.isSuccess) return checkCourse;
 
                 var assessment = _mapper.Map<Material>(createAssessmentModel);
                 await _unitOfWork.MaterialRepository.AddAsync(assessment);
@@ -70,7 +76,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-                var assessment = await _unitOfWork.AssessmentRepository.GetByIdAsync(assessmentId);
+                var assessment = await _unitOfWork.AssessmentRepository.GetExistByIdAsync(assessmentId);
                 if (assessment == null)
                 {
                     response.Data = false;
@@ -78,17 +84,12 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Không tìm thấy đánh giá của khóa học!";
                     return response;
                 }
-                switch (assessment.IsDeleted)
-                {
-                    case false:
-                        _unitOfWork.AssessmentRepository.SoftRemove(assessment);
-                        response.Message = "Xoá đánh giá của khóa học thành công!";
-                        break;
-                    case true:
-                        _unitOfWork.AssessmentRepository.RestoreSoftRemove(assessment);
-                        response.Message = "Phục hồi đánh giá của khóa học thành công!";
-                        break;
-                }
+                var checkCourse = await _courseService.CheckCourseAvailableAsync((Guid)assessment.CourseId,
+                    CourseStatusEnum.Draft);
+
+                if (!checkCourse.isSuccess) return checkCourse;
+                _unitOfWork.AssessmentRepository.SoftRemove(assessment);
+                response.Message = "Xoá đánh giá của khóa học thành công!";
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete failed!");
                 response.Data = true;
@@ -137,6 +138,8 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
                 var assessment = await _unitOfWork.AssessmentRepository.GetExistByIdAsync(assessmentId);
+                var checkCourse = await _courseService.CheckCourseAvailableAsync((Guid)assessment.CourseId, CourseStatusEnum.Draft);
+                if (!checkCourse.isSuccess) return checkCourse;
                 assessment = _mapper.Map(updateAssessmentModel, assessment);
                 await _unitOfWork.AssessmentRepository.AddAsync(assessment);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;

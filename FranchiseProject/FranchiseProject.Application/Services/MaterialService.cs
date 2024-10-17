@@ -77,17 +77,9 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Không tìm thấy tài nguyên!";
                     return response;
                 }
-                switch (material.IsDeleted)
-                {
-                    case false:
-                        _unitOfWork.MaterialRepository.SoftRemove(material);
-                        response.Message = "Xoá tài nguyên học thành công!";
-                        break;
-                    case true:
-                        _unitOfWork.MaterialRepository.RestoreSoftRemove(material);
-                        response.Message = "Phục hồi tài nguyên học thành công!";
-                        break;
-                }
+                _unitOfWork.MaterialRepository.SoftRemove(material);
+                response.Message = "Xoá tài nguyên học thành công!";
+           
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete failed!");
                 response.Data = true;

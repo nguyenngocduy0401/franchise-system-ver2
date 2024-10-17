@@ -1,5 +1,6 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.Services;
 using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -8,21 +9,21 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace FranchiseProject.API.Controllers
 {
-    [Route("api/v1/assessments")]
+    [Route("api/v1/Syllabuses")]
     [ApiController]
-    public class AssessmentController : ControllerBase
+    public class SyllabusController : ControllerBase
     {
-        private readonly IAssessmentService _assessmentService;
-        public AssessmentController(IAssessmentService assessmentService)
-        { 
-            _assessmentService = assessmentService;
+        private readonly ISyllabusService _syllabusService;
+        public SyllabusController(ISyllabusService syllabusService)
+        {
+            _syllabusService = syllabusService;
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        /*[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "xóa đánh giá của khóa học bằng id {Authorize = Admin, Manager}")]
         [HttpDelete("{id}")]
-        public async Task<ApiResponse<bool>> DeleteAssessmentByIdAsync(Guid id)
+        public async Task<ApiResponse<bool>> DeleteSyllabusByIdAsync(Guid id)
         {
-            return await _assessmentService.DeleteAssessmentByIdAsync(id);
+            return await _syllabusService.DeleteAssessmentByIdAsync(id);
         }
         [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo đánh giá của khóa học {Authorize = Admin, Manager}")]
@@ -43,6 +44,6 @@ namespace FranchiseProject.API.Controllers
         public async Task<ApiResponse<AssessmentViewModel>> GetAssessmentByIdAsync(Guid id)
         {
             return await _assessmentService.GetAssessmentByIdAsync(id);
-        }
+        }*/
     }
 }

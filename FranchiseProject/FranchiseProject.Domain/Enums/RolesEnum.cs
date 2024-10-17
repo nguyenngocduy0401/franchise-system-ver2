@@ -14,4 +14,5 @@ namespace FranchiseProject.Domain.Enums
         Student,
         Instructor
     }
+
 }
