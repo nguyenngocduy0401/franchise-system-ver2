@@ -3,11 +3,13 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Domain.Entity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,17 +44,15 @@ namespace FranchiseProject.Application.Services
                     pageIndex: filterSlotModel.PageIndex,
                     pageSize: filterSlotModel.PageSize
                     );
+                if (slots.Items.IsNullOrEmpty()) return ResponseHandler.Success<Pagination<SlotViewModel>>(null, "Không tìm thấy slot phù hợp!");
                 var slotViewModels = _mapper.Map<Pagination<SlotViewModel>>(slots);
-                response.Data = slotViewModels;
-                response.isSuccess = true;
-                response.Message = "lấy danh sách slot thành công!";
+                
+                response = ResponseHandler.Success(slotViewModels, "Successful!");
 
             }
             catch (Exception ex)
             {
-                response.Data = null;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<Pagination<SlotViewModel>>(ex.Message);
             }
             return response;
         }
@@ -61,28 +61,19 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-                var slot = await _unitOfWork.SlotRepository.GetByIdAsync(slotId);
-                if (slot == null)
-                {
-                    response.Data = false;
-                    response.isSuccess = true;
-                    response.Message = "Không tìm thấy slot!";
-                    return response;
-                }
+                var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync(slotId);
+                if (slot == null) return ResponseHandler.Failure<bool>("Slot không tồn tại!");
 
                 _unitOfWork.SlotRepository.SoftRemove(slot);
-                response.Message = "Xoá slot học thành công!";
                   
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete failed!");
-                response.Data = true;
-                response.isSuccess = true;
+                
+                response = ResponseHandler.Success(true, "Xoá slot học thành công!");
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }
@@ -92,22 +83,14 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var slot = await _unitOfWork.SlotRepository.GetByIdAsync(slotId);
-                if (slot == null) {
-                    response.Data = null;
-                    response.isSuccess = true;
-                    response.Message = "Không tìm thấy slot!";
-                    return response;
-                }
+                if (slot == null) throw new Exception("Slot does not exist!");
+
                 var slotViewModel = _mapper.Map<SlotViewModel>(slot);
-                response.Data = slotViewModel;
-                response.isSuccess = true;
-                response.Message = "tìm slot học thành công!";
+                response = ResponseHandler.Success(slotViewModel, "Successful!");
             }
             catch (Exception ex)
             {
-                response.Data = null;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<SlotViewModel>(ex.Message);
             }
             return response;
         }
@@ -117,28 +100,19 @@ namespace FranchiseProject.Application.Services
             try
             {
                 ValidationResult validationResult = await _slotValidator.ValidateAsync(updateSlotModel);
-                if (!validationResult.IsValid)
-                {
-                    response.Data = false;
-                    response.isSuccess = false;
-                    response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
-                    return response;
-                }
+                if (!validationResult.IsValid) if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+
                 var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync(slotId);
+                if(slot == null) return ResponseHandler.Failure<bool>("Slot không tồn tại!");
                 slot = _mapper.Map(updateSlotModel, slot);
                 _unitOfWork.SlotRepository.Update(slot);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Update failed!");
-                response.Data = true;
-                response.isSuccess = true;
-                response.Message = "cập nhật slot học thành công!";
-
+                response = ResponseHandler.Success(true, "cập nhật slot học thành công!");
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }
@@ -148,27 +122,19 @@ namespace FranchiseProject.Application.Services
             try
             {
                 ValidationResult validationResult = await _slotValidator.ValidateAsync(createSlotModel);
-                if (!validationResult.IsValid)
-                {
-                    response.Data = false;
-                    response.isSuccess = false;
-                    response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
-                    return response;
-                }
+                if (!validationResult.IsValid) if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+
                 var slot = _mapper.Map<Slot>(createSlotModel);
                 await _unitOfWork.SlotRepository.AddAsync(slot);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
-                response.Data = true;
-                response.isSuccess = true;
-                response.Message = "Tạo slot học thành công!";
+
+                response = ResponseHandler.Success(true, "Tạo slot học thành công!");
 
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }
@@ -179,16 +145,11 @@ namespace FranchiseProject.Application.Services
             {
                 var slot = await _unitOfWork.SlotRepository.GetAllAsync(query => query.OrderBy(p => p.Name));
                 var slotViewModel = _mapper.Map<List<SlotViewModel>>(slot);
-                response.Data = slotViewModel;
-                response.isSuccess = true;
-                response.Message = "cập nhật slot học thành công!";
-
+                response = ResponseHandler.Success(slotViewModel, "Successful!");
             }
             catch (Exception ex)
             {
-                response.Data = null;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<List<SlotViewModel>>(ex.Message);
             }
             return response;
         }

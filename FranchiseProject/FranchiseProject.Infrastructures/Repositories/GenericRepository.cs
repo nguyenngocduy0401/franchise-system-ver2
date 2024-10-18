@@ -43,7 +43,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             string? foreignKey = null,
             object? foreignKeyId = null)
         {
-            IQueryable<TEntity> query = _dbSet.Where(e => e.IsDeleted != false);
+            IQueryable<TEntity> query = _dbSet.Where(e => e.IsDeleted != true);
             if (!string.IsNullOrEmpty(foreignKey) && foreignKeyId != null)
             {
                 if (foreignKeyId is Guid guidValue)
