@@ -26,7 +26,7 @@ namespace FranchiseProject.API.Controllers
         [HttpGet("{id}")]
         public async Task<ApiResponse<UserViewModel>> GetUserByIdAsync(string id) => await _userService.GetUserByIdAsync(id);
 
-        [Authorize(Roles = AppRole.Admin)]
+        /*[Authorize(Roles = AppRole.Admin)]*/
         [SwaggerOperation(Summary = "tìm kiếm người dùng {Authorize = Administrator}")]
         [HttpGet("~/admin/api/v1/users")]
         public async Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAdminAsync([FromQuery]FilterUserByAdminModel filterUserByAdminModel)
