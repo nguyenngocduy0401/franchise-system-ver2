@@ -27,4 +27,8 @@
     <ProjectReference Include="..\FranchiseProject.Domain\FranchiseProject.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ViewModels\ChapterViewModels\" />
+  </ItemGroup>
+
 </Project>

@@ -1,5 +1,5 @@
 ﻿using FranchiseProject.API;
-using FranchiseProject.API.CustomUserIdProvider;
+using FranchiseProject.API.Services;
 using FranchiseProject.API.Middlewares;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Hubs; // Thêm dòng này để sử dụng NotificationHub

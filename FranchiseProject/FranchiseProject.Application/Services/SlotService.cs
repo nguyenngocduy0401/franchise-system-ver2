@@ -35,9 +35,8 @@ namespace FranchiseProject.Application.Services
             try
             {
                 Expression<Func<Slot, bool>> filter = s =>
-                ((!filterSlotModel.StartTime.HasValue || filterSlotModel.StartTime <= s.StartTime) &&
-                (!filterSlotModel.StartTime.HasValue || filterSlotModel.EndTime >= s.EndTime) &&
-                (!filterSlotModel.IsDeleted.HasValue || s.IsDeleted == filterSlotModel.IsDeleted));
+                (!filterSlotModel.StartTime.HasValue || filterSlotModel.StartTime <= s.StartTime) &&
+                (!filterSlotModel.StartTime.HasValue || filterSlotModel.EndTime >= s.EndTime);
                 var slots = await _unitOfWork.SlotRepository.GetFilterAsync(
                     filter: filter,
                     pageIndex: filterSlotModel.PageIndex,
@@ -70,19 +69,12 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Không tìm thấy slot!";
                     return response;
                 }
-                switch (slot.IsDeleted) 
-                {
-                    case false:
-                        _unitOfWork.SlotRepository.SoftRemove(slot);
-                        response.Message = "Xoá slot học thành công!";
-                        break;
-                    case true:
-                        _unitOfWork.SlotRepository.RestoreSoftRemove(slot);
-                        response.Message = "Phục hồi slot học thành công!";
-                        break;
-                }
+
+                _unitOfWork.SlotRepository.SoftRemove(slot);
+                response.Message = "Xoá slot học thành công!";
+                  
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Delete fail!");
+                if (!isSuccess) throw new Exception("Delete failed!");
                 response.Data = true;
                 response.isSuccess = true;
             }
@@ -133,10 +125,10 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
                 var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync(slotId);
-                _mapper.Map(updateSlotModel, slot);
+                slot = _mapper.Map(updateSlotModel, slot);
                 _unitOfWork.SlotRepository.Update(slot);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Udpate fail!");
+                if (!isSuccess) throw new Exception("Update failed!");
                 response.Data = true;
                 response.isSuccess = true;
                 response.Message = "cập nhật slot học thành công!";
@@ -166,7 +158,7 @@ namespace FranchiseProject.Application.Services
                 var slot = _mapper.Map<Slot>(createSlotModel);
                 await _unitOfWork.SlotRepository.AddAsync(slot);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Create fail!");
+                if (!isSuccess) throw new Exception("Create failed!");
                 response.Data = true;
                 response.isSuccess = true;
                 response.Message = "Tạo slot học thành công!";

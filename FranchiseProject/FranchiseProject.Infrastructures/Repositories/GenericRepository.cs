@@ -43,7 +43,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             string? foreignKey = null,
             object? foreignKeyId = null)
         {
-            IQueryable<TEntity> query = _dbSet;
+            IQueryable<TEntity> query = _dbSet.Where(e => e.IsDeleted != false);
             if (!string.IsNullOrEmpty(foreignKey) && foreignKeyId != null)
             {
                 if (foreignKeyId is Guid guidValue)
@@ -76,7 +76,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             }
             else
             {
-                query = query.OrderByDescending(e => EF.Property<DateTime>(e, "CreationDate"));
+                query = query.OrderByDescending(e => e.CreationDate);
             }
 
             if (pageIndex.HasValue && pageSize.HasValue)

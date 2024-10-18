@@ -56,6 +56,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IMaterialService, MaterialService>();
+            services.AddScoped<IAssessmentService, AssessmentService>();
             #endregion
             #region Repository DI
             services.AddScoped<IAgencyRepository, AgencyRepository>();
