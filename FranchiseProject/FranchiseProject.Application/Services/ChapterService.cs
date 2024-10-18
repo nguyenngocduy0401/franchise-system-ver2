@@ -2,6 +2,7 @@
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
@@ -38,13 +39,8 @@ namespace FranchiseProject.Application.Services
             try
             {
                 ValidationResult validationResult = await _createChapterValidator.ValidateAsync(createChapterModel);
-                if (!validationResult.IsValid)
-                {
-                    response.Data = false;
-                    response.isSuccess = false;
-                    response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
-                    return response;
-                }
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(createChapterModel.CourseId, CourseStatusEnum.Draft);
                 if (!checkCourse.isSuccess) return checkCourse;
 
@@ -107,6 +103,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var chapter = await _unitOfWork.ChapterRepository.GetByIdAsync(chapterId);
+                if (chapter == null) throw new Exception("Chapter does not exist!");
                 var chapterlModel = _mapper.Map<ChapterViewModel>(chapter);
                 response.Data = chapterlModel;
                 response.isSuccess = true;

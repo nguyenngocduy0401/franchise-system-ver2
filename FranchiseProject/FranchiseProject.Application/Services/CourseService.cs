@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
 using FranchiseProject.Application.ViewModels.MaterialViewModels;
@@ -58,9 +59,7 @@ namespace FranchiseProject.Application.Services
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }
@@ -94,9 +93,7 @@ namespace FranchiseProject.Application.Services
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }

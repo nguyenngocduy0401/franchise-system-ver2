@@ -2,6 +2,7 @@
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Application.ViewModels.AssessmentViewModels;
@@ -39,13 +40,8 @@ namespace FranchiseProject.Application.Services
             try
             {
                 ValidationResult validationResult = await _createAssessmentValidator.ValidateAsync(createAssessmentModel);
-                if (!validationResult.IsValid)
-                {
-                    response.Data = false;
-                    response.isSuccess = false;
-                    response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
-                    return response;
-                }
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(
                     createAssessmentModel.CourseId,
                     CourseStatusEnum.Draft
@@ -57,16 +53,12 @@ namespace FranchiseProject.Application.Services
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
-                response.Data = true;
-                response.isSuccess = true;
-                response.Message = "Tạo đánh giá của khóa học thành công!";
+                response = ResponseHandler.Success(true, "Successful!");
 
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }
