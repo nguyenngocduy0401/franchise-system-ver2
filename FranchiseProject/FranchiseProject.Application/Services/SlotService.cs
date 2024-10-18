@@ -44,9 +44,9 @@ namespace FranchiseProject.Application.Services
                     pageIndex: filterSlotModel.PageIndex,
                     pageSize: filterSlotModel.PageSize
                     );
-                if (slots.Items.IsNullOrEmpty()) return ResponseHandler.Success<Pagination<SlotViewModel>>(null, "Không tìm thấy slot phù hợp!");
                 var slotViewModels = _mapper.Map<Pagination<SlotViewModel>>(slots);
-                
+                if (slotViewModels.Items.IsNullOrEmpty()) return ResponseHandler.Success(slotViewModels, "Không tìm thấy slot phù hợp!");
+
                 response = ResponseHandler.Success(slotViewModels, "Successful!");
 
             }
