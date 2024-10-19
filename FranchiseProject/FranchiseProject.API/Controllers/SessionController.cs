@@ -17,21 +17,21 @@ namespace FranchiseProject.API.Controllers
         {
             _sessionService = sessionService;
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "xóa buổi học bằng id {Authorize = Admin, Manager}")]
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteSessionByIdAsync(Guid id)
         {
             return await _sessionService.DeleteSessionByIdAsync(id);
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo buổi học {Authorize = Admin, Manager}")]
         [HttpPost()]
         public async Task<ApiResponse<bool>> CreateSessionAsync(CreateSessionModel createSessionModel)
         {
             return await _sessionService.CreateSessionAsync(createSessionModel);
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "cập nhật buổi học {Authorize = Admin, Manager}")]
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> UpdateSessionAsync(Guid id, UpdateSessionModel updateSessionModel)

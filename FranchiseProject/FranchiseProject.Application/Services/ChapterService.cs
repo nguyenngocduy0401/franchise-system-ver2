@@ -42,23 +42,20 @@ namespace FranchiseProject.Application.Services
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(createChapterModel.CourseId, CourseStatusEnum.Draft);
-                if (!checkCourse.isSuccess) return checkCourse;
+                if (!checkCourse.Data) return checkCourse;
 
                 var chapter = _mapper.Map<Chapter>(createChapterModel);
                 await _unitOfWork.ChapterRepository.AddAsync(chapter);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
-                response.Data = true;
-                response.isSuccess = true;
-                response.Message = "Tạo chương học thành công!";
+
+                response = ResponseHandler.Success(true, "Tạo chương học thành công!");
 
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }
@@ -68,31 +65,21 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-                var chapter = await _unitOfWork.ChapterRepository.GetByIdAsync(chapterId);
-                if (chapter == null)
-                {
-                    response.Data = false;
-                    response.isSuccess = true;
-                    response.Message = "Không tìm thấy chương học!";
-                    return response;
-                }
+                var chapter = await _unitOfWork.ChapterRepository.GetExistByIdAsync(chapterId);
+                if (chapter == null) return ResponseHandler.Failure<bool>("Chương học không khả dụng!");
+                
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(chapter.CourseId, CourseStatusEnum.Draft);
-                if (!checkCourse.isSuccess) return checkCourse; 
+                if (!checkCourse.Data) return checkCourse; 
 
                 _unitOfWork.ChapterRepository.SoftRemove(chapter);
-                response.Message = "Xoá tài nguyên học thành công!";
-
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete failed!");
 
-                response.Data = true;
-                response.isSuccess = true;
+                response = ResponseHandler.Success(true, "Xoá tài nguyên học thành công!");
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }
@@ -105,15 +92,11 @@ namespace FranchiseProject.Application.Services
                 var chapter = await _unitOfWork.ChapterRepository.GetByIdAsync(chapterId);
                 if (chapter == null) throw new Exception("Chapter does not exist!");
                 var chapterlModel = _mapper.Map<ChapterViewModel>(chapter);
-                response.Data = chapterlModel;
-                response.isSuccess = true;
-                response.Message = "Successful!";
+                response = ResponseHandler.Success(chapterlModel);
             }
             catch (Exception ex)
             {
-                response.Data = null;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<ChapterViewModel>(ex.Message);
             }
             return response;
         }
@@ -124,41 +107,27 @@ namespace FranchiseProject.Application.Services
             try
             {
                 ValidationResult validationResult = await _updateChapterValidator.ValidateAsync(updateChapterModel);
-                if (!validationResult.IsValid)
-                {
-                    response.Data = false;
-                    response.isSuccess = false;
-                    response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
-                    return response;
-                }
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 var chapter = await _unitOfWork.ChapterRepository.GetExistByIdAsync(chapterId);
-                if (chapter == null)
-                {
-                    response.Data = false;
-                    response.isSuccess = true;
-                    response.Message = "Không tìm thấy chương học!";
-                    return response;
-                }
+                if (chapter == null) return ResponseHandler.Failure<bool>("Chương học không khả dụng!");
+                
 
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(chapter.CourseId, CourseStatusEnum.Draft);
-                if (!checkCourse.isSuccess) return checkCourse;
+                if (!checkCourse.Data) return checkCourse;
 
                 chapter = _mapper.Map(updateChapterModel, chapter);
 
                 _unitOfWork.ChapterRepository.Update(chapter);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Update failed!");
-                response.Data = true;
-                response.isSuccess = true;
-                response.Message = "cập nhật chương học thành công!";
+
+                response = ResponseHandler.Success(true,"cập nhật chương học thành công!");
 
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }

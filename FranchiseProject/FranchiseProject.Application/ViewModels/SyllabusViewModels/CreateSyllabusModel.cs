@@ -14,6 +14,6 @@ namespace FranchiseProject.Application.ViewModels.SyllabusViewModels
         public string? ToolsRequire { get; set; }
         public double Scale { get; set; }
         public double MinAvgMarkToPass { get; set; }
-        public Guid? CourseId { get; set; }
+        public Guid CourseId { get; set; }
     }
 }

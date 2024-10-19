@@ -17,21 +17,21 @@ namespace FranchiseProject.API.Controllers
         { 
             _assessmentService = assessmentService;
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        /*[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]*/
         [SwaggerOperation(Summary = "xóa đánh giá của khóa học bằng id {Authorize = Admin, Manager}")]
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteAssessmentByIdAsync(Guid id)
         {
             return await _assessmentService.DeleteAssessmentByIdAsync(id);
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo đánh giá của khóa học {Authorize = Admin, Manager}")]
         [HttpPost()]
         public async Task<ApiResponse<bool>> CreateAssessmentAsync(CreateAssessmentModel createAssessmentModel)
         {
             return await _assessmentService.CreateAssessmentAsync(createAssessmentModel);
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "cập nhật đánh giá của khóa học {Authorize = Admin, Manager}")]
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> UpdateAssessmentAsync(Guid id, UpdateAssessmentModel updateAssessmentModel)

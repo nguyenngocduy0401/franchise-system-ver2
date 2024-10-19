@@ -42,8 +42,7 @@ namespace FranchiseProject.Application.Services
                 ValidationResult validationResult = await _createAssessmentValidator.ValidateAsync(createAssessmentModel);
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
-                var checkCourse = await _courseService.CheckCourseAvailableAsync(
-                    createAssessmentModel.CourseId,
+                var checkCourse = await _courseService.CheckCourseAvailableAsync(createAssessmentModel.CourseId,
                     CourseStatusEnum.Draft
                     );
                 if (!checkCourse.Data) return checkCourse;
@@ -53,7 +52,7 @@ namespace FranchiseProject.Application.Services
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
-                response = ResponseHandler.Success(true, "Successful!");
+                response = ResponseHandler.Success(true, "Tạo đánh giá của khóa học thành công!");
 
             }
             catch (Exception ex)
@@ -69,29 +68,20 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var assessment = await _unitOfWork.AssessmentRepository.GetExistByIdAsync(assessmentId);
-                if (assessment == null)
-                {
-                    response.Data = false;
-                    response.isSuccess = true;
-                    response.Message = "Không tìm thấy đánh giá của khóa học!";
-                    return response;
-                }
-                var checkCourse = await _courseService.CheckCourseAvailableAsync(assessment.CourseId,
-                    CourseStatusEnum.Draft);
+                if (assessment == null) return ResponseHandler.Failure<bool>("Đánh giá của khóa học không khả dụng!");
+                
+                var checkCourse = await _courseService.CheckCourseAvailableAsync(assessment.CourseId, CourseStatusEnum.Draft);
+                if (!checkCourse.Data) return checkCourse;
 
-                if (!checkCourse.isSuccess) return checkCourse;
                 _unitOfWork.AssessmentRepository.SoftRemove(assessment);
-                response.Message = "Xoá đánh giá của khóa học thành công!";
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete failed!");
-                response.Data = true;
-                response.isSuccess = true;
+
+                response = ResponseHandler.Success(true, "Xoá đánh giá của khóa học thành công!");
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }
@@ -102,16 +92,13 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var assessment = await _unitOfWork.AssessmentRepository.GetByIdAsync(assessmentId);
+                if (assessment == null) throw new Exception("Assessment does not exist!");
                 var assessmentModel = _mapper.Map<AssessmentViewModel>(assessment);
-                response.Data = assessmentModel;
-                response.isSuccess = true;
-                response.Message = "Successful!";
+                response = ResponseHandler.Success(assessmentModel);
             }
             catch (Exception ex)
             {
-                response.Data = null;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<AssessmentViewModel>(ex.Message);
             }
             return response;
         }
@@ -122,30 +109,26 @@ namespace FranchiseProject.Application.Services
             try
             {
                 ValidationResult validationResult = await _updateAssessmentvalidator.ValidateAsync(updateAssessmentModel);
-                if (!validationResult.IsValid)
-                {
-                    response.Data = false;
-                    response.isSuccess = false;
-                    response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
-                    return response;
-                }
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+
                 var assessment = await _unitOfWork.AssessmentRepository.GetExistByIdAsync(assessmentId);
+                if (assessment == null) return ResponseHandler.Failure<bool>("Đánh giá của khóa học không khả dụng!");
+
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(assessment.CourseId, CourseStatusEnum.Draft);
-                if (!checkCourse.isSuccess) return checkCourse;
+                if (!checkCourse.Data) return checkCourse;
+
                 assessment = _mapper.Map(updateAssessmentModel, assessment);
                 await _unitOfWork.AssessmentRepository.AddAsync(assessment);
+
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Update failed!");
-                response.Data = true;
-                response.isSuccess = true;
-                response.Message = "cập nhật đánh giá của khóa học thành công!";
+
+                response = ResponseHandler.Success(true, "Cập nhật đánh giá của khóa học thành công!");
 
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }

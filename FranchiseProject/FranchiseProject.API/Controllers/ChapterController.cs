@@ -17,21 +17,21 @@ namespace FranchiseProject.API.Controllers
         {
             _chapterService = chapterService;
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "xóa chương của khóa học bằng id {Authorize = Admin, Manager}")]
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteChapterByIdAsync(Guid id)
         {
             return await _chapterService.DeleteChapterByIdAsync(id);
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo chương của khóa học {Authorize = Admin, Manager}")]
         [HttpPost()]
         public async Task<ApiResponse<bool>> CreateChapterAsync(CreateChapterModel createChapterModel)
         {
             return await _chapterService.CreateChapterAsync(createChapterModel);
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "cập nhật chương của khóa học {Authorize = Admin, Manager}")]
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> UpdateChapterAsync(Guid id, UpdateChapterModel updateChapterModel)

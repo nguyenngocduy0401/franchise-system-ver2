@@ -37,6 +37,8 @@ using FranchiseProject.Application.ViewModels.SyllabusViewModels;
 using FranchiseProject.API.Validator.SyllabusValidator;
 using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.API.Validator.AssessmentValidator;
+using FranchiseProject.Application.ViewModels.CourseViewModels;
+using FranchiseProject.API.Validator.CourseValidator;
 
 namespace FranchiseProject.API
 {
@@ -131,6 +133,10 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<UpdateSyllabusModel>, UpdateSyllabusValidator>();
             services.AddTransient<IValidator<CreateAssessmentModel>, CreateAssessmentValidator>();
             services.AddTransient<IValidator<UpdateAssessmentModel>, UpdateAssessmentValidator>();
+            services.AddTransient<IValidator<CreateCourseModel>, CreateCourseValidator>();
+            services.AddTransient<IValidator<UpdateCourseModel>, UpdateCourseValidator>();
+            services.AddTransient<IValidator<CreateMaterialArrangeModel>, SingleMaterialArrangeValidator>();
+            services.AddTransient<IValidator<List<CreateMaterialArrangeModel>>, CreateMaterialArrangeModelValidator>();
             #endregion
 
             return services;

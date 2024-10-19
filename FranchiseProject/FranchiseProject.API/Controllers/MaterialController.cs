@@ -18,21 +18,21 @@ namespace FranchiseProject.API.Controllers
         {
             _materialService = materialService;
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "xóa tài nguyên học bằng id {Authorize = Admin, Manager}")]
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteMaterialByIdAsync(Guid id)
         {
             return await _materialService.DeleteMaterialByIdAsync(id);
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo mới tài nguyên {Authorize = Admin, Manager}")]
         [HttpPost()]
         public async Task<ApiResponse<bool>> CreateMaterialAsync(CreateMaterialModel createMaterialModel)
         {
             return await _materialService.CreateMaterialAsync(createMaterialModel);
         }
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "cập nhật tài nguyên {Authorize = Admin, Manager}")]
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> UpdateMaterialAsync(Guid id, UpdateMaterialModel updateMaterialModel)

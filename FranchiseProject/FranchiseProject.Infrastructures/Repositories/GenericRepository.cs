@@ -24,14 +24,14 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
-        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> expression, string includeProperties = "")
+        public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, string includeProperties = "")
         {
             IQueryable<TEntity> query = _dbSet.Where(expression);
             foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 query = query.Include(includeProperty);
             }
-            return query.ToList();
+            return await query.ToListAsync();
         }
 
         public virtual async Task<Pagination<TEntity>> GetFilterAsync(

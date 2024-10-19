@@ -62,7 +62,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync(slotId);
-                if (slot == null) return ResponseHandler.Failure<bool>("Slot không tồn tại!");
+                if (slot == null) return ResponseHandler.Failure<bool>("Slot học không khả dụng!");
 
                 _unitOfWork.SlotRepository.SoftRemove(slot);
                   
@@ -103,14 +103,14 @@ namespace FranchiseProject.Application.Services
                 if (!validationResult.IsValid) if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync(slotId);
-                if(slot == null) return ResponseHandler.Failure<bool>("Slot không tồn tại!");
+                if(slot == null) return ResponseHandler.Failure<bool>("Slot học không khả dụng!");
                 slot = _mapper.Map(updateSlotModel, slot);
                 _unitOfWork.SlotRepository.Update(slot);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Update failed!");
                 response = ResponseHandler.Success(true, "cập nhật slot học thành công!");
             }
-            catch (Exception ex)
+            catch (Exception ex)    
             {
                 response = ResponseHandler.Failure<bool>(ex.Message);
             }

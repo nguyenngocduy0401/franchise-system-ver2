@@ -2,10 +2,13 @@
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.SyllabusViewModels;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,13 +19,15 @@ namespace FranchiseProject.Application.Services
 {
     public class SyllabusService : ISyllabusService
     {
+        private readonly ICourseService _courseService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IValidator<UpdateSyllabusModel> _updateSyllabusValidator;
         private readonly IValidator<CreateSyllabusModel> _createSyllabusValidator;
         public SyllabusService(IUnitOfWork unitOfWork, IMapper mapper, IValidator<UpdateSyllabusModel> updateSyllabusValidator,
-            IValidator<CreateSyllabusModel> createSyllabusValidator)
+            IValidator<CreateSyllabusModel> createSyllabusValidator, ICourseService courseService)
         {
+            _courseService = courseService;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _updateSyllabusValidator = updateSyllabusValidator;
@@ -34,31 +39,26 @@ namespace FranchiseProject.Application.Services
             try
             {
                 ValidationResult validationResult = await _createSyllabusValidator.ValidateAsync(createSyllabusModel);
-                if (!validationResult.IsValid)
-                {
-                    response.Data = false;
-                    response.isSuccess = false;
-                    response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
-                    return response;
-                }
-                var course = await _unitOfWork.CourseRepository.GetByIdAsync((Guid)createSyllabusModel.CourseId);
-                if (course == null) throw new Exception("Course does not exist!");
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
-                var chapter = _mapper.Map<Chapter>(createSyllabusModel);
-                await _unitOfWork.ChapterRepository.AddAsync(chapter);
+                var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(createSyllabusModel.CourseId);
+                var checkCourse = CheckCourseAvailableAsync(course);
+                if (!checkCourse.Data) return checkCourse;
+
+                var syllabus = _mapper.Map<Syllabus>(createSyllabusModel);
+                await _unitOfWork.SyllabusRepository.AddAsync(syllabus);
+
+                course.SyllabusId = syllabus.Id;
+                _unitOfWork.CourseRepository.Update(course);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
-                response.Data = true;
-                response.isSuccess = true;
-                response.Message = "Tạo thấy giáo trình của khóa học thành công!";
+                response = ResponseHandler.Success(true, "Tạo thấy giáo trình của khóa học thành công!");
 
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }
@@ -68,48 +68,38 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-                var syllabus = await _unitOfWork.SyllabusRepository.GetByIdAsync(syllabusId);
-                if (syllabus == null)
-                {
-                    response.Data = false;
-                    response.isSuccess = true;
-                    response.Message = "Không tìm thấy giáo trình của khóa học!";
-                    return response;
-                }
+                var syllabus = await _unitOfWork.SyllabusRepository.GetExistByIdAsync(syllabusId);
+                if (syllabus == null) return ResponseHandler.Failure<bool>("Giáo trình của khóa học không khả dụng!");
+
+                var course = (await _unitOfWork.CourseRepository.FindAsync(e => e.SyllabusId == syllabusId && e.IsDeleted != true)).FirstOrDefault();
+                var checkCourse = CheckCourseAvailableAsync(course);
+                if (!checkCourse.Data) return checkCourse;
+
                 _unitOfWork.SyllabusRepository.SoftRemove(syllabus);
-                response.Message = "Xoá giáo trình của khóa học thành công!";
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete failed!");
-
-
-                response.Data = true;
-                response.isSuccess = true;
+                response = ResponseHandler.Success(true, "Xoá giáo trình của khóa học thành công!");
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }
 
-        public async Task<ApiResponse<SyllabusViewModel>> GetSyllabusIdAsync(Guid syllabusId)
+        public async Task<ApiResponse<SyllabusViewModel>> GetSyllabusByIdAsync(Guid syllabusId)
         {
             var response = new ApiResponse<SyllabusViewModel>();
             try
             {
                 var syllabus = await _unitOfWork.SyllabusRepository.GetByIdAsync(syllabusId);
+                if(syllabus == null) throw new Exception("Syllabus does not exist!");
                 var syllabusModel = _mapper.Map<SyllabusViewModel>(syllabus);
-                response.Data = syllabusModel;
-                response.isSuccess = true;
-                response.Message = "Successful!";
+                response = ResponseHandler.Success(syllabusModel);
             }
             catch (Exception ex)
             {
-                response.Data = null;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<SyllabusViewModel>(ex.Message);
             }
             return response;
         }
@@ -120,29 +110,49 @@ namespace FranchiseProject.Application.Services
             try
             {
                 ValidationResult validationResult = await _updateSyllabusValidator.ValidateAsync(updateSyllabusModel);
-                if (!validationResult.IsValid)
-                {
-                    response.Data = false;
-                    response.isSuccess = false;
-                    response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
-                    return response;
-                }
-                var syllabus = await _unitOfWork.SyllabusRepository.GetByIdAsync(syllabusId);
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+
+                var syllabus = await _unitOfWork.SyllabusRepository.GetExistByIdAsync(syllabusId);
+                if (syllabus == null) return ResponseHandler.Failure<bool>("Giáo trình của khóa học không khả dụng!");
+
+                var course = (await _unitOfWork.CourseRepository.FindAsync(e => e.SyllabusId == syllabusId && e.IsDeleted != true)).FirstOrDefault();
+                var checkCourse = CheckCourseAvailableAsync(course);
+
+                if (!checkCourse.Data) return checkCourse;
                 syllabus = _mapper.Map(updateSyllabusModel, syllabus);
 
                 _unitOfWork.SyllabusRepository.Update(syllabus);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Update failed!");
-                response.Data = true;
-                response.isSuccess = true;
-                response.Message = "cập nhật giáo trình của khóa học thành công!";
+                response = ResponseHandler.Success(true, "Cập nhật giáo trình của khóa học thành công!");
 
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
+        private ApiResponse<bool> CheckCourseAvailableAsync(Course course)
+        {
+            var response = new ApiResponse<bool>();
+            var courseNoAvalable = "Khóa học không khả dụng!";
+            var courseCanOnlyBeEditedInDraftState = "Chỉ có thể sửa đổi thông tin của khóa học ở trạng thái nháp!";
+            try
+            {
+
+                if (course == null) return ResponseHandler.Success(false, courseNoAvalable);
+
+                if (course.Status != CourseStatusEnum.Draft)
+                {
+                    response.Message = courseNoAvalable;
+                    return ResponseHandler.Success(false, courseCanOnlyBeEditedInDraftState);
+                }
+                response = ResponseHandler.Success(true);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }

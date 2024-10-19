@@ -18,6 +18,7 @@ using FranchiseProject.Application.ViewModels.MaterialViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.SessionViewModels;
 using FranchiseProject.Application.ViewModels.AssessmentViewModels;
+using FranchiseProject.Application.ViewModels.CourseViewModels;
 
 namespace FranchiseProject.Infrastructures.Mappers
 {
@@ -109,6 +110,18 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Assessment, AssessmentViewModel>();
             CreateMap<CreateAssessmentModel, Assessment>();
             CreateMap<UpdateAssessmentModel, Assessment>();
+            #endregion
+            #region Course
+            CreateMap<Course, CourseViewModel>()
+                .ForMember(dest => dest.CourseCategoryName, opt => opt
+                .MapFrom(src => src.CourseCategory.Name));
+            CreateMap<Course, CourseDetailViewModel>();
+                
+            CreateMap<Pagination<Course>, Pagination<CourseViewModel>>()
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
+            CreateMap<CreateCourseModel, Course>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => Domain.Enums.CourseStatusEnum.Draft));
+            CreateMap<UpdateCourseModel, Course>();
             #endregion
         }
     }

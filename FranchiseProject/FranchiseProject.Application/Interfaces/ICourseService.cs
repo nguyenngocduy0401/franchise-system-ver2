@@ -13,11 +13,13 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface ICourseService
     {
+        Task<ApiResponse<bool>> CreateCourseVersionAsync(Guid courseId);
         Task<ApiResponse<List<CourseViewModel>>> GetAllCourseAsync();
+        Task<ApiResponse<Pagination<CourseViewModel>>> FilterCourseAsync(FilterCourseModel filterCourseViewModel);
         Task<ApiResponse<bool>> DeleteCourseByIdAsync(Guid courseId);
         Task<ApiResponse<CourseDetailViewModel>> GetCourseByIdAsync(Guid courseId);
-        Task<ApiResponse<bool>> UpdateCourseAsync(Guid materialId, CreateSlotModel updateCourseModel);
-        Task<ApiResponse<bool>> CreateCourseAsync(CreateSlotModel createCourseModel);
+        Task<ApiResponse<bool>> UpdateCourseAsync(Guid courseId, UpdateCourseModel updateCourseModel);
+        Task<ApiResponse<bool>> CreateCourseAsync(CreateCourseModel createCourseModel);
         Task<ApiResponse<bool>> CheckCourseAvailableAsync(Guid? courseId, CourseStatusEnum courseStatus);
     }
 }
