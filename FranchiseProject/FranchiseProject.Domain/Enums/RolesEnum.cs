@@ -12,7 +12,11 @@ namespace FranchiseProject.Domain.Enums
         Manager,
         AgencyManager,
         Student,
-        Instructor
+        Instructor,
+        SystemInstructor,
+        Consultant,
+        Technician,
+        AgencyStaff
     }
 
 }
