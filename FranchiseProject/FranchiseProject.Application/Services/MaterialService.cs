@@ -134,7 +134,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> CreateMaterialArangeAsync(Guid courseId, List<CreateMaterialArrangeModel> createMaterialArrangeModel)
+        public async Task<ApiResponse<bool>> CreateMaterialArrangeAsync(Guid courseId, List<CreateMaterialArrangeModel> createMaterialArrangeModel)
         {
             var response = new ApiResponse<bool>();
             try

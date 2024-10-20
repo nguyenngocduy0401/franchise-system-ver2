@@ -10,7 +10,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace FranchiseProject.API.Controllers
 {
-    [Route("api/v1/Syllabuses")]
+    [Route("api/v1/syllabuses")]
     [ApiController]
     public class SyllabusController : ControllerBase
     {

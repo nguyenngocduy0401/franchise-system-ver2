@@ -136,7 +136,14 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<CreateCourseModel>, CreateCourseValidator>();
             services.AddTransient<IValidator<UpdateCourseModel>, UpdateCourseValidator>();
             services.AddTransient<IValidator<CreateMaterialArrangeModel>, SingleMaterialArrangeValidator>();
-            services.AddTransient<IValidator<List<CreateMaterialArrangeModel>>, CreateMaterialArrangeModelValidator>();
+            services.AddTransient<IValidator<List<CreateMaterialArrangeModel>>, CreateMaterialArrangeValidator>();
+            services.AddTransient<IValidator<CreateAssessmentArrangeModel>, SingleAssessmentArrangeValidator>();
+            services.AddTransient<IValidator<List<CreateAssessmentArrangeModel>>, CreateAssessmentArrangeValidator>();
+            services.AddTransient<IValidator<CreateChapterArrangeModel>, SingleChapterArrangeValidator>();
+            services.AddTransient<IValidator<List<CreateChapterArrangeModel>>, CreateChapterArrangeValidator>();
+            services.AddTransient<IValidator<CreateSessionArrangeModel>, SingleSessionArrangeValidator>();
+            services.AddTransient<IValidator<List<CreateSessionArrangeModel>>, CreateSessionArrangeValidator>();
+
             #endregion
 
             return services;

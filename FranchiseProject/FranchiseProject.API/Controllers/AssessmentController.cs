@@ -1,4 +1,4 @@
-﻿using FranchiseProject.Application.Commons;
+﻿/*using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -17,7 +17,7 @@ namespace FranchiseProject.API.Controllers
         { 
             _assessmentService = assessmentService;
         }
-        /*[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]*/
+        *//*[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]*//*
         [SwaggerOperation(Summary = "xóa đánh giá của khóa học bằng id {Authorize = Admin, Manager}")]
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteAssessmentByIdAsync(Guid id)
@@ -46,3 +46,4 @@ namespace FranchiseProject.API.Controllers
         }
     }
 }
+*/

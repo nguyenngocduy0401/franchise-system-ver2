@@ -92,7 +92,9 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<SyllabusViewModel>();
             try
             {
-                var syllabus = await _unitOfWork.SyllabusRepository.GetByIdAsync(syllabusId);
+                var syllabus = (await _unitOfWork.SyllabusRepository
+                    .FindAsync(e => e.Id == syllabusId, "Courses"))
+                    .FirstOrDefault(); ;
                 if(syllabus == null) throw new Exception("Syllabus does not exist!");
                 var syllabusModel = _mapper.Map<SyllabusViewModel>(syllabus);
                 response = ResponseHandler.Success(syllabusModel);

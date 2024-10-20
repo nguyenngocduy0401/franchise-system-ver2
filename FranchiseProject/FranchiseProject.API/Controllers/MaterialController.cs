@@ -1,4 +1,4 @@
-﻿using FranchiseProject.Application.Commons;
+﻿/*using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.MaterialViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
@@ -48,3 +48,4 @@ namespace FranchiseProject.API.Controllers
       
     }
 }
+*/

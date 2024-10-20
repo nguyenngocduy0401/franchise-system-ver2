@@ -10,8 +10,8 @@ namespace FranchiseProject.API.Validator.SyllabusValidator
         {
             RuleFor(x => x.Description)
                 .NotEmpty()
-                .MaximumLength(150)
-                .WithMessage("Name must be not empty and less than 150 characters");
+                .MaximumLength(500)
+                .WithMessage("Description must be not empty and less than 150 characters");
             RuleFor(x => x.TimeAllocation)
                 .NotEmpty()
                 .MaximumLength(500)

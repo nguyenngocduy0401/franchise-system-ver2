@@ -16,6 +16,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<MaterialViewModel>> GetMaterialByIdAsync(Guid materialId);
         Task<ApiResponse<bool>> UpdateMaterialAsync(Guid materialId, UpdateMaterialModel updateMaterialModel);
         Task<ApiResponse<bool>> CreateMaterialAsync(CreateMaterialModel createMaterialModel);
-        Task<ApiResponse<bool>> CreateMaterialArangeAsync(Guid courseId, List<CreateMaterialArrangeModel> createMaterialArrangeModel);
+        Task<ApiResponse<bool>> CreateMaterialArrangeAsync(Guid courseId, List<CreateMaterialArrangeModel> createMaterialArrangeModel);
     }
 }

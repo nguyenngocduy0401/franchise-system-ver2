@@ -3,9 +3,9 @@ using FranchiseProject.Application.ViewModels.MaterialViewModels;
 
 namespace FranchiseProject.API.Validator.MaterialValidator
 {
-    public class CreateMaterialArrangeModelValidator : AbstractValidator<List<CreateMaterialArrangeModel>>
+    public class CreateMaterialArrangeValidator : AbstractValidator<List<CreateMaterialArrangeModel>>
     {
-        public CreateMaterialArrangeModelValidator()
+        public CreateMaterialArrangeValidator()
         {
             RuleForEach(x => x).SetValidator(new SingleMaterialArrangeValidator());
         }

@@ -1,4 +1,4 @@
-﻿using FranchiseProject.Application.Commons;
+﻿/*using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.SessionViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -46,3 +46,4 @@ namespace FranchiseProject.API.Controllers
         }
     }
 }
+*/

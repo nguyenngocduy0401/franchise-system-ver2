@@ -4,11 +4,10 @@ using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
-using FranchiseProject.Application.ViewModels.AssessmentViewModels;
-using FranchiseProject.Application.ViewModels.MaterialViewModels;
 using FranchiseProject.Application.ViewModels.SessionViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,14 +23,17 @@ namespace FranchiseProject.Application.Services
         private readonly IMapper _mapper;
         private readonly IValidator<UpdateSessionModel> _updateSessionValidator;
         private readonly IValidator<CreateSessionModel> _createSessionValidator;
+        private readonly IValidator<List<CreateSessionArrangeModel>> _createSessionArrangeValidator; 
         public SessionService(IUnitOfWork unitOfWork, IMapper mapper, ICourseService courseService,
-            IValidator<UpdateSessionModel> updateSessionValidator, IValidator<CreateSessionModel> createSessionModel)
+            IValidator<UpdateSessionModel> updateSessionValidator, IValidator<CreateSessionModel> createSessionModel,
+            IValidator<List<CreateSessionArrangeModel>> createSessionArrangeValidator)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _courseService = courseService;
             _updateSessionValidator = updateSessionValidator;
             _createSessionValidator = createSessionModel;
+            _createSessionArrangeValidator = createSessionArrangeValidator;
         }
         public async Task<ApiResponse<bool>> CreateSessionAsync(CreateSessionModel createSessionModel)
         {
@@ -122,6 +124,39 @@ namespace FranchiseProject.Application.Services
                 response = ResponseHandler.Success(true, "Cập nhật phiên học thành công!");
 
             }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
+        public async Task<ApiResponse<bool>> CreateSessionArrangeAsync(Guid courseId, List<CreateSessionArrangeModel> createSessionArrangeModel)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                ValidationResult validationResult = await _createSessionArrangeValidator.ValidateAsync(createSessionArrangeModel);
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+
+                var checkCourse = await _courseService.CheckCourseAvailableAsync(courseId, CourseStatusEnum.Draft);
+                if (!checkCourse.Data) return checkCourse;
+
+                var sessions = _mapper.Map<List<Session>>(createSessionArrangeModel);
+                foreach (var session in sessions)
+                {
+                    session.CourseId = courseId;
+                }
+                var deleteSessions = (await _unitOfWork.SessionRepository.FindAsync(e => e.CourseId == courseId && e.IsDeleted != true)).ToList();
+                if (!deleteSessions.IsNullOrEmpty()) _unitOfWork.SessionRepository.SoftRemoveRange(deleteSessions);
+
+                await _unitOfWork.SessionRepository.AddRangeAsync(sessions);
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Create failed!");
+                response = ResponseHandler.Success(true, "Phiên của khóa học được tạo thành công!");
+
+            }
+
             catch (Exception ex)
             {
                 response = ResponseHandler.Failure<bool>(ex.Message);

@@ -33,7 +33,7 @@ namespace FranchiseProject.API.Controllers
             => await _userService.FilterUserByAdminAsync(filterUserByAdminModel);
 
         [Authorize(Roles = AppRole.Admin)]
-        [SwaggerOperation(Summary = "xóa người dùng {Authorize = Administrator}")]
+        [SwaggerOperation(Summary = "cấm và bỏ lệnh cấm người dùng {Authorize = Administrator}")]
         [HttpPut("~/admin/api/v1/users/{id}/status")]
         public async Task<ApiResponse<bool>> BanAndUnbanUserByAdminAsync(string id)
             => await _userService.BanAndUnbanUserByAdminAsync(id);

@@ -9,6 +9,7 @@ using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.MaterialViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,14 +25,17 @@ namespace FranchiseProject.Application.Services
         private readonly ICourseService _courseService;
         private readonly IValidator<UpdateChapterModel> _updateChapterValidator;
         private readonly IValidator<CreateChapterModel> _createChapterValidator;
-        public ChapterService(IUnitOfWork unitOfWork, IMapper mapper, ICourseService courseService
-            , IValidator<UpdateChapterModel> updateChapterValidator, IValidator<CreateChapterModel> createChapterValidator)
+        private readonly IValidator<List<CreateChapterArrangeModel>> _createChapterArrangeValidator;
+        public ChapterService(IUnitOfWork unitOfWork, IMapper mapper, ICourseService courseService, 
+            IValidator<UpdateChapterModel> updateChapterValidator, IValidator<CreateChapterModel> createChapterValidator, 
+            IValidator<List<CreateChapterArrangeModel>> createChapterArrangeValidator  )
         {
             _courseService = courseService;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _updateChapterValidator = updateChapterValidator;
             _createChapterValidator = createChapterValidator;
+            _createChapterArrangeValidator = createChapterArrangeValidator;
         }
         public async Task<ApiResponse<bool>> CreateChapterAsync(CreateChapterModel createChapterModel)
         {
@@ -125,6 +129,39 @@ namespace FranchiseProject.Application.Services
                 response = ResponseHandler.Success(true,"cập nhật chương học thành công!");
 
             }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
+        public async Task<ApiResponse<bool>> CreateChapterArrangeAsync(Guid courseId, List<CreateChapterArrangeModel> createChapterArrangeModel)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                ValidationResult validationResult = await _createChapterArrangeValidator.ValidateAsync(createChapterArrangeModel);
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+
+                var checkCourse = await _courseService.CheckCourseAvailableAsync(courseId, CourseStatusEnum.Draft);
+                if (!checkCourse.Data) return checkCourse;
+
+                var chapters = _mapper.Map<List<Chapter>>(createChapterArrangeModel);
+                foreach (var chapter in chapters)
+                {
+                    chapter.CourseId = courseId;
+                }
+                var deleteChapters = (await _unitOfWork.ChapterRepository.FindAsync(e => e.CourseId == courseId && e.IsDeleted != true)).ToList();
+                if (!deleteChapters.IsNullOrEmpty()) _unitOfWork.ChapterRepository.SoftRemoveRange(deleteChapters);
+
+                await _unitOfWork.ChapterRepository.AddRangeAsync(chapters);
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Create failed!");
+                response = ResponseHandler.Success(true, "Chương của khóa học được tạo thành công!");
+
+            }
+
             catch (Exception ex)
             {
                 response = ResponseHandler.Failure<bool>(ex.Message);

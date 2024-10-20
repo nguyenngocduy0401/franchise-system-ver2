@@ -4,12 +4,10 @@ using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
-using FranchiseProject.Application.Repositories;
 using FranchiseProject.Application.ViewModels.AssessmentViewModels;
-using FranchiseProject.Application.ViewModels.MaterialViewModels;
-using FranchiseProject.Application.ViewModels.SessionViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,15 +22,18 @@ namespace FranchiseProject.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IValidator<CreateAssessmentModel> _createAssessmentValidator;
-        private readonly IValidator<UpdateAssessmentModel> _updateAssessmentvalidator;
+        private readonly IValidator<UpdateAssessmentModel> _updateAssessmentValidator;
+        private readonly IValidator<List<CreateAssessmentArrangeModel>> _createAssessmentArrangeValidator;
         public AssessmentService(IUnitOfWork unitOfWork, IMapper mapper, ICourseService courseService,
-            IValidator<UpdateAssessmentModel> updateAssessmentValidator, IValidator<CreateAssessmentModel> createAssessmentValidator)
+            IValidator<UpdateAssessmentModel> updateAssessmentValidator, IValidator<CreateAssessmentModel> createAssessmentValidator,
+            IValidator<List<CreateAssessmentArrangeModel>> createAssessmentArrangeValidator)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _courseService = courseService;
-            _updateAssessmentvalidator = updateAssessmentValidator;
+            _updateAssessmentValidator = updateAssessmentValidator;
             _createAssessmentValidator = createAssessmentValidator;
+            _createAssessmentArrangeValidator = createAssessmentArrangeValidator;
         }
         public async Task<ApiResponse<bool>> CreateAssessmentAsync(CreateAssessmentModel createAssessmentModel)
         {
@@ -108,7 +109,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-                ValidationResult validationResult = await _updateAssessmentvalidator.ValidateAsync(updateAssessmentModel);
+                ValidationResult validationResult = await _updateAssessmentValidator.ValidateAsync(updateAssessmentModel);
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 var assessment = await _unitOfWork.AssessmentRepository.GetExistByIdAsync(assessmentId);
@@ -126,6 +127,39 @@ namespace FranchiseProject.Application.Services
                 response = ResponseHandler.Success(true, "Cập nhật đánh giá của khóa học thành công!");
 
             }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
+        public async Task<ApiResponse<bool>> CreateAssessmentArangeAsync(Guid courseId, List<CreateAssessmentArrangeModel> createAssessmentArrangeModel)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                ValidationResult validationResult = await _createAssessmentArrangeValidator.ValidateAsync(createAssessmentArrangeModel);
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+
+                var checkCourse = await _courseService.CheckCourseAvailableAsync(courseId, CourseStatusEnum.Draft);
+                if (!checkCourse.Data) return checkCourse;
+
+                var assessments = _mapper.Map<List<Assessment>>(createAssessmentArrangeModel);
+                foreach (var assessment in assessments)
+                {
+                    assessment.CourseId = courseId;
+                }
+                var deleteAssessments = (await _unitOfWork.AssessmentRepository.FindAsync(e => e.CourseId == courseId && e.IsDeleted != true)).ToList();
+                if (!deleteAssessments.IsNullOrEmpty()) _unitOfWork.AssessmentRepository.SoftRemoveRange(deleteAssessments);
+
+                await _unitOfWork.AssessmentRepository.AddRangeAsync(assessments);
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Create failed!");
+                response = ResponseHandler.Success(true, "Tạo đánh giá khóa học thành công!");
+
+            }
+
             catch (Exception ex)
             {
                 response = ResponseHandler.Failure<bool>(ex.Message);

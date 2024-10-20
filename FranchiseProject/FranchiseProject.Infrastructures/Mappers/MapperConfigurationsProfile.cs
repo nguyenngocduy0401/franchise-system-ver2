@@ -19,6 +19,7 @@ using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.SessionViewModels;
 using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
+using FranchiseProject.Application.ViewModels.SyllabusViewModels;
 
 namespace FranchiseProject.Infrastructures.Mappers
 {
@@ -115,13 +116,28 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Course, CourseViewModel>()
                 .ForMember(dest => dest.CourseCategoryName, opt => opt
                 .MapFrom(src => src.CourseCategory.Name));
-            CreateMap<Course, CourseDetailViewModel>();
-                
+            CreateMap<Course, CourseDetailViewModel>()
+                .ForMember(dest => dest.Materials, opt => opt.MapFrom(src => src.Materials.Where(m => m.IsDeleted != true)))
+                .ForMember(dest => dest.Sessions, opt => opt.MapFrom(src => src.Sessions.Where(m => m.IsDeleted != true)))
+                .ForMember(dest => dest.Assessments, opt => opt.MapFrom(src => src.Assessments.Where(m => m.IsDeleted != true)))
+                .ForMember(dest => dest.Chapters, opt => opt.MapFrom(src => src.Chapters.Where(m => m.IsDeleted != true)))
+                .ForMember(dest => dest.Syllabus, opt => opt.MapFrom(src => src.Syllabus))
+                .ForMember(dest => dest.CourseCategory, opt => opt.MapFrom(src => src.CourseCategory));
             CreateMap<Pagination<Course>, Pagination<CourseViewModel>>()
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
             CreateMap<CreateCourseModel, Course>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => Domain.Enums.CourseStatusEnum.Draft));
             CreateMap<UpdateCourseModel, Course>();
+            CreateMap<CreateMaterialArrangeModel, Material>();
+            CreateMap<CreateChapterArrangeModel, Chapter>();
+            CreateMap<CreateAssessmentArrangeModel, Assessment>();
+            CreateMap<CreateSessionArrangeModel, Session>();
+            #endregion
+            #region Syllabus
+            CreateMap<CreateSyllabusModel, Syllabus>();
+            CreateMap<UpdateSyllabusModel, Syllabus>();
+            CreateMap<Syllabus, SyllabusViewModel>()
+                .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.Courses.FirstOrDefault().Id));
             #endregion
         }
     }

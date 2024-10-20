@@ -15,5 +15,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<ChapterViewModel>> GetChapterByIdAsync(Guid chapterId);
         Task<ApiResponse<bool>> UpdateChapterAsync(Guid chapterId, UpdateChapterModel updateChapterModel);
         Task<ApiResponse<bool>> CreateChapterAsync(CreateChapterModel createChapterModel);
+        Task<ApiResponse<bool>> CreateChapterArrangeAsync(Guid courseId, List<CreateChapterArrangeModel> createChapterArrangeModel);
     }
 }

@@ -46,7 +46,7 @@ namespace FranchiseProject.Application.Services
 
                 var checkCourseExist =  await _unitOfWork.CourseRepository.FindAsync
                     (e => e.Code == createCourseModel.Code && e.IsDeleted != true
-                    && e.Status == CourseStatusEnum.Closed);
+                    && e.Status != CourseStatusEnum.Closed);
                 if (!checkCourseExist.IsNullOrEmpty()) 
                     return ResponseHandler.Success
                         (false,"Khóa học đã tồn tại không thể tạo mới. Chỉ có thể cập nhật lên phiên bản mới!" );
@@ -101,7 +101,9 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<CourseDetailViewModel>();
             try
             {
-                var course = await _unitOfWork.CourseRepository.GetByIdAsync(courseId);
+                var course = (await _unitOfWork.CourseRepository
+                    .FindAsync(e=>e.Id==courseId , "Materials,Sessions,Syllabus,Assessments,Chapters,CourseCategory"))
+                    .FirstOrDefault();
                 if (course == null) throw new Exception("Course does not exist!");
                 var courseModel = _mapper.Map<CourseDetailViewModel>(course);
                 response = ResponseHandler.Success(courseModel);

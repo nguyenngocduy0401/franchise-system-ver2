@@ -15,5 +15,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<SessionViewModel>> GetSessionByIdAsync(Guid sessionId);
         Task<ApiResponse<bool>> UpdateSessionAsync(Guid sessionId, UpdateSessionModel updateSessionModel);
         Task<ApiResponse<bool>> CreateSessionAsync(CreateSessionModel createSessionModel);
+        Task<ApiResponse<bool>> CreateSessionArrangeAsync(Guid courseId, List<CreateSessionArrangeModel> createSessionArrangeModel);
     }
 }
