@@ -17,7 +17,7 @@ namespace FranchiseProject.Application.Commons
                 var temp = TotalItemsCount / PageSize;
                 if (TotalItemsCount % PageSize == 0)
                 {
-                    return temp + 1;
+                    return temp;
                 }
                 return temp + 1;
             }

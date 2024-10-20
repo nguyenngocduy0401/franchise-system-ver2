@@ -33,7 +33,7 @@ namespace FranchiseProject.Application
         public ISlotRepository SlotRepository { get; }
         public IStudentAnswerRepository StudentAnswerRepository { get; }
         public IStudentClassRepository StudentClassRepository { get; }
-        public IStudentCourseRepository StudentCourseRepository { get; }
+        public IRegisterFormRepository RegisterFormRepository { get; }
         public ISyllabusRepository SyllabusRepository { get; }
         public ITermRepository TermRepository { get; }
         public IUserRepository UserRepository { get; }

@@ -18,8 +18,8 @@ namespace FranchiseProject.Domain.Entity
         public Guid? ContractId { get; set; }
         [ForeignKey("ContractId")]
         public Contract? Contract { get; set; }
-        public Guid? StudentId { get; set; }
-        [ForeignKey("StudentId")]
-        public Guid? Student { get; set; }
+        public string ? UserId  { get; set; }
+        [ForeignKey("UserId")]
+        public User? User { get; set; }
     }
 }

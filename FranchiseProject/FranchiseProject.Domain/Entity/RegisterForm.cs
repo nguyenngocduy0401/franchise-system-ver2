@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Entity
 {
-    public class StudentCourse
+    public class RegisterForm
     {
         public Guid? CourseId { get; set; }
         [ForeignKey("CourseId")]
         public Course? Course { get; set; }
-        public Guid? StudentId { get; set; }
-        [ForeignKey("StudentId")]
-        public Student? Student { get; set; }
+        public string? UserId { get; set; }
+        [ForeignKey("UserId")]
+        public User? User { get; set; }
        
     }
 }

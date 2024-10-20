@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Infrastructures.Repositories
 {
-    public class StudentCourseRepository : IStudentCourseRepository
+    public class RegisterFormRepository : IRegisterFormRepository
     {
     }
 }

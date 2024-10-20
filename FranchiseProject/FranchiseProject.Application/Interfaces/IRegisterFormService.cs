@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.Repositories
+namespace FranchiseProject.Application.Interfaces
 {
-    public interface IStudentCourseRepository
+    public interface IRegisterFormService
     {
     }
 }

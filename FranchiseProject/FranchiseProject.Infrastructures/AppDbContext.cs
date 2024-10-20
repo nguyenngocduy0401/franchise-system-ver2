@@ -43,7 +43,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<Slot> Slots { get; set; }
         public DbSet<StudentAnswer> StudentAnswers { get; set; }
         public DbSet<StudentClass> StudentClasses { get; set; }
-        public DbSet<StudentCourse> StudentCourses { get; set; }
+        public DbSet<RegisterForm> RegisterForms{ get; set; }
         public DbSet<Syllabus> Syllabuses { get; set; }
         public DbSet<Term> Terms { get; set; }
         public DbSet<Consultation> Consultations { get; set; }

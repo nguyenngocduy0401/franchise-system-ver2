@@ -21,7 +21,7 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<Pagination<StudentViewModel>>> FilterStudentAsync(FilterStudentViewModel filter);
         Task<ApiResponse<bool>> UpdateStatusStudentAsync(StudentStatusEnum status, string studentId);
         Task<ApiResponse<int>> CountStudenInCourseAsync();
-        Task<ApiResponse<bool>> StudentEnrollClassAsync(string classId);
+        Task<ApiResponse<bool>> StudentEnrollClassAsync(string classId);//
         Task<ApiResponse<Pagination<ClassForStudentViewModel>>> GetClassForStudentAsync(string studentId);
     }
 }

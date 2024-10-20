@@ -76,7 +76,7 @@ namespace FranchiseProject.Application.Services
                       $"<p>Thông tin của bạn đã được ghi nhận thành công .</p>" +
                        $"<p>Nhân viên trung tâm sẻ liên hệ hổ trợ bạn sớm nhất có thể  .</p>" +
                       $"<p>Trân trọng,</p>" +
-                      $"<p>Đội ngũ {agency.Name}</p>"
+                      $"<p>Đội ngũ {agency.Name}</p>"// tên fix 
                     };
                     bool emailSent = await _emailService.SendEmailAsync(emailMessage);
                     if (!emailSent)
@@ -352,24 +352,21 @@ namespace FranchiseProject.Application.Services
                 }
                 switch (status)
                 {
-                    case StudentPaymentStatusEnum.Dropped:
-                        var existingUser = await _unitOfWork.UserRepository.GetByAgencyIdAsync(Guid.Parse(studentId));
-                        if (existingUser != null)
-                        {  var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(student.AgencyId.Value);
-                            var payment= await _unitOfWork.PaymentRepository.GetByIdAsync(existingUser.)
+                    case StudentPaymentStatusEnum.Refunded:
+                        var student1 = await _unitOfWork.StudentRepository.GetByIdAsync(Guid.Parse(studentId));
+                        if (student1 != null && student1.StatusPayment==StudentPaymentStatusEnum.Completed)
+                        { 
+                            
+                            var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(student.AgencyId.Value);
+                          //  var payment = await _unitOfWork.PaymentRepository.GetByIdAsync(existingUser);
                             var emailMessage = new MessageModel
                             {
                                 To = student.Email,
                                 Subject = " Thông báo đẫ hoàn tiền [noreply]",
                                 Body = $"<p>Chào {student.StudentName},</p>" +
                                    $"<p>Chúng tôi rất vui mừng khi bạn lựa chọn {agency.Name}!</p>" +
-                                    $"<p>Đây là tài khoản để bạn có thể đăng nhập hệ thống:</p>" +
-                                   $"<ul>" +
-                                   $"<li><strong>Username:</strong> {newUser.UserName}</li>" +
-                                   $"<li><strong>Password:</strong> {userCredentials.Password}</li>" +
-                                   $"</ul>" +
-                                   $"<p>Vui lòng bảo mật thông tin đăng nhập này.</p>" +
-                                   $"<p>Chúc mừng và hẹn gặp lại!</p>" +
+                                    $"<p>Tiền Đã được hoàn lại .</p>" +
+                                    $"<p>Bạn có thể liên hệ hotline để được hổ trợ thêm !</p>" +
                                    $"<p>Trân trọng,</p>" +
                                    $"<p>Đội ngũ {agency.Name}</p>"
                             };
@@ -382,10 +379,13 @@ namespace FranchiseProject.Application.Services
 
                         else
                         {
-                            existingUser.Status = UserStatusEnum.active;
+                            response.Data = false;
+                            response.isSuccess = true;
+                            response.Message = "Học sinh không tồn tại hoặc chưa thanh toán thành công !";
+                            return response;
                         }
                         break;
-                    case StudentStatusEnum.Enrolled:
+                    case StudentPaymentStatusEnum.:
                         var studentregister = await _unitOfWork.StudentRepository.GetByIdAsync(Guid.Parse(studentId));
                         if (studentregister != null && studentregister.StatusPayment == StudentPaymentStatusEnum.Completed)
                         {
