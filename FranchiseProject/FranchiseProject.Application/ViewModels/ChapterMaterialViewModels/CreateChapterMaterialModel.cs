@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Domain.Enums
+namespace FranchiseProject.Application.ViewModels.ChapterMaterialViewModels
 {
-    public enum AgencyRolesEnum
+    public class CreateChapterMaterialModel
     {
-        Student,
-        Instructor,
-        AgencyStaff 
     }
 }

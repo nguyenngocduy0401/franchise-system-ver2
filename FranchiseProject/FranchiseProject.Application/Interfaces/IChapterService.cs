@@ -1,6 +1,6 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
-using FranchiseProject.Application.ViewModels.MaterialViewModels;
+using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

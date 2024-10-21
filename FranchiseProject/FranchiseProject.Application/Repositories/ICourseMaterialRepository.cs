@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Repositories
 {
-    public interface IFeedbackAnswerRepository : IGenericRepository<FeedbackAnswer>
+    public interface ICourseMaterialRepository : IGenericRepository<CourseMaterial>
     {
     }
 }

@@ -19,9 +19,6 @@ namespace FranchiseProject.Application
         public IContractRepository ContractRepository { get; }
         public ICourseCategoryRepository CourseCategoryRepository { get; }
         public ICourseRepository CourseRepository { get; }
-        public IFeedbackAnswerRepository FeedbackAnswerRepository { get; }
-        public IFeedbackOptionRepository FeedbackOptionRepository { get; }  
-        public IFeedbackQuestionRepository FeedbackQuestionRepository { get; }
         public IFeedbackRepository FeedbackRepository { get; }
         public IQuestionOptionRepository QuestionOptionRepository { get; }
         public IQuestionRepository QuestionRepository { get; }
@@ -35,13 +32,12 @@ namespace FranchiseProject.Application
         public IStudentClassRepository StudentClassRepository { get; }
         public IStudentCourseRepository StudentCourseRepository { get; }
         public ISyllabusRepository SyllabusRepository { get; }
-        public ITermRepository TermRepository { get; }
         public IUserRepository UserRepository { get; }
         public IRefreshTokenRepository RefreshTokenRepository { get; }
         public IConsultationRepository FranchiseRegistrationRequestRepository { get; }
         public IAssessmentRepository AssessmentRepository { get; }
         public INotificationRepository NotificationRepository { get; }
-        public IMaterialRepository MaterialRepository { get; }
+        public ICourseMaterialRepository CourseMaterialRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

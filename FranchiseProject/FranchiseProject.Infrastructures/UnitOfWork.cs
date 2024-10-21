@@ -22,9 +22,6 @@ namespace FranchiseProject.Infrastructures
         private readonly IContractRepository _contractRepository;
         private readonly ICourseCategoryRepository _courseCategoryRepository;
         private readonly ICourseRepository _courseRepository;
-        private readonly IFeedbackAnswerRepository _feedbackAnswerRepository;
-        private readonly IFeedbackOptionRepository _feedbackOptionRepository;
-        private readonly IFeedbackQuestionRepository _feedbackQuestionRepository;
         private readonly IFeedbackRepository _feedbackRepository;
         private readonly IQuestionOptionRepository _questionOptionRepository;
         private readonly IQuestionRepository _questionRepository;
@@ -38,24 +35,22 @@ namespace FranchiseProject.Infrastructures
         private readonly IStudentClassRepository _studentClassRepository;
         private readonly IStudentCourseRepository _studentCourseRepository;
         private readonly ISyllabusRepository _syllabusRepository;
-        private readonly ITermRepository _termRepository;
         private readonly IUserRepository _userRepository;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IConsultationRepository _fanchiseRegistrationRequestRepository;
         private readonly IAssessmentRepository _assessmentRepository;
         private readonly INotificationRepository _notificationRepository;
-        private readonly IMaterialRepository _materialRepository;
+        private readonly ICourseMaterialRepository _courseMaterialRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
-            ICourseRepository courseRepository, IFeedbackAnswerRepository feedbackAnswerRepository,  IFeedbackOptionRepository feedbackOptionRepository,
-            IFeedbackQuestionRepository feedbackQuestionRepository, IFeedbackRepository feedbackRepository, IQuestionOptionRepository questionOptionRepository,
+            ICourseRepository courseRepository, IFeedbackRepository feedbackRepository, IQuestionOptionRepository questionOptionRepository,
             IQuestionRepository questionRepository, IQuizDetailRepository quizDetailRepository, IQuizRepository  quizRepository, IReportRepository reportRepository,
             IScoreRepository scoreRepository, ISessionRepository sessionRepository, ISlotRepository slotRepository, IStudentAnswerRepository studentAnswerRepository,
             IStudentClassRepository studentClassRepository, IStudentCourseRepository studentCourseRepository, ISyllabusRepository syllabusRepository,
-            ITermRepository termRepository, IUserRepository userRepository, IAssignmentSubmitRepository assignmentSubmitRepository, IRefreshTokenRepository refreshTokenRepository,
+            IUserRepository userRepository, IAssignmentSubmitRepository assignmentSubmitRepository, IRefreshTokenRepository refreshTokenRepository,
             IConsultationRepository franchiseRegistrationRequestRepository, IAssessmentRepository assessmentRepository,INotificationRepository notificationRepository,
-            IMaterialRepository materialRepository)
+            ICourseMaterialRepository courseMaterialRepository)
            
         {
             _dbContext = appDbContext;
@@ -69,9 +64,6 @@ namespace FranchiseProject.Infrastructures
             _contractRepository = contractRepository;
             _courseCategoryRepository = courseCategoryRepository;
             _courseRepository = courseRepository;
-            _feedbackAnswerRepository = feedbackAnswerRepository;
-            _feedbackOptionRepository = feedbackOptionRepository;
-            _feedbackQuestionRepository = feedbackQuestionRepository;
             _feedbackRepository = feedbackRepository;
             _questionRepository = questionRepository;
             _questionOptionRepository = questionOptionRepository;
@@ -85,13 +77,12 @@ namespace FranchiseProject.Infrastructures
             _studentClassRepository = studentClassRepository;
             _studentCourseRepository = studentCourseRepository;
             _syllabusRepository = syllabusRepository;
-            _termRepository = termRepository;
             _userRepository = userRepository;
             _refreshTokenRepository = refreshTokenRepository;
             _fanchiseRegistrationRequestRepository = franchiseRegistrationRequestRepository;
             _assessmentRepository = assessmentRepository;
             _notificationRepository = notificationRepository;
-            _materialRepository = materialRepository;
+            _courseMaterialRepository = courseMaterialRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -112,12 +103,6 @@ namespace FranchiseProject.Infrastructures
         public ICourseCategoryRepository CourseCategoryRepository => _courseCategoryRepository;
 
         public ICourseRepository CourseRepository => _courseRepository;
-
-        public IFeedbackAnswerRepository FeedbackAnswerRepository => _feedbackAnswerRepository;
-
-        public IFeedbackOptionRepository FeedbackOptionRepository => _feedbackOptionRepository;
-
-        public IFeedbackQuestionRepository FeedbackQuestionRepository => _feedbackQuestionRepository;
 
         public IFeedbackRepository FeedbackRepository => _feedbackRepository;
 
@@ -145,8 +130,6 @@ namespace FranchiseProject.Infrastructures
 
         public ISyllabusRepository SyllabusRepository => _syllabusRepository;
 
-        public ITermRepository TermRepository => _termRepository;
-
         public IUserRepository UserRepository => _userRepository;
 
         public IRefreshTokenRepository RefreshTokenRepository => _refreshTokenRepository;
@@ -157,7 +140,7 @@ namespace FranchiseProject.Infrastructures
         
         public IAssessmentRepository AssessmentRepository => _assessmentRepository;
 
-        public IMaterialRepository MaterialRepository => _materialRepository;   
+        public ICourseMaterialRepository CourseMaterialRepository => _courseMaterialRepository;   
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

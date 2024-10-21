@@ -24,6 +24,7 @@ namespace FranchiseProject.Domain.Entity
         public Agency? Agency { get; set; }
         public virtual ICollection<Score>? Scores { get; set; } 
         public virtual ICollection<Report>? Reports { get; set; }
+        public virtual ICollection<Feedback>? Feedbacks { get; set; }
         public virtual ICollection<StudentCourse>? StudentCourses { get; set; }
         public virtual ICollection<StudentClass>? StudentClasses { get; set; }
         public virtual ICollection<AssignmentSubmit>? AssignmentSubmits { get; set; }

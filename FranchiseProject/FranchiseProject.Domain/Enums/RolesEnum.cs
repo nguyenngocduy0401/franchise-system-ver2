@@ -14,8 +14,8 @@ namespace FranchiseProject.Domain.Enums
         Student,
         Instructor,
         SystemInstructor,
-        Consultant,
-        Technician,
+        SystemConsultant,
+        SystemTechnician,
         AgencyStaff
     }
 

@@ -16,5 +16,6 @@ namespace FranchiseProject.Domain.Entity
         [ForeignKey("CourseId")]
         public Course? Course { get; set; }
         public virtual ICollection<Question>? Questions { get; set; }
+        public virtual ICollection<ChapterMaterial>? ChapterMaterials { get; set; }
     }
 }

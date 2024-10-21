@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Infrastructures.Repositories
 {
-    public class FeedbackAnswerRepository : GenericRepository<FeedbackAnswer>, IFeedbackAnswerRepository
+    public class ChapterMaterialRepository : GenericRepository<ChapterMaterial>, IChapterMaterialRepository
     {
         private readonly AppDbContext _dbContext;
         private readonly ICurrentTime _timeService;
         private readonly IClaimsService _claimsService;
-        public FeedbackAnswerRepository(
+        public ChapterMaterialRepository(
             AppDbContext context,
             ICurrentTime timeService,
             IClaimsService claimsService
@@ -26,5 +26,3 @@ namespace FranchiseProject.Infrastructures.Repositories
         }
     }
 }
-
-

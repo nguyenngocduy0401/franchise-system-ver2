@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Repositories
 {
-    public interface ITermRepository : IGenericRepository<Term>
+    public interface IChapterMaterialRepository : IGenericRepository<ChapterMaterial>
     {
-        Task<Term?> GetOverlappingTermsAsync(DateTime startDate, DateTime endDate);
-        Task<Term?> GetByNameAsync(string name);
     }
 }

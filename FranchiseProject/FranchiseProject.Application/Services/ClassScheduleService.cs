@@ -89,28 +89,11 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
 
-                // Get the term
-                var term = await _unitOfWork.TermRepository.GetByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.TermId));
-                if (term == null)
-                {
-                    response.Data = false;
-                    response.isSuccess = true;
-                    response.Message = "Không tìm thấy kỳ học!";
-                    return response;
-                }
+              
 
                 // Lọc ngày dựa trên các ngày trong tuần đã chọn
                 var selectedDates = new List<DateTime>();
-                DateTime currentDate = term.StartDate.Value;
-                while (currentDate <= term.EndDate)
-                {
-                    // Chỉ thêm vào nếu ngày nằm trong danh sách các thứ đã chọn
-                    if (createClassScheduleDateRangeViewModel.dayOfWeeks!.Contains((DayOfWeekEnum)currentDate.DayOfWeek))
-                    {
-                        selectedDates.Add(currentDate);
-                    }
-                    currentDate = currentDate.AddDays(1);
-                }
+                
 
                 // Tạo lịch học cho mỗi ngày đã chọn
                 foreach (var date in selectedDates)

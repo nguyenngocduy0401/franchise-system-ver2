@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
-using FranchiseProject.Application.ViewModels.MaterialViewModels;
+using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
 
 namespace FranchiseProject.API.Validator.CourseValidator
 {

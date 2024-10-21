@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Domain.Enums
+namespace FranchiseProject.Application.Interfaces
 {
-    public enum AgencyRolesEnum
+    public interface IChapterMaterialService
     {
-        Student,
-        Instructor,
-        AgencyStaff 
     }
 }

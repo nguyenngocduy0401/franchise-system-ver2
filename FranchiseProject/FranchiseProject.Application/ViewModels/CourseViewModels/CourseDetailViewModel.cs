@@ -1,7 +1,7 @@
 ﻿using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.CourseCategoryViewModels;
-using FranchiseProject.Application.ViewModels.MaterialViewModels;
+using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
 using FranchiseProject.Application.ViewModels.SessionViewModels;
 using FranchiseProject.Application.ViewModels.SyllabusViewModels;
 using FranchiseProject.Domain.Entity;
@@ -33,6 +33,6 @@ namespace FranchiseProject.Application.ViewModels.CourseViewModels
         public virtual ICollection<SessionViewModel>? Sessions { get; set; }
         public virtual ICollection<ChapterViewModel>? Chapters { get; set; }
         public virtual ICollection<AssessmentViewModel>? Assessments { get; set; }
-        public virtual ICollection<MaterialViewModel>? Materials { get; set; }
+        public virtual ICollection<CourseMaterialViewModel>? CourseMaterials { get; set; }
     }
 }

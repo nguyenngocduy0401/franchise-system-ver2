@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using FranchiseProject.Application.ViewModels.MaterialViewModels;
+using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
 using FranchiseProject.Application.ViewModels.SessionViewModels;
 
 namespace FranchiseProject.API.Validator.SessionValidator

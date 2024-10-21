@@ -4,7 +4,7 @@ using FranchiseProject.Application.Services;
 using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
-using FranchiseProject.Application.ViewModels.MaterialViewModels;
+using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
 using FranchiseProject.Application.ViewModels.SessionViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -19,11 +19,11 @@ namespace FranchiseProject.API.Controllers
     public class CourseController : ControllerBase
     {
         private readonly ICourseService _courseService;
-        private readonly IMaterialService _materialService;
+        private readonly ICourseMaterialService _materialService;
         private readonly IAssessmentService _assessmentService;
         private readonly ISessionService _sessionService;
         private readonly IChapterService _chapterService;
-        public CourseController(ICourseService courseService, IMaterialService materialService,
+        public CourseController(ICourseService courseService, ICourseMaterialService materialService,
             IAssessmentService assessmentService, ISessionService sessionService, 
             IChapterService chapterService)
         {
@@ -56,7 +56,7 @@ namespace FranchiseProject.API.Controllers
         }
         [SwaggerOperation(Summary = "cập nhật tài nguyên của khoá học {Authorize = Admin, Manager}")]
         [HttpPost("{id}/materials")]
-        public async Task<ApiResponse<bool>> CreateMaterialByCourseIdAsync(Guid id, List<CreateMaterialArrangeModel> createMaterialArrangeModel)
+        public async Task<ApiResponse<bool>> CreateMaterialByCourseIdAsync(Guid id, List<CreateCourseMaterialArrangeModel> createMaterialArrangeModel)
         {
             return await _materialService.CreateMaterialArrangeAsync(id, createMaterialArrangeModel);
         }

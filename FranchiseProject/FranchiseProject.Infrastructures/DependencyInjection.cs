@@ -48,14 +48,13 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IStudentClassService, StudentClassService>();
             services.AddScoped<IStudentCourseService, StudentCourseService>();
             services.AddScoped<ISyllabusService, SyllabusService>();
-            services.AddScoped<ITermService, TermService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRedisService, RedisService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IConsultationService,ConsultationService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<INotificationService, NotificationService>();
-            services.AddScoped<IMaterialService, MaterialService>();
+            services.AddScoped<ICourseMaterialService, CourseMaterialService>();
             services.AddScoped<IAssessmentService, AssessmentService>();
             #endregion
             #region Repository DI
@@ -69,9 +68,6 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IContractRepository, ContractRepository>();
             services.AddScoped<ICourseRepository, CourseRepository>();
             services.AddScoped<ICourseCategoryRepository, CourseCategoryRepository>();
-            services.AddScoped<IFeedbackAnswerRepository, FeedbackAnswerRepository>();
-            services.AddScoped<IFeedbackOptionRepository, FeedbackOptionRepository>();
-            services.AddScoped<IFeedbackQuestionRepository, FeedbackQuestionRepository>();
             services.AddScoped<IFeedbackRepository, FeedbackRepository>();
             services.AddScoped<IQuestionRepository, QuestionRepository>();
             services.AddScoped<IQuestionOptionRepository, QuestionOptionRepository>();
@@ -85,14 +81,13 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IStudentClassRepository, StudentClassRepository>();
             services.AddScoped<IStudentCourseRepository, StudentCourseRepository>();
             services.AddScoped<ISyllabusRepository, SyllabusRepository>();
-            services.AddScoped<ITermRepository, TermRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IConsultationRepository, ConsultationRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IAssessmentRepository, AssessmentRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
-            services.AddScoped<IMaterialRepository, MaterialRepository>();
+            services.AddScoped<ICourseMaterialRepository, CourseMaterialRepository>();
             #endregion
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>

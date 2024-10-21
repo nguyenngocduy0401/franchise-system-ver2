@@ -1,6 +1,6 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
-using FranchiseProject.Application.ViewModels.MaterialViewModels;
+using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Enums;
 using System;

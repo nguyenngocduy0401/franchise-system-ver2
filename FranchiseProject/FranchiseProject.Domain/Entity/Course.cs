@@ -30,6 +30,6 @@ namespace FranchiseProject.Domain.Entity
         public virtual ICollection<Report>? Reports {get; set;}
         public virtual ICollection<Class>? Classes {get; set;}
         public virtual ICollection<Assessment>? Assessments {get; set;}
-        public virtual ICollection<Material>? Materials {get; set;}
+        public virtual ICollection<CourseMaterial>? CourseMaterials { get; set;}
     }
 }

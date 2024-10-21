@@ -6,7 +6,7 @@ using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
-using FranchiseProject.Application.ViewModels.MaterialViewModels;
+using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.IdentityModel.Tokens;

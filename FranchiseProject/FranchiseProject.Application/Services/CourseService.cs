@@ -8,6 +8,7 @@ using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -101,9 +102,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<CourseDetailViewModel>();
             try
             {
-                var course = (await _unitOfWork.CourseRepository
-                    .FindAsync(e=>e.Id==courseId , "Materials,Sessions,Syllabus,Assessments,Chapters,CourseCategory"))
-                    .FirstOrDefault();
+                var course = await _unitOfWork.CourseRepository.GetCourseDetailAsync(courseId);
                 if (course == null) throw new Exception("Course does not exist!");
                 var courseModel = _mapper.Map<CourseDetailViewModel>(course);
                 response = ResponseHandler.Success(courseModel);

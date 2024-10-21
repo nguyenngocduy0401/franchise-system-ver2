@@ -14,8 +14,8 @@ namespace FranchiseProject.Application.Commons
         public const string Student = "Student";
         public const string Instructor = "Instructor";
         public const string SystemInstructor = "SystemInstructor"; //giáo viên của trung tâm đào tạo
-        public const string Consultant = "Consultant"; // Tư vấn viên
-        public const string Technician = "Technician";// Thiết kế, khảo sảt
+        public const string SystemConsultant = "Consultant"; // Tư vấn viên
+        public const string SystemTechnician = "Technician";// Thiết kế, khảo sảt
         public const string AgencyStaff = "AgencyStaff";// tư vấn cho học viên
     }
 }

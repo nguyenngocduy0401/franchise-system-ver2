@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Infrastructures.Repositories
 {
-    public class TermRepository : GenericRepository<Term>, ITermRepository
+    public class CourseMaterialRepository : GenericRepository<CourseMaterial>, ICourseMaterialRepository
     {
         private readonly AppDbContext _dbContext;
         private readonly ICurrentTime _timeService;
         private readonly IClaimsService _claimsService;
-        public TermRepository(
+        public CourseMaterialRepository(
             AppDbContext context,
             ICurrentTime timeService,
             IClaimsService claimsService
@@ -23,18 +23,6 @@ namespace FranchiseProject.Infrastructures.Repositories
             _dbContext = context;
             _timeService = timeService;
             _claimsService = claimsService;
-        }
-        public async Task<Term?> GetOverlappingTermsAsync(DateTime startDate, DateTime endDate)
-        {
-            return  _dbContext.Set<Term>()
-                .FirstOrDefault(t =>
-                    (startDate <= t.EndDate && endDate >= t.StartDate));
-        }
-
-        public async Task<Term?> GetByNameAsync(string name)
-        {
-            return  _dbContext.Set<Term>()
-                .FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Entity
 {
-    public class Material : BaseEntity
+    public class CourseMaterial : BaseEntity
     {
         public string? URL { get; set; }
         public string? Description { get; set; }

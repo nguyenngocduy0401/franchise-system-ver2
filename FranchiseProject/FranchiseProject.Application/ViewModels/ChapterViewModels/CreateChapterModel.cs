@@ -11,6 +11,8 @@ namespace FranchiseProject.Application.ViewModels.ChapterViewModels
         public int Number { get; set; }
         public string? Topic { get; set; }
         public string? Description { get; set; }
-        public Guid? CourseId { get; set; }
+        public Guid? CourseId { get; set; }/*
+        public ICollection<Creat>*//*
+        public ICollection<Creat>*/
     }
 }

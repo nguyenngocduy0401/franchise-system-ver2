@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.ViewModels.MaterialViewModels
+namespace FranchiseProject.Application.ViewModels.CourseMaterialViewModels
 {
-    public class CreateMaterialModel
+    public class CreateCourseMaterialArrangeModel
     {
         public string? URL { get; set; }
         public string? Description { get; set; }
-        public Guid? CourseId { get; set; }
     }
 }

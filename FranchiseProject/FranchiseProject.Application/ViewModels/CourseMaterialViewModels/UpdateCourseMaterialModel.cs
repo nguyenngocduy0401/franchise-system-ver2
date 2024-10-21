@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.ViewModels.MaterialViewModels
+namespace FranchiseProject.Application.ViewModels.CourseMaterialViewModels
 {
-    public class CreateMaterialArrangeModel
+    public class UpdateCourseMaterialModel
     {
         public string? URL { get; set; }
         public string? Description { get; set; }
