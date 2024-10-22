@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using FranchiseProject.Domain.Enums;
 
 namespace FranchiseProject.API.Controllers
 {
@@ -33,46 +34,53 @@ namespace FranchiseProject.API.Controllers
             _sessionService = sessionService;
             _chapterService = chapterService;
         }
+        [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
+        [SwaggerOperation(Summary = "cập nhật trạng thái của học bằng id {Authorize = SystemInstructor, Manager}")]
+        [HttpPut("{id}/status")]
+        public async Task<ApiResponse<bool>> UpdateCourseStatusAsync(Guid id, CourseStatusEnum courseStatusEnum)
+        {
+            return await _courseService.UpdateCourseStatusAsync(id, courseStatusEnum);
+        }
         //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
-        [SwaggerOperation(Summary = "xóa khoá học bằng id {Authorize = Admin, Manager}")]
+        [SwaggerOperation(Summary = "xóa khoá học bằng id {Authorize = SystemInstructor, Manager}")]
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteCourseAsync(Guid id)
         {
             return await _courseService.DeleteCourseByIdAsync(id);
         }
         //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
-        [SwaggerOperation(Summary = "tạo mới khoá học {Authorize = Admin, Manager}")]
+        [SwaggerOperation(Summary = "tạo mới khoá học {Authorize = SystemInstructor, Manager}")]
         [HttpPost()]
         public async Task<ApiResponse<bool>> CreateCourseAsync(CreateCourseModel createCourseModel)
         {
             return await _courseService.CreateCourseAsync(createCourseModel);
         }
         //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
-        [SwaggerOperation(Summary = "cập nhật khoá học {Authorize = Admin, Manager}")]
+        [SwaggerOperation(Summary = "cập nhật khoá học {Authorize = SystemInstructor, Manager}")]
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> UpdateCourseAsync(Guid id, UpdateCourseModel updateCourseModel)
         {
             return await _courseService.UpdateCourseAsync(id, updateCourseModel);
         }
-        [SwaggerOperation(Summary = "cập nhật tài nguyên của khoá học {Authorize = Admin, Manager}")]
+        [SwaggerOperation(Summary = "cập nhật tài nguyên của khoá học {Authorize = SystemInstructor, Manager}")]
         [HttpPost("{id}/materials")]
         public async Task<ApiResponse<bool>> CreateMaterialByCourseIdAsync(Guid id, List<CreateCourseMaterialArrangeModel> createMaterialArrangeModel)
         {
             return await _materialService.CreateMaterialArrangeAsync(id, createMaterialArrangeModel);
         }
-        [SwaggerOperation(Summary = "cập nhật đánh giá của khoá học {Authorize = Admin, Manager}")]
+        [SwaggerOperation(Summary = "cập nhật đánh giá của khoá học {Authorize = SystemInstructor, Manager}")]
         [HttpPost("{id}/assessments")]
         public async Task<ApiResponse<bool>> CreateAssessmentByCourseIdAsync(Guid id, List<CreateAssessmentArrangeModel> createAssessmentArrangeModel)
         {
             return await _assessmentService.CreateAssessmentArangeAsync(id, createAssessmentArrangeModel);
         }
-        [SwaggerOperation(Summary = "cập nhật phiên của khoá học {Authorize = Admin, Manager}")]
+        [SwaggerOperation(Summary = "cập nhật phiên của khoá học {Authorize = SystemInstructor, Manager}")]
         [HttpPost("{id}/sessions")]
         public async Task<ApiResponse<bool>> CreateSessionByCourseIdAsync(Guid id, List<CreateSessionArrangeModel> createSessionArrangeModel)
         {
             return await _sessionService.CreateSessionArrangeAsync(id, createSessionArrangeModel);
         }
-        [SwaggerOperation(Summary = "cập nhật chương của khoá học {Authorize = Admin, Manager}")]
+        [SwaggerOperation(Summary = "cập nhật chương của khoá học {Authorize = SystemInstructor, Manager}")]
         [HttpPost("{id}/chapters")]
         public async Task<ApiResponse<bool>> CreateChapterByCourseIdAsync(Guid id, List<CreateChapterArrangeModel> createChapterArrangeModel)
         {

@@ -28,17 +28,18 @@ namespace FranchiseProject.Infrastructures.Repositories
         }
         public async Task<Course> GetCourseDetailAsync(Guid courseId)
         {
-            
             return await _dbSet
-        .Where(e => e.Id == courseId)
-        .Include(e => e.CourseMaterials)
-        .Include(e => e.Sessions)
-        .Include(e => e.Syllabus)
-        .Include(e => e.Assessments)
-        .Include(e => e.Chapters)
-        .ThenInclude(c => c.ChapterMaterials)
-        .Include(e => e.CourseCategory)
-        .FirstOrDefaultAsync();
+                .Where(e => e.Id == courseId)
+                .Include(e => e.CourseMaterials) 
+                .Include(e => e.Sessions.OrderBy(s => s.Number)) 
+                .Include(e => e.Syllabus) 
+                .Include(e => e.Assessments.OrderBy(a => a.Number)) 
+                .Include(e => e.Chapters
+                    .OrderBy(ch => ch.Number)) 
+                    .ThenInclude(c => c.ChapterMaterials
+                        .OrderBy(cm => cm.Number)) 
+                .Include(e => e.CourseCategory)
+                .FirstOrDefaultAsync();
         }
     }
 }

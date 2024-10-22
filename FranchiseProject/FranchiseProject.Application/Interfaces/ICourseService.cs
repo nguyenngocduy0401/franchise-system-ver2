@@ -13,6 +13,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface ICourseService
     {
+        Task<ApiResponse<bool>> UpdateCourseStatusAsync(Guid courseId, CourseStatusEnum courseStatusEnum);
         Task<ApiResponse<bool>> CreateCourseVersionAsync(Guid courseId);
         Task<ApiResponse<List<CourseViewModel>>> GetAllCourseAsync();
         Task<ApiResponse<Pagination<CourseViewModel>>> FilterCourseAsync(FilterCourseModel filterCourseViewModel);

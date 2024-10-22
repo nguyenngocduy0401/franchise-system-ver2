@@ -125,13 +125,12 @@ namespace FranchiseProject.Infrastructures.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StudentTask = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TimeAllocation = table.Column<double>(type: "float", nullable: true),
+                    TimeAllocation = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ToolsRequire = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Scale = table.Column<double>(type: "float", nullable: true),
-                    MinAvgMarkToPass = table.Column<double>(type: "float", nullable: true),
+                    Scale = table.Column<double>(type: "float", nullable: false),
+                    MinAvgMarkToPass = table.Column<double>(type: "float", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -143,27 +142,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Syllabuses", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Terms",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModificationBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Terms", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -293,7 +271,10 @@ namespace FranchiseProject.Infrastructures.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     URLImage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NumberOfSession = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NumberOfLession = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Version = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     SyllabusId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CourseCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -548,10 +529,13 @@ namespace FranchiseProject.Infrastructures.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Number = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Part = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Weight = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Weight = table.Column<double>(type: "float", nullable: true),
+                    CompletionCriteria = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Method = table.Column<int>(type: "int", nullable: false),
                     Duration = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     QuestionType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -579,10 +563,8 @@ namespace FranchiseProject.Infrastructures.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Number = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Topic = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VideoURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FileURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -610,7 +592,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                     Capacity = table.Column<int>(type: "int", nullable: false),
                     CurrentEnrollment = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TermId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -628,15 +609,10 @@ namespace FranchiseProject.Infrastructures.Migrations
                         column: x => x.CourseId,
                         principalTable: "Courses",
                         principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Classes_Terms_TermId",
-                        column: x => x.TermId,
-                        principalTable: "Terms",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Materials",
+                name: "CourseMaterials",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -653,9 +629,9 @@ namespace FranchiseProject.Infrastructures.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Materials", x => x.Id);
+                    table.PrimaryKey("PK_CourseMaterials", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Materials_Courses_CourseId",
+                        name: "FK_CourseMaterials_Courses_CourseId",
                         column: x => x.CourseId,
                         principalTable: "Courses",
                         principalColumn: "Id");
@@ -698,9 +674,9 @@ namespace FranchiseProject.Infrastructures.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Number = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Number = table.Column<int>(type: "int", nullable: false),
+                    Topic = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Chapter = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -744,6 +720,33 @@ namespace FranchiseProject.Infrastructures.Migrations
                         principalTable: "Courses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ChapterMaterials",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Number = table.Column<int>(type: "int", nullable: false),
+                    URL = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ChapterId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModificationBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChapterMaterials", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ChapterMaterials_Chapters_ChapterId",
+                        column: x => x.ChapterId,
+                        principalTable: "Chapters",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -842,6 +845,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClassId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -853,6 +857,11 @@ namespace FranchiseProject.Infrastructures.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Feedbacks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Feedbacks_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Feedbacks_Classes_ClassId",
                         column: x => x.ClassId,
@@ -993,32 +1002,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FeedbackQuestions",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    QuestionType = table.Column<int>(type: "int", nullable: false),
-                    FeedbackId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModificationBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FeedbackQuestions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_FeedbackQuestions_Feedbacks_FeedbackId",
-                        column: x => x.FeedbackId,
-                        principalTable: "Feedbacks",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "QuizDetails",
                 columns: table => new
                 {
@@ -1098,77 +1081,36 @@ namespace FranchiseProject.Infrastructures.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "FeedbackOptions",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OptionText = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FeedbackQuestionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModificationBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FeedbackOptions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_FeedbackOptions_FeedbackQuestions_FeedbackQuestionId",
-                        column: x => x.FeedbackQuestionId,
-                        principalTable: "FeedbackQuestions",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "FeedbackAnswers",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    FeedbackOptionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    FeedbackId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModificationBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FeedbackAnswers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_FeedbackAnswers_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_FeedbackAnswers_FeedbackOptions_FeedbackOptionId",
-                        column: x => x.FeedbackOptionId,
-                        principalTable: "FeedbackOptions",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_FeedbackAnswers_Feedbacks_FeedbackId",
-                        column: x => x.FeedbackId,
-                        principalTable: "Feedbacks",
-                        principalColumn: "Id");
-                });
-
             migrationBuilder.InsertData(
                 table: "Agencies",
                 columns: new[] { "Id", "Address", "City", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "District", "Email", "IsDeleted", "ModificationBy", "ModificationDate", "Name", "PhoneNumber", "PositionImageURL", "Status", "Ward" },
                 values: new object[] { new Guid("be37023d-6a58-4b4b-92e5-39dcece45473"), null, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, null, false, null, null, null, null, null, 4, null });
 
             migrationBuilder.InsertData(
+                table: "Classes",
+                columns: new[] { "Id", "Capacity", "CourseId", "CreatedBy", "CreationDate", "CurrentEnrollment", "DeleteBy", "DeletionDate", "IsDeleted", "ModificationBy", "ModificationDate", "Name" },
+                values: new object[,]
+                {
+                    { new Guid("99129374-30f6-4f57-978f-583353684ca5"), 30, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, null, false, null, null, "OOP_TEST_SU25" },
+                    { new Guid("99e3af58-64b4-4304-ae6a-2d8782e9caed"), 30, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, null, false, null, null, "JAVA_TEST_SU25" },
+                    { new Guid("a2a94ddc-ff9e-484c-8d2a-6f9d5dd21279"), 30, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, null, false, null, null, "MLN131_TEST_SU25" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Contracts",
                 columns: new[] { "Id", "AgencyId", "Amount", "ContractDocumentImageURL", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "Duration", "EndTime", "IsDeleted", "ModificationBy", "ModificationDate", "StartTime", "TermsAndCondition", "Title", "Total" },
-                values: new object[] { new Guid("550ee872-ea09-42a0-b9ac-809890debafb"), null, 0, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, 0, new DateTime(2024, 10, 19, 23, 19, 57, 226, DateTimeKind.Local).AddTicks(3181), false, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, 0 });
+                values: new object[] { new Guid("550ee872-ea09-42a0-b9ac-809890debafb"), null, 0, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, 0, new DateTime(2024, 10, 27, 21, 6, 9, 648, DateTimeKind.Local).AddTicks(796), false, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, 0 });
+
+            migrationBuilder.InsertData(
+                table: "CoursesCategories",
+                columns: new[] { "Id", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "IsDeleted", "ModificationBy", "ModificationDate", "Name" },
+                values: new object[,]
+                {
+                    { new Guid("228efc7b-2659-4186-7941-08dcf20adbbc"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Các khóa học chuyên sâu về lập trình, bao gồm các kỹ thuật lập trình phức tạp, thiết kế hệ thống, lập trình đa luồng, và tối ưu hóa hiệu suất ứng dụng.", false, null, null, "Lập trình nâng cao" },
+                    { new Guid("264c1d37-40f3-4dd9-793e-08dcf20adbbc"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Các khóa học liên quan đến thuật toán, bao gồm các khái niệm cơ bản, các loại thuật toán, và ứng dụng của chúng trong lập trình và khoa học máy tính.", false, null, null, "Thuật toán" },
+                    { new Guid("f1390dbc-82f7-4cd4-793f-08dcf20adbbc"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Các khóa học cung cấp kiến thức nền tảng về khoa học máy tính, bao gồm các khái niệm cơ bản, ngôn ngữ lập trình cơ bản, và các nguyên lý thiết kế hệ thống.", false, null, null, "Kiến thức cơ sở" },
+                    { new Guid("f8fd80dd-c470-4ecf-7940-08dcf20adbbc"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Các khóa học tập trung vào các kỹ năng lập trình cơ bản, như lập trình hướng đối tượng, cấu trúc dữ liệu, và thuật toán cơ bản, giúp học viên xây dựng nền tảng vững chắc trong lập trình.", false, null, null, "Lập trình cơ sở" }
+                });
 
             migrationBuilder.InsertData(
                 table: "Slots",
@@ -1180,23 +1122,62 @@ namespace FranchiseProject.Infrastructures.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Terms",
-                columns: new[] { "Id", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "EndDate", "IsDeleted", "ModificationBy", "ModificationDate", "Name", "StartDate" },
+                table: "Courses",
+                columns: new[] { "Id", "Code", "CourseCategoryId", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "IsDeleted", "ModificationBy", "ModificationDate", "Name", "NumberOfLession", "Price", "Status", "SyllabusId", "URLImage", "Version" },
+                values: new object[] { new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), "PRF", new Guid("f8fd80dd-c470-4ecf-7940-08dcf20adbbc"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Khóa học lập trình căn bản với ngữ C giành cho người mới bắt đầu học lập trình", false, null, null, "Nhập môn lập trình với C", 20, 2000000, 0, null, "string", 0 });
+
+            migrationBuilder.InsertData(
+                table: "Assessments",
+                columns: new[] { "Id", "CompletionCriteria", "Content", "CourseId", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Duration", "IsDeleted", "Method", "ModificationBy", "ModificationDate", "Number", "Quantity", "QuestionType", "Type", "Weight" },
                 values: new object[,]
                 {
-                    { new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, null, null, "SP25", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { new Guid("97b016ea-591f-4198-8251-5ab4ae8e88ec"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new DateTime(2025, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, null, null, "SU25", new DateTime(2025, 4, 2, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { new Guid("c60e3315-6c8b-4855-b1cb-fa92c7e4b593"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, null, null, "FA25", new DateTime(2025, 8, 2, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { new Guid("74a5614a-56e5-43c9-9d9d-beb0ecda76c1"), "0", "Luyện tập", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "20 phút", false, 1, null, null, 2, 2, "Trắc nghiệm", "Progress test", 20.0 },
+                    { new Guid("9841a317-70c1-4433-9644-a059194ef27d"), "0", "Kiểm tra giữa khóa", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Tại nhà", false, 0, null, null, 3, 1, "Giáo viên tự chọn", "Assignment", 30.0 },
+                    { new Guid("a385db00-01b3-46d0-932c-5c0d3a6a3fe9"), "4", "Kiểm tra cuối khóa", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "20 phút", false, 1, null, null, 4, 1, "Trắc nghiệm", "Final Exam", 40.0 },
+                    { new Guid("bf0ecd1a-27ba-4295-ba44-9d32bb103595"), "0", "Điểm danh", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, false, 1, null, null, 1, 1, null, "Participation", 10.0 }
                 });
 
             migrationBuilder.InsertData(
-                table: "Classes",
-                columns: new[] { "Id", "Capacity", "CourseId", "CreatedBy", "CreationDate", "CurrentEnrollment", "DeleteBy", "DeletionDate", "IsDeleted", "ModificationBy", "ModificationDate", "Name", "TermId" },
+                table: "Chapters",
+                columns: new[] { "Id", "CourseId", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "IsDeleted", "ModificationBy", "ModificationDate", "Number", "Topic" },
                 values: new object[,]
                 {
-                    { new Guid("99129374-30f6-4f57-978f-583353684ca5"), 30, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, null, false, null, null, "OOP_TEST_SU25", new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a") },
-                    { new Guid("99e3af58-64b4-4304-ae6a-2d8782e9caed"), 30, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, null, false, null, null, "JAVA_TEST_SU25", new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a") },
-                    { new Guid("a2a94ddc-ff9e-484c-8d2a-6f9d5dd21279"), 30, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, null, null, false, null, null, "MLN131_TEST_SU25", new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a") }
+                    { new Guid("620d9ca5-c6a0-4b2c-9d20-b42635a9376c"), new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giải thích về khái niệm biến, biểu thức và các phép toán cơ bản trong lập trình C. Chương này sẽ cung cấp các ví dụ minh họa cách khai báo và sử dụng biến...", false, null, null, 3, "Chương 3 : Cấu trúc logic và phong cách lập trình trong C" },
+                    { new Guid("7aa7aa40-7f23-4c73-9375-7171a284f370"), new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Chương này tập trung vào khái niệm chuỗi (strings) trong ngôn ngữ C, cách khai báo và xử lý chuỗi...", false, null, null, 7, "Chương 7 : Chuỗi và cách sử dụng trong lập trình C" },
+                    { new Guid("aad07753-6f1c-41ab-ae04-d6acad448216"), new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Chương này sẽ giới thiệu các thư viện chuẩn của ngôn ngữ C, cách sử dụng chúng trong chương trình. Học viên sẽ học cách khai báo và sử dụng các hàm từ thư viện...", false, null, null, 5, "Chương 5 : Thư viện C và cách sử dụng" },
+                    { new Guid("b91e33b2-3810-4d7f-bafb-4190831e0ae4"), new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Học viên sẽ tìm hiểu về mảng (arrays) trong lập trình C, cách khai báo và sử dụng mảng một chiều và hai chiều...", false, null, null, 6, "Chương 6 : Mảng và cách sử dụng trong lập trình C" },
+                    { new Guid("c34aee85-2527-4b7e-9117-eff651cdad70"), new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Hướng dẫn cách sử dụng tệp trong lập trình C để lưu trữ và xử lý dữ liệu. Chương này sẽ bao gồm cách mở, đọc, ghi, và đóng tệp...", false, null, null, 8, "Chương 8 : Tệp và cách sử dụng trong lập trình C" },
+                    { new Guid("c89711d7-1e02-4ec8-8c6f-7e232aa50f8c"), new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giải thích về khái niệm biến, biểu thức và các phép toán cơ bản trong lập trình C. Chương này sẽ cung cấp các ví dụ minh họa cách khai báo và sử dụng biến, cách thực hiện các phép toán số học...", false, null, null, 2, "Chương 2 : Biến, biểu thức và các phép toán cơ bản" },
+                    { new Guid("d42aaba5-c73e-4494-968c-4dda0baf33f4"), new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giải thích về khái niệm biến, biểu thức và các phép toán cơ bản trong lập trình C. Chương này sẽ cung cấp các ví dụ minh họa cách khai báo và sử dụng biến...", false, null, null, 4, "Chương 4 : Tính modular và các hàm trong lập trình C" },
+                    { new Guid("fa0ef489-0a03-4901-8e0a-70fd69b324d3"), new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Chương này sẽ trình bày cách một chương trình được tạo ra từ mã nguồn, biên dịch thành mã máy và được chạy trên máy tính. Học viên sẽ tìm hiểu về quá trình chuyển đổi từ mã lệnh thành một chương trình thực thi...", false, null, null, 1, "Chương 1 : Giới thiệu về chương trình và cách nó hoạt động trên máy tính" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Sessions",
+                columns: new[] { "Id", "Chapter", "CourseId", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "IsDeleted", "ModificationBy", "ModificationDate", "Number", "Topic" },
+                values: new object[,]
+                {
+                    { new Guid("028123ab-bf17-4490-a58e-a6682410dea1"), "Chương 2", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giải thích các thao tác bộ nhớ trong C, cách lưu trữ và xử lý dữ liệu trong bộ nhớ.", false, null, null, 6, "Module B: Tính toán - Các thao tác bộ nhớ cơ bản" },
+                    { new Guid("0e2d296e-4f37-4f36-ae2c-e20127a30e44"), "Chương 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Hướng dẫn chi tiết về cách sử dụng các cấu trúc logic trong việc giải quyết các bài toán thực tế.", false, null, null, 11, "Lô-gic cơ bản: Walkthroughs" },
+                    { new Guid("1ca30a08-671b-45b0-980d-e7c8685ac671"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu khái niệm tính mô-đun, cách sử dụng hàm trong C và phạm vi của biến trong lập trình.", false, null, null, 13, "Module D: Tính mô-đun và Hàm - Hàm C, Phạm vi biến" },
+                    { new Guid("1f4352d7-f94d-4470-8ea9-f5d30a571f57"), "Chương 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Học về các cấu trúc điều khiển trong C như cấu trúc trình tự và cấu trúc lựa chọn (if, switch).", false, null, null, 8, "Module C: Lô-gic cơ bản - Cấu trúc trình tự, Cấu trúc lựa chọn" },
+                    { new Guid("300cfaf3-edb3-4c7a-bb20-006e6ecf2897"), "Chương 1", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu cấu trúc bài tập, cách thức nộp bài và yêu cầu cần đạt.", false, null, null, 4, "Giới thiệu về bài tập" },
+                    { new Guid("306caedd-a572-4055-a632-6c7568d0b455"), "", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Tiếp tục thực hành về hàm và tính mô-đun.", false, null, null, 17, "Tính mô-đun và Hàm" },
+                    { new Guid("3e2b725d-0df4-41ae-aa93-f4263c5b3a11"), "Chương 1", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Hướng dẫn cài đặt và cấu hình công cụ lập trình, giới thiệu môi trường làm việc cho lập trình C.", false, null, null, 2, "Cài đặt Công cụ Lập trình" },
+                    { new Guid("4e427e2f-c7cd-43ad-9187-caab1965bff7"), "Chương 1", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu ngôn ngữ lập trình C, cách thức hoạt động của trình biên dịch C, và cú pháp cơ bản.", false, null, null, 3, "Module A: Giới thiệu về ngôn ngữ lập trình C và Trình biên dịch C" },
+                    { new Guid("54416cd9-088a-4f5d-ae11-f4f9001c0790"), "Chương 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Học cách viết mã có cấu trúc, dễ hiểu, tuân thủ các quy tắc về phong cách lập trình tốt.", false, null, null, 10, "Module C: Lô-gic cơ bản - Phong cách lập trình" },
+                    { new Guid("5eae45fd-a966-4459-9ff3-a63ffe44b94c"), "", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu các biểu thức trong C, các phép toán cơ bản như cộng, trừ, nhân, chia, và các phép toán logic.", false, null, null, 7, "Tính toán cơ bản: Biểu thức" },
+                    { new Guid("6e715557-7a70-4f72-beca-6c84b833e5b6"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Thực hành viết và sử dụng hàm, tối ưu hóa mã nguồn bằng cách chia thành các mô-đun.", false, null, null, 16, "Tính mô-đun và Hàm" },
+                    { new Guid("9845a3d7-fd4f-4b9f-98bf-8a2f2f4773f8"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Thực hành các bài tập liên quan đến tính mô-đun và sử dụng hàm trong C.", false, null, null, 18, "Workshop 2: Tính mô-đun và Hàm" },
+                    { new Guid("99fcb93b-201b-4265-87a8-bfb5b7037efa"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Thực hành với các bài tập sử dụng con trỏ để quản lý bộ nhớ và dữ liệu.", false, null, null, 20, "Con trỏ" },
+                    { new Guid("9cd92d97-61ff-4f55-8664-3910788ecec1"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Tìm hiểu sâu hơn về cách chia chương trình thành các mô-đun và sử dụng hàm trong lập trình.", false, null, null, 15, "Tính mô-đun và Hàm" },
+                    { new Guid("a00fddd6-2b90-4c37-96d6-519796851e2c"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu khái niệm con trỏ, cách khai báo, sử dụng và các ứng dụng của con trỏ trong lập trình.", false, null, null, 19, "Con trỏ" },
+                    { new Guid("b0574be6-4f3d-4b9c-8743-106d469e720d"), "Chương 2", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Tìm hiểu về các biến trong C, cách khai báo, kiểu dữ liệu và cách thức sử dụng biến trong tính toán.", false, null, null, 5, "Module B: Tính toán - Biến số" },
+                    { new Guid("b1e4260b-ee92-433f-9761-3b876b59bf3f"), "Chương 1, 2, 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Thực hành về các kỹ năng nhập/xuất dữ liệu, tính toán và sử dụng các cấu trúc logic cơ bản.", false, null, null, 12, "Workshop 1: Nhập/Xuất, tính toán và lô-gic cơ bản" },
+                    { new Guid("bc76398a-1205-4816-afcb-20577ead68de"), "Chương 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu các cấu trúc lặp trong C như for, while, và do-while, cách sử dụng chúng trong lập trình.", false, null, null, 9, "Module C: Lô-gic cơ bản - Cấu trúc lặp" },
+                    { new Guid("e9c2c302-3213-471b-930d-912438b1063f"), "Chương 1, 2, 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Đánh giá kết quả của workshop 1 và phân tích lỗi thường gặp.", false, null, null, 14, "Đánh giá Workshop 1" },
+                    { new Guid("f0c44d40-5cfc-40f6-b09c-3ccbdef84703"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Tiếp tục thực hành và làm quen với con trỏ trong lập trình C.", false, null, null, 21, "Con trỏ" },
+                    { new Guid("fa16c0d8-68db-4083-bba5-8f16d75fe1e4"), "Chương 1", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu tổng quan về khóa học, các chủ đề sẽ được học, yêu cầu và phương pháp đánh giá.", false, null, null, 1, "Giới thiệu khóa học" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -1274,6 +1255,11 @@ namespace FranchiseProject.Infrastructures.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ChapterMaterials_ChapterId",
+                table: "ChapterMaterials",
+                column: "ChapterId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Chapters_CourseId",
                 table: "Chapters",
                 column: "CourseId");
@@ -1282,11 +1268,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                 name: "IX_Classes_CourseId",
                 table: "Classes",
                 column: "CourseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Classes_TermId",
-                table: "Classes",
-                column: "TermId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClassSchedules_ClassId",
@@ -1309,6 +1290,11 @@ namespace FranchiseProject.Infrastructures.Migrations
                 column: "AgencyId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CourseMaterials_CourseId",
+                table: "CourseMaterials",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Courses_CourseCategoryId",
                 table: "Courses",
                 column: "CourseCategoryId");
@@ -1319,48 +1305,14 @@ namespace FranchiseProject.Infrastructures.Migrations
                 column: "SyllabusId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FeedbackAnswers_FeedbackId",
-                table: "FeedbackAnswers",
-                column: "FeedbackId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FeedbackAnswers_FeedbackOptionId",
-                table: "FeedbackAnswers",
-                column: "FeedbackOptionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FeedbackAnswers_UserId_FeedbackId",
-                table: "FeedbackAnswers",
-                columns: new[] { "UserId", "FeedbackId" },
-                unique: true,
-                filter: "[UserId] IS NOT NULL AND [FeedbackId] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FeedbackAnswers_UserId_FeedbackOptionId",
-                table: "FeedbackAnswers",
-                columns: new[] { "UserId", "FeedbackOptionId" },
-                unique: true,
-                filter: "[UserId] IS NOT NULL AND [FeedbackOptionId] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FeedbackOptions_FeedbackQuestionId",
-                table: "FeedbackOptions",
-                column: "FeedbackQuestionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FeedbackQuestions_FeedbackId",
-                table: "FeedbackQuestions",
-                column: "FeedbackId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Feedbacks_ClassId",
                 table: "Feedbacks",
                 column: "ClassId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Materials_CourseId",
-                table: "Materials",
-                column: "CourseId");
+                name: "IX_Feedbacks_UserId",
+                table: "Feedbacks",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notifications_ReceiverId",
@@ -1474,16 +1426,19 @@ namespace FranchiseProject.Infrastructures.Migrations
                 name: "Attendances");
 
             migrationBuilder.DropTable(
+                name: "ChapterMaterials");
+
+            migrationBuilder.DropTable(
                 name: "Consultations");
 
             migrationBuilder.DropTable(
                 name: "Contracts");
 
             migrationBuilder.DropTable(
-                name: "FeedbackAnswers");
+                name: "CourseMaterials");
 
             migrationBuilder.DropTable(
-                name: "Materials");
+                name: "Feedbacks");
 
             migrationBuilder.DropTable(
                 name: "Notifications");
@@ -1528,9 +1483,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                 name: "ClassSchedules");
 
             migrationBuilder.DropTable(
-                name: "FeedbackOptions");
-
-            migrationBuilder.DropTable(
                 name: "Quizs");
 
             migrationBuilder.DropTable(
@@ -1546,7 +1498,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                 name: "Slots");
 
             migrationBuilder.DropTable(
-                name: "FeedbackQuestions");
+                name: "Classes");
 
             migrationBuilder.DropTable(
                 name: "Questions");
@@ -1555,19 +1507,10 @@ namespace FranchiseProject.Infrastructures.Migrations
                 name: "Agencies");
 
             migrationBuilder.DropTable(
-                name: "Feedbacks");
-
-            migrationBuilder.DropTable(
                 name: "Chapters");
 
             migrationBuilder.DropTable(
-                name: "Classes");
-
-            migrationBuilder.DropTable(
                 name: "Courses");
-
-            migrationBuilder.DropTable(
-                name: "Terms");
 
             migrationBuilder.DropTable(
                 name: "CoursesCategories");

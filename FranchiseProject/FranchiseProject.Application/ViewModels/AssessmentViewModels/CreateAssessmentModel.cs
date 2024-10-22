@@ -9,6 +9,7 @@ namespace FranchiseProject.Application.ViewModels.AssessmentViewModels
 {
     public class CreateAssessmentModel
     {
+        public int Number { get; set; }
         public string? Type { get; set; }
         public string? Content { get; set; }
         public int Quantity { get; set; }

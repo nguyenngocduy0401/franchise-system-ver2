@@ -10,6 +10,7 @@ namespace FranchiseProject.Domain.Entity
 {
     public class Assessment : BaseEntity
     {
+        public int Number { get; set; }
         public string? Type { get; set; }
         public string? Content { get; set; }
         public int Quantity { get; set; }

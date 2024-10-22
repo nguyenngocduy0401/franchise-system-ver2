@@ -27,4 +27,8 @@
     <ProjectReference Include="..\FranchiseProject.Infrastructures\FranchiseProject.Infrastructures.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Validator\ChapterMaterialValidator\" />
+  </ItemGroup>
+
 </Project>

@@ -9,6 +9,7 @@ namespace FranchiseProject.Domain.Entity
 {
     public class ChapterMaterial : BaseEntity
     {
+        public int Number { get; set; }
         public string? URL { get; set; }
         public string? Description { get; set; }
         public Guid? ChapterId { get; set; }

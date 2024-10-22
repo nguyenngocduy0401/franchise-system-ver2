@@ -7,6 +7,8 @@ namespace FranchiseProject.API.Validator.AssessmentValidator
     {
         public UpdateAssessmentValidator()
         {
+            RuleFor(x => x.Number)
+                .GreaterThanOrEqualTo(0);
             RuleFor(x => x.Type)
                 .NotEmpty()
                 .MaximumLength(100);

@@ -11,6 +11,7 @@ namespace FranchiseProject.Application.ViewModels.AssessmentViewModels
     public class AssessmentViewModel
     {
         public Guid? Id { get; set; }
+        public int Number { get; set; }
         public string? Type { get; set; }
         public string? Content { get; set; }
         public int Quatity { get; set; }

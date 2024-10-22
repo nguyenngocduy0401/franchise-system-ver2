@@ -169,7 +169,10 @@ namespace FranchiseProject.Infrastructures.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Category")
+                    b.Property<string>("CompletionCriteria")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("CourseId")
@@ -193,14 +196,20 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int>("Method")
+                        .HasColumnType("int");
+
                     b.Property<Guid?>("ModificationBy")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Part")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
                     b.Property<string>("QuestionType")
                         .HasColumnType("nvarchar(max)");
@@ -208,14 +217,78 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Weight")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double?>("Weight")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
 
                     b.ToTable("Assessments");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("bf0ecd1a-27ba-4295-ba44-9d32bb103595"),
+                            CompletionCriteria = "0",
+                            Content = "Điểm danh",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Method = 1,
+                            Number = 1,
+                            Quantity = 1,
+                            Type = "Participation",
+                            Weight = 10.0
+                        },
+                        new
+                        {
+                            Id = new Guid("74a5614a-56e5-43c9-9d9d-beb0ecda76c1"),
+                            CompletionCriteria = "0",
+                            Content = "Luyện tập",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Duration = "20 phút",
+                            IsDeleted = false,
+                            Method = 1,
+                            Number = 2,
+                            Quantity = 2,
+                            QuestionType = "Trắc nghiệm",
+                            Type = "Progress test",
+                            Weight = 20.0
+                        },
+                        new
+                        {
+                            Id = new Guid("9841a317-70c1-4433-9644-a059194ef27d"),
+                            CompletionCriteria = "0",
+                            Content = "Kiểm tra giữa khóa",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Duration = "Tại nhà",
+                            IsDeleted = false,
+                            Method = 0,
+                            Number = 3,
+                            Quantity = 1,
+                            QuestionType = "Giáo viên tự chọn",
+                            Type = "Assignment",
+                            Weight = 30.0
+                        },
+                        new
+                        {
+                            Id = new Guid("a385db00-01b3-46d0-932c-5c0d3a6a3fe9"),
+                            CompletionCriteria = "4",
+                            Content = "Kiểm tra cuối khóa",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Duration = "20 phút",
+                            IsDeleted = false,
+                            Method = 1,
+                            Number = 4,
+                            Quantity = 1,
+                            QuestionType = "Trắc nghiệm",
+                            Type = "Final Exam",
+                            Weight = 40.0
+                        });
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Assignment", b =>
@@ -330,7 +403,132 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FileURL")
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Topic")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("Chapters");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("fa0ef489-0a03-4901-8e0a-70fd69b324d3"),
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Chương này sẽ trình bày cách một chương trình được tạo ra từ mã nguồn, biên dịch thành mã máy và được chạy trên máy tính. Học viên sẽ tìm hiểu về quá trình chuyển đổi từ mã lệnh thành một chương trình thực thi...",
+                            IsDeleted = false,
+                            Number = 1,
+                            Topic = "Chương 1 : Giới thiệu về chương trình và cách nó hoạt động trên máy tính"
+                        },
+                        new
+                        {
+                            Id = new Guid("c89711d7-1e02-4ec8-8c6f-7e232aa50f8c"),
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Giải thích về khái niệm biến, biểu thức và các phép toán cơ bản trong lập trình C. Chương này sẽ cung cấp các ví dụ minh họa cách khai báo và sử dụng biến, cách thực hiện các phép toán số học...",
+                            IsDeleted = false,
+                            Number = 2,
+                            Topic = "Chương 2 : Biến, biểu thức và các phép toán cơ bản"
+                        },
+                        new
+                        {
+                            Id = new Guid("620d9ca5-c6a0-4b2c-9d20-b42635a9376c"),
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Giải thích về khái niệm biến, biểu thức và các phép toán cơ bản trong lập trình C. Chương này sẽ cung cấp các ví dụ minh họa cách khai báo và sử dụng biến...",
+                            IsDeleted = false,
+                            Number = 3,
+                            Topic = "Chương 3 : Cấu trúc logic và phong cách lập trình trong C"
+                        },
+                        new
+                        {
+                            Id = new Guid("d42aaba5-c73e-4494-968c-4dda0baf33f4"),
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Giải thích về khái niệm biến, biểu thức và các phép toán cơ bản trong lập trình C. Chương này sẽ cung cấp các ví dụ minh họa cách khai báo và sử dụng biến...",
+                            IsDeleted = false,
+                            Number = 4,
+                            Topic = "Chương 4 : Tính modular và các hàm trong lập trình C"
+                        },
+                        new
+                        {
+                            Id = new Guid("aad07753-6f1c-41ab-ae04-d6acad448216"),
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Chương này sẽ giới thiệu các thư viện chuẩn của ngôn ngữ C, cách sử dụng chúng trong chương trình. Học viên sẽ học cách khai báo và sử dụng các hàm từ thư viện...",
+                            IsDeleted = false,
+                            Number = 5,
+                            Topic = "Chương 5 : Thư viện C và cách sử dụng"
+                        },
+                        new
+                        {
+                            Id = new Guid("b91e33b2-3810-4d7f-bafb-4190831e0ae4"),
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Học viên sẽ tìm hiểu về mảng (arrays) trong lập trình C, cách khai báo và sử dụng mảng một chiều và hai chiều...",
+                            IsDeleted = false,
+                            Number = 6,
+                            Topic = "Chương 6 : Mảng và cách sử dụng trong lập trình C"
+                        },
+                        new
+                        {
+                            Id = new Guid("7aa7aa40-7f23-4c73-9375-7171a284f370"),
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Chương này tập trung vào khái niệm chuỗi (strings) trong ngôn ngữ C, cách khai báo và xử lý chuỗi...",
+                            IsDeleted = false,
+                            Number = 7,
+                            Topic = "Chương 7 : Chuỗi và cách sử dụng trong lập trình C"
+                        },
+                        new
+                        {
+                            Id = new Guid("c34aee85-2527-4b7e-9117-eff651cdad70"),
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Hướng dẫn cách sử dụng tệp trong lập trình C để lưu trữ và xử lý dữ liệu. Chương này sẽ bao gồm cách mở, đọc, ghi, và đóng tệp...",
+                            IsDeleted = false,
+                            Number = 8,
+                            Topic = "Chương 8 : Tệp và cách sử dụng trong lập trình C"
+                        });
+                });
+
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.ChapterMaterial", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ChapterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeleteBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -345,17 +543,14 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<int>("Number")
                         .HasColumnType("int");
 
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("VideoURL")
+                    b.Property<string>("URL")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseId");
+                    b.HasIndex("ChapterId");
 
-                    b.ToTable("Chapters");
+                    b.ToTable("ChapterMaterials");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Class", b =>
@@ -397,14 +592,9 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("TermId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
-
-                    b.HasIndex("TermId");
 
                     b.ToTable("Classes");
 
@@ -416,8 +606,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CurrentEnrollment = 1,
                             IsDeleted = false,
-                            Name = "JAVA_TEST_SU25",
-                            TermId = new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a")
+                            Name = "JAVA_TEST_SU25"
                         },
                         new
                         {
@@ -426,8 +615,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CurrentEnrollment = 1,
                             IsDeleted = false,
-                            Name = "OOP_TEST_SU25",
-                            TermId = new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a")
+                            Name = "OOP_TEST_SU25"
                         },
                         new
                         {
@@ -436,8 +624,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CurrentEnrollment = 1,
                             IsDeleted = false,
-                            Name = "MLN131_TEST_SU25",
-                            TermId = new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a")
+                            Name = "MLN131_TEST_SU25"
                         });
                 });
 
@@ -608,7 +795,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                             Amount = 0,
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Duration = 0,
-                            EndTime = new DateTime(2024, 10, 19, 23, 19, 57, 226, DateTimeKind.Local).AddTicks(3181),
+                            EndTime = new DateTime(2024, 10, 27, 21, 6, 9, 648, DateTimeKind.Local).AddTicks(796),
                             IsDeleted = false,
                             StartTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Total = 0
@@ -620,6 +807,9 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("CourseCategoryId")
                         .HasColumnType("uniqueidentifier");
@@ -651,8 +841,11 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NumberOfSession")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("NumberOfLession")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -663,6 +856,9 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<string>("URLImage")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Version")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CourseCategoryId");
@@ -670,6 +866,23 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasIndex("SyllabusId");
 
                     b.ToTable("Courses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            Code = "PRF",
+                            CourseCategoryId = new Guid("f8fd80dd-c470-4ecf-7940-08dcf20adbbc"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Khóa học lập trình căn bản với ngữ C giành cho người mới bắt đầu học lập trình",
+                            IsDeleted = false,
+                            Name = "Nhập môn lập trình với C",
+                            NumberOfLession = 20,
+                            Price = 2000000,
+                            Status = 0,
+                            URLImage = "string",
+                            Version = 0
+                        });
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.CourseCategory", b =>
@@ -708,191 +921,43 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CoursesCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("264c1d37-40f3-4dd9-793e-08dcf20adbbc"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Các khóa học liên quan đến thuật toán, bao gồm các khái niệm cơ bản, các loại thuật toán, và ứng dụng của chúng trong lập trình và khoa học máy tính.",
+                            IsDeleted = false,
+                            Name = "Thuật toán"
+                        },
+                        new
+                        {
+                            Id = new Guid("f1390dbc-82f7-4cd4-793f-08dcf20adbbc"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Các khóa học cung cấp kiến thức nền tảng về khoa học máy tính, bao gồm các khái niệm cơ bản, ngôn ngữ lập trình cơ bản, và các nguyên lý thiết kế hệ thống.",
+                            IsDeleted = false,
+                            Name = "Kiến thức cơ sở"
+                        },
+                        new
+                        {
+                            Id = new Guid("f8fd80dd-c470-4ecf-7940-08dcf20adbbc"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Các khóa học tập trung vào các kỹ năng lập trình cơ bản, như lập trình hướng đối tượng, cấu trúc dữ liệu, và thuật toán cơ bản, giúp học viên xây dựng nền tảng vững chắc trong lập trình.",
+                            IsDeleted = false,
+                            Name = "Lập trình cơ sở"
+                        },
+                        new
+                        {
+                            Id = new Guid("228efc7b-2659-4186-7941-08dcf20adbbc"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Các khóa học chuyên sâu về lập trình, bao gồm các kỹ thuật lập trình phức tạp, thiết kế hệ thống, lập trình đa luồng, và tối ưu hóa hiệu suất ứng dụng.",
+                            IsDeleted = false,
+                            Name = "Lập trình nâng cao"
+                        });
                 });
 
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.Feedback", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ClassId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeleteBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("ModificationBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClassId");
-
-                    b.ToTable("Feedbacks");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.FeedbackAnswer", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Comment")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeleteBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("FeedbackId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("FeedbackOptionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("ModificationBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FeedbackId");
-
-                    b.HasIndex("FeedbackOptionId");
-
-                    b.HasIndex("UserId", "FeedbackId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL AND [FeedbackId] IS NOT NULL");
-
-                    b.HasIndex("UserId", "FeedbackOptionId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL AND [FeedbackOptionId] IS NOT NULL");
-
-                    b.ToTable("FeedbackAnswers");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.FeedbackOption", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeleteBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("FeedbackQuestionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("ModificationBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("OptionText")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FeedbackQuestionId");
-
-                    b.ToTable("FeedbackOptions");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.FeedbackQuestion", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeleteBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("FeedbackId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("ModificationBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("QuestionType")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FeedbackId");
-
-                    b.ToTable("FeedbackQuestions");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.Material", b =>
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.CourseMaterial", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -932,7 +997,55 @@ namespace FranchiseProject.Infrastructures.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Materials");
+                    b.ToTable("CourseMaterials");
+                });
+
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Feedback", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ClassId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeleteBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Feedbacks");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Notification", b =>
@@ -1335,10 +1448,10 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Number")
+                    b.Property<string>("Topic")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -1346,6 +1459,239 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasIndex("CourseId");
 
                     b.ToTable("Sessions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("fa16c0d8-68db-4083-bba5-8f16d75fe1e4"),
+                            Chapter = "Chương 1",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Giới thiệu tổng quan về khóa học, các chủ đề sẽ được học, yêu cầu và phương pháp đánh giá.",
+                            IsDeleted = false,
+                            Number = 1,
+                            Topic = "Giới thiệu khóa học"
+                        },
+                        new
+                        {
+                            Id = new Guid("3e2b725d-0df4-41ae-aa93-f4263c5b3a11"),
+                            Chapter = "Chương 1",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Hướng dẫn cài đặt và cấu hình công cụ lập trình, giới thiệu môi trường làm việc cho lập trình C.",
+                            IsDeleted = false,
+                            Number = 2,
+                            Topic = "Cài đặt Công cụ Lập trình"
+                        },
+                        new
+                        {
+                            Id = new Guid("4e427e2f-c7cd-43ad-9187-caab1965bff7"),
+                            Chapter = "Chương 1",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Giới thiệu ngôn ngữ lập trình C, cách thức hoạt động của trình biên dịch C, và cú pháp cơ bản.",
+                            IsDeleted = false,
+                            Number = 3,
+                            Topic = "Module A: Giới thiệu về ngôn ngữ lập trình C và Trình biên dịch C"
+                        },
+                        new
+                        {
+                            Id = new Guid("300cfaf3-edb3-4c7a-bb20-006e6ecf2897"),
+                            Chapter = "Chương 1",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Giới thiệu cấu trúc bài tập, cách thức nộp bài và yêu cầu cần đạt.",
+                            IsDeleted = false,
+                            Number = 4,
+                            Topic = "Giới thiệu về bài tập"
+                        },
+                        new
+                        {
+                            Id = new Guid("b0574be6-4f3d-4b9c-8743-106d469e720d"),
+                            Chapter = "Chương 2",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Tìm hiểu về các biến trong C, cách khai báo, kiểu dữ liệu và cách thức sử dụng biến trong tính toán.",
+                            IsDeleted = false,
+                            Number = 5,
+                            Topic = "Module B: Tính toán - Biến số"
+                        },
+                        new
+                        {
+                            Id = new Guid("028123ab-bf17-4490-a58e-a6682410dea1"),
+                            Chapter = "Chương 2",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Giải thích các thao tác bộ nhớ trong C, cách lưu trữ và xử lý dữ liệu trong bộ nhớ.",
+                            IsDeleted = false,
+                            Number = 6,
+                            Topic = "Module B: Tính toán - Các thao tác bộ nhớ cơ bản"
+                        },
+                        new
+                        {
+                            Id = new Guid("5eae45fd-a966-4459-9ff3-a63ffe44b94c"),
+                            Chapter = "",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Giới thiệu các biểu thức trong C, các phép toán cơ bản như cộng, trừ, nhân, chia, và các phép toán logic.",
+                            IsDeleted = false,
+                            Number = 7,
+                            Topic = "Tính toán cơ bản: Biểu thức"
+                        },
+                        new
+                        {
+                            Id = new Guid("1f4352d7-f94d-4470-8ea9-f5d30a571f57"),
+                            Chapter = "Chương 3",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Học về các cấu trúc điều khiển trong C như cấu trúc trình tự và cấu trúc lựa chọn (if, switch).",
+                            IsDeleted = false,
+                            Number = 8,
+                            Topic = "Module C: Lô-gic cơ bản - Cấu trúc trình tự, Cấu trúc lựa chọn"
+                        },
+                        new
+                        {
+                            Id = new Guid("bc76398a-1205-4816-afcb-20577ead68de"),
+                            Chapter = "Chương 3",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Giới thiệu các cấu trúc lặp trong C như for, while, và do-while, cách sử dụng chúng trong lập trình.",
+                            IsDeleted = false,
+                            Number = 9,
+                            Topic = "Module C: Lô-gic cơ bản - Cấu trúc lặp"
+                        },
+                        new
+                        {
+                            Id = new Guid("54416cd9-088a-4f5d-ae11-f4f9001c0790"),
+                            Chapter = "Chương 3",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Học cách viết mã có cấu trúc, dễ hiểu, tuân thủ các quy tắc về phong cách lập trình tốt.",
+                            IsDeleted = false,
+                            Number = 10,
+                            Topic = "Module C: Lô-gic cơ bản - Phong cách lập trình"
+                        },
+                        new
+                        {
+                            Id = new Guid("0e2d296e-4f37-4f36-ae2c-e20127a30e44"),
+                            Chapter = "Chương 3",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Hướng dẫn chi tiết về cách sử dụng các cấu trúc logic trong việc giải quyết các bài toán thực tế.",
+                            IsDeleted = false,
+                            Number = 11,
+                            Topic = "Lô-gic cơ bản: Walkthroughs"
+                        },
+                        new
+                        {
+                            Id = new Guid("b1e4260b-ee92-433f-9761-3b876b59bf3f"),
+                            Chapter = "Chương 1, 2, 3",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Thực hành về các kỹ năng nhập/xuất dữ liệu, tính toán và sử dụng các cấu trúc logic cơ bản.",
+                            IsDeleted = false,
+                            Number = 12,
+                            Topic = "Workshop 1: Nhập/Xuất, tính toán và lô-gic cơ bản"
+                        },
+                        new
+                        {
+                            Id = new Guid("1ca30a08-671b-45b0-980d-e7c8685ac671"),
+                            Chapter = "Chương 4",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Giới thiệu khái niệm tính mô-đun, cách sử dụng hàm trong C và phạm vi của biến trong lập trình.",
+                            IsDeleted = false,
+                            Number = 13,
+                            Topic = "Module D: Tính mô-đun và Hàm - Hàm C, Phạm vi biến"
+                        },
+                        new
+                        {
+                            Id = new Guid("e9c2c302-3213-471b-930d-912438b1063f"),
+                            Chapter = "Chương 1, 2, 3",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Đánh giá kết quả của workshop 1 và phân tích lỗi thường gặp.",
+                            IsDeleted = false,
+                            Number = 14,
+                            Topic = "Đánh giá Workshop 1"
+                        },
+                        new
+                        {
+                            Id = new Guid("9cd92d97-61ff-4f55-8664-3910788ecec1"),
+                            Chapter = "Chương 4",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Tìm hiểu sâu hơn về cách chia chương trình thành các mô-đun và sử dụng hàm trong lập trình.",
+                            IsDeleted = false,
+                            Number = 15,
+                            Topic = "Tính mô-đun và Hàm"
+                        },
+                        new
+                        {
+                            Id = new Guid("6e715557-7a70-4f72-beca-6c84b833e5b6"),
+                            Chapter = "Chương 4",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Thực hành viết và sử dụng hàm, tối ưu hóa mã nguồn bằng cách chia thành các mô-đun.",
+                            IsDeleted = false,
+                            Number = 16,
+                            Topic = "Tính mô-đun và Hàm"
+                        },
+                        new
+                        {
+                            Id = new Guid("306caedd-a572-4055-a632-6c7568d0b455"),
+                            Chapter = "",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Tiếp tục thực hành về hàm và tính mô-đun.",
+                            IsDeleted = false,
+                            Number = 17,
+                            Topic = "Tính mô-đun và Hàm"
+                        },
+                        new
+                        {
+                            Id = new Guid("9845a3d7-fd4f-4b9f-98bf-8a2f2f4773f8"),
+                            Chapter = "Chương 4",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Thực hành các bài tập liên quan đến tính mô-đun và sử dụng hàm trong C.",
+                            IsDeleted = false,
+                            Number = 18,
+                            Topic = "Workshop 2: Tính mô-đun và Hàm"
+                        },
+                        new
+                        {
+                            Id = new Guid("a00fddd6-2b90-4c37-96d6-519796851e2c"),
+                            Chapter = "Chương 4",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Giới thiệu khái niệm con trỏ, cách khai báo, sử dụng và các ứng dụng của con trỏ trong lập trình.",
+                            IsDeleted = false,
+                            Number = 19,
+                            Topic = "Con trỏ"
+                        },
+                        new
+                        {
+                            Id = new Guid("99fcb93b-201b-4265-87a8-bfb5b7037efa"),
+                            Chapter = "Chương 4",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Thực hành với các bài tập sử dụng con trỏ để quản lý bộ nhớ và dữ liệu.",
+                            IsDeleted = false,
+                            Number = 20,
+                            Topic = "Con trỏ"
+                        },
+                        new
+                        {
+                            Id = new Guid("f0c44d40-5cfc-40f6-b09c-3ccbdef84703"),
+                            Chapter = "Chương 4",
+                            CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Tiếp tục thực hành và làm quen với con trỏ trong lập trình C.",
+                            IsDeleted = false,
+                            Number = 21,
+                            Topic = "Con trỏ"
+                        });
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Slot", b =>
@@ -1490,7 +1836,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<double?>("MinAvgMarkToPass")
+                    b.Property<double>("MinAvgMarkToPass")
                         .HasColumnType("float");
 
                     b.Property<Guid?>("ModificationBy")
@@ -1499,17 +1845,14 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double?>("Scale")
+                    b.Property<double>("Scale")
                         .HasColumnType("float");
 
                     b.Property<string>("StudentTask")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double?>("TimeAllocation")
-                        .HasColumnType("float");
+                    b.Property<string>("TimeAllocation")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ToolsRequire")
                         .HasColumnType("nvarchar(max)");
@@ -1517,76 +1860,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Syllabuses");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.Term", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeleteBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("ModificationBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Terms");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("1fea8f3b-4fc2-49e5-b059-23821b9af45a"),
-                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EndDate = new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            Name = "SP25",
-                            StartDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = new Guid("97b016ea-591f-4198-8251-5ab4ae8e88ec"),
-                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EndDate = new DateTime(2025, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            Name = "SU25",
-                            StartDate = new DateTime(2025, 4, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            Id = new Guid("c60e3315-6c8b-4855-b1cb-fa92c7e4b593"),
-                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EndDate = new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            Name = "FA25",
-                            StartDate = new DateTime(2025, 8, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.User", b =>
@@ -1950,19 +2223,22 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("Course");
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.ChapterMaterial", b =>
+                {
+                    b.HasOne("FranchiseProject.Domain.Entity.Chapter", "Chapter")
+                        .WithMany("ChapterMaterials")
+                        .HasForeignKey("ChapterId");
+
+                    b.Navigation("Chapter");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Class", b =>
                 {
                     b.HasOne("FranchiseProject.Domain.Entity.Course", "Course")
                         .WithMany("Classes")
                         .HasForeignKey("CourseId");
 
-                    b.HasOne("FranchiseProject.Domain.Entity.Term", "Term")
-                        .WithMany("Classes")
-                        .HasForeignKey("TermId");
-
                     b.Navigation("Course");
-
-                    b.Navigation("Term");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.ClassSchedule", b =>
@@ -2013,61 +2289,28 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("Syllabus");
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.CourseMaterial", b =>
+                {
+                    b.HasOne("FranchiseProject.Domain.Entity.Course", "Course")
+                        .WithMany("CourseMaterials")
+                        .HasForeignKey("CourseId");
+
+                    b.Navigation("Course");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Feedback", b =>
                 {
                     b.HasOne("FranchiseProject.Domain.Entity.Class", "Class")
                         .WithMany("Feedbacks")
                         .HasForeignKey("ClassId");
 
-                    b.Navigation("Class");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.FeedbackAnswer", b =>
-                {
-                    b.HasOne("FranchiseProject.Domain.Entity.Feedback", "Feedback")
-                        .WithMany("FeedbackAnswers")
-                        .HasForeignKey("FeedbackId");
-
-                    b.HasOne("FranchiseProject.Domain.Entity.FeedbackOption", "FeedbackOption")
-                        .WithMany("FeedbackAnswers")
-                        .HasForeignKey("FeedbackOptionId");
-
                     b.HasOne("FranchiseProject.Domain.Entity.User", "User")
-                        .WithMany()
+                        .WithMany("Feedbacks")
                         .HasForeignKey("UserId");
 
-                    b.Navigation("Feedback");
-
-                    b.Navigation("FeedbackOption");
+                    b.Navigation("Class");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.FeedbackOption", b =>
-                {
-                    b.HasOne("FranchiseProject.Domain.Entity.FeedbackQuestion", "FeedbackQuestion")
-                        .WithMany("FeedbackQuestions")
-                        .HasForeignKey("FeedbackQuestionId");
-
-                    b.Navigation("FeedbackQuestion");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.FeedbackQuestion", b =>
-                {
-                    b.HasOne("FranchiseProject.Domain.Entity.Feedback", "Feedback")
-                        .WithMany("QuestionFeedbacks")
-                        .HasForeignKey("FeedbackId");
-
-                    b.Navigation("Feedback");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.Material", b =>
-                {
-                    b.HasOne("FranchiseProject.Domain.Entity.Course", "Course")
-                        .WithMany("Materials")
-                        .HasForeignKey("CourseId");
-
-                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Notification", b =>
@@ -2338,6 +2581,8 @@ namespace FranchiseProject.Infrastructures.Migrations
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Chapter", b =>
                 {
+                    b.Navigation("ChapterMaterials");
+
                     b.Navigation("Questions");
                 });
 
@@ -2367,7 +2612,7 @@ namespace FranchiseProject.Infrastructures.Migrations
 
                     b.Navigation("Classes");
 
-                    b.Navigation("Materials");
+                    b.Navigation("CourseMaterials");
 
                     b.Navigation("Reports");
 
@@ -2379,23 +2624,6 @@ namespace FranchiseProject.Infrastructures.Migrations
             modelBuilder.Entity("FranchiseProject.Domain.Entity.CourseCategory", b =>
                 {
                     b.Navigation("Courses");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.Feedback", b =>
-                {
-                    b.Navigation("FeedbackAnswers");
-
-                    b.Navigation("QuestionFeedbacks");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.FeedbackOption", b =>
-                {
-                    b.Navigation("FeedbackAnswers");
-                });
-
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.FeedbackQuestion", b =>
-                {
-                    b.Navigation("FeedbackQuestions");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Question", b =>
@@ -2432,11 +2660,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("Courses");
                 });
 
-            modelBuilder.Entity("FranchiseProject.Domain.Entity.Term", b =>
-                {
-                    b.Navigation("Classes");
-                });
-
             modelBuilder.Entity("FranchiseProject.Domain.Entity.User", b =>
                 {
                     b.Navigation("AppointmentDetails");
@@ -2444,6 +2667,8 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("AssignmentSubmits");
 
                     b.Navigation("Attendances");
+
+                    b.Navigation("Feedbacks");
 
                     b.Navigation("Reports");
 

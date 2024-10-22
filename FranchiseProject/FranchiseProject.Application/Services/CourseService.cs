@@ -8,6 +8,7 @@ using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -23,15 +24,22 @@ namespace FranchiseProject.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IClaimsService _claimsService;
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
         private readonly IValidator<CreateCourseModel> _createCourseValidator;
         private readonly IValidator<UpdateCourseModel> _updateCourseValidator;
         public CourseService(IUnitOfWork unitOfWork, IMapper mapper, 
-            IValidator<UpdateCourseModel> updateCourseValidator, IValidator<CreateCourseModel> createCourseValidator)
+            IValidator<UpdateCourseModel> updateCourseValidator, IValidator<CreateCourseModel> createCourseValidator,
+            IClaimsService claimsService, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             _createCourseValidator = createCourseValidator;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _updateCourseValidator = updateCourseValidator;
+            _claimsService = claimsService;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
         public Task<ApiResponse<bool>> CreateCourseVersionAsync(Guid courseId)
         {
@@ -151,8 +159,12 @@ namespace FranchiseProject.Application.Services
                 Expression<Func<Course, bool>> filter = s =>
                 (!filterCourseViewModel.MaxPrice.HasValue || filterCourseViewModel.MaxPrice >= s.Price) &&
                 (!filterCourseViewModel.MinPrice.HasValue || filterCourseViewModel.MinPrice <= s.Price) &&
-                (string.IsNullOrEmpty(filterCourseViewModel.Search) || s.Name.Contains(filterCourseViewModel.Search) ||
-                s.Description.Contains(filterCourseViewModel.Search) || s.Code.Contains(filterCourseViewModel.Search));
+                (string.IsNullOrEmpty(filterCourseViewModel.Search) ||
+                 s.Name.Contains(filterCourseViewModel.Search) ||
+                 s.Description.Contains(filterCourseViewModel.Search) ||
+                 s.Code.Contains(filterCourseViewModel.Search)) &&
+                (!filterCourseViewModel.Status.HasValue || s.Status == filterCourseViewModel.Status) &&
+                (!filterCourseViewModel.CourseCategoryId.HasValue || s.CourseCategoryId == filterCourseViewModel.CourseCategoryId);
 
                 Func<IQueryable<Course>, IOrderedQueryable<Course>>? orderBy = null;
                 if (filterCourseViewModel.SortBy.HasValue && filterCourseViewModel.SortDirection.HasValue)
@@ -213,6 +225,62 @@ namespace FranchiseProject.Application.Services
                     return ResponseHandler.Success(false, response.Message);
                 }
                 response = ResponseHandler.Success(true);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
+
+        public async Task<ApiResponse<bool>> UpdateCourseStatusAsync(Guid courseId, CourseStatusEnum courseStatusEnum)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var userId = _claimsService.GetCurrentUserId.ToString();
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null) throw new Exception("Authenticate failed!");
+                var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+                if (role == null) throw new Exception("User role not found!");
+                var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(courseId);
+                if (course == null) return ResponseHandler.Failure<bool>("Khóa học không khả dụng!");
+                switch (course.Status) 
+                {
+                    case CourseStatusEnum.Draft:
+                        if ((courseStatusEnum != CourseStatusEnum.PendingApproval)) 
+                            throw new Exception("Can only update to PendingApproval status");
+                        if ((role != RolesEnum.SystemInstructor.ToString()) && (role != RolesEnum.Manager.ToString()))
+                            throw new Exception("Authorize Failed!");
+                        break;
+                    case CourseStatusEnum.PendingApproval:
+                        if ((courseStatusEnum != CourseStatusEnum.AvailableForFranchise) && (courseStatusEnum != CourseStatusEnum.Closed))
+                            throw new Exception("Can only update to AvailableForFranchise status or Closed status");
+                        if ((role != RolesEnum.Manager.ToString()))
+                            throw new Exception("Authorize Failed!");
+                        break;
+                    case CourseStatusEnum.AvailableForFranchise:
+                        if ((courseStatusEnum != CourseStatusEnum.TemporarilySuspended) && (courseStatusEnum != CourseStatusEnum.Closed))
+                            throw new Exception("Can only update to TemporarilySuspended status or Closed status");
+                        if ((role != RolesEnum.Manager.ToString()))
+                            throw new Exception("Authorize Failed!");
+                        break;
+                    case CourseStatusEnum.TemporarilySuspended:
+                        if ((courseStatusEnum != CourseStatusEnum.AvailableForFranchise) && (courseStatusEnum != CourseStatusEnum.Closed))
+                            throw new Exception("Can only update to AvailableForFranchise status or Closed status");
+                        if ((role != RolesEnum.Manager.ToString()))
+                            throw new Exception("Authorize Failed!");
+                        break;
+                    case CourseStatusEnum.Closed:
+                            throw new Exception("Cannot update in this state");
+                }
+                course.Status = courseStatusEnum;
+                _unitOfWork.CourseRepository.Update(course);
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Update failed!");
+                response = ResponseHandler.Success(true, "Cập nhật trạng thái khóa học thành công!");
+
             }
             catch (Exception ex)
             {

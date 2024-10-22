@@ -6,7 +6,9 @@ namespace FranchiseProject.API.Validator.AssessmentValidator
     public class CreateAssessmentValidator : AbstractValidator<CreateAssessmentModel>
     {
         public CreateAssessmentValidator()
-        {
+        {   
+            RuleFor(x => x.Number)
+                .GreaterThanOrEqualTo(0);
             RuleFor(x => x.Type)
                 .NotEmpty()
                 .MaximumLength(10);
