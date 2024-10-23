@@ -49,6 +49,13 @@ namespace FranchiseProject.API.Controllers
             return await _courseService.DeleteCourseByIdAsync(id);
         }
         //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        [SwaggerOperation(Summary = "dupliate khoá học bằng id {Authorize = SystemInstructor, Manager}")]
+        [HttpPost("{id}/versionss")]
+        public async Task<ApiResponse<CourseDetailViewModel>> DuplicateCourseAsync(Guid id)
+        {
+            return await _courseService.CreateCourseVersionAsync(id);
+        }
+        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo mới khoá học {Authorize = SystemInstructor, Manager}")]
         [HttpPost()]
         public async Task<ApiResponse<bool>> CreateCourseAsync(CreateCourseModel createCourseModel)

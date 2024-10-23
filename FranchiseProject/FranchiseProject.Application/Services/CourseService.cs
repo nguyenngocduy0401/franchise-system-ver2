@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,7 +30,7 @@ namespace FranchiseProject.Application.Services
         private readonly RoleManager<Role> _roleManager;
         private readonly IValidator<CreateCourseModel> _createCourseValidator;
         private readonly IValidator<UpdateCourseModel> _updateCourseValidator;
-        public CourseService(IUnitOfWork unitOfWork, IMapper mapper, 
+        public CourseService(IUnitOfWork unitOfWork, IMapper mapper,
             IValidator<UpdateCourseModel> updateCourseValidator, IValidator<CreateCourseModel> createCourseValidator,
             IClaimsService claimsService, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
@@ -41,9 +42,87 @@ namespace FranchiseProject.Application.Services
             _userManager = userManager;
             _roleManager = roleManager;
         }
-        public Task<ApiResponse<bool>> CreateCourseVersionAsync(Guid courseId)
+        public async Task<ApiResponse<CourseDetailViewModel>> CreateCourseVersionAsync(Guid courseId)
         {
-            throw new NotImplementedException();
+            var response = new ApiResponse<CourseDetailViewModel>();
+            try
+            {
+             
+                var course = await _unitOfWork.CourseRepository.GetCourseDetailAsync(courseId);
+                if (course == null) throw new Exception("Course does not exist!");
+
+           
+                var newCourse = _mapper.Map<Course>(course);
+                newCourse.Id = Guid.NewGuid(); 
+                newCourse.Status = CourseStatusEnum.Draft;
+
+               
+                newCourse.CourseMaterials = course.CourseMaterials.Select(material =>
+                {
+                    var newMaterial = _mapper.Map<CourseMaterial>(material);
+                    newMaterial.Id = Guid.NewGuid(); 
+                    newMaterial.CourseId = newCourse.Id;
+                    return newMaterial;
+                }).ToList();
+
+                newCourse.Assessments = course.Assessments.Select(assessment =>
+                {
+                    var newAssessment = _mapper.Map<Assessment>(assessment);
+                    newAssessment.Id = Guid.NewGuid(); 
+                    newAssessment.CourseId = newCourse.Id; 
+                    return newAssessment;
+                }).ToList();
+
+             
+                newCourse.Sessions = course.Sessions.Select(session =>
+                {
+                    var newSession = _mapper.Map<Session>(session);
+                    newSession.Id = Guid.NewGuid(); 
+                    newSession.CourseId = newCourse.Id; 
+                    return newSession;
+                }).ToList();
+
+                newCourse.Chapters = course.Chapters.Select(chapter =>
+                {
+                    var newChapter = _mapper.Map<Chapter>(chapter);
+                    newChapter.Id = Guid.NewGuid(); 
+                    newChapter.CourseId = newCourse.Id; 
+
+                    newChapter.ChapterMaterials = chapter.ChapterMaterials.Select(chapterMaterial =>
+                    {
+                        var newChapterMaterial = _mapper.Map<ChapterMaterial>(chapterMaterial);
+                        newChapterMaterial.Id = Guid.NewGuid();
+                        newChapterMaterial.ChapterId = newChapter.Id; 
+                        return newChapterMaterial;
+                    }).ToList();
+
+                    return newChapter;
+                }).ToList();
+                var newSyllabus = new Syllabus();
+                if (course.Syllabus != null)
+                {
+                    newSyllabus = _mapper.Map<Syllabus>(course.Syllabus);
+                    newSyllabus.Id = Guid.NewGuid(); 
+                    await _unitOfWork.SyllabusRepository.AddAsync(newSyllabus); 
+                    var isSuccessSyllabus = await _unitOfWork.SaveChangeAsync() > 0;
+                    if (!isSuccessSyllabus) throw new Exception("Duplicate Syllabus failed!");
+                    newCourse.SyllabusId = newSyllabus.Id;
+                }
+                await _unitOfWork.CourseRepository.AddAsync(newCourse);
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Duplicate failed!");
+
+                newCourse.Syllabus = newSyllabus;
+                var courseModel = _mapper.Map<CourseDetailViewModel>(newCourse);
+                response = ResponseHandler.Success(courseModel);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<CourseDetailViewModel>(ex.Message);
+            }
+
+            return response;
         }
         public async Task<ApiResponse<bool>> CreateCourseAsync(CreateCourseModel createCourseModel)
         {
@@ -53,12 +132,12 @@ namespace FranchiseProject.Application.Services
                 ValidationResult validationResult = await _createCourseValidator.ValidateAsync(createCourseModel);
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
-                var checkCourseExist =  await _unitOfWork.CourseRepository.FindAsync
+                var checkCourseExist = await _unitOfWork.CourseRepository.FindAsync
                     (e => e.Code == createCourseModel.Code && e.IsDeleted != true
                     && e.Status != CourseStatusEnum.Closed);
-                if (!checkCourseExist.IsNullOrEmpty()) 
+                if (!checkCourseExist.IsNullOrEmpty())
                     return ResponseHandler.Success
-                        (false,"Khóa học đã tồn tại không thể tạo mới. Chỉ có thể cập nhật lên phiên bản mới!" );
+                        (false, "Khóa học đã tồn tại không thể tạo mới. Chỉ có thể cập nhật lên phiên bản mới!");
 
                 var course = _mapper.Map<Course>(createCourseModel);
                 await _unitOfWork.CourseRepository.AddAsync(course);
@@ -169,24 +248,24 @@ namespace FranchiseProject.Application.Services
                 Func<IQueryable<Course>, IOrderedQueryable<Course>>? orderBy = null;
                 if (filterCourseViewModel.SortBy.HasValue && filterCourseViewModel.SortDirection.HasValue)
                 {
-                    switch (filterCourseViewModel.SortBy) 
-                    { 
-                    case SortCourseStatusEnum.Name:
-                        orderBy = filterCourseViewModel.SortDirection == SortDirectionEnum.Descending ?
-                            query => query.OrderByDescending(p => p.Name) :
-                            query => query.OrderBy(p => p.Name);
-                        break;
-                    case SortCourseStatusEnum.Price:
-                        orderBy = filterCourseViewModel.SortDirection == SortDirectionEnum.Descending ?
-                            query => query.OrderByDescending(p => p.Price) :
-                            query => query.OrderBy(p => p.Price);
-                        break;
+                    switch (filterCourseViewModel.SortBy)
+                    {
+                        case SortCourseStatusEnum.Name:
+                            orderBy = filterCourseViewModel.SortDirection == SortDirectionEnum.Descending ?
+                                query => query.OrderByDescending(p => p.Name) :
+                                query => query.OrderBy(p => p.Name);
+                            break;
+                        case SortCourseStatusEnum.Price:
+                            orderBy = filterCourseViewModel.SortDirection == SortDirectionEnum.Descending ?
+                                query => query.OrderByDescending(p => p.Price) :
+                                query => query.OrderBy(p => p.Price);
+                            break;
 
                     }
                 }
                 var courses = await _unitOfWork.CourseRepository.GetFilterAsync(
                     filter: filter,
-                    includeProperties:"CourseCategory",
+                    includeProperties: "CourseCategory",
                     pageIndex: filterCourseViewModel.PageIndex,
                     pageSize: filterCourseViewModel.PageSize
                     );
@@ -245,10 +324,10 @@ namespace FranchiseProject.Application.Services
                 if (role == null) throw new Exception("User role not found!");
                 var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(courseId);
                 if (course == null) return ResponseHandler.Failure<bool>("Khóa học không khả dụng!");
-                switch (course.Status) 
+                switch (course.Status)
                 {
                     case CourseStatusEnum.Draft:
-                        if ((courseStatusEnum != CourseStatusEnum.PendingApproval)) 
+                        if ((courseStatusEnum != CourseStatusEnum.PendingApproval))
                             throw new Exception("Can only update to PendingApproval status");
                         if ((role != RolesEnum.SystemInstructor.ToString()) && (role != RolesEnum.Manager.ToString()))
                             throw new Exception("Authorize Failed!");
@@ -272,9 +351,24 @@ namespace FranchiseProject.Application.Services
                             throw new Exception("Authorize Failed!");
                         break;
                     case CourseStatusEnum.Closed:
-                            throw new Exception("Cannot update in this state");
+                        throw new Exception("Cannot update in this state");
                 }
                 course.Status = courseStatusEnum;
+                //Update course cũ
+                if (course.Status == CourseStatusEnum.AvailableForFranchise)
+                {
+                    var oldCourse = (await _unitOfWork.CourseRepository.FindAsync
+                        (e => e.Code == course.Code && e.Status != CourseStatusEnum.Draft
+                        && e.Status != CourseStatusEnum.PendingApproval))
+                        .OrderByDescending(e => e.Version).FirstOrDefault();
+                    if (oldCourse != null)
+                    {
+                        oldCourse.Status = CourseStatusEnum.Closed;
+                        course.Version = oldCourse.Version + 1;
+                        _unitOfWork.CourseRepository.Update(oldCourse);
+                    }
+                    else course.Version = 1;
+                }
                 _unitOfWork.CourseRepository.Update(course);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
