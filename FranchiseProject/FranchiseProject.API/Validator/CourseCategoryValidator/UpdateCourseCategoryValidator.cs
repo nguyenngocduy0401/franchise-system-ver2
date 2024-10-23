@@ -7,7 +7,7 @@ namespace FranchiseProject.API.Validator.CourseCategoryValidator
     {
         public UpdateCourseCategoryValidator()
         {
-            RuleFor(x => x.Name).NotEmpty().WithMessage("Name must be not empty!");
+            RuleFor(x => x.Name).NotEmpty();
         }
     }
 }

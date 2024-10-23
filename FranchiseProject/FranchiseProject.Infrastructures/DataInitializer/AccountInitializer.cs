@@ -21,7 +21,9 @@ namespace FranchiseProject.Infrastructures.DataInitializer
 
         public async Task AccountInitializeAsync()
         {
-            string[] roles = { AppRole.Admin, AppRole.Student, AppRole.Instructor, AppRole.Manager, AppRole.AgencyManager };
+            string[] roles = { AppRole.Admin, AppRole.Student, AppRole.Instructor, AppRole.Manager,
+                AppRole.AgencyManager, AppRole.AgencyStaff, AppRole.SystemInstructor, 
+                AppRole.SystemConsultant, AppRole.SystemTechnician };
 
             foreach (var role in roles)
             {

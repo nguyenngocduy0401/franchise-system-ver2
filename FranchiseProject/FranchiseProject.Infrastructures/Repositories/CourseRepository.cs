@@ -1,9 +1,11 @@
 ﻿using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,6 +25,21 @@ namespace FranchiseProject.Infrastructures.Repositories
             _dbContext = context;
             _timeService = timeService;
             _claimsService = claimsService;
+        }
+        public async Task<Course> GetCourseDetailAsync(Guid courseId)
+        {
+            return await _dbSet
+                .Where(e => e.Id == courseId)
+                .Include(e => e.CourseMaterials) 
+                .Include(e => e.Sessions.OrderBy(s => s.Number)) 
+                .Include(e => e.Syllabus) 
+                .Include(e => e.Assessments.OrderBy(a => a.Number)) 
+                .Include(e => e.Chapters
+                    .OrderBy(ch => ch.Number)) 
+                    .ThenInclude(c => c.ChapterMaterials
+                        .OrderBy(cm => cm.Number)) 
+                .Include(e => e.CourseCategory)
+                .FirstOrDefaultAsync();
         }
     }
 }

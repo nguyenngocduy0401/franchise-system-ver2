@@ -2,10 +2,12 @@
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.CourseCategoryViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,9 +46,7 @@ namespace FranchiseProject.Application.Services
             }
             catch (Exception ex)
             {
-                response.Data = null;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<List<CourseCategoryViewModel>>(ex.Message);
             }
             return response;
         }
@@ -57,26 +57,18 @@ namespace FranchiseProject.Application.Services
             try
             {
                 ValidationResult validationResult = await _createCourseCategoryValidator.ValidateAsync(createCourseCategoryModel);
-                if (!validationResult.IsValid)
-                {
-                    response.Data = false;
-                    response.isSuccess = false;
-                    response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
-                    return response;
-                }
+                if (!validationResult.IsValid) if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
                 var createCourse = _mapper.Map<CourseCategory>(createCourseCategoryModel);
                 await _unitOfWork.CourseCategoryRepository.AddAsync(createCourse);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Create fail!");
+                if (!isSuccess) throw new Exception("Create failed!");
                 response.Data = true;
                 response.isSuccess = true;
                 response.Message = "Tạo loại của khóa học thành công!";
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }
@@ -86,35 +78,17 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-                var courseCategory = await _unitOfWork.CourseCategoryRepository.GetByIdAsync(courseCategoryId);
-                if (courseCategory == null)
-                {
-                    response.Data = false;
-                    response.isSuccess = true;
-                    response.Message = "Không tìm thấy loại của khóa học!";
-                    return response;
-                }
-                switch (courseCategory.IsDeleted)
-                {
-                    case false:
-                        _unitOfWork.CourseCategoryRepository.SoftRemove(courseCategory);
-                        response.Message = "Xoá loại của khóa học thành công!";
-                        break;
-                    case true:
-                        _unitOfWork.CourseCategoryRepository.RestoreSoftRemove(courseCategory);
-                        response.Message = "Phục hồi loại của khóa học học thành công!";
-                        break;
-                }
+                var courseCategory = await _unitOfWork.CourseCategoryRepository.GetExistByIdAsync(courseCategoryId);
+                if (courseCategory == null) return ResponseHandler.Failure<bool>("Loại của khóa học không khả dụng!");
+                _unitOfWork.CourseCategoryRepository.SoftRemove(courseCategory);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Delete fail!");
-                response.Data = true;
-                response.isSuccess = true;
+                if (!isSuccess) throw new Exception("Delete failed!");
+                
+                response = ResponseHandler.Success(true , "Xoá loại của khóa học thành công!");
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }
@@ -125,9 +99,8 @@ namespace FranchiseProject.Application.Services
             try 
             {
                 Expression<Func<CourseCategory, bool>> filter = e =>
-                ((string.IsNullOrEmpty(filterCourseCategoryModel.Search) || e.Name.Contains(filterCourseCategoryModel.Search) ||
-                e.Description.Contains(filterCourseCategoryModel.Search)) &&
-                (!filterCourseCategoryModel.IsDeleted.HasValue || e.IsDeleted == filterCourseCategoryModel.IsDeleted));
+                (string.IsNullOrEmpty(filterCourseCategoryModel.Search) || e.Name.Contains(filterCourseCategoryModel.Search) ||
+                e.Description.Contains(filterCourseCategoryModel.Search));
 
                 var courseCategory = await _unitOfWork.CourseCategoryRepository.GetFilterAsync
                     (filter : filter,
@@ -135,15 +108,12 @@ namespace FranchiseProject.Application.Services
                      pageSize: filterCourseCategoryModel.PageSize
                     );
                 var courseCategoryModel = _mapper.Map<Pagination<CourseCategoryViewModel>>(courseCategory);
-                response.Data = courseCategoryModel;
-                response.isSuccess = true;
-                response.Message = "Successful!";
+                if (courseCategoryModel.Items.IsNullOrEmpty()) return ResponseHandler.Success(courseCategoryModel, "Không tìm thấy thấy loại của khóa học phù hợp!");
+                response = ResponseHandler.Success(courseCategoryModel);
             }
             catch(Exception ex)
             {
-                response.Data = null;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<Pagination<CourseCategoryViewModel>>(ex.Message);
             }
             return response;
         }
@@ -156,15 +126,11 @@ namespace FranchiseProject.Application.Services
                 var courseCategory = await _unitOfWork.CourseCategoryRepository.GetByIdAsync(courseCategoryId);
                 if (courseCategory == null) throw new Exception("Category does not exist!");
                 var courseCategoryModel = _mapper.Map<CourseCategoryViewModel>(courseCategory);
-                response.Data = courseCategoryModel;
-                response.isSuccess = true;
-                response.Message = "Successful!";
+                response = ResponseHandler.Success(courseCategoryModel);
             }
             catch (Exception ex)
             {
-                response.Data = null;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<CourseCategoryViewModel>(ex.Message);
             }
             return response;
         }
@@ -175,28 +141,21 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var courseCategory = await _unitOfWork.CourseCategoryRepository.GetExistByIdAsync(courseCategoryId);
-                if (courseCategory == null) throw new Exception("Category does not exist!");
+                if (courseCategory == null) return ResponseHandler.Failure<bool>("Loại của khóa học không khả dụng!");
+
                 ValidationResult validationResult = await _updateCourseCategoryValidator.ValidateAsync(updateCourseCategoryModel);
-                if (!validationResult.IsValid)
-                {
-                    response.Data = false;
-                    response.isSuccess = false;
-                    response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
-                    return response;
-                }
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+
                 courseCategory = _mapper.Map(updateCourseCategoryModel, courseCategory);
                 _unitOfWork.CourseCategoryRepository.Update(courseCategory);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Create fail!");
-                response.Data = true;
-                response.isSuccess = true;
-                response.Message = "Cập nhật loại của khóa học thành công!";
+                if (!isSuccess) throw new Exception("Update failed!");
+
+                response = ResponseHandler.Success(true, "Cập nhật loại của khóa học thành công!");
             }
             catch (Exception ex)
             {
-                response.Data = false;
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }

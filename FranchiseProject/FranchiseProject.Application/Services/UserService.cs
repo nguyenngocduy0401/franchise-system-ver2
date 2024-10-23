@@ -3,6 +3,7 @@ using ClosedXML.Excel;
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Utils;
 using FranchiseProject.Application.ViewModels.UserViewModels;
@@ -83,30 +84,19 @@ namespace FranchiseProject.Application.Services
                     pageIndex: filterUserByAgencyModel.PageIndex,
                     pageSize: filterUserByAgencyModel.PageSize
                 );
-
-                if (usersPagination.Items.IsNullOrEmpty())
+                var userViewModels = _mapper.Map<List<UserViewModel>>(usersPagination.Items);
+                var result = new Pagination<UserViewModel>
                 {
-                    response.Data = null;
-                    response.isSuccess = true;
-                    response.Message = "Không tìm thấy người dùng phù hợp!";
-                }
-                else
-                {
-                    var userViewModels = _mapper.Map<List<UserViewModel>>(usersPagination.Items);
+                    PageIndex = usersPagination.PageIndex,
+                    PageSize = usersPagination.PageSize,
+                    TotalItemsCount = usersPagination.TotalItemsCount,
+                    Items = userViewModels
+                };
+                if (result.Items.IsNullOrEmpty()) return ResponseHandler.Success(result, "Không tìm thấy người dùng phù hợp!");
 
 
-                    var result = new Pagination<UserViewModel>
-                    {
-                        PageIndex = usersPagination.PageIndex,
-                        PageSize = usersPagination.PageSize,
-                        TotalItemsCount = usersPagination.TotalItemsCount,
-                        Items = userViewModels
-                    };
+                response = ResponseHandler.Success(result);
 
-                    response.Data = result;
-                    response.isSuccess = true;
-                    response.Message = "Successful!";
-                }
             }
             catch (Exception ex)
             {
@@ -140,23 +130,23 @@ namespace FranchiseProject.Application.Services
                         var headerRow = rows.First();
                         var headers = headerRow.Cells().Select(c => c.Value.ToString()).ToList();
 
-                        
+
                         foreach (var row in rows.Skip(1))
                         {
                             var user = new CreateUserByAgencyModel();
                             foreach (var cell in row.Cells())
                             {
-                                var columnIndex = cell.Address.ColumnNumber - 1;  
+                                var columnIndex = cell.Address.ColumnNumber - 1;
 
                                 switch (columnIndex)
                                 {
-                                    case 0:  
+                                    case 0:
                                         user.FullName = cell.Value.ToString();
                                         break;
-                                    case 1:  
+                                    case 1:
                                         user.Email = cell.Value.ToString();
                                         break;
-                                    case 2:  
+                                    case 2:
                                         user.PhoneNumber = cell.Value.ToString();
                                         break;
                                     case 3:
@@ -271,7 +261,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> DeleteUserByAgencyAsync(string id)
+        public async Task<ApiResponse<bool>> BanAndUnbanUserByAgencyAsync(string id)
         {
             var response = new ApiResponse<bool>();
             try
@@ -338,29 +328,22 @@ namespace FranchiseProject.Application.Services
                     pageSize: filterUserByAdminModel.PageSize
                 );
 
-                if (usersPagination.Items.IsNullOrEmpty())
+
+
+                var userViewModels = _mapper.Map<List<UserViewModel>>(usersPagination.Items);
+
+
+                var result = new Pagination<UserViewModel>
                 {
-                    response.Data = null;
-                    response.isSuccess = true;
-                    response.Message = "Không tìm thấy người dùng phù hợp!";
-                }
-                else
-                {
-                    var userViewModels = _mapper.Map<List<UserViewModel>>(usersPagination.Items);
+                    PageIndex = usersPagination.PageIndex,
+                    PageSize = usersPagination.PageSize,
+                    TotalItemsCount = usersPagination.TotalItemsCount,
+                    Items = userViewModels
+                };
 
+                if (result.Items.IsNullOrEmpty()) return ResponseHandler.Success(result, "Không tìm thấy người dùng phù hợp!");
+                response = ResponseHandler.Success(result);
 
-                    var result = new Pagination<UserViewModel>
-                    {
-                        PageIndex = usersPagination.PageIndex,
-                        PageSize = usersPagination.PageSize,
-                        TotalItemsCount = usersPagination.TotalItemsCount,
-                        Items = userViewModels
-                    };
-
-                    response.Data = result;
-                    response.isSuccess = true;
-                    response.Message = "Successful!";
-                }
             }
             catch (Exception ex)
             {
@@ -430,7 +413,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> DeleteUserByAdminAsync(string id)
+        public async Task<ApiResponse<bool>> BanAndUnbanUserByAdminAsync(string id)
         {
             var response = new ApiResponse<bool>();
             try
@@ -539,7 +522,7 @@ namespace FranchiseProject.Application.Services
                 var user = await _userManager.FindByIdAsync(userId);
                 if (user == null) throw new Exception("User does not exist!");
                 var checkOldPassword = await _userManager.CheckPasswordAsync(user, updatePasswordModel.OldPassword);
-                if (!checkOldPassword) 
+                if (!checkOldPassword)
                 {
                     response.Data = false;
                     response.isSuccess = true;
@@ -574,8 +557,8 @@ namespace FranchiseProject.Application.Services
                 response.Message = ex.Message;
             }
             return response;
-        } 
-        public async Task<UserLoginModel> GenerateUserCredentials(string fullname)
+        }
+        private async Task<UserLoginModel> GenerateUserCredentials(string fullname)
         {
             var normalizedString = fullname.Normalize(NormalizationForm.FormD);
             var stringBuilder = new StringBuilder();

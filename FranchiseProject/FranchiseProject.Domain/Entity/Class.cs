@@ -14,9 +14,6 @@ namespace FranchiseProject.Domain.Entity
         public int MinimumCapacity { get; set; }
         public int CurrentEnrollment { get; set; }
         public string? Name { get; set; }
-        public Guid? TermId { get; set; }
-        [ForeignKey("TermId")]
-        public Term? Term { get; set; }
         public Guid? CourseId { get; set; }
         [ForeignKey("CourseId")]
         public Course? Course { get; set; }

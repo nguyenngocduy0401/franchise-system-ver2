@@ -29,6 +29,6 @@ namespace FranchiseProject.Application.Commons
         /// </summary>
         public bool Next => PageIndex + 1 < TotalPagesCount;
         public bool Previous => PageIndex > 1;
-        public ICollection<T> Items { get; set; }
+        public ICollection<T>? Items { get; set; }
     }
 }

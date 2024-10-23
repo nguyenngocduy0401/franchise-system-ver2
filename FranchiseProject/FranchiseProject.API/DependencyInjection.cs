@@ -24,11 +24,22 @@ using FranchiseProject.Application.ViewModels.CourseCategoryViewModels;
 using FranchiseProject.API.Validator.CourseCategoryValidator;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using FranchiseProject.API.Validator.ClassScheduleValidator;
-using FranchiseProject.Application.ViewModels.TermViewModels;
-using FranchiseProject.API.Validator.TermValidator;
 using Microsoft.AspNetCore.SignalR;
 using FranchiseProject.Application.ViewModels.StudentViewModel;
 using FranchiseProject.API.Validator.StudentValidator;
+using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
+using FranchiseProject.API.Validator.CourseMaterialValidator;
+using FranchiseProject.Application.ViewModels.ChapterViewModels;
+using FranchiseProject.API.Validator.ChapterValidator;
+using FranchiseProject.API.Validator.SessionValidator;
+using FranchiseProject.Application.ViewModels.SessionViewModels;
+using FranchiseProject.Application.ViewModels.SyllabusViewModels;
+using FranchiseProject.API.Validator.SyllabusValidator;
+using FranchiseProject.Application.ViewModels.AssessmentViewModels;
+using FranchiseProject.API.Validator.AssessmentValidator;
+using FranchiseProject.Application.ViewModels.CourseViewModels;
+using FranchiseProject.API.Validator.CourseValidator;
+
 
 namespace FranchiseProject.API
 {
@@ -114,6 +125,27 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<CreateClassScheduleDateRangeViewModel>, CreateClassScheduleDateRangeValidator>();
             services.AddTransient<IValidator<CreateTermViewModel>,CreateTermValidator>();
             services.AddScoped<IValidator<CreateStudentViewModel>, CreateStudentValidator>();
+            services.AddTransient<IValidator<CreateCourseMaterialModel>, CreateCourseMaterialValidator>();
+            services.AddTransient<IValidator<UpdateCourseMaterialModel>, UpdateCourseMaterialValidator>();
+            services.AddTransient<IValidator<CreateChapterModel>, CreateChapterValidator>();
+            services.AddTransient<IValidator<UpdateChapterModel>, UpdateChapterValidator>();
+            services.AddTransient<IValidator<CreateSessionModel>, CreateSessionValidator>();
+            services.AddTransient<IValidator<UpdateSessionModel>, UpdateSessionValidator>();
+            services.AddTransient<IValidator<CreateSyllabusModel>, CreateSyllabusValidator>();
+            services.AddTransient<IValidator<UpdateSyllabusModel>, UpdateSyllabusValidator>();
+            services.AddTransient<IValidator<CreateAssessmentModel>, CreateAssessmentValidator>();
+            services.AddTransient<IValidator<UpdateAssessmentModel>, UpdateAssessmentValidator>();
+            services.AddTransient<IValidator<CreateCourseModel>, CreateCourseValidator>();
+            services.AddTransient<IValidator<UpdateCourseModel>, UpdateCourseValidator>();
+            services.AddTransient<IValidator<CreateCourseMaterialArrangeModel>, SingleCourseMaterialArrangeValidator>();
+            services.AddTransient<IValidator<List<CreateCourseMaterialArrangeModel>>, CreateCourseMaterialArrangeValidator>();
+            services.AddTransient<IValidator<CreateAssessmentArrangeModel>, SingleAssessmentArrangeValidator>();
+            services.AddTransient<IValidator<List<CreateAssessmentArrangeModel>>, CreateAssessmentArrangeValidator>();
+            services.AddTransient<IValidator<CreateChapterArrangeModel>, SingleChapterArrangeValidator>();
+            services.AddTransient<IValidator<List<CreateChapterArrangeModel>>, CreateChapterArrangeValidator>();
+            services.AddTransient<IValidator<CreateSessionArrangeModel>, SingleSessionArrangeValidator>();
+            services.AddTransient<IValidator<List<CreateSessionArrangeModel>>, CreateSessionArrangeValidator>();
+
             #endregion
 
             return services;

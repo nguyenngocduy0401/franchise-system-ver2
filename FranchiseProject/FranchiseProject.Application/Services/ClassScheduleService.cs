@@ -23,8 +23,8 @@ namespace FranchiseProject.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<CreateClassScheduleViewModel> _validator1;
         private readonly IValidator<CreateClassScheduleDateRangeViewModel> _validator2;
-       
-        public ClassScheduleService(IValidator<CreateClassScheduleDateRangeViewModel> validator2,IMapper mapper, IUnitOfWork unitOfWork, IValidator<CreateClassScheduleViewModel> validator1)
+
+        public ClassScheduleService(IValidator<CreateClassScheduleDateRangeViewModel> validator2, IMapper mapper, IUnitOfWork unitOfWork, IValidator<CreateClassScheduleViewModel> validator1)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -107,6 +107,12 @@ namespace FranchiseProject.Application.Services
                     currentDate = currentDate.AddDays(1);
                 }
             
+
+                // Lọc ngày dựa trên các ngày trong tuần đã chọn
+                var selectedDates = new List<DateTime>();
+                
+
+                // Tạo lịch học cho mỗi ngày đã chọn
                 foreach (var date in selectedDates)
                 {
   
@@ -171,6 +177,8 @@ namespace FranchiseProject.Application.Services
                         response.Message = "Phục hồi class schedule học thành công!";
                         break;
                 }
+                _unitOfWork.ClassScheduleRepository.SoftRemove(classSchedule);
+                response.Message = "Xoá class schedule học thành công!";
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete fail!");
                 response.Data = true;
@@ -185,7 +193,7 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async  Task<ApiResponse<Pagination<ClassScheduleViewModel>>> FilterClassScheduleAsync(FilterClassScheduleViewModel filterClassScheduleViewModel)
+        public async Task<ApiResponse<Pagination<ClassScheduleViewModel>>> FilterClassScheduleAsync(FilterClassScheduleViewModel filterClassScheduleViewModel)
         {
             var response = new ApiResponse<Pagination<ClassScheduleViewModel>>();
             try
@@ -208,7 +216,7 @@ namespace FranchiseProject.Application.Services
                     (!start.HasValue || s.Date >= start.Value) &&
                     (!end.HasValue || s.Date <= end.Value);
 
-        
+
                 var schedules = await _unitOfWork.ClassScheduleRepository.GetFilterAsync(
                     filter: filter,
                     includeProperties: "Class,Slot"
@@ -252,6 +260,10 @@ namespace FranchiseProject.Application.Services
                 var class1 =await _unitOfWork.ClassRepository.GetByIdAsync(classSchedule.ClassId.Value);
                 var clasScheduleViewModel =  _mapper.Map<ClassScheduleViewModel>(classSchedule);
          /*       clasScheduleViewModel.SlotName=slot.Name;
+                var slot = await _unitOfWork.SlotRepository.GetByIdAsync(classSchedule.SlotId.Value);
+                var class1 = await _unitOfWork.ClassRepository.GetByIdAsync(classSchedule.ClassId.Value);
+                var clasScheduleViewModel = _mapper.Map<ClassScheduleViewModel>(classSchedule);
+                clasScheduleViewModel.SlotName = slot.Name;
                 clasScheduleViewModel.ClassName = class1.Name;
                 clasScheduleViewModel.Date = classSchedule.Date.Value.ToString("d/M/yyyy");*/
 
@@ -268,7 +280,7 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<ApiResponse<bool>> UpdateClassScheduleAsync(CreateClassScheduleViewModel updateClassScheduleViewModel,string id)
+        public async Task<ApiResponse<bool>> UpdateClassScheduleAsync(CreateClassScheduleViewModel updateClassScheduleViewModel, string id)
         {
             var response = new ApiResponse<bool>();
             try
@@ -282,8 +294,8 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
                 var classSchedule = await _unitOfWork.ClassScheduleRepository.GetByIdAsync(Guid.Parse(id));
-                 _mapper.Map(updateClassScheduleViewModel, classSchedule);
-                 _unitOfWork.ClassScheduleRepository.Update(classSchedule);
+                _mapper.Map(updateClassScheduleViewModel, classSchedule);
+                _unitOfWork.ClassScheduleRepository.Update(classSchedule);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Update fail!");
                 response.Data = true;

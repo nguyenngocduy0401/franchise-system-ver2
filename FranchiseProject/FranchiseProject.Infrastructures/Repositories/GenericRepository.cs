@@ -24,14 +24,14 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
-        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> expression, string includeProperties = "")
+        public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, string includeProperties = "")
         {
             IQueryable<TEntity> query = _dbSet.Where(expression);
             foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 query = query.Include(includeProperty);
             }
-            return query.ToList();
+            return await query.ToListAsync();
         }
 
         public virtual async Task<Pagination<TEntity>> GetFilterAsync(
@@ -43,7 +43,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             string? foreignKey = null,
             object? foreignKeyId = null)
         {
-            IQueryable<TEntity> query = _dbSet;
+            IQueryable<TEntity> query = _dbSet.Where(e => e.IsDeleted != true);
             if (!string.IsNullOrEmpty(foreignKey) && foreignKeyId != null)
             {
                 if (foreignKeyId is Guid guidValue)
@@ -76,7 +76,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             }
             else
             {
-                query = query.OrderByDescending(e => EF.Property<DateTime>(e, "CreationDate"));
+                query = query.OrderByDescending(e => e.CreationDate);
             }
 
             if (pageIndex.HasValue && pageSize.HasValue)

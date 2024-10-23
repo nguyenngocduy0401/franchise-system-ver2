@@ -13,7 +13,10 @@ namespace FranchiseProject.Domain.Entity
         public string? Name {get; set;}
         public string? Description {get; set;}
         public string? URLImage {get; set;}
-        public string? NumberOfSession {get; set;}
+        public int NumberOfLession {get; set;}
+        public int Price { get; set; }
+        public string? Code { get; set; }
+        public int Version { get; set; }
         public CourseStatusEnum Status {get; set;}
         public Guid? SyllabusId {get; set;}
         [ForeignKey("SyllabusId")]
@@ -28,5 +31,6 @@ namespace FranchiseProject.Domain.Entity
         public virtual ICollection<Report>? Reports {get; set;}
         public virtual ICollection<Class>? Classes {get; set;}
         public virtual ICollection<Assessment>? Assessments {get; set;}
+        public virtual ICollection<CourseMaterial>? CourseMaterials { get; set;}
     }
 }

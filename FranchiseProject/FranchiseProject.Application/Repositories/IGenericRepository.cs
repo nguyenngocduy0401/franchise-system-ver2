@@ -11,7 +11,7 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IGenericRepository<TEntity> where TEntity : BaseEntity
     {
-        IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> expression, string includeProperties = "");
+        Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, string includeProperties = "");
         Task<Pagination<TEntity>> GetFilterAsync(
            Expression<Func<TEntity, bool>>? filter = null,
            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
@@ -30,7 +30,6 @@ namespace FranchiseProject.Application.Repositories
         void UpdateRange(List<TEntity> entities);
         void SoftRemove(TEntity entity);
         void SoftRemoveRange(List<TEntity> entities);
-        void RestoreSoftRemove(TEntity entity);
         Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate);
     }
 }

@@ -8,13 +8,12 @@ namespace FranchiseProject.Domain.Entity
 {
     public class Syllabus : BaseEntity
     {
-        public string? Name { get; set; }
         public string? Description { get; set; }
         public string? StudentTask { get; set; }
-        public double? TimeAllocation { get; set; }
+        public string? TimeAllocation { get; set; }
         public string? ToolsRequire { get; set; }
-        public double? Scale { get; set; }
-        public double? MinAvgMarkToPass { get; set; }
+        public double Scale { get; set; }
+        public double MinAvgMarkToPass { get; set; }
         public virtual ICollection<Course>? Courses { get; set; }
     }
 }

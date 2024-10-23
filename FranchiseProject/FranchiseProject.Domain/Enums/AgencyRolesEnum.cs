@@ -9,6 +9,7 @@ namespace FranchiseProject.Domain.Enums
     public enum AgencyRolesEnum
     {
         Student,
-        Instructor
+        Instructor,
+        AgencyStaff 
     }
 }

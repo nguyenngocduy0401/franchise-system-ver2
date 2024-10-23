@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+/*using Microsoft.AspNetCore.Mvc;
 
 namespace FranchiseProject.API.Controllers
 {
@@ -31,3 +31,4 @@ namespace FranchiseProject.API.Controllers
         }
     }
 }
+*/
