@@ -99,17 +99,29 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<CreateCourseMaterialModel, CourseMaterial>();
             CreateMap<UpdateCourseMaterialModel, CourseMaterial>();
             #endregion
+            #region ChapterMaterial
+            CreateMap<ChapterMaterial, ChapterMaterialViewModel>();
+            CreateMap<CreateChapterMaterialArrangeModel, ChapterMaterial>();
+            CreateMap<ChapterMaterial, ChapterMaterial>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.ChapterId, opt => opt.Ignore());
+
+            
+            #endregion
             #region Chapter
             CreateMap<Chapter, ChapterViewModel>()
                 .ForMember(dest => dest.ChapterMaterials, opt => opt.MapFrom(src => src.ChapterMaterials.Where(m => m.IsDeleted != true)));
             CreateMap<CreateChapterModel, Chapter>();
             CreateMap<UpdateChapterModel, Chapter>();
+            CreateMap<CreateChapterArrangeModel, Chapter>()
+                .ForMember(dest => dest.ChapterMaterials, opt => opt.MapFrom(src => src.ChapterMaterials));
             #endregion
             #region Session
             CreateMap<Session, SessionViewModel>();
             CreateMap<CreateSessionModel, Session>();
             CreateMap<UpdateSessionModel, Session>();
             #endregion
+            
             #region Assessment
             CreateMap<Assessment, AssessmentViewModel>();
             CreateMap<CreateAssessmentModel, Assessment>();
@@ -139,7 +151,6 @@ namespace FranchiseProject.Infrastructures.Mappers
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => Domain.Enums.CourseStatusEnum.Draft));
             CreateMap<UpdateCourseModel, Course>();
             CreateMap<CreateCourseMaterialArrangeModel, CourseMaterial>();
-            CreateMap<CreateChapterArrangeModel, Chapter>();
             CreateMap<CreateAssessmentArrangeModel, Assessment>();
             CreateMap<CreateSessionArrangeModel, Session>();
             CreateMap<CourseMaterial, CourseMaterial>()
@@ -159,9 +170,7 @@ namespace FranchiseProject.Infrastructures.Mappers
                 .ForMember(dest => dest.CourseId, opt => opt.Ignore()) 
                 .ForMember(dest => dest.ChapterMaterials, opt => opt.Ignore()); 
 
-            CreateMap<ChapterMaterial, ChapterMaterial>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore()) 
-                .ForMember(dest => dest.ChapterId, opt => opt.Ignore());
+            
             #endregion
             #region Syllabus
             CreateMap<CreateSyllabusModel, Syllabus>();
@@ -169,9 +178,7 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Syllabus, SyllabusViewModel>()
                 .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.Courses.FirstOrDefault().Id)).ReverseMap();
             #endregion
-            #region ChapterMaterial
-            CreateMap<Chapter, ChapterMaterialViewModel>();
-            #endregion
+           
 
         }
     }

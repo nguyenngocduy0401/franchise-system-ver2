@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FranchiseProject.API.Validator.ChapterMaterialValidator;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
 
 namespace FranchiseProject.API.Validator.ChapterValidator
@@ -16,6 +17,10 @@ namespace FranchiseProject.API.Validator.ChapterValidator
             RuleFor(x => x.Description)
                 .NotEmpty()
                 .MaximumLength(500);
+            RuleFor(x => x.ChapterMaterials)
+            .ForEach(material => {
+                material.SetValidator(new SingleChapterMaterialArrangeValidator());
+            });
         }
     }
 }

@@ -5,6 +5,7 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AssessmentViewModels;
+using FranchiseProject.Application.ViewModels.ChapterMaterialViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
 using FranchiseProject.Domain.Entity;
@@ -28,7 +29,7 @@ namespace FranchiseProject.Application.Services
         private readonly IValidator<List<CreateChapterArrangeModel>> _createChapterArrangeValidator;
         public ChapterService(IUnitOfWork unitOfWork, IMapper mapper, ICourseService courseService, 
             IValidator<UpdateChapterModel> updateChapterValidator, IValidator<CreateChapterModel> createChapterValidator, 
-            IValidator<List<CreateChapterArrangeModel>> createChapterArrangeValidator  )
+            IValidator<List<CreateChapterArrangeModel>> createChapterArrangeValidator)
         {
             _courseService = courseService;
             _unitOfWork = unitOfWork;
@@ -63,7 +64,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
         public async Task<ApiResponse<bool>> DeleteChapterByIdAsync(Guid chapterId)
         {
             var response = new ApiResponse<bool>();
@@ -87,7 +87,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
         public async Task<ApiResponse<ChapterViewModel>> GetChapterByIdAsync(Guid chapterId)
         {
             var response = new ApiResponse<ChapterViewModel>();
@@ -104,7 +103,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
         public async Task<ApiResponse<bool>> UpdateChapterAsync(Guid chapterId, UpdateChapterModel updateChapterModel)
         {
             var response = new ApiResponse<bool>();

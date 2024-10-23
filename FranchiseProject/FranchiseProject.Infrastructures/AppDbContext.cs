@@ -147,6 +147,21 @@ namespace FranchiseProject.Infrastructures
                 }
             );
             #endregion
+            #region Syllabus
+            modelBuilder.Entity<Syllabus>().HasData(
+                new Syllabus
+                {
+                    Id = Guid.Parse("990ca87d-c261-4cb3-1b9d-08dcf34d3900"),
+                    Description = "Khóa học này sẽ cung cấp kiến thức cơ bản về lý thuyết thông tin, hệ thống máy tính và các phương pháp phát triển phần mềm, với trọng tâm vào lập trình hướng thủ tục " +
+                    "(function-oriented programming). Học viên sẽ học các kỹ năng liên quan đến thiết kế chương trình, viết mã, kiểm thử và phát triển kỷ luật lập trình.\"",
+                    StudentTask = "Học sinh có trách nhiệm làm tất cả các bài tập được giao bởi giảng viên trên lớp hoặc ở nhà và nộp đúng hạn",
+                    TimeAllocation = "Giờ học (150 giờ) = 45 giờ học trên lớp(60 * 45') + 1 giờ thi cuối kỳ + 104 giờ tự học",
+                    ToolsRequire = "- Internet\n- C language utility",
+                    Scale = 10,
+                    MinAvgMarkToPass = 5,
+                }
+                );
+            #endregion
             #region Course
             modelBuilder.Entity<Course>().HasData(
                 new Course
@@ -160,7 +175,9 @@ namespace FranchiseProject.Infrastructures
                     Code = "PRF",
                     Version = 0,
                     Status = CourseStatusEnum.Draft,
-                    CourseCategoryId = Guid.Parse("f8fd80dd-c470-4ecf-7940-08dcf20adbbc")
+                    CourseCategoryId = Guid.Parse("f8fd80dd-c470-4ecf-7940-08dcf20adbbc"),
+                    SyllabusId = Guid.Parse("990ca87d-c261-4cb3-1b9d-08dcf34d3900")
+
                 }
             );
             #endregion
@@ -317,6 +334,8 @@ namespace FranchiseProject.Infrastructures
             }
         );
             #endregion
+            
+            
         }
     }
 }

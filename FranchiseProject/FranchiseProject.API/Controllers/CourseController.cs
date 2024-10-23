@@ -50,7 +50,7 @@ namespace FranchiseProject.API.Controllers
         }
         //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "dupliate khoá học bằng id {Authorize = SystemInstructor, Manager}")]
-        [HttpPost("{id}/versionss")]
+        [HttpPost("{id}/versions")]
         public async Task<ApiResponse<CourseDetailViewModel>> DuplicateCourseAsync(Guid id)
         {
             return await _courseService.CreateCourseVersionAsync(id);
