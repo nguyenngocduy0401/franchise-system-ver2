@@ -79,7 +79,6 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-                // Validate input
                 FluentValidation.Results.ValidationResult validationResult = await _validator2.ValidateAsync(createClassScheduleDateRangeViewModel);
                 if (!validationResult.IsValid)
                 {
@@ -88,17 +87,9 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
-
-              
-
-                // Lọc ngày dựa trên các ngày trong tuần đã chọn
                 var selectedDates = new List<DateTime>();
-                
-
-                // Tạo lịch học cho mỗi ngày đã chọn
                 foreach (var date in selectedDates)
                 {
-                    // Check nếu đã có lớp vào ngày đó, phòng đó, slot đó
                     var existingSchedule = await _unitOfWork.ClassScheduleRepository
                         .GetExistingScheduleAsync(date, createClassScheduleDateRangeViewModel.Room, Guid.Parse(createClassScheduleDateRangeViewModel.SlotId));
 
@@ -109,8 +100,6 @@ namespace FranchiseProject.Application.Services
                         response.Message = $"Lịch học đã tồn tại vào ngày {date.ToString("yyyy-MM-dd")}, phòng {createClassScheduleDateRangeViewModel.Room}, slot {createClassScheduleDateRangeViewModel.SlotId}!";
                         return response;
                     }
-
-                    // Tạo lịch học mới
                     var classSchedule = new ClassSchedule
                     {
                         Room = createClassScheduleDateRangeViewModel.Room,
@@ -121,8 +110,6 @@ namespace FranchiseProject.Application.Services
 
                     await _unitOfWork.ClassScheduleRepository.AddAsync(classSchedule);
                 }
-
-                // Lưu thay đổi vào database
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Tạo lịch học thất bại!");
 
