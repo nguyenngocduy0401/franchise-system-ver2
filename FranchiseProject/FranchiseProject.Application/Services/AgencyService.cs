@@ -63,7 +63,7 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
                 var agency = _mapper.Map<Agency>(create);
-                agency.Status = AgencyStatusEnum.Pending;
+                agency.Status = AgencyStatusEnum.Processing;
                 await _unitOfWork.AgencyRepository.AddAsync(agency);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                 if (isSuccess > 0)
@@ -320,7 +320,7 @@ namespace FranchiseProject.Application.Services
 
                     break;
 
-                    case AgencyStatusEnum.Expired:
+                    case AgencyStatusEnum.Terminated:
                         var user = await _unitOfWork.UserRepository.GetByAgencyIdAsync(agencyId);
                         if (user != null)
                         {
@@ -331,7 +331,7 @@ namespace FranchiseProject.Application.Services
                                 IsRead = false,
                                 SenderId = agencyId.ToString(),
                                 ReceiverId = user.Id,
-                                Message = "Hợp Đồng đã hêt hạn"
+                                Message = "Chấm dứt hợp đồng"
                             };
                             user.Status = UserStatusEnum.blocked;
                             await _hubContext.Clients.User(agencyId.ToString()).SendAsync("ReceivedNotification",notification.Message);

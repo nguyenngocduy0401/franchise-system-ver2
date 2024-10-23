@@ -21,7 +21,7 @@ namespace FranchiseProject.Domain.Entity
         public Guid? CourseCategoryId { get; set;}
         [ForeignKey("CourseCategoryId")]
         public CourseCategory? CourseCategory { get; set;}
-        public virtual ICollection<StudentCourse>? StudentCourses { get; set; }
+        public virtual ICollection<RegisterCourse>? RegisterCourses { get; set; }
         public virtual ICollection<Session>? Sessions {get; set;}
         public virtual ICollection<Chapter>? Chapters {get; set;}
     //    public virtual ICollection<StudentCourse>? StudentCourses { get; set; }

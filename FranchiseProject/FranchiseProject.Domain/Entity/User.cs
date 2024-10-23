@@ -26,8 +26,8 @@ namespace FranchiseProject.Domain.Entity
         public UserStatusEnum? Status { get; set; }
         public virtual ICollection<Score>? Scores { get; set; } 
         public virtual ICollection<Report>? Reports { get; set; }
-    //    public virtual ICollection<StudentCourse>? StudentCourses { get; set; }
-        public virtual ICollection<StudentClass>? StudentClasses { get; set; }
+        public virtual ICollection<RegisterCourse>? RegisterCourses { get; set; }
+        public virtual ICollection<ClassRoom>? StudentClasses { get; set; }
         public virtual ICollection<AssignmentSubmit>? AssignmentSubmits { get; set; }
         public virtual ICollection<Attendance>? Attendances { get; set; }
         public virtual ICollection<StudentAnswer>? StudentAnswers { get; set; }

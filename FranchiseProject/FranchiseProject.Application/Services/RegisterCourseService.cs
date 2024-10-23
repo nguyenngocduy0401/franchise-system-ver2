@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Services
 {
-    public class StudentClassService : IStudentClassService
+    public class RegisterCourseService : IRegisterCourseService
     {
     }
 }

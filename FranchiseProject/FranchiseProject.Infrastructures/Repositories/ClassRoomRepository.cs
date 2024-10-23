@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Infrastructures.Repositories
 {
-    public class StudentClassRepository : IStudentClassRepository
+    public class ClassRoomRepository : IClassRoomRepository
     {
         private readonly AppDbContext _dbContext;
         private readonly ICurrentTime _timeService;
@@ -20,7 +20,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         private readonly UserManager<User> _userManager;
 
         private readonly RoleManager<Role> _roleManager;
-        public StudentClassRepository(
+        public ClassRoomRepository(
             AppDbContext context,
             ICurrentTime timeService,
             IClaimsService claimsService,
@@ -34,9 +34,9 @@ namespace FranchiseProject.Infrastructures.Repositories
             _userManager = userManager;
             _roleManager = roleManager;
         }
-        public async Task<IEnumerable<StudentClass>> GetFilterAsync(Expression<Func<StudentClass, bool>> filter)
+        public async Task<IEnumerable<ClassRoom>> GetFilterAsync(Expression<Func<ClassRoom, bool>> filter)
         {
-            return await _dbContext.StudentClasses
+            return await _dbContext.ClassRooms
                 .Include(sc => sc.User)  
                 .Include(sc => sc.Class)    
                 .Where(filter)
@@ -49,19 +49,19 @@ namespace FranchiseProject.Infrastructures.Repositories
             if (studentRole == null) return 0; 
             var usersInRole = await _userManager.GetUsersInRoleAsync(studentRole.Name);
             var userIdsInRole = usersInRole.Select(u => u.Id).ToList();
-            var studentCount = await _dbContext.StudentClasses
+            var studentCount = await _dbContext.ClassRooms
                 .Where(sc => sc.ClassId == classId && userIdsInRole.Contains(sc.UserId))
                 .CountAsync();
 
             return studentCount;
         }
-        public async Task<List<StudentClass>> GetAllAsync(Expression<Func<StudentClass, bool>> predicate)
+        public async Task<List<ClassRoom>> GetAllAsync(Expression<Func<ClassRoom, bool>> predicate)
         {
-            return await _dbContext.StudentClasses.Where(predicate).ToListAsync();
+            return await _dbContext.ClassRooms.Where(predicate).ToListAsync();
         }
         public async Task<List<ClassSchedule>> GetClassSchedulesByUserIdAndTermIdAsync(string userId, Guid termId)
         {
-            var studentClasses = await _dbContext.StudentClasses
+            var studentClasses = await _dbContext.ClassRooms
                 .Where(sc => sc.UserId == userId)
                 .Select(sc => sc.ClassId)
                 .ToListAsync();
@@ -79,7 +79,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         }
         public async Task<int> CountClassSchedulesByUserIdAndTermIdAsync(string userId, Guid termId)
         {
-            var classIds = await _dbContext.StudentClasses
+            var classIds = await _dbContext.ClassRooms
                 .Where(sc => sc.UserId == userId)
                 .Select(sc => sc.ClassId)
                 .ToListAsync();

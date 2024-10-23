@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Repositories
 {
-    public interface IStudentClassRepository
+    public interface IClassRoomRepository
     {
-        Task<IEnumerable<StudentClass>> GetFilterAsync(Expression<Func<StudentClass, bool>> filter);
+        Task<IEnumerable<ClassRoom>> GetFilterAsync(Expression<Func<ClassRoom, bool>> filter);
         Task<int> CountStudentsByClassIdAsync(Guid classId);
-        Task<List<StudentClass>> GetAllAsync(Expression<Func<StudentClass, bool>> predicate);
+        Task<List<ClassRoom>> GetAllAsync(Expression<Func<ClassRoom, bool>> predicate);
         Task<List<ClassSchedule>> GetClassSchedulesByUserIdAndTermIdAsync(string userId, Guid termId);
         Task<int> CountClassSchedulesByUserIdAndTermIdAsync(string userId, Guid termId);
     }

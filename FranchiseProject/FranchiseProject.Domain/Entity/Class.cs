@@ -25,7 +25,7 @@ namespace FranchiseProject.Domain.Entity
         public Agency? Agency { get; set; }
 
         public ClassStatusEnum? Status { get; set; }
-        public virtual ICollection<StudentClass>? StudentClasses { get; set; }
+        public virtual ICollection<ClassRoom>? StudentClasses { get; set; }
         public virtual ICollection<Assignment>? Assignments { get; set; }
         public virtual ICollection<ClassSchedule>? ClassSchedules { get; set; }
         public virtual ICollection<Feedback>? Feedbacks { get; set; }

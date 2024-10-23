@@ -18,5 +18,6 @@ namespace FranchiseProject.Domain.Entity
         [ForeignKey("SlotId")]
         public Slot? Slot { get; set; }
         public virtual ICollection<Attendance>? Attendances { get; set; }
+        public virtual ICollection<Slot>? Slots { get; set; }
     }
 }

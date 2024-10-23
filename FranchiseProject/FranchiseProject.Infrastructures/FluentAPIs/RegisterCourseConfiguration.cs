@@ -9,16 +9,16 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Infrastructures.FluentAPIs
 {
-    public class StudentCourseConfiguration : IEntityTypeConfiguration<StudentCourse>
+    public class RegisterCourseConfiguration : IEntityTypeConfiguration<RegisterCourse>
     {
-        public void Configure(EntityTypeBuilder<StudentCourse> builder)
+        public void Configure(EntityTypeBuilder<RegisterCourse> builder)
         {
-            builder.HasKey(x => new { x.CourseId, x.StudentId });
-            builder.HasOne(a => a.Student)
-                .WithMany(a => a.StudentCourses)
-                .HasForeignKey(a => a.StudentId);
+            builder.HasKey(x => new { x.CourseId, x.UserId });
+            builder.HasOne(a => a.User)
+                .WithMany(a => a.RegisterCourses)
+                .HasForeignKey(a => a.UserId);
             builder.HasOne(a => a.Course)
-                .WithMany(a => a.StudentCourses)
+                .WithMany(a => a.RegisterCourses)
                 .HasForeignKey(a => a.CourseId);
         }
     }

@@ -42,11 +42,10 @@ namespace FranchiseProject.Infrastructures
         public DbSet<Session> Sessions { get; set; }
         public DbSet<Slot> Slots { get; set; }
         public DbSet<StudentAnswer> StudentAnswers { get; set; }
-        public DbSet<StudentClass> StudentClasses { get; set; }
+        public DbSet<ClassRoom> ClassRooms { get; set; }
         public DbSet<RegisterForm> RegisterForms{ get; set; }
         public DbSet<Syllabus> Syllabuses { get; set; }
         public DbSet<Term> Terms { get; set; }
-        public DbSet<Consultation> Consultations { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         /*public DbSet<User> Users { get; set; }*/
         public DbSet<RefreshToken> RefreshTokens { get; set; }
@@ -58,6 +57,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Material> Materials { get; set; }
+        public DbSet<RegisterCourse> RegisterCourses { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -67,7 +67,7 @@ namespace FranchiseProject.Infrastructures
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(QuizDetailConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentAnswerConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentClassConfiguration).Assembly);
-             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentCourseConfiguration).Assembly);
+             modelBuilder.ApplyConfigurationsFromAssembly(typeof(RegisterCourseConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AssignmentSubmitConfiguration).Assembly);
             modelBuilder.Entity<Contract>().HasData(
                      new Contract
@@ -80,7 +80,7 @@ namespace FranchiseProject.Infrastructures
                      new Agency
                      {
                          Id = Guid.Parse("BE37023D-6A58-4B4B-92E5-39DCECE45473"),
-                         Status = AgencyStatusEnum.Partner
+                         Status = AgencyStatusEnum.Processing
                      }
                      );
             #region SLot
@@ -172,7 +172,7 @@ namespace FranchiseProject.Infrastructures
 
             #endregion
             #region ClassUser
-       modelBuilder.Entity<StudentClass>().HasData(
+       modelBuilder.Entity<ClassRoom>().HasData(
            
               
             );

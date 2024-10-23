@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Interfaces
 {
-    public interface IRegisterFormService
+    public interface IRegisterCourseService
     {
     }
 }

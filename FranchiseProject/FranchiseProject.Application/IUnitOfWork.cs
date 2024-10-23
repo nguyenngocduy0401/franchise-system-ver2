@@ -32,18 +32,19 @@ namespace FranchiseProject.Application
         public ISessionRepository SessionRepository { get; }
         public ISlotRepository SlotRepository { get; }
         public IStudentAnswerRepository StudentAnswerRepository { get; }
-        public IStudentClassRepository StudentClassRepository { get; }
-        public IRegisterFormRepository RegisterFormRepository { get; }
+        public IClassRoomRepository ClassRoomRepository { get; }
+        public IRegisterCourseRepository RegisterCourseRepository { get; }
         public ISyllabusRepository SyllabusRepository { get; }
         public ITermRepository TermRepository { get; }
         public IUserRepository UserRepository { get; }
         public IRefreshTokenRepository RefreshTokenRepository { get; }
-        public IConsultationRepository FranchiseRegistrationRequestRepository { get; }
+        public IRegisterFormRepository FranchiseRegistrationRequestRepository { get; }
         public IAssessmentRepository AssessmentRepository { get; }
         public INotificationRepository NotificationRepository { get; }
         public IPaymentRepository PaymentRepository { get; }
         public IStudentRepository StudentRepository { get; }
         public IMaterialRepository MaterialRepository { get; }
+      
         public Task<int> SaveChangeAsync();
     }
 }

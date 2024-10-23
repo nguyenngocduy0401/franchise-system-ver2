@@ -35,13 +35,13 @@ namespace FranchiseProject.Infrastructures
         private readonly ISessionRepository _sessionRepository;
         private readonly ISlotRepository _slotRepository;
         private readonly IStudentAnswerRepository _studentAnswerRepository;
-        private readonly IStudentClassRepository _studentClassRepository;
-        private readonly IRegisterFormRepository _registerFormRepository;
+        private readonly IClassRoomRepository _studentClassRepository;
+        private readonly IRegisterCourseRepository _registerFormRepository;
         private readonly ISyllabusRepository _syllabusRepository;
         private readonly ITermRepository _termRepository;
         private readonly IUserRepository _userRepository;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
-        private readonly IConsultationRepository _fanchiseRegistrationRequestRepository;
+        private readonly IRegisterFormRepository _fanchiseRegistrationRequestRepository;
         private readonly IAssessmentRepository _assessmentRepository;
         private readonly INotificationRepository _notificationRepository;
         private readonly IStudentRepository _studentRepository;
@@ -54,9 +54,9 @@ namespace FranchiseProject.Infrastructures
             IFeedbackQuestionRepository feedbackQuestionRepository, IFeedbackRepository feedbackRepository, IQuestionOptionRepository questionOptionRepository,
             IQuestionRepository questionRepository, IQuizDetailRepository quizDetailRepository, IQuizRepository  quizRepository, IReportRepository reportRepository,
             IScoreRepository scoreRepository, ISessionRepository sessionRepository, ISlotRepository slotRepository, IStudentAnswerRepository studentAnswerRepository,
-            IStudentClassRepository studentClassRepository, IRegisterFormRepository registerFormRepository, ISyllabusRepository syllabusRepository,
+            IClassRoomRepository studentClassRepository, IRegisterCourseRepository registerFormRepository, ISyllabusRepository syllabusRepository,
             ITermRepository termRepository, IUserRepository userRepository, IAssignmentSubmitRepository assignmentSubmitRepository, IRefreshTokenRepository refreshTokenRepository,
-            IConsultationRepository franchiseRegistrationRequestRepository, IAssessmentRepository assessmentRepository,INotificationRepository notificationRepository,
+            IRegisterFormRepository franchiseRegistrationRequestRepository, IAssessmentRepository assessmentRepository,INotificationRepository notificationRepository,
             IPaymentRepository paymentRepository,IStudentRepository studentRepository,
             IMaterialRepository materialRepository)
            
@@ -144,9 +144,9 @@ namespace FranchiseProject.Infrastructures
 
         public IStudentAnswerRepository StudentAnswerRepository => _studentAnswerRepository;
 
-        public IStudentClassRepository StudentClassRepository => _studentClassRepository;
+        public IClassRoomRepository StudentClassRepository => _studentClassRepository;
 
-        public IRegisterFormRepository RegisterFormRepository => _registerFormRepository;
+        public IRegisterCourseRepository RegisterFormRepository => _registerFormRepository;
 
         public ISyllabusRepository SyllabusRepository => _syllabusRepository;
 
@@ -156,7 +156,7 @@ namespace FranchiseProject.Infrastructures
 
         public IRefreshTokenRepository RefreshTokenRepository => _refreshTokenRepository;
 
-        public IConsultationRepository FranchiseRegistrationRequestRepository=> _fanchiseRegistrationRequestRepository;
+        public IRegisterFormRepository FranchiseRegistrationRequestRepository=> _fanchiseRegistrationRequestRepository;
 
         public INotificationRepository NotificationRepository => _notificationRepository;
         

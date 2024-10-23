@@ -14,7 +14,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IStudentService
     {
-        Task<ApiResponse<bool>>CreateStudentAsync(CreateStudentViewModel createStudentViewModel, string agencyId);
+     /*   Task<ApiResponse<bool>>CreateStudentAsync(CreateStudentViewModel createStudentViewModel, string agencyId);
         Task<ApiResponse<bool>> UpdateStudentAsync(CreateStudentViewModel updateStudentViewModel, string studentId);
         Task<ApiResponse<bool>> DeleteStudentAsync(string studentId);
         Task<ApiResponse<StudentViewModel>> GetStudentByIdAsync(string studentId);
@@ -22,6 +22,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> UpdateStatusStudentAsync(StudentStatusEnum status, string studentId);
         Task<ApiResponse<int>> CountStudenInCourseAsync();
         Task<ApiResponse<bool>> StudentEnrollClassAsync(string classId);//
-        Task<ApiResponse<Pagination<ClassForStudentViewModel>>> GetClassForStudentAsync(string studentId);
+        Task<ApiResponse<Pagination<ClassForStudentViewModel>>> GetClassForStudentAsync(string studentId);*/
     }
 }

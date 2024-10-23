@@ -125,7 +125,7 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Class, ClassStudentViewModel>()
                 .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Name));    
             
-            CreateMap<StudentClass, StudentClassViewModel>()
+            CreateMap<ClassRoom, StudentClassViewModel>()
                 .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.User.FullName))
                 .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.User.DateOfBirth))
                 .ForMember(dest => dest.URLImage, opt => opt.MapFrom(src => src.User.URLImage));

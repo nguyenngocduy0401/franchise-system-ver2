@@ -10,8 +10,8 @@ namespace FranchiseProject.API.Controllers
     [Route("api/v1/consultations")]
     public class ConsultationController
     {
-        private readonly IConsultationService _consultationService;
-        public ConsultationController( IConsultationService consultationService)
+        private readonly IRegisterFormSevice _consultationService;
+        public ConsultationController( IRegisterFormSevice consultationService)
         {
             _consultationService = consultationService;
         }

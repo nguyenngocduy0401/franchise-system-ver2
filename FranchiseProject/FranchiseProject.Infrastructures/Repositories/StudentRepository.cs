@@ -9,10 +9,8 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Infrastructures.Repositories
 {
-    public class StudentRepository : GenericRepository<Student>, IStudentRepository
+    public class StudentRepository : IStudentRepository
     {
-        public StudentRepository(AppDbContext context, ICurrentTime timeService, IClaimsService claimsService) : base(context, timeService, claimsService)
-        {
-        }
+        
     }
 }

@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Enums
 {
-    public enum ConsultationStatusEnum
+    public enum ClassRoomStatusEnum
     {
-        NotConsulted = 0,  //chưa tư vấn 
-        Consulted = 1     // đã tư vẫn 
     }
 }
