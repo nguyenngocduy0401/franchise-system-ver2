@@ -121,7 +121,6 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<CreateSessionModel, Session>();
             CreateMap<UpdateSessionModel, Session>();
             #endregion
-            
             #region Assessment
             CreateMap<Assessment, AssessmentViewModel>();
             CreateMap<CreateAssessmentModel, Assessment>();
@@ -139,16 +138,12 @@ namespace FranchiseProject.Infrastructures.Mappers
                 .ForMember(dest => dest.Syllabus, opt => opt.MapFrom(src => src.Syllabus))
                 .ForMember(dest => dest.CourseCategory, opt => opt.MapFrom(src => src.CourseCategory));
             CreateMap<Course, Course>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore()) 
-                .ForMember(dest => dest.CourseMaterials, opt => opt.Ignore()) 
-                .ForMember(dest => dest.Sessions, opt => opt.Ignore()) 
-                .ForMember(dest => dest.Assessments, opt => opt.Ignore()) 
-                .ForMember(dest => dest.Chapters, opt => opt.Ignore()) 
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => CourseStatusEnum.Draft));
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.SyllabusId, opt => opt.Ignore());
             CreateMap<Pagination<Course>, Pagination<CourseViewModel>>()
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
             CreateMap<CreateCourseModel, Course>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => Domain.Enums.CourseStatusEnum.Draft));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => CourseStatusEnum.Draft));
             CreateMap<UpdateCourseModel, Course>();
             CreateMap<CreateCourseMaterialArrangeModel, CourseMaterial>();
             CreateMap<CreateAssessmentArrangeModel, Assessment>();
@@ -177,8 +172,10 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<UpdateSyllabusModel, Syllabus>();
             CreateMap<Syllabus, SyllabusViewModel>()
                 .ForMember(dest => dest.CourseId, opt => opt.MapFrom(src => src.Courses.FirstOrDefault().Id)).ReverseMap();
+            CreateMap<Syllabus, Syllabus>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
             #endregion
-           
+
 
         }
     }

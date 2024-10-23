@@ -32,9 +32,6 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IContractService, ContractService>();
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<ICourseCategoryService, CourseCategoryService>();
-            services.AddScoped<IFeedbackAnswerService, FeedbackAnswerService>();
-            services.AddScoped<IFeedbackOptionService, FeedbackOptionService>();
-            services.AddScoped<IFeedbackQuestionService, FeedbackQuestionService>();
             services.AddScoped<IFeedbackService, FeedbackService>();
             services.AddScoped<IQuestionService, QuestionService>();
             services.AddScoped<IQuestionOptionService, QuestionOptionService>();
