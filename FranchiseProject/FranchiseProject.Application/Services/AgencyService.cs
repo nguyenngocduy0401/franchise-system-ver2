@@ -250,7 +250,7 @@ namespace FranchiseProject.Application.Services
                 }
                 switch (newStatus)
                 {
-                    case AgencyStatusEnum.Partner:
+                    case AgencyStatusEnum.Approved:
                         var existingUser = await _unitOfWork.UserRepository.GetByAgencyIdAsync(agencyId);
                         if (existingUser == null)
                         {

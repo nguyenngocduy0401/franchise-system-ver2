@@ -16,7 +16,6 @@ namespace FranchiseProject.Application.ViewModels.ClassViewModel
         public int Capacity { get; set; }
         public int CurrentEnrollment { get; set; }
         public string? InstructorName { get; set; }
-        public string? TermName { get; set; }
         public string? CourseName { get; set; }
         public ClassStatusEnum Status { get; set; }
     }

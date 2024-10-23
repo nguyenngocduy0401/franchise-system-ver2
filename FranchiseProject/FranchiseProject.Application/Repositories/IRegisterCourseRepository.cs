@@ -8,5 +8,6 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IRegisterCourseRepository
     {
+        Task<List<string>> GetCourseNamesByUserIdAsync(string userId);
     }
 }

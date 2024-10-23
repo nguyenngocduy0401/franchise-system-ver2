@@ -28,5 +28,6 @@ namespace FranchiseProject.Application.Repositories
         Task<bool> CheckUserNameExistAsync(string username);
         Task<User> GetByAgencyIdAsync(Guid agencyId);
         Task<Guid?> GetAgencyIdByUserIdAsync(string userId);
+        Task<User> GetStudentByIdAsync(string id);
     }
 }

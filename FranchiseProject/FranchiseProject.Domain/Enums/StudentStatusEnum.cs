@@ -8,8 +8,9 @@ namespace FranchiseProject.Domain.Enums
 {
     public enum StudentStatusEnum
     {
-        pending=0  ,        // Chờ  
-        Waitlisted = 1,     //Chờ để join vào lớp
-        Enrolled = 2,       // Đã vào lớp 
+        NotConsult=0  ,        // chua tu van 
+        Pending=1,             //Đã tư vấn 
+        Waitlisted = 2,     //Chờ để join vào lớp
+        Enrolled = 3,       // Đã vào lớp 
     }
 }

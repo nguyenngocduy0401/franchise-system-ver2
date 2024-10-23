@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FranchiseProject.Application.ViewModels.TermViewModels;
 using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.SessionViewModels;
@@ -32,10 +31,10 @@ namespace FranchiseProject.Infrastructures.Mappers
     {
         public MapperConfigurationsProfile() {
             #region FranchiseRegist
-            CreateMap<ConsultationViewModel, Consultation>();
-            CreateMap<RegisterConsultationViewModel, Consultation>();
-            CreateMap<Consultation, ConsultationViewModel>().ReverseMap();
-            CreateMap<Consultation, ConsultationViewModel>()
+            CreateMap<ConsultationViewModel, RegisterForm>();
+            CreateMap<RegisterConsultationViewModel, RegisterForm>();
+            CreateMap<RegisterForm, ConsultationViewModel>().ReverseMap();
+            CreateMap<RegisterForm, ConsultationViewModel>()
             .ForMember(dest => dest.ConsultantUserName, opt => opt.MapFrom(src => src.User != null ? src.User.UserName : string.Empty));
             #endregion
             #region Agency
@@ -99,31 +98,14 @@ namespace FranchiseProject.Infrastructures.Mappers
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.Message)).ReverseMap();
             #endregion
-            #region term
-            CreateMap<Term, TermViewModel>();
-            CreateMap<CreateTermViewModel, Term>();
-
-            CreateMap(typeof(Pagination<>), typeof(Pagination<>));
-            CreateMap<List<Term>, Pagination<TermViewModel>>()
-            .ConvertUsing((source, destination, context) =>
-            {
-                var pagedResult = new Pagination<TermViewModel>
-                {
-                    Items = context.Mapper.Map<List<TermViewModel>>(source),
-                    TotalItemsCount = source.Count, 
-                    PageIndex = 1, 
-                    PageSize = source.Count 
-                };
-                return pagedResult;
-            });
-            #endregion
+           
 
             #region Class
             CreateMap<CreateClassViewModel, Class>();
             CreateMap<Class, ClassViewModel>();
 
             CreateMap<Class, ClassViewModel>()
-                .ForMember(dest => dest.TermName, opt => opt.MapFrom(src => src.Term.Name))
+              
                 .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Course.Name));
 
             CreateMap<Class, ClassStudentViewModel>()
@@ -145,6 +127,7 @@ namespace FranchiseProject.Infrastructures.Mappers
                     };
                     return pagedResult;
                 });
+            #endregion
             #region Material
             CreateMap<CourseMaterial, CourseMaterialViewModel>();
             CreateMap<CreateCourseMaterialModel, CourseMaterial>();

@@ -39,7 +39,7 @@ namespace FranchiseProject.Application
         public INotificationRepository NotificationRepository { get; }
         public IPaymentRepository PaymentRepository { get; }
         public IStudentRepository StudentRepository { get; }
-        public IMaterialRepository MaterialRepository { get; }
+     //   public IMaterialRepository MaterialRepository { get; }
         public ICourseMaterialRepository CourseMaterialRepository { get; }
         public Task<int> SaveChangeAsync();
     }

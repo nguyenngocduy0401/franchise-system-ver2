@@ -39,6 +39,9 @@ using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.API.Validator.AssessmentValidator;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
 using FranchiseProject.API.Validator.CourseValidator;
+using FranchiseProject.Application.ViewModels.StudentViewModels;
+using FranchiseProject.Application.ViewModels.PaymentViewModel;
+using FranchiseProject.API.Validator.PaymentValidator;
 
 
 namespace FranchiseProject.API
@@ -123,8 +126,8 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<UpdateCourseCategoryModel>, UpdateCourseCategoryValidator>();
             services.AddTransient<IValidator<CreateClassScheduleViewModel>, CreateClassScheduleValidor>();
             services.AddTransient<IValidator<CreateClassScheduleDateRangeViewModel>, CreateClassScheduleDateRangeValidator>();
-            services.AddTransient<IValidator<CreateTermViewModel>,CreateTermValidator>();
-            services.AddScoped<IValidator<CreateStudentViewModel>, CreateStudentValidator>();
+            services.AddTransient<IValidator<CreateStudentPaymentViewModel>, PaymentStudentValidator>();
+            services.AddTransient<IValidator<RegisterCourseViewModel>, RegisterCourseValidator>();
             services.AddTransient<IValidator<CreateCourseMaterialModel>, CreateCourseMaterialValidator>();
             services.AddTransient<IValidator<UpdateCourseMaterialModel>, UpdateCourseMaterialValidator>();
             services.AddTransient<IValidator<CreateChapterModel>, CreateChapterValidator>();

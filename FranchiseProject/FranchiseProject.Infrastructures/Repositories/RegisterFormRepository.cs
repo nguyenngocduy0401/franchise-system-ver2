@@ -14,7 +14,6 @@ namespace FranchiseProject.Infrastructures.Repositories
 {
     public class RegisterFormRepository:GenericRepository<RegisterForm>, IRegisterFormRepository
     {
-        private readonly AppDbContext _context;
 
         private readonly AppDbContext _dbContext;
         private readonly ICurrentTime _timeService;

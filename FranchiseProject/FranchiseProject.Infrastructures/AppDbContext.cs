@@ -41,8 +41,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<ClassRoom> ClassRooms { get; set; }
         public DbSet<RegisterForm> RegisterForms{ get; set; }
         public DbSet<Syllabus> Syllabuses { get; set; }
-        public DbSet<Term> Terms { get; set; }
-        public DbSet<Consultation> Consultations { get; set; }
+   
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Assessment> Assessments { get; set; }
@@ -52,7 +51,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<AppointmentDetail> AppointmentDetails { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<Payment> Payments { get; set; }
-        public DbSet<Material> Materials { get; set; }
+    //    public DbSet<Material> Materials { get; set; }
         public DbSet<RegisterCourse> RegisterCourses { get; set; }
         public DbSet<CourseMaterial> CourseMaterials { get; set; }
         public DbSet<ChapterMaterial> ChapterMaterials { get; set; }

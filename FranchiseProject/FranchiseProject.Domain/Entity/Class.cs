@@ -11,7 +11,6 @@ namespace FranchiseProject.Domain.Entity
     public class Class : BaseEntity
     {
         public int Capacity { get; set; }
-        public int MinimumCapacity { get; set; }
         public int CurrentEnrollment { get; set; }
         public string? Name { get; set; }
         public Guid? CourseId { get; set; }
@@ -22,7 +21,7 @@ namespace FranchiseProject.Domain.Entity
         public Agency? Agency { get; set; }
 
         public ClassStatusEnum? Status { get; set; }
-        public virtual ICollection<ClassRoom>? StudentClasses { get; set; }
+        public virtual ICollection<ClassRoom>? ClassRooms { get; set; }
         public virtual ICollection<Assignment>? Assignments { get; set; }
         public virtual ICollection<ClassSchedule>? ClassSchedules { get; set; }
         public virtual ICollection<Feedback>? Feedbacks { get; set; }
