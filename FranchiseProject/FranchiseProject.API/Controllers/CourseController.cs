@@ -70,7 +70,7 @@ namespace FranchiseProject.API.Controllers
             return await _courseService.UpdateCourseAsync(id, updateCourseModel);
         }
         [SwaggerOperation(Summary = "cập nhật tài nguyên của khoá học {Authorize = SystemInstructor, Manager}")]
-        [HttpPost("{id}/materials")]
+        [HttpPost("{id}/course-materials")]
         public async Task<ApiResponse<bool>> CreateMaterialByCourseIdAsync(Guid id, List<CreateCourseMaterialArrangeModel> createMaterialArrangeModel)
         {
             return await _materialService.CreateMaterialArrangeAsync(id, createMaterialArrangeModel);
