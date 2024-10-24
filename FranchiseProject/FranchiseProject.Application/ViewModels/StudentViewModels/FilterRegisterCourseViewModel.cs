@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.ViewModels.StudentViewModel
 {
-    public class FilterStudentViewModel
+    public class FilterRegisterCourseViewModel
     {
         public  StudentPaymentStatusEnum? StatusPayment {  get; set; }
         public StudentStatusEnum? Status {  get; set; } 

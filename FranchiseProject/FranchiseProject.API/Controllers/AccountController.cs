@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace FranchiseProject.API.Controllers
 {
@@ -7,5 +8,7 @@ namespace FranchiseProject.API.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
+       
+
     }
 }

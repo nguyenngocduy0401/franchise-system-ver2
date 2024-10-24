@@ -23,6 +23,9 @@ using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
 using FranchiseProject.Application.ViewModels.SyllabusViewModels;
 using FranchiseProject.Application.ViewModels.ChapterMaterialViewModels;
+using FranchiseProject.Application.ViewModels.StudentViewModel;
+using FranchiseProject.Application.ViewModels.StudentViewModels;
+using FranchiseProject.Domain.Enums;
 
 
 namespace FranchiseProject.Infrastructures.Mappers
@@ -178,6 +181,18 @@ namespace FranchiseProject.Infrastructures.Mappers
             #endregion
             #region ChapterMaterial
             CreateMap<Chapter, ChapterMaterialViewModel>();
+            #endregion
+            #region RegisterCourse
+            CreateMap<User, StudentViewModel>();
+            CreateMap<Pagination<User>, Pagination<StudentViewModel>>()
+            .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
+            CreateMap<User, StudentViewModel>()
+           .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.RegisterCourses.FirstOrDefault().Course.Name));
+            CreateMap<User, StudentRegisterViewModel>()
+           .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+           .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+           .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+
             #endregion
         }
     }

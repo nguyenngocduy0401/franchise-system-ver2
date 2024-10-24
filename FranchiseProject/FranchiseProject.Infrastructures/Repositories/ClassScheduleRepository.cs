@@ -28,7 +28,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return  _dbContext.ClassSchedules
                 .FirstOrDefault(cs => cs.Date == date &&
-                                            cs.Room == room &&
+                                           
                                             cs.SlotId == slotId);
         }
       

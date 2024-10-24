@@ -87,55 +87,7 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
-
-                var term = await _unitOfWork.TermRepository.GetExistByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.TermId));
-                if (term == null)
-                {
-                    response.Data = false;
-                    response.isSuccess = true;
-                    response.Message = "Không tìm thấy kỳ học!";
-                    return response;
-                }
-                var selectedDates = new List<DateTime>();
-                DateTime currentDate = term.StartDate.Value.Date;
-                while (currentDate <= term.EndDate)
-                {
-                    if (createClassScheduleDateRangeViewModel.dayOfWeeks!.Contains((DayOfWeekEnum)currentDate.DayOfWeek))
-                    {
-                        selectedDates.Add(currentDate.Date);
-                    }
-                    currentDate = currentDate.AddDays(1);
-                }
-            
-
-                // Lọc ngày dựa trên các ngày trong tuần đã chọn
-                var selectedDates = new List<DateTime>();
-                
-
-                // Tạo lịch học cho mỗi ngày đã chọn
-                foreach (var date in selectedDates)
-                {
-  
-                    var existingSchedule = await _unitOfWork.ClassScheduleRepository
-                        .GetExistingScheduleAsync(date, createClassScheduleDateRangeViewModel.Room, Guid.Parse(createClassScheduleDateRangeViewModel.SlotId));
-
-                    if (existingSchedule != null)
-                    {
-                        response.Data = false;
-                        response.isSuccess = false;
-                        response.Message = $"Lịch học đã tồn tại ";
-                        return response;
-                    }
-                    var classSchedule = new ClassSchedule
-                    {
-                        Room = createClassScheduleDateRangeViewModel.Room,
-                        ClassId = Guid.Parse(createClassScheduleDateRangeViewModel.ClassId),
-                        SlotId = Guid.Parse(createClassScheduleDateRangeViewModel.SlotId),
-                        Date = date,
-                    };
-
-                    await _unitOfWork.ClassScheduleRepository.AddAsync(classSchedule);
-                }
+               
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Tạo lịch học thất bại!");
 
@@ -166,17 +118,7 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
                
-                switch (classSchedule.IsDeleted)
-                {
-                    case false:
-                        _unitOfWork.ClassScheduleRepository.SoftRemove(classSchedule);
-                        response.Message = "Xoá class schedule học thành công!";
-                        break;
-                    case true:
-                        _unitOfWork.ClassScheduleRepository.RestoreSoftRemove(classSchedule);
-                        response.Message = "Phục hồi class schedule học thành công!";
-                        break;
-                }
+               
                 _unitOfWork.ClassScheduleRepository.SoftRemove(classSchedule);
                 response.Message = "Xoá class schedule học thành công!";
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;

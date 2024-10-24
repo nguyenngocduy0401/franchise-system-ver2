@@ -25,7 +25,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
-        public async Task<bool> HasOverlappingTermsAsync(DateTime startDate, DateTime endDate)
+       /* public async Task<bool> HasOverlappingTermsAsync(DateTime startDate, DateTime endDate)
         {
             return await _dbContext.Set<Term>()
                 .AnyAsync(t =>
@@ -35,6 +35,6 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.Set<Term>()
                 .FirstOrDefaultAsync(t => t.Name.ToLower() == name.ToLower());
-        }
+        }*/
     }
 }

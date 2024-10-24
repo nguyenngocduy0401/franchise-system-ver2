@@ -70,8 +70,8 @@ namespace FranchiseProject.API.Controllers
             => await _userService.CreateListUserByAgencyAsync(file);
 
 
-        [SwaggerOperation(Summary = "Người dùng lấy lịch học bằng by login")]
+       /* [SwaggerOperation(Summary = "Người dùng lấy lịch học bằng by login")]
         [HttpGet("mine/class-schedules/{id}")]
-        public async Task<ApiResponse<Pagination<StudentClassScheduleViewModel>>> GetClassSchedulesForCurrentUserByTermAsync(string id, int pageIndex, int pageSize) => await _classService.GetClassSchedulesForCurrentUserByTermAsync(id, pageIndex, pageSize);
+        public async Task<ApiResponse<Pagination<StudentClassScheduleViewModel>>> GetClassSchedulesForCurrentUserByTermAsync(string id, int pageIndex, int pageSize) => await _classService.GetClassSchedulesForCurrentUserByTermAsync(id, pageIndex, pageSize);*/
     }
 }

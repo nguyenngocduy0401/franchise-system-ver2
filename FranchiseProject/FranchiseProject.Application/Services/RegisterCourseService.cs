@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Cryptography.Pkcs;
@@ -33,13 +34,14 @@ namespace FranchiseProject.Application.Services
         private readonly IValidator<RegisterCourseViewModel> _validator;
         private readonly IEmailService _emailService;
         private readonly UserManager<User> _userManager;
-        public RegisterCourseService(IClaimsService claimsService,UserManager<User> userManager, IMapper mapper, IUnitOfWork unitOfWork, IValidator<RegisterCourseViewModel> validator)
+        public RegisterCourseService(IEmailService emailService, IClaimsService claimsService,UserManager<User> userManager, IMapper mapper, IUnitOfWork unitOfWork, IValidator<RegisterCourseViewModel> validator)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _validator = validator;
             _userManager = userManager;
             _claimsService = claimsService;
+            _emailService = emailService;
         }
 
 
@@ -53,56 +55,99 @@ namespace FranchiseProject.Application.Services
                 {
                     return ValidatorHandler.HandleValidation<bool>(validationResult);
                 }
-                var course=await _unitOfWork.CourseRepository.GetExistByIdAsync(Guid.Parse(model.CourseId));
-                if (course == null) {return ResponseHandler.Failure<bool>("Khóa học không khả dụng!"); }
-                var agency= await  _unitOfWork.AgencyRepository.GetExistByIdAsync(Guid.Parse(model.AgencyId));
-                if (agency == null) { return ResponseHandler.Failure<bool>("Trung tâm không khả dụng!"); }
+
+              
+                var nameParts = model.StudentName.Split(' ');
+                var lastName = nameParts.LastOrDefault()?.ToLower(); 
+                lastName = RemoveDiacritics(lastName);
+
+                if (string.IsNullOrEmpty(lastName))
+                {
+                    return ResponseHandler.Failure<bool>("Tên người dùng không hợp lệ!");
+                }
+           
+                string baseUserName = $"{lastName}lc";
+                string finalUserName = baseUserName;
+                int counter = 1;
+
+ 
+                while (await _userManager.FindByNameAsync(finalUserName) != null)
+                {
+                    counter++;
+                    finalUserName = $"{baseUserName}{counter}"; 
+                }
+
+      
+                var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(Guid.Parse(model.CourseId));
+                if (course == null) return ResponseHandler.Failure<bool>("Khóa học không khả dụng!");
+
+                var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(Guid.Parse(model.AgencyId));
+                if (agency == null) return ResponseHandler.Failure<bool>("Trung tâm không khả dụng!");
+
                 var newUser = new User
                 {
-                    UserName = model.StudentName,
+                    UserName = finalUserName, 
+                    FullName = model.StudentName,
                     Email = model.Email,
                     PhoneNumber = model.PhoneNumber,
-                    AgencyId=Guid.Parse(model.AgencyId),
-                    StudentStatus=StudentStatusEnum.NotConsult,
-                    Status=UserStatusEnum.active,   
-                    
-                    
+                    AgencyId = Guid.Parse(model.AgencyId),
+                    StudentStatus = StudentStatusEnum.NotConsult,
+                    Status = UserStatusEnum.active,
                 };
+
                 var result = await _userManager.CreateAsync(newUser);
                 if (!result.Succeeded)
                 {
                     return ResponseHandler.Failure<bool>("Không thể tạo tài khoản người dùng!");
                 }
+
                 var roleResult = await _userManager.AddToRoleAsync(newUser, AppRole.Student);
                 if (!roleResult.Succeeded)
                 {
                     return ResponseHandler.Failure<bool>("Không thể gán quyền cho người dùng!");
                 }
+
                 var newRegisterCourse = new RegisterCourse
                 {
                     UserId = newUser.Id,
                     CourseId = Guid.Parse(model.CourseId),
-                    StudentCourseStatus=StudentCourseStatusEnum.NotStudied
+                    StudentCourseStatus = StudentCourseStatusEnum.NotStudied
                 };
+                 await _unitOfWork.RegisterCourseRepository.AddAsync(newRegisterCourse);
                 var emailMessage = EmailTemplateHandler.SuccessRegisterCourseEmaill(model.Email, model.StudentName, course.Name, agency.Name);
                 bool emailSent = await _emailService.SendEmailAsync(emailMessage);
                 if (!emailSent)
                 {
-                    response = ResponseHandler.Failure<bool>("Lỗi khi gửi mail");
+                    return ResponseHandler.Failure<bool>("Lỗi khi gửi mail");
                 }
+
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
 
-                response = ResponseHandler.Success(true, "Đăng kí thành công!");
-
+                return ResponseHandler.Success(true, "Đăng kí thành công!");
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<bool>(ex.Message);
+                return ResponseHandler.Failure<bool>(ex.Message);
             }
-            return response;
         }
 
+        private string RemoveDiacritics(string text)
+        {
+            var normalizedString = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
+
+            foreach (var c in normalizedString)
+            {
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+        }
         public async Task<ApiResponse<bool>> UpdateStatusStudentAsync(StudentStatusEnum studentStatus, string studentId)
         {
           var response= new ApiResponse<bool>();
@@ -145,11 +190,11 @@ namespace FranchiseProject.Application.Services
             {
                 var userCurrentId  =  _claimsService.GetCurrentUserId;
                 var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
-                var student = await _unitOfWork.UserRepository.GetStudentByIdAsync(id);
-                if (student == null) throw new Exception("Student does not exist!");
+                 var student = await _userManager.FindByIdAsync(id);
+                  if (student == null) throw new Exception("Student does not exist!");
 
                 //cần check Student thuộc agency 
-                var agency = _unitOfWork.AgencyRepository.GetExistByIdAsync(userCurrent.AgencyId.Value);
+                var agency = await  _unitOfWork.AgencyRepository.GetExistByIdAsync(userCurrent.AgencyId.Value);
                 if (student.AgencyId != userCurrent.AgencyId)
                 {
                     throw new Exception("Student does not belong to your agency!");
@@ -168,7 +213,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<Pagination<StudentViewModel>>> FilterStudentAsync(FilterStudentViewModel filterStudentModel)
+        public async Task<ApiResponse<Pagination<StudentViewModel>>> FilterStudentAsync(FilterRegisterCourseViewModel filterStudentModel)
         {
             var response = new ApiResponse<Pagination<StudentViewModel>>();
             try
@@ -179,25 +224,46 @@ namespace FranchiseProject.Application.Services
                 // Kiểm tra agency của người dùng hiện tại
                 var currentAgencyId = userCurrent.AgencyId;
                 Expression<Func<User, bool>> filter = u =>
-                 (u.AgencyId == currentAgencyId) &&
+                    (u.AgencyId == currentAgencyId) &&
                     (!filterStudentModel.StatusPayment.HasValue || u.StudentPaymentStatus == filterStudentModel.StatusPayment) &&
-                    (!filterStudentModel.Status.HasValue || u.StudentStatus == filterStudentModel.Status)&&
+                    (!filterStudentModel.Status.HasValue || u.StudentStatus == filterStudentModel.Status) &&
                     (string.IsNullOrEmpty(filterStudentModel.CourseId) ||
                     u.RegisterCourses.Any(rc => rc.CourseId.ToString() == filterStudentModel.CourseId));
+
                 var students = await _unitOfWork.UserRepository.GetFilterAsync(
                     filter: filter,
-                    
                     pageIndex: filterStudentModel.PageIndex,
                     pageSize: filterStudentModel.PageSize,
-                    includeProperties:"Course"
+                    includeProperties: "RegisterCourses.Course" // Đảm bảo bao gồm khóa học
                 );
 
-                var studentViewModels = _mapper.Map<Pagination<StudentViewModel>>(students);
+                // Ánh xạ và lấy tên khóa học có trạng thái NotStudied
+                var studentViewModels = students.Items.Select(s => new StudentViewModel
+                {
+                    Id = s.Id,
+                    AgencyId = s.AgencyId.ToString(),
+                    FullName = s.FullName,
+                   
+                    PhoneNumber = s.PhoneNumber,
+                    Email = s.Email,
+                    CourseName = s.RegisterCourses
+                        .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied) // Lọc trạng thái NotStudied
+                        .Select(rc => rc.Course?.Name) // Lấy tên khóa học
+                        .FirstOrDefault() // Lấy tên khóa học đầu tiên (nếu có)
+                }).ToList();
 
-                if (studentViewModels.Items.IsNullOrEmpty())
-                    return ResponseHandler.Success(studentViewModels, "Không tìm thấy sinh viên phù hợp!");
+                var paginatedResult = new Pagination<StudentViewModel>
+                {
+                    Items = studentViewModels,
+                    TotalItemsCount = students.TotalItemsCount,
+                    PageIndex = students.PageIndex,
+                    PageSize = students.PageSize
+                };
 
-                response = ResponseHandler.Success(studentViewModels, "Successful!");
+                if (!studentViewModels.Any())
+                    return ResponseHandler.Success(paginatedResult, "Không tìm thấy sinh viên phù hợp!");
+
+                response = ResponseHandler.Success(paginatedResult, "Successful!");
             }
             catch (Exception ex)
             {
@@ -205,6 +271,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+
 
     }
 }

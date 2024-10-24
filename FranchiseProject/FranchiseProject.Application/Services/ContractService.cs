@@ -62,7 +62,7 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Không tìm thấy đối tác ";
                     return response;
                 }
-                if(existAgency.Status== AgencyStatusEnum.Pending || existAgency.Status == AgencyStatusEnum.Processing )
+                if( existAgency.Status == AgencyStatusEnum.Processing )
                 {
                     response.Data = false;
                     response.isSuccess=true;

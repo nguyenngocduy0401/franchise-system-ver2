@@ -32,7 +32,7 @@ namespace FranchiseProject.Infrastructures
         private readonly ISessionRepository _sessionRepository;
         private readonly ISlotRepository _slotRepository;
         private readonly IStudentAnswerRepository _studentAnswerRepository;
-        private readonly IClassRoomRepository _studentClassRepository;
+        private readonly IClassRoomRepository _classRoomRepository;
         private readonly IRegisterCourseRepository _registerFormRepository;
         private readonly ISyllabusRepository _syllabusRepository;
         private readonly IUserRepository _userRepository;
@@ -42,23 +42,19 @@ namespace FranchiseProject.Infrastructures
         private readonly INotificationRepository _notificationRepository;
         private readonly IStudentRepository _studentRepository;
         private readonly IPaymentRepository _paymentRepository;
-        private readonly IMaterialRepository _materialRepository;
         private readonly ICourseMaterialRepository _courseMaterialRepository;
+        private readonly IRegisterCourseRepository _registerCourseRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
             ICourseRepository courseRepository, IFeedbackRepository feedbackRepository, IQuestionOptionRepository questionOptionRepository,
             IQuestionRepository questionRepository, IQuizDetailRepository quizDetailRepository, IQuizRepository  quizRepository, IReportRepository reportRepository,
             IScoreRepository scoreRepository, ISessionRepository sessionRepository, ISlotRepository slotRepository, IStudentAnswerRepository studentAnswerRepository,
-            IClassRoomRepository studentClassRepository, IRegisterCourseRepository registerFormRepository, ISyllabusRepository syllabusRepository,
-            ITermRepository termRepository, IUserRepository userRepository, IAssignmentSubmitRepository assignmentSubmitRepository, IRefreshTokenRepository refreshTokenRepository,
-            IRegisterFormRepository franchiseRegistrationRequestRepository, IAssessmentRepository assessmentRepository,INotificationRepository notificationRepository,
-            IPaymentRepository paymentRepository,IStudentRepository studentRepository,
-            IMaterialRepository materialRepository,
-            IStudentClassRepository studentClassRepository, IStudentCourseRepository studentCourseRepository, ISyllabusRepository syllabusRepository,
+            IClassRoomRepository classRoomRepository, IRegisterCourseRepository registerFormRepository, ISyllabusRepository syllabusRepository,
             IUserRepository userRepository, IAssignmentSubmitRepository assignmentSubmitRepository, IRefreshTokenRepository refreshTokenRepository,
-            IConsultationRepository franchiseRegistrationRequestRepository, IAssessmentRepository assessmentRepository,INotificationRepository notificationRepository,
-            ICourseMaterialRepository courseMaterialRepository)
+            IRegisterFormRepository franchiseRegistrationRequestRepository, IAssessmentRepository assessmentRepository,INotificationRepository notificationRepository,
+            IPaymentRepository paymentRepository,IStudentRepository studentRepository
+            ,ICourseMaterialRepository courseMaterialRepository,IRegisterCourseRepository registerCourseRepository)
 
            
         {
@@ -83,7 +79,7 @@ namespace FranchiseProject.Infrastructures
             _sessionRepository = sessionRepository;
             _slotRepository = slotRepository;
             _studentAnswerRepository = studentAnswerRepository;
-            _studentClassRepository = studentClassRepository;
+            _classRoomRepository = classRoomRepository;
             _registerFormRepository = registerFormRepository;
             _syllabusRepository = syllabusRepository;
             _userRepository = userRepository;
@@ -93,7 +89,8 @@ namespace FranchiseProject.Infrastructures
             _notificationRepository = notificationRepository;
             _paymentRepository = paymentRepository;
             _studentRepository = studentRepository;
-            _materialRepository = materialRepository;
+            _registerCourseRepository= registerCourseRepository;
+    
             _courseMaterialRepository = courseMaterialRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
@@ -136,7 +133,7 @@ namespace FranchiseProject.Infrastructures
 
         public IStudentAnswerRepository StudentAnswerRepository => _studentAnswerRepository;
 
-        public IClassRoomRepository StudentClassRepository => _studentClassRepository;
+        public IClassRoomRepository ClassRoomRepository => _classRoomRepository;
 
         public IRegisterCourseRepository RegisterFormRepository => _registerFormRepository;
 
@@ -155,7 +152,10 @@ namespace FranchiseProject.Infrastructures
         public IPaymentRepository PaymentRepository=>_paymentRepository;
 
 
-        public ICourseMaterialRepository CourseMaterialRepository => _courseMaterialRepository;   
+        public ICourseMaterialRepository CourseMaterialRepository => _courseMaterialRepository;
+
+        public IRegisterCourseRepository RegisterCourseRepository => _registerCourseRepository;
+
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

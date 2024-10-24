@@ -22,7 +22,7 @@ namespace FranchiseProject.API.Controllers
         }
 
        // [Authorize(Roles = AppRole.Admin)]
-        [SwaggerOperation(Summary = "Tạo mới lớp học {Authorize = AgencyManager}")]
+       /* [SwaggerOperation(Summary = "Tạo mới lớp học {Authorize = AgencyManager}")]
         [HttpPost()]
         public async Task<ApiResponse<bool>> CreateClassAsync(CreateClassViewModel createClassModel)
         {
@@ -62,6 +62,6 @@ namespace FranchiseProject.API.Controllers
         }
         [SwaggerOperation(Summary = "Lấy danh sách lớp học chưa có lịch học {Authorize = AgencyManager,")]
         [HttpGet("/class-schedules")]
-        public async Task<ApiResponse<Pagination<ClassViewModel>>> GetClassesWithoutScheduleAsync(int pageIndex, int pageSize) => await _classService.GetClassesWithoutScheduleAsync(pageIndex, pageSize);
+        public async Task<ApiResponse<Pagination<ClassViewModel>>> GetClassesWithoutScheduleAsync(int pageIndex, int pageSize) => await _classService.GetClassesWithoutScheduleAsync(pageIndex, pageSize);*/
     }
 }

@@ -59,33 +59,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.ClassRooms.Where(predicate).ToListAsync();
         }
-        public async Task<List<ClassSchedule>> GetClassSchedulesByUserIdAndTermIdAsync(string userId, Guid termId)
-        {
-            var studentClasses = await _dbContext.ClassRooms
-                .Where(sc => sc.UserId == userId)
-                .Select(sc => sc.ClassId)
-                .ToListAsync();
-
-            if (!studentClasses.Any())
-            {
-                return new List<ClassSchedule>(); 
-            }
-            var classSchedules = await _dbContext.ClassSchedules
-                .Include(cs => cs.Class) 
-                .Where(cs => studentClasses.Contains(cs.ClassId.Value) && cs.Class.TermId == termId)
-                .ToListAsync();
-
-            return classSchedules;
-        }
-        public async Task<int> CountClassSchedulesByUserIdAndTermIdAsync(string userId, Guid termId)
-        {
-            var classIds = await _dbContext.ClassRooms
-                .Where(sc => sc.UserId == userId)
-                .Select(sc => sc.ClassId)
-                .ToListAsync();
-
-            return await _dbContext.ClassSchedules
-                .CountAsync(cs => classIds.Contains(cs.ClassId) && cs.Class.TermId == termId);
-        }
+      
+   
     }
 }

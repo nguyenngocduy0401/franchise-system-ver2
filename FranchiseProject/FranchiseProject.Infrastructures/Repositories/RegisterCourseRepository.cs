@@ -1,4 +1,5 @@
 ﻿using FranchiseProject.Application.Repositories;
+using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,13 +18,17 @@ namespace FranchiseProject.Infrastructures.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<List<string>> GetCourseNamesByUserIdAsync(string userId)
+        public  Task<List<string>> GetCourseNamesByUserIdAsync(string userId)
         {
-            return await _dbContext.RegisterCourses
+            return  _dbContext.RegisterCourses
             .Where(rc => rc.UserId == userId && rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied) 
             .Include(rc => rc.Course) 
             .Select(rc => rc.Course.Name) 
             .ToListAsync();
             }
+        public async Task AddAsync(RegisterCourse registerCourse)
+        {
+            await _dbContext.Set<RegisterCourse>().AddAsync(registerCourse);
+        }
     }
 }

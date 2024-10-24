@@ -15,10 +15,10 @@ namespace FranchiseProject.Infrastructures.FluentAPIs
         {
             builder.HasKey(x => new { x.ClassId, x.UserId });
             builder.HasOne(a => a.User)
-                .WithMany(a => a.StudentClasses)
+                .WithMany(a => a.ClassRooms)
                 .HasForeignKey(a => a.UserId);
             builder.HasOne(a => a.Class)
-                .WithMany(a => a.StudentClasses)
+                .WithMany(a => a.ClassRooms)
                 .HasForeignKey(a => a.ClassId);
         }
     }

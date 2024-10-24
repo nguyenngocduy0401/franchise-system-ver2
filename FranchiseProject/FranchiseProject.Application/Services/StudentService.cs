@@ -22,17 +22,17 @@ namespace FranchiseProject.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClaimsService _claimsService;
-        private readonly IValidator<CreateStudentViewModel> _validator;
+      //  private readonly IValidator<CreateStudentViewModel> _validator;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly IEmailService _emailService;
 
-        public StudentService(IUnitOfWork unitOfWork, IClaimsService claimsService, IValidator<CreateStudentViewModel> validator, IUserService userService, IMapper mapper, IHubContext<NotificationHub> hubContext, IEmailService emailService)
+        public StudentService(IUnitOfWork unitOfWork, IClaimsService claimsService, IUserService userService, IMapper mapper, IHubContext<NotificationHub> hubContext, IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _claimsService = claimsService;
-            _validator = validator;
+      
             _userService = userService;
             _mapper = mapper;
             _hubContext = hubContext;

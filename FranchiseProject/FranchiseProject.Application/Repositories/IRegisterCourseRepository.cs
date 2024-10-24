@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FranchiseProject.Domain.Entity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,5 +10,6 @@ namespace FranchiseProject.Application.Repositories
     public interface IRegisterCourseRepository
     {
         Task<List<string>> GetCourseNamesByUserIdAsync(string userId);
+        Task AddAsync(RegisterCourse registerCourse);
     }
 }
