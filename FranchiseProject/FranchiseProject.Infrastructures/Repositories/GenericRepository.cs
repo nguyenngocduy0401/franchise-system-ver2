@@ -177,7 +177,14 @@ namespace FranchiseProject.Infrastructures.Repositories
             return await _dbSet.AnyAsync(predicate);
         }
 
+        public void HardRemove(TEntity entity)
+        {
+            _dbSet.Remove(entity);
+        }
 
-
+        public void HardRemoveRange(List<TEntity> entities)
+        {
+            _dbSet.RemoveRange(entities);
+        }
     }
 }

@@ -14,8 +14,7 @@ namespace FranchiseProject.Infrastructures.Repositories
 {
     public class RegisterFormRepository:GenericRepository<RegisterForm>, IRegisterFormRepository
     {
-
-        private readonly AppDbContext _dbContext;
+        private readonly AppDbContext _context;
         private readonly ICurrentTime _timeService;
         private readonly IClaimsService _claimsService;
         public RegisterFormRepository(
@@ -24,7 +23,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             IClaimsService claimsService
         ) : base(context, timeService, claimsService)
         {
-            _dbContext = context;
+            _context = context;
             _timeService = timeService;
             _claimsService = claimsService;
         }

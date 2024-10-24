@@ -1,21 +1,18 @@
 ﻿using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Domain.Entity
+namespace FranchiseProject.Application.ViewModels.QuestionOptionViewModels
 {
-    public class QuestionOption : BaseEntity
+    public class QuestionOptionViewModel
     {
+        public Guid Id { get; set; }
         public string? Description { get; set; }
         public string? ImageURL { get; set; }
         public bool Status { get; set; }
         public Guid? QuestionId { get; set; }
-        [ForeignKey("QuestionId")]
-        public Question? Question { get; set; }
-        public virtual ICollection<StudentAnswer>? StudentAnswers { get; set; }
     }
 }
