@@ -30,5 +30,23 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             await _dbContext.Set<RegisterCourse>().AddAsync(registerCourse);
         }
+        public async Task UpdateAsync(RegisterCourse registerCourse)
+        {
+           
+            var existingRegisterCourse = await _dbContext.Set<RegisterCourse>().FindAsync(registerCourse.UserId, registerCourse.CourseId);
+
+            if (existingRegisterCourse != null)
+            {
+
+                existingRegisterCourse.DateTime = registerCourse.DateTime;
+                existingRegisterCourse.StudentCourseStatus = registerCourse.StudentCourseStatus;
+                _dbContext.Entry(existingRegisterCourse).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                throw new Exception("RegisterCourse not found.");
+            }
+        }
     }
 }

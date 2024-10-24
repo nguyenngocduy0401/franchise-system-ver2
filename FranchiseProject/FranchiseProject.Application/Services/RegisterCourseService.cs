@@ -3,8 +3,8 @@ using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Wordprocessing;
 using FluentValidation;
 using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.EmailTemplateHandler;
 using FranchiseProject.Application.Handler;
-using FranchiseProject.Application.Handler.EmailTemplateHandler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Application.ViewModels.StudentViewModel;
@@ -114,7 +114,7 @@ namespace FranchiseProject.Application.Services
                     StudentCourseStatus = StudentCourseStatusEnum.NotStudied
                 };
                  await _unitOfWork.RegisterCourseRepository.AddAsync(newRegisterCourse);
-                var emailMessage = EmailTemplateHandler.SuccessRegisterCourseEmaill(model.Email, model.StudentName, course.Name, agency.Name);
+                var emailMessage = EmailTemplate.SuccessRegisterCourseEmaill(model.Email, model.StudentName, course.Name, agency.Name);
                 bool emailSent = await _emailService.SendEmailAsync(emailMessage);
                 if (!emailSent)
                 {
@@ -148,33 +148,34 @@ namespace FranchiseProject.Application.Services
 
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
-        public async Task<ApiResponse<bool>> UpdateStatusStudentAsync(StudentStatusEnum studentStatus, string studentId)
+        public async Task<ApiResponse<bool>> UpdateStatusStudentAsync( string studentId)
         {
           var response= new ApiResponse<bool>();
             try
             {
-                var student= await _unitOfWork.UserRepository.GetStudentByIdAsync(studentId);
+                var student = await _userManager.FindByIdAsync(studentId);
                 if (student == null) { return ResponseHandler.Failure<bool>("Học sinh không khả dụng!"); }
-                switch (studentStatus) 
-                {
-                    case StudentStatusEnum.Pending:
+              
                         if(student.StudentStatus == StudentStatusEnum.NotConsult)
                         {
                             student.StudentStatus = StudentStatusEnum.Pending;
+                            
                         }else
                         {
                             return ResponseHandler.Failure<bool>("Học sinh không thể chuyển thành trạng thái Chờ!");
                         }
-                        break;
-                    case StudentStatusEnum.Waitlisted:
-                        //Nếu có lỗi hệ thống gì đó khi mà thanh toán thành công mà không chuyển qua wailisted
-                        if (student.StudentPaymentStatus == StudentPaymentStatusEnum.Completed)
-                        {
-                            student.StudentStatus = StudentStatusEnum.Waitlisted;
-                        }
-                        break;
-                    
+
+
+
+
+
+                var updateResult = await _userManager.UpdateAsync(student);
+                if (!updateResult.Succeeded)
+                {
+        
+                    return ResponseHandler.Failure<bool>("Update Failed!");
                 }
+                response = ResponseHandler.Success(true, "Cập nhật trạng thái học sinh thành công!");
             }
             catch (Exception ex)
             {
@@ -234,10 +235,8 @@ namespace FranchiseProject.Application.Services
                     filter: filter,
                     pageIndex: filterStudentModel.PageIndex,
                     pageSize: filterStudentModel.PageSize,
-                    includeProperties: "RegisterCourses.Course" // Đảm bảo bao gồm khóa học
+                    includeProperties: "RegisterCourses.Course" 
                 );
-
-                // Ánh xạ và lấy tên khóa học có trạng thái NotStudied
                 var studentViewModels = students.Items.Select(s => new StudentViewModel
                 {
                     Id = s.Id,
@@ -247,9 +246,9 @@ namespace FranchiseProject.Application.Services
                     PhoneNumber = s.PhoneNumber,
                     Email = s.Email,
                     CourseName = s.RegisterCourses
-                        .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied) // Lọc trạng thái NotStudied
-                        .Select(rc => rc.Course?.Name) // Lấy tên khóa học
-                        .FirstOrDefault() // Lấy tên khóa học đầu tiên (nếu có)
+                        .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied) 
+                        .Select(rc => rc.Course?.Name) 
+                        .FirstOrDefault() 
                 }).ToList();
 
                 var paginatedResult = new Pagination<StudentViewModel>

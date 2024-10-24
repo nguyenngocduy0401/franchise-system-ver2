@@ -11,5 +11,6 @@ namespace FranchiseProject.Application.Repositories
     {
         Task<List<string>> GetCourseNamesByUserIdAsync(string userId);
         Task AddAsync(RegisterCourse registerCourse);
+        Task UpdateAsync(RegisterCourse registerCourse);
     }
 }

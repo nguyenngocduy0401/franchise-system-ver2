@@ -2,8 +2,8 @@
 using DocumentFormat.OpenXml.Office2010.PowerPoint;
 using FluentValidation;
 using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.EmailTemplateHandler;
 using FranchiseProject.Application.Handler;
-using FranchiseProject.Application.Handler.EmailTemplateHandler;
 using FranchiseProject.Application.Hubs;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ConsultationViewModels;
@@ -65,7 +65,7 @@ namespace FranchiseProject.Application.Services
                     student.StudentStatus=StudentStatusEnum.Waitlisted;
                     var courseNames = await _unitOfWork.RegisterCourseRepository
                   .GetCourseNamesByUserIdAsync(userId);
-                    var emailMessage = EmailTemplateHandler.StudentPaymentSuccsess(student.Email, student.FullName, create.Amount, agency.Name);
+                    var emailMessage = EmailTemplate.StudentPaymentSuccsess(student.Email, student.FullName, create.Amount, agency.Name);
                     bool emailSent = await _emailService.SendEmailAsync(emailMessage);
                     if (!emailSent)
                     {

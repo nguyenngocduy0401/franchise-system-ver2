@@ -102,7 +102,7 @@ namespace FranchiseProject.Application.Services
                     }
                     var classSchedule = new ClassSchedule
                     {
-                        Room = createClassScheduleDateRangeViewModel.Room,
+                      
                         ClassId = Guid.Parse(createClassScheduleDateRangeViewModel.ClassId),
                         SlotId = Guid.Parse(createClassScheduleDateRangeViewModel.SlotId),
                         Date = date,
@@ -221,7 +221,6 @@ namespace FranchiseProject.Application.Services
                 var slot = await _unitOfWork.SlotRepository.GetByIdAsync(classSchedule.SlotId.Value);
                 var class1 = await _unitOfWork.ClassRepository.GetByIdAsync(classSchedule.ClassId.Value);
                 var clasScheduleViewModel = _mapper.Map<ClassScheduleViewModel>(classSchedule);
-                clasScheduleViewModel.SlotName = slot.Name;
                 clasScheduleViewModel.ClassName = class1.Name;
 
                 response.Data = clasScheduleViewModel;

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.Handler.EmailTemplateHandler
+namespace FranchiseProject.Application.EmailTemplateHandler
 {
-    public static class EmailTemplateHandler
+    public static class EmailTemplate
     {
         #region AgencyEmail
         public static MessageModel AgencyRegistrationSuccess(string to, string name)
@@ -39,7 +39,7 @@ namespace FranchiseProject.Application.Handler.EmailTemplateHandler
         }
         #endregion
         #region RegisterCourseEmail
-        public static MessageModel SuccessRegisterCourseEmaill(string to, string name,string courseName,string agencyName)
+        public static MessageModel SuccessRegisterCourseEmaill(string to, string name, string courseName, string agencyName)
         {
             return new MessageModel
             {
@@ -52,7 +52,7 @@ namespace FranchiseProject.Application.Handler.EmailTemplateHandler
                        $"<p>Đội ngũ {agencyName}</p>"
             };
         }
-        public static MessageModel StudentPaymentSuccsess(string to, string name, int amount,string agencyName)
+        public static MessageModel StudentPaymentSuccsess(string to, string name, int amount, string agencyName)
         {
             return new MessageModel
             {
