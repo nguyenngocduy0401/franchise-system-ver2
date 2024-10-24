@@ -48,7 +48,7 @@ namespace FranchiseProject.Application.Services
             try
             {
              
-                var course = await _unitOfWork.CourseRepository.GetCourseDetailAsync(courseId);
+                var course = await _unitOfWork.CourseRepository.GetCourseDetailForDuplicateAsync(courseId);
                 if (course == null) throw new Exception("Course does not exist!");
                 var newCourse = _mapper.Map<Course>(course);
                 newCourse.Status = CourseStatusEnum.Draft;

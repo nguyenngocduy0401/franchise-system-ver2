@@ -22,6 +22,8 @@ using FranchiseProject.Application.ViewModels.CourseViewModels;
 using FranchiseProject.Application.ViewModels.SyllabusViewModels;
 using FranchiseProject.Application.ViewModels.ChapterMaterialViewModels;
 using FranchiseProject.Domain.Enums;
+using FranchiseProject.Application.ViewModels.QuestionViewModels;
+using FranchiseProject.Application.ViewModels.QuestionOptionViewModels;
 
 namespace FranchiseProject.Infrastructures.Mappers
 {
@@ -175,7 +177,16 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Syllabus, Syllabus>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             #endregion
+            #region Question
+            CreateMap<CreateQuestionOptionArrangeModel, QuestionOption>();
+            CreateMap<CreateQuestionArrangeModel, Question>()
+                .ForMember(dest => dest.QuestionOptions, opt => opt.MapFrom(src => src.QuestionOptions));
 
+
+            CreateMap<QuestionOption, QuestionOptionViewModel>();
+            CreateMap<Question, QuestionViewModel>()
+                .ForMember(dest => dest.QuestionOptions, opt => opt.MapFrom(src => src.QuestionOptions));
+            #endregion
 
         }
     }

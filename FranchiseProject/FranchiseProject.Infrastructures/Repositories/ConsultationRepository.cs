@@ -15,8 +15,6 @@ namespace FranchiseProject.Infrastructures.Repositories
     public class ConsultationRepository:GenericRepository<Consultation>, IConsultationRepository
     {
         private readonly AppDbContext _context;
-
-        private readonly AppDbContext _dbContext;
         private readonly ICurrentTime _timeService;
         private readonly IClaimsService _claimsService;
         public ConsultationRepository(
@@ -25,7 +23,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             IClaimsService claimsService
         ) : base(context, timeService, claimsService)
         {
-            _dbContext = context;
+            _context = context;
             _timeService = timeService;
             _claimsService = claimsService;
         }

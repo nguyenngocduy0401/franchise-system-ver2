@@ -37,6 +37,8 @@ using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.API.Validator.AssessmentValidator;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
 using FranchiseProject.API.Validator.CourseValidator;
+using FranchiseProject.Application.ViewModels.QuestionViewModels;
+using FranchiseProject.API.Validator.QuestionValidator;
 
 namespace FranchiseProject.API
 {
@@ -132,14 +134,20 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<UpdateAssessmentModel>, UpdateAssessmentValidator>();
             services.AddTransient<IValidator<CreateCourseModel>, CreateCourseValidator>();
             services.AddTransient<IValidator<UpdateCourseModel>, UpdateCourseValidator>();
+
             services.AddTransient<IValidator<CreateCourseMaterialArrangeModel>, SingleCourseMaterialArrangeValidator>();
             services.AddTransient<IValidator<List<CreateCourseMaterialArrangeModel>>, CreateCourseMaterialArrangeValidator>();
+
             services.AddTransient<IValidator<CreateAssessmentArrangeModel>, SingleAssessmentArrangeValidator>();
             services.AddTransient<IValidator<List<CreateAssessmentArrangeModel>>, CreateAssessmentArrangeValidator>();
+
             services.AddTransient<IValidator<CreateChapterArrangeModel>, SingleChapterArrangeValidator>();
             services.AddTransient<IValidator<List<CreateChapterArrangeModel>>, CreateChapterArrangeValidator>();
+
             services.AddTransient<IValidator<CreateSessionArrangeModel>, SingleSessionArrangeValidator>();
             services.AddTransient<IValidator<List<CreateSessionArrangeModel>>, CreateSessionArrangeValidator>();
+
+            services.AddTransient<IValidator<List<CreateQuestionArrangeModel>>, CreateQuestionArrangeValidator>();
 
             #endregion
 

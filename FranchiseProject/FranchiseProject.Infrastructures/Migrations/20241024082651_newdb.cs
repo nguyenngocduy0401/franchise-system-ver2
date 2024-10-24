@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FranchiseProject.Infrastructures.Migrations
 {
     /// <inheritdoc />
-    public partial class newDB : Migration
+    public partial class newdb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -97,27 +97,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CoursesCategories", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Slots",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StartTime = table.Column<TimeSpan>(type: "time", nullable: true),
-                    EndTime = table.Column<TimeSpan>(type: "time", nullable: true),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModificationBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Slots", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -237,6 +216,33 @@ namespace FranchiseProject.Infrastructures.Migrations
                     table.PrimaryKey("PK_Contracts", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Contracts_Agencies_AgencyId",
+                        column: x => x.AgencyId,
+                        principalTable: "Agencies",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Slots",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StartTime = table.Column<TimeSpan>(type: "time", nullable: true),
+                    EndTime = table.Column<TimeSpan>(type: "time", nullable: true),
+                    AgencyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModificationBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Slots", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Slots_Agencies_AgencyId",
                         column: x => x.AgencyId,
                         principalTable: "Agencies",
                         principalColumn: "Id");
@@ -756,7 +762,6 @@ namespace FranchiseProject.Infrastructures.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ImageURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Score = table.Column<double>(type: "float", nullable: true),
                     ChapterId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -1099,7 +1104,7 @@ namespace FranchiseProject.Infrastructures.Migrations
             migrationBuilder.InsertData(
                 table: "Contracts",
                 columns: new[] { "Id", "AgencyId", "Amount", "ContractDocumentImageURL", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "Duration", "EndTime", "IsDeleted", "ModificationBy", "ModificationDate", "StartTime", "TermsAndCondition", "Title", "Total" },
-                values: new object[] { new Guid("550ee872-ea09-42a0-b9ac-809890debafb"), null, 0, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, 0, new DateTime(2024, 10, 28, 17, 25, 29, 119, DateTimeKind.Local).AddTicks(2993), false, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, 0 });
+                values: new object[] { new Guid("550ee872-ea09-42a0-b9ac-809890debafb"), null, 0, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, null, 0, new DateTime(2024, 10, 29, 15, 26, 51, 95, DateTimeKind.Local).AddTicks(8413), false, null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, 0 });
 
             migrationBuilder.InsertData(
                 table: "CoursesCategories",
@@ -1114,17 +1119,22 @@ namespace FranchiseProject.Infrastructures.Migrations
 
             migrationBuilder.InsertData(
                 table: "Slots",
-                columns: new[] { "Id", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "EndTime", "IsDeleted", "ModificationBy", "ModificationDate", "Name", "StartTime" },
+                columns: new[] { "Id", "AgencyId", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "EndTime", "IsDeleted", "ModificationBy", "ModificationDate", "Name", "StartTime" },
                 values: new object[,]
                 {
-                    { new Guid("849116fa-dd9c-49a4-a019-7616b7447ae9"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new TimeSpan(0, 15, 0, 0, 0), false, null, null, "SLot 1", new TimeSpan(0, 8, 0, 0, 0) },
-                    { new Guid("a994e524-943d-4022-b258-de37662055c9"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new TimeSpan(0, 21, 0, 0, 0), false, null, null, "SLot 2", new TimeSpan(0, 15, 0, 0, 0) }
+                    { new Guid("849116fa-dd9c-49a4-a019-7616b7447ae9"), null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new TimeSpan(0, 15, 0, 0, 0), false, null, null, "SLot 1", new TimeSpan(0, 8, 0, 0, 0) },
+                    { new Guid("a994e524-943d-4022-b258-de37662055c9"), null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, new TimeSpan(0, 21, 0, 0, 0), false, null, null, "SLot 2", new TimeSpan(0, 15, 0, 0, 0) }
                 });
+
+            migrationBuilder.InsertData(
+                table: "Syllabuses",
+                columns: new[] { "Id", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "IsDeleted", "MinAvgMarkToPass", "ModificationBy", "ModificationDate", "Scale", "StudentTask", "TimeAllocation", "ToolsRequire" },
+                values: new object[] { new Guid("990ca87d-c261-4cb3-1b9d-08dcf34d3900"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Khóa học này sẽ cung cấp kiến thức cơ bản về lý thuyết thông tin, hệ thống máy tính và các phương pháp phát triển phần mềm, với trọng tâm vào lập trình hướng thủ tục (function-oriented programming). Học viên sẽ học các kỹ năng liên quan đến thiết kế chương trình, viết mã, kiểm thử và phát triển kỷ luật lập trình.\"", false, 5.0, null, null, 10.0, "Học sinh có trách nhiệm làm tất cả các bài tập được giao bởi giảng viên trên lớp hoặc ở nhà và nộp đúng hạn", "Giờ học (150 giờ) = 45 giờ học trên lớp(60 * 45') + 1 giờ thi cuối kỳ + 104 giờ tự học", "- Internet\n- C language utility" });
 
             migrationBuilder.InsertData(
                 table: "Courses",
                 columns: new[] { "Id", "Code", "CourseCategoryId", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "IsDeleted", "ModificationBy", "ModificationDate", "Name", "NumberOfLession", "Price", "Status", "SyllabusId", "URLImage", "Version" },
-                values: new object[] { new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), "PRF", new Guid("f8fd80dd-c470-4ecf-7940-08dcf20adbbc"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Khóa học lập trình căn bản với ngữ C giành cho người mới bắt đầu học lập trình", false, null, null, "Nhập môn lập trình với C", 20, 2000000, 0, null, "string", 0 });
+                values: new object[] { new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), "PRF", new Guid("f8fd80dd-c470-4ecf-7940-08dcf20adbbc"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Khóa học lập trình căn bản với ngữ C giành cho người mới bắt đầu học lập trình", false, null, null, "Nhập môn lập trình với C", 20, 2000000, 0, new Guid("990ca87d-c261-4cb3-1b9d-08dcf34d3900"), "string", 0 });
 
             migrationBuilder.InsertData(
                 table: "Assessments",
@@ -1157,27 +1167,27 @@ namespace FranchiseProject.Infrastructures.Migrations
                 columns: new[] { "Id", "Chapter", "CourseId", "CreatedBy", "CreationDate", "DeleteBy", "DeletionDate", "Description", "IsDeleted", "ModificationBy", "ModificationDate", "Number", "Topic" },
                 values: new object[,]
                 {
-                    { new Guid("0707e929-939a-4e9a-b6c7-3e1bb2c1a69d"), "Chương 1", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu cấu trúc bài tập, cách thức nộp bài và yêu cầu cần đạt.", false, null, null, 4, "Giới thiệu về bài tập" },
-                    { new Guid("40b64354-9169-4b0a-a72d-7f313543e54b"), "Chương 2", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giải thích các thao tác bộ nhớ trong C, cách lưu trữ và xử lý dữ liệu trong bộ nhớ.", false, null, null, 6, "Module B: Tính toán - Các thao tác bộ nhớ cơ bản" },
-                    { new Guid("54562e9c-1be9-4107-a544-8b31c5b945e0"), "Chương 1", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu tổng quan về khóa học, các chủ đề sẽ được học, yêu cầu và phương pháp đánh giá.", false, null, null, 1, "Giới thiệu khóa học" },
-                    { new Guid("5a16a76c-0920-4d24-9e49-aa5b42b72aca"), "", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Tiếp tục thực hành về hàm và tính mô-đun.", false, null, null, 17, "Tính mô-đun và Hàm" },
-                    { new Guid("5ccfa1ee-90b6-473d-9477-15f77a3f14a6"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Tiếp tục thực hành và làm quen với con trỏ trong lập trình C.", false, null, null, 21, "Con trỏ" },
-                    { new Guid("64bfe5c2-bdd7-49f2-9b7c-cf8ce3fe1e3c"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Tìm hiểu sâu hơn về cách chia chương trình thành các mô-đun và sử dụng hàm trong lập trình.", false, null, null, 15, "Tính mô-đun và Hàm" },
-                    { new Guid("84b25381-29f9-4959-bcd9-3ba183e28099"), "Chương 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu các cấu trúc lặp trong C như for, while, và do-while, cách sử dụng chúng trong lập trình.", false, null, null, 9, "Module C: Lô-gic cơ bản - Cấu trúc lặp" },
-                    { new Guid("90312418-4e80-480b-8740-c4588c8a6a62"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu khái niệm con trỏ, cách khai báo, sử dụng và các ứng dụng của con trỏ trong lập trình.", false, null, null, 19, "Con trỏ" },
-                    { new Guid("a17962f5-80ff-4c95-89c9-293bb8bd01f3"), "Chương 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Hướng dẫn chi tiết về cách sử dụng các cấu trúc logic trong việc giải quyết các bài toán thực tế.", false, null, null, 11, "Lô-gic cơ bản: Walkthroughs" },
-                    { new Guid("a2b71836-292f-4c2b-8911-3b87cd9ad649"), "Chương 2", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Tìm hiểu về các biến trong C, cách khai báo, kiểu dữ liệu và cách thức sử dụng biến trong tính toán.", false, null, null, 5, "Module B: Tính toán - Biến số" },
-                    { new Guid("b1fb45a8-6696-470d-a311-cbccec3c594b"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Thực hành viết và sử dụng hàm, tối ưu hóa mã nguồn bằng cách chia thành các mô-đun.", false, null, null, 16, "Tính mô-đun và Hàm" },
-                    { new Guid("bad1d689-45e2-4f07-8921-0254a33eddcb"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Thực hành với các bài tập sử dụng con trỏ để quản lý bộ nhớ và dữ liệu.", false, null, null, 20, "Con trỏ" },
-                    { new Guid("c75318b4-b5a6-468e-b188-713196ef9d48"), "Chương 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Học về các cấu trúc điều khiển trong C như cấu trúc trình tự và cấu trúc lựa chọn (if, switch).", false, null, null, 8, "Module C: Lô-gic cơ bản - Cấu trúc trình tự, Cấu trúc lựa chọn" },
-                    { new Guid("c8eaed9f-0724-47c4-aa4f-7358ed9a19ad"), "", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu các biểu thức trong C, các phép toán cơ bản như cộng, trừ, nhân, chia, và các phép toán logic.", false, null, null, 7, "Tính toán cơ bản: Biểu thức" },
-                    { new Guid("c9105249-6eff-4a78-b7cb-ccd7e713115a"), "Chương 1, 2, 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Thực hành về các kỹ năng nhập/xuất dữ liệu, tính toán và sử dụng các cấu trúc logic cơ bản.", false, null, null, 12, "Workshop 1: Nhập/Xuất, tính toán và lô-gic cơ bản" },
-                    { new Guid("cdc33073-b1f1-4262-af5f-bc2a072212ee"), "Chương 1", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Hướng dẫn cài đặt và cấu hình công cụ lập trình, giới thiệu môi trường làm việc cho lập trình C.", false, null, null, 2, "Cài đặt Công cụ Lập trình" },
-                    { new Guid("d608c029-5cc0-4963-8834-9e9cc71f8674"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Thực hành các bài tập liên quan đến tính mô-đun và sử dụng hàm trong C.", false, null, null, 18, "Workshop 2: Tính mô-đun và Hàm" },
-                    { new Guid("db583d2d-3bc7-490d-adc8-ab5fb762edad"), "Chương 1", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu ngôn ngữ lập trình C, cách thức hoạt động của trình biên dịch C, và cú pháp cơ bản.", false, null, null, 3, "Module A: Giới thiệu về ngôn ngữ lập trình C và Trình biên dịch C" },
-                    { new Guid("dbf9a57a-3be7-4fb2-a4f3-31ed64252742"), "Chương 1, 2, 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Đánh giá kết quả của workshop 1 và phân tích lỗi thường gặp.", false, null, null, 14, "Đánh giá Workshop 1" },
-                    { new Guid("f96d98b3-8d42-468d-a7f5-ddee3798bdbd"), "Chương 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Học cách viết mã có cấu trúc, dễ hiểu, tuân thủ các quy tắc về phong cách lập trình tốt.", false, null, null, 10, "Module C: Lô-gic cơ bản - Phong cách lập trình" },
-                    { new Guid("fbb7ea0f-9c9f-422b-a137-37ef7e44cc70"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu khái niệm tính mô-đun, cách sử dụng hàm trong C và phạm vi của biến trong lập trình.", false, null, null, 13, "Module D: Tính mô-đun và Hàm - Hàm C, Phạm vi biến" }
+                    { new Guid("1698026c-c435-4f16-882c-396bc076c5d6"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Tìm hiểu sâu hơn về cách chia chương trình thành các mô-đun và sử dụng hàm trong lập trình.", false, null, null, 15, "Tính mô-đun và Hàm" },
+                    { new Guid("1b8bfca0-126c-48a1-8da1-0c584397b9f6"), "", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Tiếp tục thực hành về hàm và tính mô-đun.", false, null, null, 17, "Tính mô-đun và Hàm" },
+                    { new Guid("2b2c84c8-5b03-4ed2-8ac8-a06f8061fa06"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Tiếp tục thực hành và làm quen với con trỏ trong lập trình C.", false, null, null, 21, "Con trỏ" },
+                    { new Guid("3e7f0744-3265-48d5-b08f-5e2307da47be"), "Chương 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Hướng dẫn chi tiết về cách sử dụng các cấu trúc logic trong việc giải quyết các bài toán thực tế.", false, null, null, 11, "Lô-gic cơ bản: Walkthroughs" },
+                    { new Guid("48743490-8ecd-4ff6-8db9-e9fb8dd77ca3"), "Chương 1", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Hướng dẫn cài đặt và cấu hình công cụ lập trình, giới thiệu môi trường làm việc cho lập trình C.", false, null, null, 2, "Cài đặt Công cụ Lập trình" },
+                    { new Guid("49c5ffeb-0296-4022-b484-70ac50b6aae3"), "", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu các biểu thức trong C, các phép toán cơ bản như cộng, trừ, nhân, chia, và các phép toán logic.", false, null, null, 7, "Tính toán cơ bản: Biểu thức" },
+                    { new Guid("4d7d0dd4-abc7-41e7-8dac-754342fae51d"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Thực hành với các bài tập sử dụng con trỏ để quản lý bộ nhớ và dữ liệu.", false, null, null, 20, "Con trỏ" },
+                    { new Guid("63f537b9-70dc-4593-9a7b-eaba8c8b596e"), "Chương 1", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu cấu trúc bài tập, cách thức nộp bài và yêu cầu cần đạt.", false, null, null, 4, "Giới thiệu về bài tập" },
+                    { new Guid("673b704e-df6c-4459-9ec0-6f15b8c3ac94"), "Chương 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu các cấu trúc lặp trong C như for, while, và do-while, cách sử dụng chúng trong lập trình.", false, null, null, 9, "Module C: Lô-gic cơ bản - Cấu trúc lặp" },
+                    { new Guid("6a94f91c-0a97-4b1b-ad49-33c1ee440266"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Thực hành các bài tập liên quan đến tính mô-đun và sử dụng hàm trong C.", false, null, null, 18, "Workshop 2: Tính mô-đun và Hàm" },
+                    { new Guid("705d552d-cff3-44bd-baf3-6ebda385295f"), "Chương 1", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu ngôn ngữ lập trình C, cách thức hoạt động của trình biên dịch C, và cú pháp cơ bản.", false, null, null, 3, "Module A: Giới thiệu về ngôn ngữ lập trình C và Trình biên dịch C" },
+                    { new Guid("777bd3d1-152d-4b8c-8309-8a554e02caf0"), "Chương 1, 2, 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Thực hành về các kỹ năng nhập/xuất dữ liệu, tính toán và sử dụng các cấu trúc logic cơ bản.", false, null, null, 12, "Workshop 1: Nhập/Xuất, tính toán và lô-gic cơ bản" },
+                    { new Guid("85360bd2-533e-43ae-972a-0bbd0b8ffc71"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu khái niệm con trỏ, cách khai báo, sử dụng và các ứng dụng của con trỏ trong lập trình.", false, null, null, 19, "Con trỏ" },
+                    { new Guid("c4995cd8-be05-4a45-8aef-3497c35efbac"), "Chương 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Học về các cấu trúc điều khiển trong C như cấu trúc trình tự và cấu trúc lựa chọn (if, switch).", false, null, null, 8, "Module C: Lô-gic cơ bản - Cấu trúc trình tự, Cấu trúc lựa chọn" },
+                    { new Guid("d3223adf-c908-4d2e-afe0-ba6e1122614e"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Thực hành viết và sử dụng hàm, tối ưu hóa mã nguồn bằng cách chia thành các mô-đun.", false, null, null, 16, "Tính mô-đun và Hàm" },
+                    { new Guid("dc4f8e76-a008-45ca-8ac0-2c16f2751a5b"), "Chương 1, 2, 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Đánh giá kết quả của workshop 1 và phân tích lỗi thường gặp.", false, null, null, 14, "Đánh giá Workshop 1" },
+                    { new Guid("e520c029-26f9-4053-9154-f3f465d81d97"), "Chương 4", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu khái niệm tính mô-đun, cách sử dụng hàm trong C và phạm vi của biến trong lập trình.", false, null, null, 13, "Module D: Tính mô-đun và Hàm - Hàm C, Phạm vi biến" },
+                    { new Guid("e92ff7f8-8d13-4182-b136-1522c3825bdd"), "Chương 3", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Học cách viết mã có cấu trúc, dễ hiểu, tuân thủ các quy tắc về phong cách lập trình tốt.", false, null, null, 10, "Module C: Lô-gic cơ bản - Phong cách lập trình" },
+                    { new Guid("f46745fe-eaca-442b-a9cf-7c356566e1b4"), "Chương 1", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giới thiệu tổng quan về khóa học, các chủ đề sẽ được học, yêu cầu và phương pháp đánh giá.", false, null, null, 1, "Giới thiệu khóa học" },
+                    { new Guid("f53bb695-b311-497a-8711-46092edbf144"), "Chương 2", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Tìm hiểu về các biến trong C, cách khai báo, kiểu dữ liệu và cách thức sử dụng biến trong tính toán.", false, null, null, 5, "Module B: Tính toán - Biến số" },
+                    { new Guid("fbaab02a-7182-4086-820a-45d59ba24d75"), "Chương 2", new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"), null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, null, "Giải thích các thao tác bộ nhớ trong C, cách lưu trữ và xử lý dữ liệu trong bộ nhớ.", false, null, null, 6, "Module B: Tính toán - Các thao tác bộ nhớ cơ bản" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -1373,6 +1383,11 @@ namespace FranchiseProject.Infrastructures.Migrations
                 name: "IX_Sessions_CourseId",
                 table: "Sessions",
                 column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Slots_AgencyId",
+                table: "Slots",
+                column: "AgencyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentAnswers_UserId",

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FranchiseProject.Infrastructures.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241023102529_newDB")]
-    partial class newDB
+    [Migration("20241024082651_newdb")]
+    partial class newdb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -798,7 +798,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                             Amount = 0,
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Duration = 0,
-                            EndTime = new DateTime(2024, 10, 28, 17, 25, 29, 119, DateTimeKind.Local).AddTicks(2993),
+                            EndTime = new DateTime(2024, 10, 29, 15, 26, 51, 95, DateTimeKind.Local).AddTicks(8413),
                             IsDeleted = false,
                             StartTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Total = 0
@@ -883,6 +883,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                             NumberOfLession = 20,
                             Price = 2000000,
                             Status = 0,
+                            SyllabusId = new Guid("990ca87d-c261-4cb3-1b9d-08dcf34d3900"),
                             URLImage = "string",
                             Version = 0
                         });
@@ -1134,9 +1135,6 @@ namespace FranchiseProject.Infrastructures.Migrations
 
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<double?>("Score")
-                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -1466,7 +1464,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("54562e9c-1be9-4107-a544-8b31c5b945e0"),
+                            Id = new Guid("f46745fe-eaca-442b-a9cf-7c356566e1b4"),
                             Chapter = "Chương 1",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1477,7 +1475,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("cdc33073-b1f1-4262-af5f-bc2a072212ee"),
+                            Id = new Guid("48743490-8ecd-4ff6-8db9-e9fb8dd77ca3"),
                             Chapter = "Chương 1",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1488,7 +1486,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("db583d2d-3bc7-490d-adc8-ab5fb762edad"),
+                            Id = new Guid("705d552d-cff3-44bd-baf3-6ebda385295f"),
                             Chapter = "Chương 1",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1499,7 +1497,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("0707e929-939a-4e9a-b6c7-3e1bb2c1a69d"),
+                            Id = new Guid("63f537b9-70dc-4593-9a7b-eaba8c8b596e"),
                             Chapter = "Chương 1",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1510,7 +1508,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("a2b71836-292f-4c2b-8911-3b87cd9ad649"),
+                            Id = new Guid("f53bb695-b311-497a-8711-46092edbf144"),
                             Chapter = "Chương 2",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1521,7 +1519,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("40b64354-9169-4b0a-a72d-7f313543e54b"),
+                            Id = new Guid("fbaab02a-7182-4086-820a-45d59ba24d75"),
                             Chapter = "Chương 2",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1532,7 +1530,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("c8eaed9f-0724-47c4-aa4f-7358ed9a19ad"),
+                            Id = new Guid("49c5ffeb-0296-4022-b484-70ac50b6aae3"),
                             Chapter = "",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1543,7 +1541,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("c75318b4-b5a6-468e-b188-713196ef9d48"),
+                            Id = new Guid("c4995cd8-be05-4a45-8aef-3497c35efbac"),
                             Chapter = "Chương 3",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1554,7 +1552,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("84b25381-29f9-4959-bcd9-3ba183e28099"),
+                            Id = new Guid("673b704e-df6c-4459-9ec0-6f15b8c3ac94"),
                             Chapter = "Chương 3",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1565,7 +1563,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("f96d98b3-8d42-468d-a7f5-ddee3798bdbd"),
+                            Id = new Guid("e92ff7f8-8d13-4182-b136-1522c3825bdd"),
                             Chapter = "Chương 3",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1576,7 +1574,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("a17962f5-80ff-4c95-89c9-293bb8bd01f3"),
+                            Id = new Guid("3e7f0744-3265-48d5-b08f-5e2307da47be"),
                             Chapter = "Chương 3",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1587,7 +1585,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("c9105249-6eff-4a78-b7cb-ccd7e713115a"),
+                            Id = new Guid("777bd3d1-152d-4b8c-8309-8a554e02caf0"),
                             Chapter = "Chương 1, 2, 3",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1598,7 +1596,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("fbb7ea0f-9c9f-422b-a137-37ef7e44cc70"),
+                            Id = new Guid("e520c029-26f9-4053-9154-f3f465d81d97"),
                             Chapter = "Chương 4",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1609,7 +1607,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("dbf9a57a-3be7-4fb2-a4f3-31ed64252742"),
+                            Id = new Guid("dc4f8e76-a008-45ca-8ac0-2c16f2751a5b"),
                             Chapter = "Chương 1, 2, 3",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1620,7 +1618,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("64bfe5c2-bdd7-49f2-9b7c-cf8ce3fe1e3c"),
+                            Id = new Guid("1698026c-c435-4f16-882c-396bc076c5d6"),
                             Chapter = "Chương 4",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1631,7 +1629,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("b1fb45a8-6696-470d-a311-cbccec3c594b"),
+                            Id = new Guid("d3223adf-c908-4d2e-afe0-ba6e1122614e"),
                             Chapter = "Chương 4",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1642,7 +1640,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("5a16a76c-0920-4d24-9e49-aa5b42b72aca"),
+                            Id = new Guid("1b8bfca0-126c-48a1-8da1-0c584397b9f6"),
                             Chapter = "",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1653,7 +1651,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("d608c029-5cc0-4963-8834-9e9cc71f8674"),
+                            Id = new Guid("6a94f91c-0a97-4b1b-ad49-33c1ee440266"),
                             Chapter = "Chương 4",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1664,7 +1662,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("90312418-4e80-480b-8740-c4588c8a6a62"),
+                            Id = new Guid("85360bd2-533e-43ae-972a-0bbd0b8ffc71"),
                             Chapter = "Chương 4",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1675,7 +1673,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("bad1d689-45e2-4f07-8921-0254a33eddcb"),
+                            Id = new Guid("4d7d0dd4-abc7-41e7-8dac-754342fae51d"),
                             Chapter = "Chương 4",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1686,7 +1684,7 @@ namespace FranchiseProject.Infrastructures.Migrations
                         },
                         new
                         {
-                            Id = new Guid("5ccfa1ee-90b6-473d-9477-15f77a3f14a6"),
+                            Id = new Guid("2b2c84c8-5b03-4ed2-8ac8-a06f8061fa06"),
                             Chapter = "Chương 4",
                             CourseId = new Guid("1b182028-e25d-43b0-ba63-08dcf207c014"),
                             CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1701,6 +1699,9 @@ namespace FranchiseProject.Infrastructures.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("AgencyId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("CreatedBy")
@@ -1734,6 +1735,8 @@ namespace FranchiseProject.Infrastructures.Migrations
                         .HasColumnType("time");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AgencyId");
 
                     b.ToTable("Slots");
 
@@ -1863,6 +1866,20 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Syllabuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("990ca87d-c261-4cb3-1b9d-08dcf34d3900"),
+                            CreationDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Khóa học này sẽ cung cấp kiến thức cơ bản về lý thuyết thông tin, hệ thống máy tính và các phương pháp phát triển phần mềm, với trọng tâm vào lập trình hướng thủ tục (function-oriented programming). Học viên sẽ học các kỹ năng liên quan đến thiết kế chương trình, viết mã, kiểm thử và phát triển kỷ luật lập trình.\"",
+                            IsDeleted = false,
+                            MinAvgMarkToPass = 5.0,
+                            Scale = 10.0,
+                            StudentTask = "Học sinh có trách nhiệm làm tất cả các bài tập được giao bởi giảng viên trên lớp hoặc ở nhà và nộp đúng hạn",
+                            TimeAllocation = "Giờ học (150 giờ) = 45 giờ học trên lớp(60 * 45') + 1 giờ thi cuối kỳ + 104 giờ tự học",
+                            ToolsRequire = "- Internet\n- C language utility"
+                        });
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.User", b =>
@@ -2427,6 +2444,15 @@ namespace FranchiseProject.Infrastructures.Migrations
                     b.Navigation("Course");
                 });
 
+            modelBuilder.Entity("FranchiseProject.Domain.Entity.Slot", b =>
+                {
+                    b.HasOne("FranchiseProject.Domain.Entity.Agency", "Agency")
+                        .WithMany("Slots")
+                        .HasForeignKey("AgencyId");
+
+                    b.Navigation("Agency");
+                });
+
             modelBuilder.Entity("FranchiseProject.Domain.Entity.StudentAnswer", b =>
                 {
                     b.HasOne("FranchiseProject.Domain.Entity.QuestionOption", "QuestionOptions")
@@ -2570,6 +2596,8 @@ namespace FranchiseProject.Infrastructures.Migrations
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Agency", b =>
                 {
                     b.Navigation("Contracts");
+
+                    b.Navigation("Slots");
                 });
 
             modelBuilder.Entity("FranchiseProject.Domain.Entity.Appointment", b =>

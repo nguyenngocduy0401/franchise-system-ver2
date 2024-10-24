@@ -49,7 +49,7 @@ namespace FranchiseProject.Application.Services
                    $"<p>Vui lòng bảo mật thông tin đăng nhập này.</p>"
                 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
