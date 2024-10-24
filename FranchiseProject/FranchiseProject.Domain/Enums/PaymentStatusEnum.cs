@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.Repositories
+namespace FranchiseProject.Domain.Enums
 {
-    public interface IStudentClassRepository
+    public enum PaymentStatusEnum
     {
     }
 }

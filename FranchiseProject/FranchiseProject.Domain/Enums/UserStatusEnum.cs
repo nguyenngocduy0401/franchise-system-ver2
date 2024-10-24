@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.Interfaces
+namespace FranchiseProject.Domain.Enums
 {
-    public interface IStudentClassService
+    public  enum UserStatusEnum
     {
+        active=0, blocked=1,
     }
 }

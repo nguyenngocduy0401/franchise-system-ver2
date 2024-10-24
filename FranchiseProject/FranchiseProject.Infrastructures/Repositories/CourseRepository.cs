@@ -41,6 +41,7 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Include(e => e.CourseCategory)
                 .FirstOrDefaultAsync();
         }
+
     }
 }
 

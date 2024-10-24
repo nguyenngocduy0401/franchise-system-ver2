@@ -12,14 +12,13 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Infrastructures.Repositories
 {
-    public class ConsultationRepository:GenericRepository<Consultation>, IConsultationRepository
+    public class RegisterFormRepository:GenericRepository<RegisterForm>, IRegisterFormRepository
     {
-        private readonly AppDbContext _context;
 
         private readonly AppDbContext _dbContext;
         private readonly ICurrentTime _timeService;
         private readonly IClaimsService _claimsService;
-        public ConsultationRepository(
+        public RegisterFormRepository(
             AppDbContext context,
             ICurrentTime timeService,
             IClaimsService claimsService

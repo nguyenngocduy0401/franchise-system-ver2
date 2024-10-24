@@ -8,5 +8,6 @@ namespace FranchiseProject.Domain.Enums
 {
     public enum StudentClassStatusEnum
     {
+
     }
 }

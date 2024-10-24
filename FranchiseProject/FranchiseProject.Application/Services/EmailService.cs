@@ -224,6 +224,26 @@ namespace FranchiseProject.Application.Services
             };
             await client.SendAsync(emailMessage);
         }
+
+        public async Task<bool> SendEmailAsync(MessageModel message)
+        {
+            using var client = new SmtpClient();
+            try
+            {
+                await ConnectAndAuthenticateAsync(client);
+                await SendMessageAsync(client, message); // Gửi email với thông tin từ MessageModel
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            finally
+            {
+                await client.DisconnectAsync(true);
+                client.Dispose();
+            }
+            return true;
+        }
     }
 }
     

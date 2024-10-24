@@ -42,17 +42,22 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<ISessionService, SessionService>();
             services.AddScoped<ISlotService, SlotService>();
             services.AddScoped<IStudentAnswerService, StudentAnswerService>();
-            services.AddScoped<IStudentClassService, StudentClassService>();
-            services.AddScoped<IStudentCourseService, StudentCourseService>();
+            services.AddScoped<IClassRoomService, ClassRoomService>();
+            services.AddScoped<IRegisterCourseService, RegisterCourseService>();
             services.AddScoped<ISyllabusService, SyllabusService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRedisService, RedisService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
-            services.AddScoped<IConsultationService,ConsultationService>();
+            services.AddScoped<IRegisterFormSevice,RegisterFormService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<IPaymentService, PaymentService>();
+           // services.AddScoped<IMaterialService, MaterialService>();
             services.AddScoped<ICourseMaterialService, CourseMaterialService>();
             services.AddScoped<IAssessmentService, AssessmentService>();
+           
+
             #endregion
             #region Repository DI
             services.AddScoped<IAgencyRepository, AgencyRepository>();
@@ -75,15 +80,18 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<ISessionRepository, SessionRepository>();
             services.AddScoped<ISlotRepository, SlotRepository>();
             services.AddScoped<IStudentAnswerRepository, StudentAnswerRepository>();
-            services.AddScoped<IStudentClassRepository, StudentClassRepository>();
-            services.AddScoped<IStudentCourseRepository, StudentCourseRepository>();
+            services.AddScoped<IClassRoomRepository, ClassRoomRepository>();
+            services.AddScoped<IRegisterCourseRepository, RegisterCourseRepository>();
             services.AddScoped<ISyllabusRepository, SyllabusRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IConsultationRepository, ConsultationRepository>();
+            services.AddScoped<IRegisterFormRepository, RegisterFormRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IAssessmentRepository, AssessmentRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<IStudentRepository, StudentRepository>();
+          //  services.AddScoped<IMaterialRepository, MaterialRepository>();
             services.AddScoped<ICourseMaterialRepository, CourseMaterialRepository>();
             #endregion
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();

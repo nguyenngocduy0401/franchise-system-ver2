@@ -17,6 +17,7 @@ namespace FranchiseProject.Infrastructures.Repositories
 {
     public class UserRepository : IUserRepository
     {
+        protected DbSet<User> _dbSet;
         private readonly AppDbContext _dbContext;
         private readonly UserManager<User> _userManager;
         private readonly ICurrentTime _currentTime;
@@ -161,6 +162,32 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
 
             return await _dbContext.Users.AnyAsync(u => u.UserName == username);
+        }
+        public async Task<User> GetByAgencyIdAsync(Guid agencyId)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(u => u.AgencyId == agencyId);
+        }
+        public async Task<Guid?> GetAgencyIdByUserIdAsync(string userId)
+        {
+            var user = await _dbContext.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            return user?.AgencyId;
+        }
+        public async Task<User> GetStudentByIdAsync(string id)
+        {
+            var user = await _dbSet.FirstOrDefaultAsync(u => u.Id == id);
+            if (user == null)
+            {
+                return null;
+            }
+            var roles = await _userManager.GetRolesAsync(user);
+            if (!roles.Contains(AppRole.Student))
+            {
+                return null; 
+            }
+            return user;
         }
     }
 }

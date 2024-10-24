@@ -9,5 +9,7 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IChapterMaterialRepository : IGenericRepository<ChapterMaterial>
     {
+       // Task<bool> HasOverlappingTermsAsync(DateTime startDate, DateTime endDate);
+        //Task<Term?> GetByNameAsync(string name);
     }
 }

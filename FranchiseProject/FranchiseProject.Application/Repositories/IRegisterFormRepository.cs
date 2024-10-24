@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Repositories
 {
-    public interface IConsultationRepository :IGenericRepository<Consultation>
+    public interface IRegisterFormRepository :IGenericRepository<RegisterForm>
     {
 
     }

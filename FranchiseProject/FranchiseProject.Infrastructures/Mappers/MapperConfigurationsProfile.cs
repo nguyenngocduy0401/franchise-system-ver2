@@ -1,5 +1,7 @@
-using AutoMapper;
+﻿using AutoMapper;
 using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
+using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Application.ViewModels.ConsultationViewModels;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using FranchiseProject.Application.ViewModels.ContractViewModels;
@@ -22,6 +24,10 @@ using FranchiseProject.Application.ViewModels.CourseViewModels;
 using FranchiseProject.Application.ViewModels.SyllabusViewModels;
 using FranchiseProject.Application.ViewModels.ChapterMaterialViewModels;
 using FranchiseProject.Domain.Enums;
+using FranchiseProject.Application.ViewModels.StudentViewModel;
+using FranchiseProject.Application.ViewModels.StudentViewModels;
+using FranchiseProject.Domain.Enums;
+
 
 namespace FranchiseProject.Infrastructures.Mappers
 {
@@ -29,10 +35,10 @@ namespace FranchiseProject.Infrastructures.Mappers
     {
         public MapperConfigurationsProfile() {
             #region FranchiseRegist
-            CreateMap<ConsultationViewModel, Consultation>();
-            CreateMap<RegisterConsultationViewModel, Consultation>();
-            CreateMap<Consultation, ConsultationViewModel>().ReverseMap();
-            CreateMap<Consultation, ConsultationViewModel>()
+            CreateMap<ConsultationViewModel, RegisterForm>();
+            CreateMap<RegisterConsultationViewModel, RegisterForm>();
+            CreateMap<RegisterForm, ConsultationViewModel>().ReverseMap();
+            CreateMap<RegisterForm, ConsultationViewModel>()
             .ForMember(dest => dest.ConsultantUserName, opt => opt.MapFrom(src => src.User != null ? src.User.UserName : string.Empty));
             #endregion
             #region Agency
@@ -67,6 +73,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<UpdateUserByAgencyModel, User>();
             CreateMap<CreateUserByAgencyModel, User>();
             CreateMap<User, CreateUserViewModel>();
+
+
             #endregion
             #region Slot
             CreateMap<CreateSlotModel, Slot>();
@@ -81,8 +89,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             #endregion
             #region ClassSchedule
             CreateMap<ClassSchedule, ClassScheduleViewModel>()
-              .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
-            .ForMember(dest => dest.SlotName, opt => opt.MapFrom(src => src.Slot.Name)).ReverseMap();
+              .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name));
+          //  .ForMember(dest => dest.SlotName, opt => opt.MapFrom(src => src.Slot.Name)).ReverseMap();
             CreateMap<ClassSchedule, ClassScheduleViewModel>()
           .ReverseMap();
 
@@ -93,6 +101,36 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Notification, NotificationViewModel>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.Message)).ReverseMap();
+            #endregion
+           
+
+            #region Class
+            CreateMap<CreateClassViewModel, Class>();
+            CreateMap<Class, ClassViewModel>();
+
+            CreateMap<Class, ClassViewModel>()
+              
+                .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Course.Name));
+
+            CreateMap<Class, ClassStudentViewModel>()
+                .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Name));    
+            
+            CreateMap<ClassRoom, StudentClassViewModel>()
+                .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.User.DateOfBirth))
+                .ForMember(dest => dest.URLImage, opt => opt.MapFrom(src => src.User.URLImage));
+            CreateMap<List<Class>, Pagination<ClassViewModel>>()
+                .ConvertUsing((source, destination, context) =>
+                {
+                    var pagedResult = new Pagination<ClassViewModel>
+                    {
+                        Items = context.Mapper.Map<List<ClassViewModel>>(source), // Map list of Class to ClassViewModel
+                        TotalItemsCount = source.Count, // Set total item count based on the source list count
+                        PageIndex = 1, // Hardcoded for now, you can change it dynamically
+                        PageSize = source.Count // Set the page size to the total number of items in the source list
+                    };
+                    return pagedResult;
+                });
             #endregion
             #region Material
             CreateMap<CourseMaterial, CourseMaterialViewModel>();
@@ -177,6 +215,18 @@ namespace FranchiseProject.Infrastructures.Mappers
             #endregion
 
 
+            #region RegisterCourse
+            CreateMap<User, StudentViewModel>();
+            CreateMap<Pagination<User>, Pagination<StudentViewModel>>()
+            .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
+            CreateMap<User, StudentViewModel>()
+           .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.RegisterCourses.FirstOrDefault().Course.Name));
+            CreateMap<User, StudentRegisterViewModel>()
+           .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+           .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+           .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+
+            #endregion
         }
     }
 }

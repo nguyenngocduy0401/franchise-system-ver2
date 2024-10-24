@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,5 +25,16 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
+       /* public async Task<bool> HasOverlappingTermsAsync(DateTime startDate, DateTime endDate)
+        {
+            return await _dbContext.Set<Term>()
+                .AnyAsync(t =>
+                    (startDate < t.EndDate && endDate > t.StartDate));
+        }
+        public async Task<Term?> GetByNameAsync(string name)
+        {
+            return await _dbContext.Set<Term>()
+                .FirstOrDefaultAsync(t => t.Name.ToLower() == name.ToLower());
+        }*/
     }
 }

@@ -8,12 +8,13 @@ namespace FranchiseProject.Domain.Enums
 {
     public enum AgencyStatusEnum
     {
-        Pending = 1,          // Chờ
-        Processing = 2,       // Đang xử lý
-        Approved = 3,         // Xét duyệt thành công
-                               // 
-        Partner = 4,          // Đối tác
-        Expired = 5           // Hết hạn
-
+       
+        Processing   = 1,       // Chờ duyệt
+        Approved = 2,           // Đã duyệt
+        Active = 3,             // Đang hoạt động
+        Suspended = 4,          // Tạm ngưng hoạt động
+        Terminated = 5,         // Chấm dứt hợp tác
+        Inactive = 6            // Không hoạt động
     }
+
 }

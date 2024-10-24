@@ -10,7 +10,6 @@ namespace FranchiseProject.Domain.Entity
     public class ClassSchedule : BaseEntity
     {
         public DateTime? Date { get; set; }
-        public string? Room { get; set; }
         public Guid? ClassId { get; set; }
         [ForeignKey("ClassId")]
         public Class? Class { get; set; }
@@ -18,5 +17,5 @@ namespace FranchiseProject.Domain.Entity
         [ForeignKey("SlotId")]
         public Slot? Slot { get; set; }
         public virtual ICollection<Attendance>? Attendances { get; set; }
-    }
+      }
 }

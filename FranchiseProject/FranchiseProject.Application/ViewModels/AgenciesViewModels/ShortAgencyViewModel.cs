@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.Interfaces
+namespace FranchiseProject.Application.ViewModels.AgenciesViewModels
 {
-    public interface IStudentCourseService
+    public class ShortAgencyViewModel
     {
     }
 }

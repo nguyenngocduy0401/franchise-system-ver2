@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Interfaces
 {
-    public interface IConsultationService
+    public interface IRegisterFormSevice
     {
+
         Task<ApiResponse<bool>> RegisterConsultationAsync(RegisterConsultationViewModel regisFranchiseViewModel);
         Task<ApiResponse<bool>> UpdateConsultationStatusAsync(string requestId);
         Task<ApiResponse<Pagination<ConsultationViewModel>>> FilterConsultationAsync(FilterConsultationViewModel filterModel);

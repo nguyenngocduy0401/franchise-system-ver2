@@ -38,10 +38,10 @@ namespace FranchiseProject.Infrastructures
         public DbSet<Session> Sessions { get; set; }
         public DbSet<Slot> Slots { get; set; }
         public DbSet<StudentAnswer> StudentAnswers { get; set; }
-        public DbSet<StudentClass> StudentClasses { get; set; }
-        public DbSet<StudentCourse> StudentCourses { get; set; }
+        public DbSet<ClassRoom> ClassRooms { get; set; }
+        public DbSet<RegisterForm> RegisterForms{ get; set; }
         public DbSet<Syllabus> Syllabuses { get; set; }
-        public DbSet<Consultation> Consultations { get; set; }
+   
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Assessment> Assessments { get; set; }
@@ -49,6 +49,10 @@ namespace FranchiseProject.Infrastructures
         public DbSet<WorkDetail> WorkDetails { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<AppointmentDetail> AppointmentDetails { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<Payment> Payments { get; set; }
+    //    public DbSet<Material> Materials { get; set; }
+        public DbSet<RegisterCourse> RegisterCourses { get; set; }
         public DbSet<CourseMaterial> CourseMaterials { get; set; }
         public DbSet<ChapterMaterial> ChapterMaterials { get; set; }
         #endregion
@@ -59,7 +63,7 @@ namespace FranchiseProject.Infrastructures
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(QuizDetailConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentAnswerConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentClassConfiguration).Assembly);
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentCourseConfiguration).Assembly);
+             modelBuilder.ApplyConfigurationsFromAssembly(typeof(RegisterCourseConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AssignmentSubmitConfiguration).Assembly);
             modelBuilder.Entity<Contract>().HasData(
                      new Contract

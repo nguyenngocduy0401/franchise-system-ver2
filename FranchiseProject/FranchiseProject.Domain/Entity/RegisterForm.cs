@@ -8,14 +8,15 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Entity
 {
-    public  class Consultation :BaseEntity
+    public class RegisterForm: BaseEntity
     {
-
-        public string? CusomterName { get; set; }
+       public string ? CustomerName {  get; set; }
         public string? Email {  get; set; }
-        public string? PhoneNumber {  get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Address { get; set; }
+        public DateTime? ConsultTime { get; set; }
         public ConsultationStatusEnum Status { get; set; }
-        public string? UserId { get; set; }
+        public string? ConsultanId {  get; set; }
         [ForeignKey("UserId")]
         public User? User { get; set; }
        

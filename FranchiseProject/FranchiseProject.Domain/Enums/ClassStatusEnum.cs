@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.Repositories
+namespace FranchiseProject.Domain.Enums
 {
-    public interface IStudentCourseRepository
+    public enum ClassStatusEnum
     {
+        Active=1,
+      Inactive=2,
     }
 }

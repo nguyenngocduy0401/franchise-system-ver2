@@ -8,14 +8,15 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Entity
 {
-    public class StudentCourse
+    public class RegisterCourse
     {
-        public StudentCourseStatusEnum Status { get; set; }
-        public Guid? CourseId { get; set; }
-        [ForeignKey("CourseId")]
-        public Course? Course { get; set; }
         public string? UserId { get; set; }
         [ForeignKey("UserId")]
         public User? User { get; set; }
+        public Guid? CourseId { get; set; }
+        [ForeignKey("CourseId")]
+        public Course? Course { get; set; }
+        public string? DateTime {  get; set; }
+        public StudentCourseStatusEnum? StudentCourseStatus { get; set; }
     }
 }

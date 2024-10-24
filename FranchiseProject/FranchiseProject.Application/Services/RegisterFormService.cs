@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Services
 {
-    public class ConsultationService :IConsultationService
+    public class RegisterFormService :IRegisterFormSevice
     {
         private readonly IClaimsService _claimsService;
         private readonly IUnitOfWork _unitOfWork;
@@ -23,7 +23,7 @@ namespace FranchiseProject.Application.Services
         private readonly IValidator<RegisterConsultationViewModel> _validator;
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
-        public ConsultationService(IEmailService emailService,IUnitOfWork unitOfWork,IClaimsService claimsService, IValidator<RegisterConsultationViewModel> validator,
+        public RegisterFormService(IEmailService emailService,IUnitOfWork unitOfWork,IClaimsService claimsService, IValidator<RegisterConsultationViewModel> validator,
             IMapper mapper,UserManager<User> userManager)
         {
             _unitOfWork = unitOfWork;
@@ -45,9 +45,9 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
-                var franchiseRequest = _mapper.Map<Consultation>(regis);
+                var franchiseRequest = _mapper.Map<RegisterForm>(regis);
                 franchiseRequest.Status = ConsultationStatusEnum.NotConsulted;
-                franchiseRequest.CusomterName = regis.CustomerName;
+                franchiseRequest.CustomerName = regis.CustomerName;
                 await _unitOfWork.FranchiseRegistrationRequestRepository.AddAsync(franchiseRequest);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                if (isSuccess > 0)
@@ -107,7 +107,7 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Current user not found.";
                     
                 }
-               exist.UserId = userId;
+               exist.ConsultanId = userId;
                _unitOfWork.FranchiseRegistrationRequestRepository.Update(exist);
                 var result = await _unitOfWork.SaveChangeAsync();
                 if (result > 0)

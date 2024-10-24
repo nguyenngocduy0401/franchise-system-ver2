@@ -8,7 +8,7 @@ namespace FranchiseProject.Domain.Enums
 {
     public enum ConsultationStatusEnum
     {
-        NotConsulted = 0,  
-        Consulted = 1     
+        NotConsulted = 0,  //chưa tư vấn 
+        Consulted = 1     // đã tư vẫn 
     }
 }

@@ -8,16 +8,19 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Entity
 {
-    public class StudentClass
+    public class ClassRoom
     {
-        public DateTime? From { get; set; }
-        public DateTime? To { get; set; }
-        public StudentClassStatusEnum Status { get; set; }
+     
         public string? UserId { get; set; }
         [ForeignKey("UserId")]
         public User? User { get; set; }
         public Guid? ClassId { get; set; }
         [ForeignKey("ClassId")]
         public Class? Class { get; set; }
+        public string? DayofWeek {  get; set; }
+        public string? Room {  get; set; }
+        public DateOnly? FromDate { get; set; }
+        public DateOnly? ToDate { get;set; }
+        public ClassRoomStatusEnum? Status { get; set; }
     }
 }

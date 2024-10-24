@@ -16,5 +16,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<Pagination<AgencyViewModel>>> FilterAgencyAsync(FilterAgencyViewModel filter);
         Task<ApiResponse<AgencyViewModel>> GetAgencyById(string id);
         Task<ApiResponse<bool>> UpdateAgencyStatusAsync(string id, AgencyStatusEnum newStatus);
+        
     }
 }
