@@ -35,6 +35,11 @@ namespace FranchiseProject.API.Controllers
         [SwaggerOperation(Summary = "Lấy thông tin đăng kí học sinh {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpGet("filter")]
-        public async Task<ApiResponse<Pagination<StudentViewModel>>> FilterStudentAsync([FromQuery]FilterRegisterCourseViewModel filterStudentModel)=> await _registerCourseService.FilterStudentAsync(filterStudentModel);    
+        public async Task<ApiResponse<Pagination<StudentRegisterViewModel>>> FilterStudentAsync([FromQuery]FilterRegisterCourseViewModel filterStudentModel)=> await _registerCourseService.FilterStudentAsync(filterStudentModel);
+
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
+        [SwaggerOperation(Summary = "cập nhật slot {Authorize = AgencyStaff, AgencyManager}")]
+        [HttpPut("{userId}/{courseId}")]
+        public async Task<ApiResponse<bool>> UpdateRegisterCourseDateTimeAsync(string userId, string courseId,[FromBody] string newDateTime)=> await _registerCourseService.UpdateRegisterCourseDateTimeAsync(userId,courseId,newDateTime);
     }
 }

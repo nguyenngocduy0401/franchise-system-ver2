@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,9 +14,11 @@ namespace FranchiseProject.Infrastructures.Repositories
     public class RegisterCourseRepository : IRegisterCourseRepository
     {
         private readonly AppDbContext _dbContext;
+      
         public RegisterCourseRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
+           
         }
 
         public  Task<List<string>> GetCourseNamesByUserIdAsync(string userId)
@@ -33,7 +36,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         public async Task UpdateAsync(RegisterCourse registerCourse)
         {
            
-            var existingRegisterCourse = await _dbContext.Set<RegisterCourse>().FindAsync(registerCourse.UserId, registerCourse.CourseId);
+            var existingRegisterCourse = await _dbContext.Set<RegisterCourse>().FindAsync(registerCourse.UserId, Guid.Parse(registerCourse.CourseId));
 
             if (existingRegisterCourse != null)
             {
@@ -48,5 +51,10 @@ namespace FranchiseProject.Infrastructures.Repositories
                 throw new Exception("RegisterCourse not found.");
             }
         }
+        public async Task<RegisterCourse?> GetFirstOrDefaultAsync(Expression<Func<RegisterCourse, bool>> filter)
+        {
+            return await _dbContext.RegisterCourses.FirstOrDefaultAsync(filter);
+        }
+
     }
 }

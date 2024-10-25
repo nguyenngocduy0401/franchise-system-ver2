@@ -162,7 +162,10 @@ namespace FranchiseProject.Application.Services
             {
                 var userCurrentId = _claimsService.GetCurrentUserId.ToString();
                 var userCurrent =await _userManager.FindByIdAsync(userCurrentId);
-                
+                if (userCurrent == null || !userCurrent.AgencyId.HasValue)
+                {
+                    return ResponseHandler.Failure<bool>("User hoặc Agency không khả dụng!");
+                }
                 ValidationResult validationResult = await _slotValidator.ValidateAsync(createSlotModel);
                 if (!validationResult.IsValid) if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 

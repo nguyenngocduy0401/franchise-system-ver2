@@ -13,6 +13,7 @@ using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Cryptography.Pkcs;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Services
@@ -207,7 +209,7 @@ namespace FranchiseProject.Application.Services
                 var courseNames = await _unitOfWork.RegisterCourseRepository
                     .GetCourseNamesByUserIdAsync(id); 
                 var studentViewModel = _mapper.Map<StudentRegisterViewModel>(student);
-                studentViewModel.CourseName = courseNames;
+                studentViewModel.CourseName = courseNames.FirstOrDefault();
                 response = ResponseHandler.Success(studentViewModel, "Successful!");
             }
             catch (Exception ex)
@@ -216,9 +218,9 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<Pagination<StudentViewModel>>> FilterStudentAsync(FilterRegisterCourseViewModel filterStudentModel)
+        public async Task<ApiResponse<Pagination<StudentRegisterViewModel>>> FilterStudentAsync(FilterRegisterCourseViewModel filterStudentModel)
         {
-            var response = new ApiResponse<Pagination<StudentViewModel>>();
+            var response = new ApiResponse<Pagination<StudentRegisterViewModel>>();
             try
             {
                 var userCurrentId = _claimsService.GetCurrentUserId;
@@ -226,7 +228,7 @@ namespace FranchiseProject.Application.Services
                 var studentRole = await _roleManager.FindByNameAsync(AppRole.Student);
                 if (studentRole == null)
                 {
-                    return ResponseHandler.Failure<Pagination<StudentViewModel>>("Không tìm thấy vai trò sinh viên.");
+                    return ResponseHandler.Failure<Pagination<StudentRegisterViewModel>>("Không tìm thấy vai trò sinh viên.");
                 }
                 var studentRoleId = studentRole.Id;
                 var currentAgencyId = userCurrent.AgencyId;
@@ -244,22 +246,28 @@ namespace FranchiseProject.Application.Services
                     pageSize: filterStudentModel.PageSize,
                     includeProperties: "RegisterCourses.Course" 
                 );
-                var studentViewModels = students.Items.Select(s => new StudentViewModel
+                var studentViewModels = students.Items.Select(s => new StudentRegisterViewModel
                 {
                     Id = s.Id,
-                    AgencyId = s.AgencyId.ToString(),
+                   
                     FullName = s.FullName,
                     StatusPayment=s.StudentPaymentStatus,
                     StudentStatus=s.StudentStatus,
                     PhoneNumber = s.PhoneNumber,
                     Email = s.Email,
+                    CourseId=s.RegisterCourses.Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied)
+                        .Select(rc => rc.CourseId)
+                        .FirstOrDefault(),
+                    DateTime =s.RegisterCourses.Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied)
+                        .Select(rc => rc.DateTime)
+                        .FirstOrDefault(),
                     CourseName = s.RegisterCourses
                         .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied) 
                         .Select(rc => rc.Course?.Name) 
                         .FirstOrDefault() 
                 }).ToList();
 
-                var paginatedResult = new Pagination<StudentViewModel>
+                var paginatedResult = new Pagination<StudentRegisterViewModel>
                 {
                     Items = studentViewModels,
                     TotalItemsCount = students.TotalItemsCount,
@@ -274,11 +282,56 @@ namespace FranchiseProject.Application.Services
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<Pagination<StudentViewModel>>(ex.Message);
+                response = ResponseHandler.Failure<Pagination<StudentRegisterViewModel>>(ex.Message);
             }
             return response;
         }
 
+        public async Task<ApiResponse<bool>> UpdateRegisterCourseDateTimeAsync(string userId, string courseId, [FromBody] string newDateTime)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var dateTimePattern = @"^(Thứ [2-7]|Chủ Nhật)(,\s*(Thứ [2-7]|Chủ Nhật))*;\s*[0-2][0-9]:[0-5][0-9]$";
+                if (!Regex.IsMatch(newDateTime, dateTimePattern))
+                {
+                    return ResponseHandler.Failure<bool>("Định dạng không hợp lệ! Định dạng đúng: Thứ X,Thứ Y;HH:mm.");
+                }
+
+                var dateTimeParts = newDateTime.Split(';');
+                var dayOfWeek = dateTimeParts[0].Trim();
+                var time = TimeSpan.Parse(dateTimeParts[1]);
+                var validDaysOfWeek = new HashSet<string> { "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật" };
+                if (!validDaysOfWeek.Contains(dayOfWeek))
+                {
+                    return ResponseHandler.Failure<bool>("Ngày trong tuần không hợp lệ. Chỉ chấp nhận Thứ 2 đến Thứ 7 hoặc Chủ Nhật.");
+                }
+                var slot = await _unitOfWork.SlotRepository.GetFirstOrDefaultAsync(s => s.StartTime == time);
+                if (slot == null)
+                {
+                    return ResponseHandler.Failure<bool>("Không có Slot nào khớp với thời gian đã nhập!");
+                }
+                var registerCourse = await _unitOfWork.RegisterCourseRepository.GetFirstOrDefaultAsync(
+                    rc => rc.UserId == userId && rc.CourseId == new Guid(courseId));
+                if (registerCourse == null)
+                {
+                    return ResponseHandler.Failure<bool>("Không tìm thấy khóa học đăng ký phù hợp.");
+                }
+                registerCourse.DateTime = newDateTime;
+                 await _unitOfWork.RegisterCourseRepository.UpdateAsync(registerCourse);
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Cập nhật thất bại!");
+
+                response = ResponseHandler.Success(true, "Cập nhật slot thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
 
     }
+
 }
+
