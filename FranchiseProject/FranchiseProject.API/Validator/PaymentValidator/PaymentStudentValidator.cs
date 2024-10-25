@@ -11,9 +11,9 @@ namespace FranchiseProject.API.Validator.PaymentValidator
             .NotEmpty().WithMessage("Title is required.")
             .Length(1, 100).WithMessage("Title must be between 1 and 100 characters.");
 
-            RuleFor(x => x.StudentName)
+        /*    RuleFor(x => x.StudentName)
                 .NotEmpty().WithMessage("Student Name is required.")
-                .Length(1, 50).WithMessage("Student Name must be between 1 and 50 characters.");
+                .Length(1, 50).WithMessage("Student Name must be between 1 and 50 characters.");*/
 
             RuleFor(x => x.Description)
                 .MaximumLength(500).WithMessage("Description must not exceed 500 characters.");
@@ -22,8 +22,7 @@ namespace FranchiseProject.API.Validator.PaymentValidator
                 .NotNull().WithMessage("Amount is required.")
                 .GreaterThan(0).WithMessage("Amount must be greater than zero.");
 
-            RuleFor(x => x.Status)
-                .IsInEnum().WithMessage("Status must be a valid enum value.");
+           
         }
     }
 }

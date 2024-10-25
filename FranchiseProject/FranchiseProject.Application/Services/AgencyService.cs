@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Services
 {
-    public class AgencyService : IAgencyService
+    public class    AgencyService : IAgencyService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClaimsService _claimsService;

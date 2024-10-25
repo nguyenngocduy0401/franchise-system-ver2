@@ -49,7 +49,7 @@ namespace FranchiseProject.Application.EmailTemplateHandler
                        $"<p>Cảm ơn bạn đã đăng kí khóa học {courseName} </p>" +
                        $"<p>Chúng tôi sẻ liên hệ với bạn trong thời gian sớm nhất !</p>" +
                        $"<p>Trân trọng,</p>" +
-                       $"<p>Đội ngũ {agencyName}</p>"
+                       $"<p>Đội ngũ FutureTech</p>"
             };
         }
         public static MessageModel StudentPaymentSuccsess(string to, string name, int amount, string agencyName)
@@ -59,11 +59,11 @@ namespace FranchiseProject.Application.EmailTemplateHandler
                 To = to,
                 Subject = "Xác Nhận Thanh Toán Thành Công [futuretech-noreply]",
                 Body = $"<p>Chào bạn {name},</p>" +
-                       $"<p>B ạn đã đăng Thanh khóa học  thành công </p>" +
+                       $"<p>Bạn đã đăng Thanh khóa học  thành công </p>" +
                        $"<p>Số tiền đã thanh toán:{amount} </p>" +
                        $"<p>Chúng tôi sẻ liên hệ và gửi thông báo về thông tin lớp học trong thời gian sớm nhất </p>" +
                        $"<p>Trân trọng,</p>" +
-                       $"<p>Đội ngũ {agencyName}</p>"
+                       $"<p>Đội ngũ FutureTech</p>"
             };
         }
         #endregion

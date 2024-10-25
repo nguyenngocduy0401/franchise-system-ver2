@@ -34,7 +34,8 @@ namespace FranchiseProject.Application.Services
         private readonly IValidator<RegisterCourseViewModel> _validator;
         private readonly IEmailService _emailService;
         private readonly UserManager<User> _userManager;
-        public RegisterCourseService(IEmailService emailService, IClaimsService claimsService,UserManager<User> userManager, IMapper mapper, IUnitOfWork unitOfWork, IValidator<RegisterCourseViewModel> validator)
+        private readonly RoleManager<Role> _roleManager;
+        public RegisterCourseService(RoleManager<Role> roleManager,IEmailService emailService, IClaimsService claimsService,UserManager<User> userManager, IMapper mapper, IUnitOfWork unitOfWork, IValidator<RegisterCourseViewModel> validator)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -42,6 +43,7 @@ namespace FranchiseProject.Application.Services
             _userManager = userManager;
             _claimsService = claimsService;
             _emailService = emailService;
+            _roleManager = roleManager;
         }
 
 
@@ -159,7 +161,7 @@ namespace FranchiseProject.Application.Services
                         if(student.StudentStatus == StudentStatusEnum.NotConsult)
                         {
                             student.StudentStatus = StudentStatusEnum.Pending;
-                            
+                            student.StudentPaymentStatus = StudentPaymentStatusEnum.Pending_Payment;
                         }else
                         {
                             return ResponseHandler.Failure<bool>("Học sinh không thể chuyển thành trạng thái Chờ!");
@@ -221,11 +223,16 @@ namespace FranchiseProject.Application.Services
             {
                 var userCurrentId = _claimsService.GetCurrentUserId;
                 var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
-
-                // Kiểm tra agency của người dùng hiện tại
+                var studentRole = await _roleManager.FindByNameAsync(AppRole.Student);
+                if (studentRole == null)
+                {
+                    return ResponseHandler.Failure<Pagination<StudentViewModel>>("Không tìm thấy vai trò sinh viên.");
+                }
+                var studentRoleId = studentRole.Id;
                 var currentAgencyId = userCurrent.AgencyId;
                 Expression<Func<User, bool>> filter = u =>
                     (u.AgencyId == currentAgencyId) &&
+                    (u.UserRoles.Any(r => r.RoleId == studentRoleId.ToString())) && 
                     (!filterStudentModel.StatusPayment.HasValue || u.StudentPaymentStatus == filterStudentModel.StatusPayment) &&
                     (!filterStudentModel.Status.HasValue || u.StudentStatus == filterStudentModel.Status) &&
                     (string.IsNullOrEmpty(filterStudentModel.CourseId) ||
@@ -242,7 +249,8 @@ namespace FranchiseProject.Application.Services
                     Id = s.Id,
                     AgencyId = s.AgencyId.ToString(),
                     FullName = s.FullName,
-                   
+                    StatusPayment=s.StudentPaymentStatus,
+                    StudentStatus=s.StudentStatus,
                     PhoneNumber = s.PhoneNumber,
                     Email = s.Email,
                     CourseName = s.RegisterCourses

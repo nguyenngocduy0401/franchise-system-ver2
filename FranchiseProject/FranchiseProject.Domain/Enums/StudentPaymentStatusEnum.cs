@@ -8,8 +8,7 @@ namespace FranchiseProject.Domain.Enums
 {
     public enum StudentPaymentStatusEnum
     {
-  
-        Pending_Payment=0,//chờ thanh toán
-        Completed = 1,  //hoàn thành thanh toán
+        Pending_Payment=0,      //chờ thanh toán
+        Completed = 1,          //hoàn thành thanh toán
     }
 }

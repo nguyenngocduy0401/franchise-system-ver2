@@ -42,6 +42,7 @@ using FranchiseProject.API.Validator.CourseValidator;
 using FranchiseProject.Application.ViewModels.StudentViewModels;
 using FranchiseProject.Application.ViewModels.PaymentViewModel;
 using FranchiseProject.API.Validator.PaymentValidator;
+using Google;
 
 
 namespace FranchiseProject.API
@@ -101,6 +102,7 @@ namespace FranchiseProject.API
             services.AddScoped<IPdfService, PdfService>();
             services.AddSingleton<IFirebaseService, FirebaseService>();
           
+      
             services.AddHttpContextAccessor();
             services.AddLogging();
 
