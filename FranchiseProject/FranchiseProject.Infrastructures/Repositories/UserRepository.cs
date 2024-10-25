@@ -189,5 +189,9 @@ namespace FranchiseProject.Infrastructures.Repositories
             }
             return user;
         }
+        public async Task<List<User>> GetAllAsync(Expression<Func<User, bool>> filter)
+        {
+            return await _dbContext.Users.Where(filter).ToListAsync();
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using FranchiseProject.API.Services;
+using FranchiseProject.API.Services;
 using Microsoft.OpenApi.Models;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
@@ -44,6 +44,8 @@ using FranchiseProject.Application.ViewModels.PaymentViewModel;
 using FranchiseProject.API.Validator.PaymentValidator;
 using FranchiseProject.Application.ViewModels.QuestionViewModels;
 using FranchiseProject.API.Validator.QuestionValidator;
+using Google;
+
 
 namespace FranchiseProject.API
 {
@@ -102,6 +104,7 @@ namespace FranchiseProject.API
             services.AddScoped<IPdfService, PdfService>();
             services.AddSingleton<IFirebaseService, FirebaseService>();
           
+      
             services.AddHttpContextAccessor();
             services.AddLogging();
 

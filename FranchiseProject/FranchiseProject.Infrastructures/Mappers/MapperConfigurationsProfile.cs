@@ -28,6 +28,10 @@ using FranchiseProject.Application.ViewModels.StudentViewModel;
 using FranchiseProject.Application.ViewModels.StudentViewModels;
 using FranchiseProject.Application.ViewModels.QuestionViewModels;
 using FranchiseProject.Application.ViewModels.QuestionOptionViewModels;
+using FranchiseProject.Domain.Enums;
+using FranchiseProject.Application.ViewModels.PaymentViewModel;
+
+
 
 namespace FranchiseProject.Infrastructures.Mappers
 {
@@ -231,6 +235,15 @@ namespace FranchiseProject.Infrastructures.Mappers
            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
             #endregion
            
+            #region Payment
+            CreateMap<CreateStudentPaymentViewModel, Payment>()
+           .ForMember(dest => dest.Id, opt => opt.Ignore());
+            CreateMap<Payment, StudentViewModel>();
+            CreateMap<Pagination<Payment>, Pagination<StudentViewModel>>();
+            CreateMap<Payment, PaymentStudentViewModel>()
+           .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.User.FullName))
+           .ForMember(dest => dest.DateTime, opt => opt.MapFrom(src => src.CreationDate));
+            #endregion
         }
     }
 }

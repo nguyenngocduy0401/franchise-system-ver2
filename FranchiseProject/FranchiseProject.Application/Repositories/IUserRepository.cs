@@ -29,5 +29,6 @@ namespace FranchiseProject.Application.Repositories
         Task<User> GetByAgencyIdAsync(Guid agencyId);
         Task<Guid?> GetAgencyIdByUserIdAsync(string userId);
         Task<User> GetStudentByIdAsync(string id);
+        Task<List<User>> GetAllAsync(Expression<Func<User, bool>> filter);
     }
 }
