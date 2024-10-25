@@ -292,19 +292,30 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-                var dateTimePattern = @"^(Thứ [2-7]|Chủ Nhật)(,\s*(Thứ [2-7]|Chủ Nhật))*;\s*[0-2][0-9]:[0-5][0-9]$";
-                if (!Regex.IsMatch(newDateTime, dateTimePattern))
+                var dateTimePattern = @"^(Thứ [2-7]|Chủ Nhật)(,\s*(Thứ [2-7]|Chủ Nhật))*;\s*[0-2][0-9]:[0-5][0-9]$"; // Hỗ trợ nhiều ngày
+                if (!Regex.IsMatch(newDateTime, dateTimePattern, RegexOptions.IgnoreCase))
                 {
-                    return ResponseHandler.Failure<bool>("Định dạng không hợp lệ! Định dạng đúng: Thứ X,Thứ Y;HH:mm.");
+                    return ResponseHandler.Failure<bool>("Định dạng không hợp lệ! Định dạng đúng: Thứ X, Thứ Y;HH:mm.");
                 }
 
                 var dateTimeParts = newDateTime.Split(';');
-                var dayOfWeek = dateTimeParts[0].Trim();
-                var time = TimeSpan.Parse(dateTimeParts[1]);
-                var validDaysOfWeek = new HashSet<string> { "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật" };
-                if (!validDaysOfWeek.Contains(dayOfWeek))
+                var daysOfWeek = dateTimeParts[0].Trim().Split(','); // Tách từng ngày
+                var time = TimeSpan.Parse(dateTimeParts[1].Trim());
+
+                // Tạo danh sách các ngày hợp lệ (thay đổi chữ hoa chữ thường)
+                var validDaysOfWeek = new HashSet<string>
+        {
+            "thứ 2", "thứ 3", "thứ 4", "thứ 5", "thứ 6", "thứ 7", "chủ nhật"
+        };
+
+                // Kiểm tra tất cả các ngày trong tuần
+                foreach (var day in daysOfWeek)
                 {
-                    return ResponseHandler.Failure<bool>("Ngày trong tuần không hợp lệ. Chỉ chấp nhận Thứ 2 đến Thứ 7 hoặc Chủ Nhật.");
+                    var trimmedDay = day.Trim().ToLower(); // Chuyển đổi về chữ thường
+                    if (!validDaysOfWeek.Contains(trimmedDay))
+                    {
+                        return ResponseHandler.Failure<bool>("Ngày trong tuần không hợp lệ. Chỉ chấp nhận Thứ 2 đến Thứ 7 hoặc Chủ Nhật.");
+                    }
                 }
                 var slot = await _unitOfWork.SlotRepository.GetFirstOrDefaultAsync(s => s.StartTime == time);
                 if (slot == null)
@@ -318,11 +329,15 @@ namespace FranchiseProject.Application.Services
                     return ResponseHandler.Failure<bool>("Không tìm thấy khóa học đăng ký phù hợp.");
                 }
                 registerCourse.DateTime = newDateTime;
-                 await _unitOfWork.RegisterCourseRepository.UpdateAsync(registerCourse);
-                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Cập nhật thất bại!");
+              var isSuccess = await _unitOfWork.RegisterCourseRepository.Update1Async(registerCourse);
+             
+                if (!isSuccess)
+                {
+                    return ResponseHandler.Failure<bool>("Cập nhật thất bại!");
+                }
 
-                response = ResponseHandler.Success(true, "Cập nhật slot thành công!");
+                response = ResponseHandler.Success(true, "Cập nhật  thành công!");
+
             }
             catch (Exception ex)
             {

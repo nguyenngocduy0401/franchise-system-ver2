@@ -68,6 +68,20 @@ namespace FranchiseProject.Application.Services
                     if (student.StudentStatus == StudentStatusEnum.Pending)
                     {
                         student.StudentStatus = StudentStatusEnum.Waitlisted;
+                        var registerCourses = await _unitOfWork.RegisterCourseRepository
+                             .GetRegisterCoursesByUserIdAndStatusNullAsync(student.Id); 
+
+                        if (registerCourses == null || !registerCourses.Any())
+                        {
+                            response = ResponseHandler.Failure<bool>("Không có khóa học nào với trạng thái null cho học sinh này.");
+                            return response;
+                        }
+
+                        foreach (var registerCourse in registerCourses)
+                        {
+                            registerCourse.StudentCourseStatus = StudentCourseStatusEnum.NotStudied; // Hoặc trạng thái phù hợp mà bạn muốn thiết lập
+                            await _unitOfWork.RegisterCourseRepository.Update1Async(registerCourse);
+                        }
                         var courseNames = await _unitOfWork.RegisterCourseRepository
                       .GetCourseNamesByUserIdAsync(create.UserId);
                         var emailMessage = EmailTemplate.StudentPaymentSuccsess(student.Email, student.FullName, create.Amount, agency.Name);

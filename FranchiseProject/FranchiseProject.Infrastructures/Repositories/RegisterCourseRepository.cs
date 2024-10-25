@@ -36,7 +36,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         public async Task UpdateAsync(RegisterCourse registerCourse)
         {
            
-            var existingRegisterCourse = await _dbContext.Set<RegisterCourse>().FindAsync(registerCourse.UserId, Guid.Parse(registerCourse.CourseId));
+            var existingRegisterCourse = await _dbContext.Set<RegisterCourse>().FindAsync(registerCourse.UserId, registerCourse.CourseId);
 
             if (existingRegisterCourse != null)
             {
@@ -54,6 +54,22 @@ namespace FranchiseProject.Infrastructures.Repositories
         public async Task<RegisterCourse?> GetFirstOrDefaultAsync(Expression<Func<RegisterCourse, bool>> filter)
         {
             return await _dbContext.RegisterCourses.FirstOrDefaultAsync(filter);
+        }
+        public async Task<bool> Update1Async(RegisterCourse registerCourse)
+        {
+            if (registerCourse == null)
+            {
+                throw new ArgumentNullException(nameof(registerCourse));
+            }
+            _dbContext.RegisterCourses.Update(registerCourse);
+            var result = await _dbContext.SaveChangesAsync();
+            return result > 0;
+        }
+        public async Task<List<RegisterCourse>> GetRegisterCoursesByUserIdAndStatusNullAsync(string userId)
+        {
+            return await _dbContext.RegisterCourses
+                .Where(rc => rc.UserId == userId && rc.StudentCourseStatus == 0)
+                .ToListAsync();
         }
 
     }
