@@ -75,5 +75,24 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             _dbContext.RegisterCourses.Remove(registerCourse);
         }
+        public async Task<IEnumerable<RegisterCourse>> GetAllAsync(Expression<Func<RegisterCourse, bool>> filter = null, string includeProperties = "")
+        {
+            IQueryable<RegisterCourse> query = _dbContext.RegisterCourses;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var property in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(property.Trim());
+                }
+            }
+
+            return await query.ToListAsync();
+        }
     }
 }

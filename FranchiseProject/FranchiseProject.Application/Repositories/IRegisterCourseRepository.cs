@@ -17,5 +17,6 @@ namespace FranchiseProject.Application.Repositories
         Task<bool> Update1Async(RegisterCourse registerCourse);
         Task<List<RegisterCourse>> GetRegisterCoursesByUserIdAndStatusNullAsync(string userId);
         void Delete(RegisterCourse registerCourse);
+        Task<IEnumerable<RegisterCourse>> GetAllAsync(Expression<Func<RegisterCourse, bool>> filter = null, string includeProperties = "");
     }
 }
