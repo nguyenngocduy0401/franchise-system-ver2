@@ -1,31 +1,22 @@
-﻿
-using AutoMapper;
-using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.Spreadsheet;
+﻿using AutoMapper;
 using FluentValidation;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Hubs;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.EmailViewModels;
-using FranchiseProject.Application.ViewModels.NotificationViewModels;
-using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Application.ViewModels.ConsultationViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
-using Google.Apis.Auth.OAuth2;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using FranchiseProject.Application.ViewModels.AgenciesViewModels;
+using FranchiseProject.Application.Handler;
+using FranchiseProject.Application.ViewModels.CourseViewModels;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FranchiseProject.Application.Services
 {
-    public class    AgencyService : IAgencyService
+	public class    AgencyService : IAgencyService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClaimsService _claimsService;
@@ -384,5 +375,21 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-    }
+		public async Task<ApiResponse<IEnumerable<AgencyAddressViewModel>>> GetActiveAgencyAdresses()
+		{
+			var response = new ApiResponse<IEnumerable<AgencyAddressViewModel>>();
+			try
+			{
+                var agencies = await _unitOfWork.AgencyRepository.FindAsync(x => x.Status == AgencyStatusEnum.Active);
+				var agencyAddressViewModels = _mapper.Map<IEnumerable<AgencyAddressViewModel>>(agencies);
+				if (agencyAddressViewModels.IsNullOrEmpty()) return ResponseHandler.Success(agencyAddressViewModels, "Không có chi nhánh nào đang hoạt động!");
+				response = ResponseHandler.Success(agencyAddressViewModels, "Lấy địa chỉ các chi nhánh đang hoạt động thành công!");
+			}
+			catch (Exception ex)
+			{
+				response = ResponseHandler.Failure<IEnumerable<AgencyAddressViewModel>>(ex.Message);
+			}
+			return response;
+		}
+	}
 }
