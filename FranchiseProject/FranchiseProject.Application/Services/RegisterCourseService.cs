@@ -3,9 +3,9 @@ using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Wordprocessing;
 using FluentValidation;
 using FranchiseProject.Application.Commons;
-using FranchiseProject.Application.EmailTemplateHandler;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.Utils;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Application.ViewModels.StudentViewModel;
 using FranchiseProject.Application.ViewModels.StudentViewModels;
@@ -37,7 +37,8 @@ namespace FranchiseProject.Application.Services
         private readonly IEmailService _emailService;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
-        public RegisterCourseService(RoleManager<Role> roleManager,IEmailService emailService, IClaimsService claimsService,UserManager<User> userManager, IMapper mapper, IUnitOfWork unitOfWork, IValidator<RegisterCourseViewModel> validator)
+        private readonly IValidator<UpdateRegisterCourseViewModel> _updateValidator;
+        public RegisterCourseService(IValidator<UpdateRegisterCourseViewModel> updateValidator, RoleManager<Role> roleManager,IEmailService emailService, IClaimsService claimsService,UserManager<User> userManager, IMapper mapper, IUnitOfWork unitOfWork, IValidator<RegisterCourseViewModel> validator)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -46,6 +47,7 @@ namespace FranchiseProject.Application.Services
             _claimsService = claimsService;
             _emailService = emailService;
             _roleManager = roleManager;
+            _updateValidator = updateValidator;
         }
 
 
@@ -115,7 +117,7 @@ namespace FranchiseProject.Application.Services
                 {
                     UserId = newUser.Id,
                     CourseId = Guid.Parse(model.CourseId),
-                    StudentCourseStatus = StudentCourseStatusEnum.NotStudied
+                    StudentCourseStatus = StudentCourseStatusEnum.Pending
                 };
                  await _unitOfWork.RegisterCourseRepository.AddAsync(newRegisterCourse);
                 var emailMessage = EmailTemplate.SuccessRegisterCourseEmaill(model.Email, model.StudentName, course.Name, agency.Name);
@@ -237,8 +239,11 @@ namespace FranchiseProject.Application.Services
                     (u.UserRoles.Any(r => r.RoleId == studentRoleId.ToString())) && 
                     (!filterStudentModel.StatusPayment.HasValue || u.StudentPaymentStatus == filterStudentModel.StatusPayment) &&
                     (!filterStudentModel.Status.HasValue || u.StudentStatus == filterStudentModel.Status) &&
+                    (u.StudentStatus != StudentStatusEnum.Enrolled)&&
                     (string.IsNullOrEmpty(filterStudentModel.CourseId) ||
-                    u.RegisterCourses.Any(rc => rc.CourseId.ToString() == filterStudentModel.CourseId));
+                    u.RegisterCourses.Any(rc => rc.CourseId.ToString() == filterStudentModel.CourseId &&
+                                (rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
+                                 rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied)));
 
                 var students = await _unitOfWork.UserRepository.GetFilterAsync(
                     filter: filter,
@@ -255,16 +260,21 @@ namespace FranchiseProject.Application.Services
                     StudentStatus=s.StudentStatus,
                     PhoneNumber = s.PhoneNumber,
                     Email = s.Email,
-                    CourseId=s.RegisterCourses.Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied)
+                                    CourseId = s.RegisterCourses
+                        .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
+                                     rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied)
                         .Select(rc => rc.CourseId)
                         .FirstOrDefault(),
-                    DateTime =s.RegisterCourses.Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied)
+                                    DateTime = s.RegisterCourses
+                        .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
+                                     rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied)
                         .Select(rc => rc.DateTime)
                         .FirstOrDefault(),
-                    CourseName = s.RegisterCourses
-                        .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied) 
-                        .Select(rc => rc.Course?.Name) 
-                        .FirstOrDefault() 
+                                    CourseName = s.RegisterCourses
+                        .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
+                                     rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied)
+                        .Select(rc => rc.Course?.Name)
+                        .FirstOrDefault()
                 }).ToList();
 
                 var paginatedResult = new Pagination<StudentRegisterViewModel>
@@ -287,54 +297,102 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<ApiResponse<bool>> UpdateRegisterCourseDateTimeAsync(string userId, string courseId, [FromBody] string newDateTime)
+        public async Task<ApiResponse<bool>> UpdateRegisterCourseDateTimeAsync(string userId, string courseId, UpdateRegisterCourseViewModel update)
         {
             var response = new ApiResponse<bool>();
             try
             {
-                var dateTimePattern = @"^(Thứ [2-7]|Chủ Nhật)(,\s*(Thứ [2-7]|Chủ Nhật))*;\s*[0-2][0-9]:[0-5][0-9]$"; // Hỗ trợ nhiều ngày
-                if (!Regex.IsMatch(newDateTime, dateTimePattern, RegexOptions.IgnoreCase))
-                {
-                    return ResponseHandler.Failure<bool>("Định dạng không hợp lệ! Định dạng đúng: Thứ X, Thứ Y;HH:mm.");
-                }
-
-                var dateTimeParts = newDateTime.Split(';');
-                var daysOfWeek = dateTimeParts[0].Trim().Split(','); // Tách từng ngày
-                var time = TimeSpan.Parse(dateTimeParts[1].Trim());
-
-                // Tạo danh sách các ngày hợp lệ (thay đổi chữ hoa chữ thường)
-                var validDaysOfWeek = new HashSet<string>
-        {
-            "thứ 2", "thứ 3", "thứ 4", "thứ 5", "thứ 6", "thứ 7", "chủ nhật"
-        };
-
-                // Kiểm tra tất cả các ngày trong tuần
-                foreach (var day in daysOfWeek)
-                {
-                    var trimmedDay = day.Trim().ToLower(); // Chuyển đổi về chữ thường
-                    if (!validDaysOfWeek.Contains(trimmedDay))
-                    {
-                        return ResponseHandler.Failure<bool>("Ngày trong tuần không hợp lệ. Chỉ chấp nhận Thứ 2 đến Thứ 7 hoặc Chủ Nhật.");
-                    }
-                }
-                var slot = await _unitOfWork.SlotRepository.GetFirstOrDefaultAsync(s => s.StartTime == time);
-                if (slot == null)
-                {
-                    return ResponseHandler.Failure<bool>("Không có Slot nào khớp với thời gian đã nhập!");
-                }
                 var registerCourse = await _unitOfWork.RegisterCourseRepository.GetFirstOrDefaultAsync(
-                    rc => rc.UserId == userId && rc.CourseId == new Guid(courseId));
+                    rc => rc.UserId == userId && rc.CourseId ==  Guid.Parse(courseId)&& rc.StudentCourseStatus==StudentCourseStatusEnum.Pending);
                 if (registerCourse == null)
                 {
                     return ResponseHandler.Failure<bool>("Không tìm thấy khóa học đăng ký phù hợp.");
                 }
-                registerCourse.DateTime = newDateTime;
-              var isSuccess = await _unitOfWork.RegisterCourseRepository.Update1Async(registerCourse);
-             
+                
+                if (update.CourseId != null) 
+                {
+                    var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(Guid.Parse(update.CourseId));
+                    if (course == null) { return ResponseHandler.Failure<bool>("Không tìm thấy khóa học phù hợp."); }
+                    _unitOfWork.RegisterCourseRepository.Delete(registerCourse);
+                }
+                
+                if (update.DateTime !="")
+                {
+                    var dateTimePattern = @"^(Thứ [2-7]|Chủ Nhật)(,\s*(Thứ [2-7]|Chủ Nhật))*;\s*[0-2][0-9]:[0-5][0-9]$";
+                    if (!Regex.IsMatch(update.DateTime, dateTimePattern, RegexOptions.IgnoreCase))
+                    {
+                        return ResponseHandler.Failure<bool>("Định dạng không hợp lệ! Định dạng đúng: Thứ X, Thứ Y;HH:mm.");
+                    }
+
+                    var dateTimeParts = update.DateTime.Split(';');
+                    var daysOfWeek = dateTimeParts[0].Trim().Split(',');
+                    var time = TimeSpan.Parse(dateTimeParts[1].Trim());
+
+
+                    var validDaysOfWeek = new HashSet<string>
+        {
+            "thứ 2", "thứ 3", "thứ 4", "thứ 5", "thứ 6", "thứ 7", "chủ nhật"
+        };
+
+
+                    foreach (var day in daysOfWeek)
+                    {
+                        var trimmedDay = day.Trim().ToLower(); // Chuyển đổi về chữ thường
+                        if (!validDaysOfWeek.Contains(trimmedDay))
+                        {
+                            return ResponseHandler.Failure<bool>("Ngày trong tuần không hợp lệ. Chỉ chấp nhận Thứ 2 đến Thứ 7 hoặc Chủ Nhật.");
+                        }
+                    }
+                    var slot = await _unitOfWork.SlotRepository.GetFirstOrDefaultAsync(s => s.StartTime == time);
+                    if (slot == null)
+                    {
+                        return ResponseHandler.Failure<bool>("Không có Slot nào khớp với thời gian đã nhập!");
+                    }
+                }
+                if (update.CourseId != null)
+                {
+                    var newRegisterCourse = new RegisterCourse
+                    {
+                        UserId = userId,
+                        CourseId = Guid.Parse(update.CourseId),
+                        DateTime = update.DateTime,
+                        StudentCourseStatus = StudentCourseStatusEnum.Pending
+                    };
+                    await _unitOfWork.RegisterCourseRepository.AddAsync(newRegisterCourse);
+                }
+                else
+                {
+                    var registerCourseExist = await _unitOfWork.RegisterCourseRepository.GetFirstOrDefaultAsync(
+                   rc => rc.UserId == userId && rc.CourseId == Guid.Parse(courseId) && rc.StudentCourseStatus == StudentCourseStatusEnum.Pending);
+                    registerCourseExist.DateTime = update.DateTime;
+                    await _unitOfWork.RegisterCourseRepository.UpdateAsync(registerCourseExist);
+                }
+                if (update.StudentName != null)
+                {
+                    var user = await _userManager.FindByIdAsync(userId);
+                    var nameParts = update.StudentName.Split(' ');
+                    var lastName = nameParts.LastOrDefault()?.ToLower();
+                    lastName = RemoveDiacritics(lastName);
+
+                    if (string.IsNullOrEmpty(lastName))
+                    {
+                        return ResponseHandler.Failure<bool>("Tên người dùng không hợp lệ!");
+                    }
+
+                    string baseUserName = $"{lastName}lc";
+                    string finalUserName = baseUserName;
+                    int counter = 1;
+                    user.UserName=finalUserName;
+                    user.FullName = update.StudentName;
+                }
+              
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess)
                 {
                     return ResponseHandler.Failure<bool>("Cập nhật thất bại!");
                 }
+
 
                 response = ResponseHandler.Success(true, "Cập nhật  thành công!");
 

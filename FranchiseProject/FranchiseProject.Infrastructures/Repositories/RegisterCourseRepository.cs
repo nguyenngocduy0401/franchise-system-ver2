@@ -68,9 +68,12 @@ namespace FranchiseProject.Infrastructures.Repositories
         public async Task<List<RegisterCourse>> GetRegisterCoursesByUserIdAndStatusNullAsync(string userId)
         {
             return await _dbContext.RegisterCourses
-                .Where(rc => rc.UserId == userId && rc.StudentCourseStatus == 0)
+                .Where(rc => rc.UserId == userId && rc.StudentCourseStatus == StudentCourseStatusEnum.Pending)
                 .ToListAsync();
         }
-
+        public void Delete(RegisterCourse registerCourse)
+        {
+            _dbContext.RegisterCourses.Remove(registerCourse);
+        }
     }
 }
