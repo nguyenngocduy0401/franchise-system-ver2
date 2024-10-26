@@ -70,8 +70,8 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var chapter = await _unitOfWork.ChapterRepository.GetExistByIdAsync(chapterId);
-                if (chapter == null) return ResponseHandler.Failure<bool>("Chương học không khả dụng!");
-                
+                if (chapter == null) throw new Exception("Chapter does not exist!");
+
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(chapter.CourseId, CourseStatusEnum.Draft);
                 if (!checkCourse.Data) return checkCourse; 
 
@@ -79,7 +79,7 @@ namespace FranchiseProject.Application.Services
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete failed!");
 
-                response = ResponseHandler.Success(true, "Xoá tài nguyên học thành công!");
+                response = ResponseHandler.Success(true, "Xoá chương học thành công!");
             }
             catch (Exception ex)
             {
@@ -166,5 +166,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        
     }
 }

@@ -91,8 +91,8 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<INotificationRepository, NotificationRepository>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();
-          //  services.AddScoped<IMaterialRepository, MaterialRepository>();
             services.AddScoped<ICourseMaterialRepository, CourseMaterialRepository>();
+            services.AddScoped<IChapterMaterialRepository, ChapterMaterialRepository>();
             #endregion
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>

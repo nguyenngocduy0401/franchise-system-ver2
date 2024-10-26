@@ -87,12 +87,12 @@ namespace FranchiseProject.API.Controllers
         {
             return await _sessionService.CreateSessionArrangeAsync(id, createSessionArrangeModel);
         }
-        [SwaggerOperation(Summary = "cập nhật chương của khoá học {Authorize = SystemInstructor, Manager}")]
+        /*[SwaggerOperation(Summary = "cập nhật chương của khoá học {Authorize = SystemInstructor, Manager}")]
         [HttpPost("{id}/chapters")]
         public async Task<ApiResponse<bool>> CreateChapterByCourseIdAsync(Guid id, List<CreateChapterArrangeModel> createChapterArrangeModel)
         {
             return await _chapterService.CreateChapterArrangeAsync(id, createChapterArrangeModel);
-        }
+        }*/
         [SwaggerOperation(Summary = "tìm khoá học bằng id")]
         [HttpGet("{id}")]
         public async Task<ApiResponse<CourseDetailViewModel>> GetCourseByIdAsync(Guid id)
