@@ -53,9 +53,10 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IPaymentService, PaymentService>();
-           // services.AddScoped<IMaterialService, MaterialService>();
+            services.AddScoped<IChapterMaterialService, ChapterMaterialService>();
             services.AddScoped<ICourseMaterialService, CourseMaterialService>();
             services.AddScoped<IAssessmentService, AssessmentService>();
+
            
 
             #endregion

@@ -20,6 +20,13 @@ namespace FranchiseProject.API.Controllers
             _chapterService = chapterService;
             _questionService = questionService;
         }
+        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        [SwaggerOperation(Summary = "tạo câu hỏi của chương học {Authorize = Instructor, Manager}")]
+        [HttpPost("{id}/questions")]
+        public async Task<ApiResponse<bool>> CreateQuestionByChapterIdAsync(Guid id, CreateQuestionArrangeModel createQuestionArrangeModel)
+        {
+            return await _questionService.CreateQuestionByChapterIdAsync(id, createQuestionArrangeModel);
+        }
         [SwaggerOperation(Summary = "lấy tất cả câu hỏi của chương học bằng id {Authorize = Admin, Manager}")]
         [HttpGet("{id}/questions")]
         public async Task<ApiResponse<List<QuestionViewModel>>> GetAllQuestionByChapterIdAsync(Guid id)

@@ -12,5 +12,7 @@ namespace FranchiseProject.Application.Interfaces
     {
         Task<ApiResponse<bool>> CreateQuestionArrangeAsync(Guid chapterId, List<CreateQuestionArrangeModel> createQuestionArrangeModel);
         Task<ApiResponse<List<QuestionViewModel>>> GetAllQuestionByChapterId(Guid chapterId);
+        Task<ApiResponse<bool>> CreateQuestionByChapterIdAsync(Guid chapterId, CreateQuestionArrangeModel createQuestionArrangeModel);
+        Task<ApiResponse<bool>> DeleteQuestionByIdAsync(Guid questionId);
     }
 }

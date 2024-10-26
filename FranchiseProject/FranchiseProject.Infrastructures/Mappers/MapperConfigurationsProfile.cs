@@ -145,8 +145,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<ChapterMaterial, ChapterMaterial>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.ChapterId, opt => opt.Ignore());
-            CreateMap<UpdateChapterMaterialModel, Chapter>();
-            CreateMap<CreateChapterMaterialModel, Chapter>();
+            CreateMap<UpdateChapterMaterialModel, ChapterMaterial>();
+            CreateMap<CreateChapterMaterialModel, ChapterMaterial>();
             #endregion
             #region Chapter
             CreateMap<Chapter, ChapterViewModel>()
