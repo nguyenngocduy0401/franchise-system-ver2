@@ -27,7 +27,7 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpPut("{id}")]
 
-        public async  Task<ApiResponse<bool>> UpdateStatusStudentAsync( string id)=> await _registerCourseService.UpdateStatusStudentAsync(id);
+        public async  Task<ApiResponse<bool>> UpdateStatusStudentAsync( string id,StudentStatusEnum status) => await _registerCourseService.UpdateStatusStudentAsync(id,status);
         [SwaggerOperation(Summary = "lấy thông tin học sinh by Id   {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpGet("{id}")]

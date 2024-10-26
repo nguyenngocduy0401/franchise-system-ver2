@@ -139,27 +139,33 @@ namespace FranchiseProject.Application.Services
         }
 
       
-        public async Task<ApiResponse<bool>> UpdateStatusStudentAsync( string studentId)
+        public async Task<ApiResponse<bool>> UpdateStatusStudentAsync( string studentId, StudentStatusEnum status)
         {
           var response= new ApiResponse<bool>();
             try
             {
                 var student = await _userManager.FindByIdAsync(studentId);
-                if (student == null) { return ResponseHandler.Failure<bool>("Học sinh không khả dụng!"); }
-              
-                        if(student.StudentStatus == StudentStatusEnum.NotConsult)
+                switch (status)
+                {
+                    case StudentStatusEnum.Pending:
+                        
+                        if (student == null) { return ResponseHandler.Failure<bool>("Học sinh không khả dụng!"); }
+
+                        if (student.StudentStatus == StudentStatusEnum.NotConsult)
                         {
                             student.StudentStatus = StudentStatusEnum.Pending;
                             student.StudentPaymentStatus = StudentPaymentStatusEnum.Pending_Payment;
-                        }else
+                        }
+                        else
                         {
                             return ResponseHandler.Failure<bool>("Học sinh không thể chuyển thành trạng thái Chờ!");
                         }
-
-
-
-
-
+                        break;
+                    case StudentStatusEnum.Cancel:
+                        student.StudentStatus = StudentStatusEnum.Cancel;
+                        break;
+                }
+                   
                 var updateResult = await _userManager.UpdateAsync(student);
                 if (!updateResult.Succeeded)
                 {
