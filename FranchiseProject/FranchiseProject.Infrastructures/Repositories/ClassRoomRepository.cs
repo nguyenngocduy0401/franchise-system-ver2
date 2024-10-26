@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -42,24 +43,29 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Where(filter)
                 .ToListAsync();
         }
-        public async Task<int> CountStudentsByClassIdAsync(Guid classId)
-        {
-            var roles = await _roleManager.Roles.ToListAsync();
-            var studentRole = roles.FirstOrDefault(r => r.Name == "Student");
-            if (studentRole == null) return 0; 
-            var usersInRole = await _userManager.GetUsersInRoleAsync(studentRole.Name);
-            var userIdsInRole = usersInRole.Select(u => u.Id).ToList();
-            var studentCount = await _dbContext.ClassRooms
-                .Where(sc => sc.ClassId == classId && userIdsInRole.Contains(sc.UserId))
-                .CountAsync();
-
-            return studentCount;
-        }
+     
         public async Task<List<ClassRoom>> GetAllAsync(Expression<Func<ClassRoom, bool>> predicate)
         {
             return await _dbContext.ClassRooms.Where(predicate).ToListAsync();
         }
-      
-   
+        public async Task AddAsync(ClassRoom classRoom)
+        {
+            await _dbContext.Set<ClassRoom>().AddAsync(classRoom);
+        }
+        public async Task<List<User>> GetWaitlistedStudentsAsync(List<string> studentIds)
+        {
+            return await _dbContext.Users
+                .Where(u => studentIds.Contains(u.Id) && u.StudentStatus == StudentStatusEnum.Waitlisted)
+                .ToListAsync();
+        }
+
+
+        public async Task<List<string>> GetInvalidStudentsAsync(List<string> studentIds)
+        {
+            return await _dbContext.Users
+                .Where(u => studentIds.Contains(u.Id) && u.StudentStatus != StudentStatusEnum.Waitlisted)
+                .Select(u => u.FullName)
+                .ToListAsync();
+        }
     }
 }

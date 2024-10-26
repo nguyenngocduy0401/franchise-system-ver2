@@ -45,6 +45,8 @@ using FranchiseProject.API.Validator.PaymentValidator;
 using FranchiseProject.Application.ViewModels.QuestionViewModels;
 using FranchiseProject.API.Validator.QuestionValidator;
 using Google;
+using FranchiseProject.Application.ViewModels.ClassViewModel;
+using FranchiseProject.API.Validator.ClassValidator;
 
 
 namespace FranchiseProject.API
@@ -159,6 +161,7 @@ namespace FranchiseProject.API
 
             services.AddTransient<IValidator<List<CreateQuestionArrangeModel>>, CreateQuestionArrangeValidator>();
             services.AddTransient<IValidator<UpdateRegisterCourseViewModel>,UpdateRegisterCourseValidator>();
+            services.AddTransient<IValidator<CreateClassViewModel>,CreateClassValidator>();
             #endregion
 
             return services;
