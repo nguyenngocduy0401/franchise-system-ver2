@@ -37,6 +37,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
+                
                 ValidationResult validationResult = await _createQuestionArrangeValidator.ValidateAsync(createQuestionArrangeModel);
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
                 var chapter = await _unitOfWork.ChapterRepository.GetExistByIdAsync(chapterId);

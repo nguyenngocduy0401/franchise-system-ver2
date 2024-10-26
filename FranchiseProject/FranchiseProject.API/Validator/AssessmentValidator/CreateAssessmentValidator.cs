@@ -11,7 +11,7 @@ namespace FranchiseProject.API.Validator.AssessmentValidator
                 .GreaterThanOrEqualTo(0);
             RuleFor(x => x.Type)
                 .NotEmpty()
-                .MaximumLength(10);
+                .MaximumLength(100);
             RuleFor(x => x.Content)
                 .NotEmpty()
                 .MaximumLength(100);

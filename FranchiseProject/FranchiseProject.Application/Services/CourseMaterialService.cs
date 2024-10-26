@@ -151,7 +151,7 @@ namespace FranchiseProject.Application.Services
                     material.CourseId = courseId;
                 }
                 var deleteMaterials = (await _unitOfWork.CourseMaterialRepository.FindAsync(e => e.CourseId == courseId && e.IsDeleted != true)).ToList();
-                if(!deleteMaterials.IsNullOrEmpty()) _unitOfWork.CourseMaterialRepository.SoftRemoveRange(deleteMaterials);
+                if(!deleteMaterials.IsNullOrEmpty()) _unitOfWork.CourseMaterialRepository.HardRemoveRange(deleteMaterials);
 
                 await _unitOfWork.CourseMaterialRepository.AddRangeAsync(materials);
 

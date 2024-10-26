@@ -28,7 +28,6 @@ using FranchiseProject.Application.ViewModels.StudentViewModel;
 using FranchiseProject.Application.ViewModels.StudentViewModels;
 using FranchiseProject.Application.ViewModels.QuestionViewModels;
 using FranchiseProject.Application.ViewModels.QuestionOptionViewModels;
-using FranchiseProject.Domain.Enums;
 using FranchiseProject.Application.ViewModels.PaymentViewModel;
 
 
@@ -106,7 +105,6 @@ namespace FranchiseProject.Infrastructures.Mappers
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.Message)).ReverseMap();
             #endregion
-           
 
             #region Class
             CreateMap<CreateClassViewModel, Class>();
@@ -147,6 +145,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<ChapterMaterial, ChapterMaterial>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.ChapterId, opt => opt.Ignore());
+            CreateMap<UpdateChapterMaterialModel, Chapter>();
+            CreateMap<CreateChapterMaterialModel, Chapter>();
             #endregion
             #region Chapter
             CreateMap<Chapter, ChapterViewModel>()
