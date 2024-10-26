@@ -158,7 +158,7 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<List<CreateSessionArrangeModel>>, CreateSessionArrangeValidator>();
 
             services.AddTransient<IValidator<List<CreateQuestionArrangeModel>>, CreateQuestionArrangeValidator>();
-
+            services.AddTransient<IValidator<UpdateRegisterCourseViewModel>,UpdateRegisterCourseValidator>();
             #endregion
 
             return services;

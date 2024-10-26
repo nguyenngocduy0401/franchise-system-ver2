@@ -10,7 +10,7 @@ namespace FranchiseProject.Application.ViewModels.PaymentViewModel
     public class FilterStudentPaymentViewModel
     {
        
-        public StudentPaymentStatusEnum? Status { get; set; }
+    //    public StudentPaymentStatusEnum? Status { get; set; }
         public string? StudentName { get; set; }
         public int PageIndex { get; set; } = 1;
         public int PageSize { get; set; } = 10;

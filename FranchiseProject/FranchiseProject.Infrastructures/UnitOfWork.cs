@@ -44,6 +44,7 @@ namespace FranchiseProject.Infrastructures
         private readonly IPaymentRepository _paymentRepository;
         private readonly ICourseMaterialRepository _courseMaterialRepository;
         private readonly IRegisterCourseRepository _registerCourseRepository;
+        private readonly IChapterMaterialRepository _chapterMaterialRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -53,8 +54,9 @@ namespace FranchiseProject.Infrastructures
             IClassRoomRepository classRoomRepository, IRegisterCourseRepository registerFormRepository, ISyllabusRepository syllabusRepository,
             IUserRepository userRepository, IAssignmentSubmitRepository assignmentSubmitRepository, IRefreshTokenRepository refreshTokenRepository,
             IRegisterFormRepository franchiseRegistrationRequestRepository, IAssessmentRepository assessmentRepository,INotificationRepository notificationRepository,
-            IPaymentRepository paymentRepository,IStudentRepository studentRepository
-            ,ICourseMaterialRepository courseMaterialRepository,IRegisterCourseRepository registerCourseRepository)
+            IPaymentRepository paymentRepository,IStudentRepository studentRepository,
+            ICourseMaterialRepository courseMaterialRepository,IRegisterCourseRepository registerCourseRepository,
+            IChapterMaterialRepository chapterMaterialRepository)
 
            
         {
@@ -90,7 +92,7 @@ namespace FranchiseProject.Infrastructures
             _paymentRepository = paymentRepository;
             _studentRepository = studentRepository;
             _registerCourseRepository= registerCourseRepository;
-    
+            _chapterMaterialRepository= chapterMaterialRepository;
             _courseMaterialRepository = courseMaterialRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
@@ -155,6 +157,7 @@ namespace FranchiseProject.Infrastructures
         public ICourseMaterialRepository CourseMaterialRepository => _courseMaterialRepository;
 
         public IRegisterCourseRepository RegisterCourseRepository => _registerCourseRepository;
+        public IChapterMaterialRepository ChapterMaterialRepository => _chapterMaterialRepository;
 
         public async Task<int> SaveChangeAsync()
         {

@@ -12,5 +12,6 @@ namespace FranchiseProject.Domain.Enums
         Pending=1,             //Đã tư vấn 
         Waitlisted = 2,     //Chờ để join vào lớp
         Enrolled = 3,       // Đã vào lớp 
+        Cancel = 4          //Cancel
     }
 }

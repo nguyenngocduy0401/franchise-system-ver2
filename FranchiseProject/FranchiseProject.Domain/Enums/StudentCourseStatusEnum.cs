@@ -12,5 +12,6 @@ namespace FranchiseProject.Domain.Enums
         Studied=1,             // Đã Học
         CurrentlyStudying=2 , // Đang Học
         DroppedOut=3 ,    //Thôi học
+        Pending=4 ,
     }
 }
