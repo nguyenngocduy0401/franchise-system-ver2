@@ -1,11 +1,12 @@
 ﻿using FranchiseProject.Application.ViewModels.EmailViewModels;
+using Google.Apis.Auth.OAuth2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.EmailTemplateHandler
+namespace FranchiseProject.Application.Utils
 {
     public static class EmailTemplate
     {
@@ -52,7 +53,25 @@ namespace FranchiseProject.Application.EmailTemplateHandler
                        $"<p>Đội ngũ FutureTech</p>"
             };
         }
-        public static MessageModel StudentPaymentSuccsess(string to, string name, int amount, string agencyName)
+        public static MessageModel StudentPaymentSuccsess(string to, string name, int amount, string agencyName, string UserName, string password)
+        {
+            return new MessageModel
+            {
+                To = to,
+                Subject = "Xác Nhận Thanh Toán Thành Công [futuretech-noreply]",
+                Body = $"<p>Chào bạn {name},</p>" +
+                       $"<p>Bạn đã đăng Thanh khóa học  thành công </p>" +
+                       $"<p>Số tiền đã thanh toán:{amount} </p>" +
+                       $"<li><strong>Username:</strong> {UserName}</li>" +
+                       $"<li><strong>Password:</strong> {password}</li>" +
+                       $"</ul>" +
+                       $"<p>Vui lòng bảo mật thông tin đăng nhập này.</p>" +
+                       $"<p>Chúng tôi sẻ liên hệ và gửi thông báo về thông tin lớp học trong thời gian sớm nhất </p>" +
+                       $"<p>Trân trọng,</p>" +
+                       $"<p>Đội ngũ FutureTech</p>"
+            };
+        }
+        public static MessageModel StudentPaymentSuccsessNotCompleted(string to, string name, int amount, string agencyName)
         {
             return new MessageModel
             {

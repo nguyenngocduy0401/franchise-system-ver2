@@ -10,6 +10,6 @@ namespace FranchiseProject.Application.Repositories
     public interface ICourseRepository : IGenericRepository<Course>
     {
         Task<Course> GetCourseDetailAsync(Guid courseId);
-    
+        Task<Course> GetCourseDetailForDuplicateAsync(Guid courseId);
     }
 }

@@ -2,10 +2,10 @@
 using DocumentFormat.OpenXml.Office2010.PowerPoint;
 using FluentValidation;
 using FranchiseProject.Application.Commons;
-using FranchiseProject.Application.EmailTemplateHandler;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Hubs;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.Utils;
 using FranchiseProject.Application.ViewModels.ConsultationViewModels;
 using FranchiseProject.Application.ViewModels.PaymentViewModel;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
@@ -68,9 +68,32 @@ namespace FranchiseProject.Application.Services
                     if (student.StudentStatus == StudentStatusEnum.Pending)
                     {
                         student.StudentStatus = StudentStatusEnum.Waitlisted;
+                        var registerCourses = await _unitOfWork.RegisterCourseRepository
+                             .GetRegisterCoursesByUserIdAndStatusNullAsync(student.Id); 
+
+                        if (registerCourses == null || !registerCourses.Any())
+                        {
+                            response = ResponseHandler.Failure<bool>("Không có khóa học nào với trạng thái null cho học sinh này.");
+                            return response;
+                        }
+
+                        foreach (var registerCourse in registerCourses)
+                        {
+                            if (registerCourse.StudentCourseStatus == StudentCourseStatusEnum.Pending)
+                            {
+                                registerCourse.StudentCourseStatus = StudentCourseStatusEnum.NotStudied;
+                                await _unitOfWork.RegisterCourseRepository.Update1Async(registerCourse);
+                                break; // Stop after updating the first "Pending" status
+                            }
+                        }
                         var courseNames = await _unitOfWork.RegisterCourseRepository
                       .GetCourseNamesByUserIdAsync(create.UserId);
-                        var emailMessage = EmailTemplate.StudentPaymentSuccsess(student.Email, student.FullName, create.Amount, agency.Name);
+                        var random = new Random();
+                        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                        var password = new string(Enumerable.Repeat(chars, 6)
+                            .Select(s => s[random.Next(s.Length)]).ToArray());
+                        var user1=  _userManager.AddPasswordAsync(student, password);
+                        var emailMessage = EmailTemplate.StudentPaymentSuccsess(student.Email, student.FullName, create.Amount, agency.Name,student.UserName, password);
                         bool emailSent = await _emailService.SendEmailAsync(emailMessage);
                         if (!emailSent)
                         {
@@ -89,7 +112,7 @@ namespace FranchiseProject.Application.Services
                         //student.StudentStatus = StudentStatusEnum.Waitlisted;
                         var courseNames = await _unitOfWork.RegisterCourseRepository
                       .GetCourseNamesByUserIdAsync(create.UserId);
-                        var emailMessage = EmailTemplate.StudentPaymentSuccsess(student.Email, student.FullName, create.Amount, agency.Name);
+                        var emailMessage = EmailTemplate.StudentPaymentSuccsessNotCompleted(student.Email, student.FullName, create.Amount, agency.Name);
                         bool emailSent = await _emailService.SendEmailAsync(emailMessage);
                         if (!emailSent)
                         {

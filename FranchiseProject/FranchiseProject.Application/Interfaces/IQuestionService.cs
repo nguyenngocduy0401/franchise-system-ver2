@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.ViewModels.QuestionViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +10,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IQuestionService
     {
+        Task<ApiResponse<bool>> CreateQuestionArrangeAsync(Guid chapterId, List<CreateQuestionArrangeModel> createQuestionArrangeModel);
+        Task<ApiResponse<List<QuestionViewModel>>> GetAllQuestionByChapterId(Guid chapterId);
     }
 }

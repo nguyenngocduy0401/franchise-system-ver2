@@ -23,7 +23,7 @@ namespace FranchiseProject.API.Controllers
         [SwaggerOperation(Summary = "học sinh đăng kí khóa học ")]
         [HttpPost]
         public async Task<ApiResponse<bool>> RegisterCourseAsync(RegisterCourseViewModel model)=>await _registerCourseService.RegisterCourseAsync(model);
-        [SwaggerOperation(Summary = "Cập nhật trạng thái học sinh từ Notcónullt thành Pending  {Authorize = AgencyManager ,AgencyStaff}")]
+        [SwaggerOperation(Summary = "Cập nhật trạng thái học sinh từ Notconsul thành Pending  {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpPut("{id}")]
 
@@ -35,6 +35,11 @@ namespace FranchiseProject.API.Controllers
         [SwaggerOperation(Summary = "Lấy thông tin đăng kí học sinh {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpGet("filter")]
-        public async Task<ApiResponse<Pagination<StudentViewModel>>> FilterStudentAsync([FromQuery]FilterRegisterCourseViewModel filterStudentModel)=> await _registerCourseService.FilterStudentAsync(filterStudentModel);    
+        public async Task<ApiResponse<Pagination<StudentRegisterViewModel>>> FilterStudentAsync([FromQuery]FilterRegisterCourseViewModel filterStudentModel)=> await _registerCourseService.FilterStudentAsync(filterStudentModel);
+
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
+        [SwaggerOperation(Summary = "cập nhật thông tin đăng kí {Authorize = AgencyStaff, AgencyManager}")]
+        [HttpPut("{userId}/{courseId}")]
+        public async Task<ApiResponse<bool>> UpdateRegisterCourseDateTimeAsync(string userId, string courseId,[FromBody] UpdateRegisterCourseViewModel update)=> await _registerCourseService.UpdateRegisterCourseDateTimeAsync(userId,courseId,update);
     }
 }

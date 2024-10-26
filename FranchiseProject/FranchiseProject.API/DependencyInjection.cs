@@ -1,4 +1,4 @@
-﻿using FranchiseProject.API.Services;
+using FranchiseProject.API.Services;
 using Microsoft.OpenApi.Models;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
@@ -42,6 +42,8 @@ using FranchiseProject.API.Validator.CourseValidator;
 using FranchiseProject.Application.ViewModels.StudentViewModels;
 using FranchiseProject.Application.ViewModels.PaymentViewModel;
 using FranchiseProject.API.Validator.PaymentValidator;
+using FranchiseProject.Application.ViewModels.QuestionViewModels;
+using FranchiseProject.API.Validator.QuestionValidator;
 using Google;
 
 
@@ -142,15 +144,21 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<UpdateAssessmentModel>, UpdateAssessmentValidator>();
             services.AddTransient<IValidator<CreateCourseModel>, CreateCourseValidator>();
             services.AddTransient<IValidator<UpdateCourseModel>, UpdateCourseValidator>();
+
             services.AddTransient<IValidator<CreateCourseMaterialArrangeModel>, SingleCourseMaterialArrangeValidator>();
             services.AddTransient<IValidator<List<CreateCourseMaterialArrangeModel>>, CreateCourseMaterialArrangeValidator>();
+
             services.AddTransient<IValidator<CreateAssessmentArrangeModel>, SingleAssessmentArrangeValidator>();
             services.AddTransient<IValidator<List<CreateAssessmentArrangeModel>>, CreateAssessmentArrangeValidator>();
+
             services.AddTransient<IValidator<CreateChapterArrangeModel>, SingleChapterArrangeValidator>();
             services.AddTransient<IValidator<List<CreateChapterArrangeModel>>, CreateChapterArrangeValidator>();
+
             services.AddTransient<IValidator<CreateSessionArrangeModel>, SingleSessionArrangeValidator>();
             services.AddTransient<IValidator<List<CreateSessionArrangeModel>>, CreateSessionArrangeValidator>();
 
+            services.AddTransient<IValidator<List<CreateQuestionArrangeModel>>, CreateQuestionArrangeValidator>();
+            services.AddTransient<IValidator<UpdateRegisterCourseViewModel>,UpdateRegisterCourseValidator>();
             #endregion
 
             return services;

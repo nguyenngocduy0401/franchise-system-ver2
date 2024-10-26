@@ -26,6 +26,8 @@ using FranchiseProject.Application.ViewModels.ChapterMaterialViewModels;
 using FranchiseProject.Domain.Enums;
 using FranchiseProject.Application.ViewModels.StudentViewModel;
 using FranchiseProject.Application.ViewModels.StudentViewModels;
+using FranchiseProject.Application.ViewModels.QuestionViewModels;
+using FranchiseProject.Application.ViewModels.QuestionOptionViewModels;
 using FranchiseProject.Domain.Enums;
 using FranchiseProject.Application.ViewModels.PaymentViewModel;
 
@@ -145,8 +147,6 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<ChapterMaterial, ChapterMaterial>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.ChapterId, opt => opt.Ignore());
-
-            
             #endregion
             #region Chapter
             CreateMap<Chapter, ChapterViewModel>()
@@ -204,8 +204,6 @@ namespace FranchiseProject.Infrastructures.Mappers
                 .ForMember(dest => dest.Id, opt => opt.Ignore()) 
                 .ForMember(dest => dest.CourseId, opt => opt.Ignore()) 
                 .ForMember(dest => dest.ChapterMaterials, opt => opt.Ignore()); 
-
-            
             #endregion
             #region Syllabus
             CreateMap<CreateSyllabusModel, Syllabus>();
@@ -215,8 +213,16 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Syllabus, Syllabus>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             #endregion
-
-
+            #region Question
+            CreateMap<CreateQuestionOptionArrangeModel, QuestionOption>();
+            CreateMap<CreateQuestionArrangeModel, Question>()
+                .ForMember(dest => dest.QuestionOptions, opt => opt.MapFrom(src => src.QuestionOptions));
+            #endregion
+            #region QuestionOption
+            CreateMap<QuestionOption, QuestionOptionViewModel>();
+            CreateMap<Question, QuestionViewModel>()
+                .ForMember(dest => dest.QuestionOptions, opt => opt.MapFrom(src => src.QuestionOptions));
+            #endregion
             #region RegisterCourse
             CreateMap<User, StudentViewModel>();
             CreateMap<Pagination<User>, Pagination<StudentViewModel>>()
@@ -227,8 +233,8 @@ namespace FranchiseProject.Infrastructures.Mappers
            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
            .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
-
             #endregion
+           
             #region Payment
             CreateMap<CreateStudentPaymentViewModel, Payment>()
            .ForMember(dest => dest.Id, opt => opt.Ignore());

@@ -41,7 +41,25 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Include(e => e.CourseCategory)
                 .FirstOrDefaultAsync();
         }
-
+        public async Task<Course> GetCourseDetailForDuplicateAsync(Guid courseId)
+        {
+            return await _dbSet
+                .Where(e => e.Id == courseId)
+                .Include(e => e.CourseMaterials.Where(cm => !cm.IsDeleted != true))
+                .Include(e => e.Sessions.Where(cm => cm.IsDeleted != true))
+                .Include(e => e.Syllabus)
+                .Include(e => e.Assessments.Where(a => a.IsDeleted != true))
+                .Include(e => e.Chapters
+                    .Where(c => c.IsDeleted != true))
+                    .ThenInclude(c => c.ChapterMaterials
+                        .Where(cm => cm.IsDeleted != true))
+                  .Include(e => e.Chapters
+                    .Where(c => c.IsDeleted != true))
+                    .ThenInclude(c => c.Questions.Where(q => q.IsDeleted != true))
+                    .ThenInclude(q => q.QuestionOptions.Where(qo => qo.IsDeleted != true))
+                .Include(e => e.CourseCategory)
+                .FirstOrDefaultAsync();
+        }
     }
 }
 

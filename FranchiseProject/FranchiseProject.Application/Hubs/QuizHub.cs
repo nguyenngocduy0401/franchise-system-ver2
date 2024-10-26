@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Domain.Enums
+namespace FranchiseProject.Application.Hubs
 {
-    public enum QuestionOptionStatusEnum
+    internal class QuizHub
     {
     }
 }

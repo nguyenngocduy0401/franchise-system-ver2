@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,9 +14,11 @@ namespace FranchiseProject.Infrastructures.Repositories
     public class RegisterCourseRepository : IRegisterCourseRepository
     {
         private readonly AppDbContext _dbContext;
+      
         public RegisterCourseRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
+           
         }
 
         public  Task<List<string>> GetCourseNamesByUserIdAsync(string userId)
@@ -47,6 +50,49 @@ namespace FranchiseProject.Infrastructures.Repositories
             {
                 throw new Exception("RegisterCourse not found.");
             }
+        }
+        public async Task<RegisterCourse?> GetFirstOrDefaultAsync(Expression<Func<RegisterCourse, bool>> filter)
+        {
+            return await _dbContext.RegisterCourses.FirstOrDefaultAsync(filter);
+        }
+        public async Task<bool> Update1Async(RegisterCourse registerCourse)
+        {
+            if (registerCourse == null)
+            {
+                throw new ArgumentNullException(nameof(registerCourse));
+            }
+            _dbContext.RegisterCourses.Update(registerCourse);
+            var result = await _dbContext.SaveChangesAsync();
+            return result > 0;
+        }
+        public async Task<List<RegisterCourse>> GetRegisterCoursesByUserIdAndStatusNullAsync(string userId)
+        {
+            return await _dbContext.RegisterCourses
+                .Where(rc => rc.UserId == userId && rc.StudentCourseStatus == StudentCourseStatusEnum.Pending)
+                .ToListAsync();
+        }
+        public void Delete(RegisterCourse registerCourse)
+        {
+            _dbContext.RegisterCourses.Remove(registerCourse);
+        }
+        public async Task<IEnumerable<RegisterCourse>> GetAllAsync(Expression<Func<RegisterCourse, bool>> filter = null, string includeProperties = "")
+        {
+            IQueryable<RegisterCourse> query = _dbContext.RegisterCourses;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var property in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(property.Trim());
+                }
+            }
+
+            return await query.ToListAsync();
         }
     }
 }
