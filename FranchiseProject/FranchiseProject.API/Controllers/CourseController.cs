@@ -105,5 +105,12 @@ namespace FranchiseProject.API.Controllers
         {
             return await _courseService.FilterCourseAsync(filterCourseModel);
         }
-    }
+
+		[SwaggerOperation(Summary = "Lấy tất cả khóa học khả dụng")]
+		[HttpGet("available")]
+		public async Task<ApiResponse<IEnumerable<CourseViewModel>>> GetAllCoursesAvailableAsync()
+		{
+			return await _courseService.GetAllCoursesAvailableAsync();
+		}
+	}
 }

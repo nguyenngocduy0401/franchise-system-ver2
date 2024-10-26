@@ -1,27 +1,20 @@
 ﻿using AutoMapper;
-using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Services
 {
-    public class CourseService : ICourseService
+	public class CourseService : ICourseService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -120,10 +113,22 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<ApiResponse<List<CourseViewModel>>> GetAllCourseAsync()
+        public async Task<ApiResponse<IEnumerable<CourseViewModel>>> GetAllCoursesAvailableAsync()
         {
-            throw new NotImplementedException();
-        }
+			var response = new ApiResponse<IEnumerable<CourseViewModel>>();
+			try
+			{
+				var courses = await _unitOfWork.CourseRepository.FindAsync(x => x.Status == CourseStatusEnum.AvailableForFranchise);
+				var courseViewModel = _mapper.Map<IEnumerable<CourseViewModel>>(courses);
+				if (courseViewModel.IsNullOrEmpty()) return ResponseHandler.Success(courseViewModel, "Không có khóa học nào khả dụng!");
+				response = ResponseHandler.Success(courseViewModel, "Lấy tất cả khóa học khả dụng thành công!");
+			}
+			catch (Exception ex)
+			{
+				response = ResponseHandler.Failure<IEnumerable<CourseViewModel>>(ex.Message);
+			}
+			return response;
+		}
 
         public async Task<ApiResponse<CourseDetailViewModel>> GetCourseByIdAsync(Guid courseId)
         {
