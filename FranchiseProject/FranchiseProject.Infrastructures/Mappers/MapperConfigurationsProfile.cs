@@ -37,7 +37,7 @@ namespace FranchiseProject.Infrastructures.Mappers
     public class MapperConfigurationsProfile : Profile 
     {
         public MapperConfigurationsProfile() {
-            #region FranchiseRegist
+            #region FranchiseRegister
             CreateMap<ConsultationViewModel, RegisterForm>();
             CreateMap<RegisterConsultationViewModel, RegisterForm>();
             CreateMap<RegisterForm, ConsultationViewModel>().ReverseMap();
@@ -217,11 +217,14 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<CreateQuestionOptionArrangeModel, QuestionOption>();
             CreateMap<CreateQuestionArrangeModel, Question>()
                 .ForMember(dest => dest.QuestionOptions, opt => opt.MapFrom(src => src.QuestionOptions));
+            CreateMap<UpdateQuestionModel, Question>()
+                .ForMember(dest => dest.QuestionOptions, opt => opt.Ignore());
             #endregion
             #region QuestionOption
             CreateMap<QuestionOption, QuestionOptionViewModel>();
             CreateMap<Question, QuestionViewModel>()
                 .ForMember(dest => dest.QuestionOptions, opt => opt.MapFrom(src => src.QuestionOptions));
+            CreateMap<QuestionOptionViewModel, Question>();
             #endregion
             #region RegisterCourse
             CreateMap<User, StudentViewModel>();

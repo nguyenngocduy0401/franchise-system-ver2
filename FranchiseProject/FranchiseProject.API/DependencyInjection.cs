@@ -16,7 +16,6 @@ using FranchiseProject.Infrastructures.DataInitializer;
 using FranchiseProject.Application.ViewModels.ConsultationViewModels;
 using FranchiseProject.API.Validator.AutheticationValidator;
 using FranchiseProject.Application.ViewModels.UserViewModels;
-using FranchiseProject.Domain.Entity;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.API.Validator.SlotValidator;
 using FranchiseProject.API.Validator.UserValidator;
@@ -24,8 +23,6 @@ using FranchiseProject.Application.ViewModels.CourseCategoryViewModels;
 using FranchiseProject.API.Validator.CourseCategoryValidator;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using FranchiseProject.API.Validator.ClassScheduleValidator;
-using Microsoft.AspNetCore.SignalR;
-using FranchiseProject.Application.ViewModels.StudentViewModel;
 using FranchiseProject.API.Validator.StudentValidator;
 using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
 using FranchiseProject.API.Validator.CourseMaterialValidator;
@@ -44,9 +41,9 @@ using FranchiseProject.Application.ViewModels.PaymentViewModel;
 using FranchiseProject.API.Validator.PaymentValidator;
 using FranchiseProject.Application.ViewModels.QuestionViewModels;
 using FranchiseProject.API.Validator.QuestionValidator;
-using Google;
 using FranchiseProject.Application.ViewModels.ChapterMaterialViewModels;
 using FranchiseProject.API.Validator.ChapterMaterialValidator;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace FranchiseProject.API
@@ -165,6 +162,8 @@ namespace FranchiseProject.API
 
             services.AddTransient<IValidator<UpdateChapterMaterialModel>, UpdateChapterMaterialValidator>();
             services.AddTransient<IValidator<CreateChapterMaterialModel>, CreateChapterMaterialValidator>();
+
+            services.AddTransient<IValidator<UpdateQuestionModel>, UpdateQuestionValidator>();
             #endregion
 
             return services;
