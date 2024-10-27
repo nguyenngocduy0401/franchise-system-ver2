@@ -60,7 +60,7 @@ namespace FranchiseProject.Application.Utils
                 To = to,
                 Subject = "Xác Nhận Thanh Toán Thành Công [futuretech-noreply]",
                 Body = $"<p>Chào bạn {name},</p>" +
-                       $"<p>Bạn đã  Thanh khóa học  thành công </p>" +
+                       $"<p>Bạn đã Thanh khóa học  thành công </p>" +
                        $"<p>Số tiền đã thanh toán:{amount} </p>" +
                        $"<li><strong>Username:</strong> {UserName}</li>" +
                        $"<li><strong>Password:</strong> {password}</li>" +

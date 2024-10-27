@@ -436,13 +436,15 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> StudentRegisterCourse(string courseId)
+       /* public async Task<ApiResponse<bool>> StudentRegisterCourse(string courseId)
         {
             var response = ApiResponse<bool>();
             try
             {
                 var userCurrentId = _claimsService.GetCurrentUserId;
-                var userCurrent = _userManager.FindByIdAsync(userCurrentId.ToString);
+                var userCurrent = _userManager.FindByIdAsync(userCurrentId.ToString());
+                var course = _unitOfWork.CourseRepository.GetExistByIdAsync(Guid.Parse(courseId));
+                if (course == null) { return ResponseHandler.Failure<bool>("Khóa học không khả dụng "); }
 
             }
             catch (Exception ex)
@@ -450,7 +452,7 @@ namespace FranchiseProject.Application.Services
                 response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
-        }
+        }*/
         private async Task<string> GetDateTimeFromRegisterCourseAsync(string userId, Guid courseId)
         {
             var registerCourses = await _unitOfWork.RegisterCourseRepository.GetAllAsync(rc =>
