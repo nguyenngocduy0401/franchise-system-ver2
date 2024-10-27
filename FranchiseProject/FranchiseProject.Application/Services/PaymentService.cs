@@ -157,7 +157,8 @@ namespace FranchiseProject.Application.Services
 
                 var userIdsInAgency = usersInAgency.Select(u => u.Id).ToList();
                 var payments = await _unitOfWork.PaymentRepository.GetAllAsync(p =>
-                    userIdsInAgency.Contains(p.UserId)
+                    userIdsInAgency.Contains(p.UserId),
+                    orderBy: q => q.OrderByDescending(p => p.CreatedDate
                 );
                 var paymentViewModels = _mapper.Map<List<PaymentStudentViewModel>>(payments);
                 var pagedResult = new Pagination<PaymentStudentViewModel>
