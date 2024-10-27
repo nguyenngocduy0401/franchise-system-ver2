@@ -11,8 +11,6 @@ namespace FranchiseProject.Application.ViewModels.ClassViewModel
     {
         public string? Name { get; set; }
         public ClassStatusEnum? Status {  get; set; }     
-
-        public string? TermId { get; set; }
         public string? CourseId { get; set; }
         public bool? IsDeleted { get; set; }
         public int PageIndex { get; set; } = 1;

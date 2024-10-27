@@ -35,15 +35,16 @@ namespace FranchiseProject.Infrastructures.Repositories
         }
         public async Task UpdateAsync(RegisterCourse registerCourse)
         {
-           
-            var existingRegisterCourse = await _dbContext.Set<RegisterCourse>().FindAsync(registerCourse.UserId, registerCourse.CourseId);
+
+            var existingRegisterCourse = await _dbContext.Set<RegisterCourse>()
+        .FirstOrDefaultAsync(rc => rc.UserId == registerCourse.UserId && rc.CourseId == registerCourse.CourseId);
 
             if (existingRegisterCourse != null)
             {
-
+       
                 existingRegisterCourse.DateTime = registerCourse.DateTime;
                 existingRegisterCourse.StudentCourseStatus = registerCourse.StudentCourseStatus;
-                _dbContext.Entry(existingRegisterCourse).State = EntityState.Modified;
+
                 await _dbContext.SaveChangesAsync();
             }
             else
