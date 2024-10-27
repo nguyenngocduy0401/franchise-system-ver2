@@ -47,6 +47,8 @@ using FranchiseProject.API.Validator.QuestionValidator;
 using Google;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.API.Validator.ClassValidator;
+using FranchiseProject.Application.ViewModels.ChapterMaterialViewModels;
+using FranchiseProject.API.Validator.ChapterMaterialValidator;
 
 
 namespace FranchiseProject.API
@@ -159,9 +161,13 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<CreateSessionArrangeModel>, SingleSessionArrangeValidator>();
             services.AddTransient<IValidator<List<CreateSessionArrangeModel>>, CreateSessionArrangeValidator>();
 
+            services.AddTransient<IValidator<CreateQuestionArrangeModel>, SingleQuestionArrangeValidator>();
             services.AddTransient<IValidator<List<CreateQuestionArrangeModel>>, CreateQuestionArrangeValidator>();
             services.AddTransient<IValidator<UpdateRegisterCourseViewModel>,UpdateRegisterCourseValidator>();
             services.AddTransient<IValidator<CreateClassViewModel>,CreateClassValidator>();
+
+            services.AddTransient<IValidator<UpdateChapterMaterialModel>, UpdateChapterMaterialValidator>();
+            services.AddTransient<IValidator<CreateChapterMaterialModel>, CreateChapterMaterialValidator>();
             #endregion
 
             return services;

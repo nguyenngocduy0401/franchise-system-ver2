@@ -68,6 +68,7 @@ namespace FranchiseProject.Application.Services
                     if (student.StudentStatus == StudentStatusEnum.Pending)
                     {
                         student.StudentStatus = StudentStatusEnum.Waitlisted;
+                        await _userManager.UpdateAsync(student);
                         var registerCourses = await _unitOfWork.RegisterCourseRepository
                              .GetRegisterCoursesByUserIdAndStatusNullAsync(student.Id); 
 
