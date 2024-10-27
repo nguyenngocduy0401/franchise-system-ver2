@@ -44,10 +44,7 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .ToListAsync();
         }
      
-        public async Task<List<ClassRoom>> GetAllAsync(Expression<Func<ClassRoom, bool>> predicate)
-        {
-            return await _dbContext.ClassRooms.Where(predicate).ToListAsync();
-        }
+        
         public async Task AddAsync(ClassRoom classRoom)
         {
             await _dbContext.Set<ClassRoom>().AddAsync(classRoom);
@@ -67,5 +64,31 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Select(u => u.FullName)
                 .ToListAsync();
         }
+        public async Task<List<ClassRoom>> GetAllAsync(Expression<Func<ClassRoom, bool>> predicate)
+        {
+              if (predicate == null)
+            {
+                return await _dbContext.Set<ClassRoom>().ToListAsync();
+            }
+            return await _dbContext.Set<ClassRoom>()
+                .Where(predicate)
+                .ToListAsync();
+        }
+        public async Task<ClassRoom> GetFirstOrDefaultAsync(Expression<Func<ClassRoom, bool>> predicate)
+        {
+            return await _dbContext.Set<ClassRoom>().FirstOrDefaultAsync(predicate);
+        }
+
+        public async Task DeleteAsync(ClassRoom entity)
+        {
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
+            _dbContext.Set<ClassRoom>().Remove(entity);
+            await _dbContext.SaveChangesAsync();
+        }
+
     }
 }

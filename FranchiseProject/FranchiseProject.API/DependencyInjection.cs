@@ -49,6 +49,7 @@ using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.API.Validator.ClassValidator;
 using FranchiseProject.Application.ViewModels.ChapterMaterialViewModels;
 using FranchiseProject.API.Validator.ChapterMaterialValidator;
+using FranchiseProject.Application.ViewModels.ClassViewModels;
 
 
 namespace FranchiseProject.API
@@ -168,6 +169,9 @@ namespace FranchiseProject.API
 
             services.AddTransient<IValidator<UpdateChapterMaterialModel>, UpdateChapterMaterialValidator>();
             services.AddTransient<IValidator<CreateChapterMaterialModel>, CreateChapterMaterialValidator>();
+
+
+            services.AddTransient<IValidator<UpdateClassViewModel>, UpdateClassValidator>();
             #endregion
 
             return services;
