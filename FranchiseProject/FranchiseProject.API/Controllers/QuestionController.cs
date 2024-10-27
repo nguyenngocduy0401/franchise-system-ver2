@@ -25,14 +25,14 @@ namespace FranchiseProject.API.Controllers
         {
             return await _questionService.DeleteQuestionByIdAsync(id);
         }
-        
-        
+
         //[Authorize(Roles = AppRole.Instructor + "," + AppRole.Manager)]
-        /*[SwaggerOperation(Summary = "cập nhật câu hỏi của chương học bằng id {Authorize = Instructor, Manager}")]
+        [SwaggerOperation(Summary = "cập nhật câu hỏi của chương học bằng id {Authorize = Instructor, Manager}")]
         [HttpPut("{id}")]
-        public async Task<ApiResponse<bool>> UpdateQuestionIdAsync(Guid id, UpdateChapterMaterialModel updateChapterMaterialModel)
+        public async Task<ApiResponse<bool>> UpdateQuestionIdAsync(Guid id, UpdateQuestionModel updateQuestionModel)
         {
-            return await _questionService.UpdateChapterMaterialAsync(id, updateChapterMaterialModel);
-        }*/
+            return await _questionService.UpdateQuestionByIdAsync(id, updateQuestionModel);
+        }
+        
     }
 }
