@@ -1,6 +1,8 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
+using FranchiseProject.Application.ViewModels.ClassViewModels;
+using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -28,29 +30,34 @@ namespace FranchiseProject.API.Controllers
         {
             return await _classService.CreateClassAsync(createClassModel);
         }
+        [SwaggerOperation(Summary = "Cập nhật lớp học {Authorize = AgencyManager}")]
+        [HttpPut("{id}")]
+        public async Task<ApiResponse<bool>> UpdateClassAsync(string id, UpdateClassViewModel model)
+        {
+            return await _classService.UpdateClassAsync(id,model);
+        }
+        [SwaggerOperation(Summary = "Tìm kiếm lớp học{Authorize = AgencyManager,")]
+        [HttpGet("filter")]
+        public async Task<ApiResponse<Pagination<ClassViewModel>>> FilterClassAsync([FromQuery] FilterClassViewModel filterClassModel)
+        {
+            return await _classService.FilterClassAsync(filterClassModel);
+        }
+        [SwaggerOperation(Summary = "Cập nhật Trạng thái lớp học  {Authorize = AgencyManager}")]
+        [HttpPut("{id}")]
+        public async Task<ApiResponse<bool>> UpdateClassStatusAsync(ClassStatusEnum status, string id)
+        {
+            return await _classService.UpdateClassStatusAsync(status, id);
+        }
 
-        /* 
-                [SwaggerOperation(Summary = "Cập nhật lớp học {Authorize = AgencyManager}")]
-                [HttpPut("{id}")]
-                public async Task<ApiResponse<bool>> UpdateClassAsync(Guid id, CreateClassViewModel updateClassModel)
-                {
-                    return await _classService.UpdateClassAsync(updateClassModel, id.ToString());
-                }
+        [SwaggerOperation(Summary = "Tìm kiếm lớp học{Authorize = AgencyManager,")]
+        [HttpGet("")]
+        public async Task<ApiResponse<Pagination<ClassStudentViewModel>>> GetClassDetailAsync(string id)
+        {
+            return await _classService.GetClassDetailAsync(id);
+        }
 
-                [SwaggerOperation(Summary = "Tìm lớp học bằng id {Authorize = AgencyManager}")]
-                [HttpGet("{id}")]
-                public async Task<ApiResponse<ClassViewModel>> GetClassByIdAsync(Guid id)
-                {
-                    return await _classService.GetClassByIdAsync(id.ToString());
-                }
 
-                [SwaggerOperation(Summary = "Tìm kiếm lớp học{Authorize = AgencyManager,")]
-                [HttpGet("filter")]
-                public async Task<ApiResponse<Pagination<ClassViewModel>>> FilterClassAsync([FromQuery] FilterClassViewModel filterClassModel)
-                {
-                    return await _classService.FilterClassAsync(filterClassModel);
-                }
-                [SwaggerOperation(Summary = "Xóa lớp học{Authorize = AgencyManager,")]
+        [SwaggerOperation(Summary = "Xóa lớp học{Authorize = AgencyManager,")]
                 [HttpDelete("{id}")]
                 public async Task<ApiResponse<bool>> DeleteClassAsync(string id) => await _classService.DeleteClassAsync(id);
                 // GET: api/v1/classes/{id}/students (Lấy danh sách học sinh trong lớp học)
