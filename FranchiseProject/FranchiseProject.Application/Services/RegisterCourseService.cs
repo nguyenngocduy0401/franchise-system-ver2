@@ -99,6 +99,7 @@ namespace FranchiseProject.Application.Services
                     AgencyId = Guid.Parse(model.AgencyId),
                     StudentStatus = StudentStatusEnum.NotConsult,
                     Status = UserStatusEnum.active,
+                    CreateAt = DateTime.Now,
                 };
 
                 var result = await _userManager.CreateAsync(newUser);
@@ -118,6 +119,7 @@ namespace FranchiseProject.Application.Services
                     UserId = newUser.Id,
                     CourseId = Guid.Parse(model.CourseId),
                     StudentCourseStatus = StudentCourseStatusEnum.Pending
+                    ,CreatDate=DateTime.Now,
                 };
                  await _unitOfWork.RegisterCourseRepository.AddAsync(newRegisterCourse);
                 var emailMessage = EmailTemplate.SuccessRegisterCourseEmaill(model.Email, model.StudentName, course.Name, agency.Name);
@@ -190,14 +192,12 @@ namespace FranchiseProject.Application.Services
                 var userCurrentId = _claimsService.GetCurrentUserId;
                 var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
 
-                // Kiểm tra sự tồn tại của sinh viên
                 var student = await _userManager.FindByIdAsync(id);
                 if (student == null)
                 {
                     return ResponseHandler.Failure<StudentRegisterViewModel>("Học sinh không tồn tại!");
                 }
 
-                // Kiểm tra xem sinh viên có thuộc agency của người dùng hiện tại không
                 if (student.AgencyId != userCurrent.AgencyId)
                 {
                     return ResponseHandler.Failure<StudentRegisterViewModel>("Học sinh không thuộc về agency của bạn!");
@@ -211,7 +211,6 @@ namespace FranchiseProject.Application.Services
                 var courseNames = await _unitOfWork.RegisterCourseRepository
                     .GetCourseNamesByUserIdAsync(id);
 
-                // Map thông tin sinh viên sang ViewModel
                 var studentViewModel = new StudentRegisterViewModel
                 {
                     Id = student.Id,
@@ -222,7 +221,9 @@ namespace FranchiseProject.Application.Services
                     StatusPayment = student.StudentPaymentStatus,
                     StudentStatus = student.StudentStatus,
                     CourseId = firstRegisterCourse?.CourseId,
-                    DateTime = await GetDateTimeFromRegisterCourseAsync(id, firstRegisterCourse.CourseId.Value) // Hàm này sẽ lấy thời gian từ RegisterCourse
+                    DateTime = await GetDateTimeFromRegisterCourseAsync(id, firstRegisterCourse.CourseId.Value) ,
+                    CoursePrice=firstRegisterCourse?.Course.Price,
+                    RegisterDate= firstRegisterCourse.CreatDate.ToString(),
                 };
 
                 response = ResponseHandler.Success(studentViewModel, "Lấy thông tin thành công!");
@@ -261,11 +262,18 @@ namespace FranchiseProject.Application.Services
 
                 var students = await _unitOfWork.UserRepository.GetFilterAsync(
                     filter: filter,
+                 
                     pageIndex: filterStudentModel.PageIndex,
                     pageSize: filterStudentModel.PageSize,
                     includeProperties: "RegisterCourses.Course" 
                 );
-                var studentViewModels = students.Items.Select(s => new StudentRegisterViewModel
+                var studentViewModels = students.Items
+                    .AsEnumerable()
+            .OrderByDescending(s => s.RegisterCourses
+                .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
+                             rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied)
+                .Select(rc => rc.CreatDate)
+                .FirstOrDefault()).Select(s => new StudentRegisterViewModel
                 {
                     Id = s.Id,
                    
@@ -274,21 +282,32 @@ namespace FranchiseProject.Application.Services
                     StudentStatus=s.StudentStatus,
                     PhoneNumber = s.PhoneNumber,
                     Email = s.Email,
-                                    CourseId = s.RegisterCourses
+                    CourseId = s.RegisterCourses
                         .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
                                      rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied)
                         .Select(rc => rc.CourseId)
                         .FirstOrDefault(),
-                                    DateTime = s.RegisterCourses
+                    DateTime = s.RegisterCourses
                         .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
                                      rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied)
                         .Select(rc => rc.DateTime)
                         .FirstOrDefault(),
-                                    CourseName = s.RegisterCourses
+                    CourseName = s.RegisterCourses
                         .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
                                      rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied)
                         .Select(rc => rc.Course?.Name)
-                        .FirstOrDefault()
+                        .FirstOrDefault(),
+                    CoursePrice= s.RegisterCourses
+                        .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
+                                     rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied)
+                        .Select(rc => rc.Course?.Price)
+                        .FirstOrDefault(),
+                    RegisterDate = s.RegisterCourses
+                        .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
+                                     rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied)
+                        .Select(rc => rc.CreatDate)
+                        .FirstOrDefault().ToString(),
+
                 }).ToList();
 
                 var paginatedResult = new Pagination<StudentRegisterViewModel>
