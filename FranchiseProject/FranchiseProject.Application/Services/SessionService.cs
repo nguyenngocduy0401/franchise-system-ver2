@@ -147,7 +147,7 @@ namespace FranchiseProject.Application.Services
                     session.CourseId = courseId;
                 }
                 var deleteSessions = (await _unitOfWork.SessionRepository.FindAsync(e => e.CourseId == courseId && e.IsDeleted != true)).ToList();
-                if (!deleteSessions.IsNullOrEmpty()) _unitOfWork.SessionRepository.SoftRemoveRange(deleteSessions);
+                if (!deleteSessions.IsNullOrEmpty()) _unitOfWork.SessionRepository.HardRemoveRange(deleteSessions);
 
                 await _unitOfWork.SessionRepository.AddRangeAsync(sessions);
 

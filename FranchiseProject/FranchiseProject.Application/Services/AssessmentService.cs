@@ -150,7 +150,7 @@ namespace FranchiseProject.Application.Services
                     assessment.CourseId = courseId;
                 }
                 var deleteAssessments = (await _unitOfWork.AssessmentRepository.FindAsync(e => e.CourseId == courseId && e.IsDeleted != true)).ToList();
-                if (!deleteAssessments.IsNullOrEmpty()) _unitOfWork.AssessmentRepository.SoftRemoveRange(deleteAssessments);
+                if (!deleteAssessments.IsNullOrEmpty()) _unitOfWork.AssessmentRepository.HardRemoveRange(deleteAssessments);
 
                 await _unitOfWork.AssessmentRepository.AddRangeAsync(assessments);
 
