@@ -10,10 +10,11 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IClassRoomRepository
     {
-       /* Task<IEnumerable<ClassRoom>> GetFilterAsync(Expression<Func<ClassRoom, bool>> filter);
-        Task<int> CountStudentsByClassIdAsync(Guid classId);
+        Task AddAsync(ClassRoom classRoom);
+        Task<List<User>> GetWaitlistedStudentsAsync(List<string> studentIds);
+        Task<List<string>> GetInvalidStudentsAsync(List<string> studentIds);
         Task<List<ClassRoom>> GetAllAsync(Expression<Func<ClassRoom, bool>> predicate);
-        Task<List<ClassSchedule>> GetClassSchedulesByUserIdAndTermIdAsync(string userId, Guid termId);
-        Task<int> CountClassSchedulesByUserIdAndTermIdAsync(string userId, Guid termId);*/
+        Task<ClassRoom> GetFirstOrDefaultAsync(Expression<Func<ClassRoom, bool>> predicate);
+        Task DeleteAsync(ClassRoom entity);
     }
 }

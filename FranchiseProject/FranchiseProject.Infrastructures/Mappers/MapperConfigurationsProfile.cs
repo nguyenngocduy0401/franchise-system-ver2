@@ -92,8 +92,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             #endregion
             #region ClassSchedule
             CreateMap<ClassSchedule, ClassScheduleViewModel>()
-              .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name));
-          //  .ForMember(dest => dest.SlotName, opt => opt.MapFrom(src => src.Slot.Name)).ReverseMap();
+              .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
+                 .ForMember(dest => dest.Room, opt => opt.MapFrom(src => src.Room)).ReverseMap();
             CreateMap<ClassSchedule, ClassScheduleViewModel>()
           .ReverseMap();
 
@@ -109,30 +109,13 @@ namespace FranchiseProject.Infrastructures.Mappers
             #region Class
             CreateMap<CreateClassViewModel, Class>();
             CreateMap<Class, ClassViewModel>();
-
-            CreateMap<Class, ClassViewModel>()
-              
-                .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Course.Name));
-
-            CreateMap<Class, ClassStudentViewModel>()
-                .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Name));    
-            
             CreateMap<ClassRoom, StudentClassViewModel>()
-                .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.User.FullName))
-                .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.User.DateOfBirth))
-                .ForMember(dest => dest.URLImage, opt => opt.MapFrom(src => src.User.URLImage));
-            CreateMap<List<Class>, Pagination<ClassViewModel>>()
-                .ConvertUsing((source, destination, context) =>
-                {
-                    var pagedResult = new Pagination<ClassViewModel>
-                    {
-                        Items = context.Mapper.Map<List<ClassViewModel>>(source), // Map list of Class to ClassViewModel
-                        TotalItemsCount = source.Count, // Set total item count based on the source list count
-                        PageIndex = 1, // Hardcoded for now, you can change it dynamically
-                        PageSize = source.Count // Set the page size to the total number of items in the source list
-                    };
-                    return pagedResult;
-                });
+             .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.User.FullName))
+             .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.User.DateOfBirth))
+             .ForMember(dest => dest.URLImage, opt => opt.MapFrom(src => src.User.URLImage));
+
+            CreateMap(typeof(Pagination<>), typeof(Pagination<>));
+
             #endregion
             #region Material
             CreateMap<CourseMaterial, CourseMaterialViewModel>();
