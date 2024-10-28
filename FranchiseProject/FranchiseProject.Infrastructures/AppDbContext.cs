@@ -286,7 +286,7 @@ namespace FranchiseProject.Infrastructures
                 Content = "Điểm danh",
                 Quantity = 1,
                 Weight = 10, // 10%
-                CompletionCriteria = "0",
+                CompletionCriteria = 0,
                 Method = AssessmentMethodEnum.Online,
                 Duration = null,
                 QuestionType = null,
@@ -300,7 +300,7 @@ namespace FranchiseProject.Infrastructures
                 Content = "Luyện tập",
                 Quantity = 2,
                 Weight = 20, // 20%
-                CompletionCriteria = "0",
+                CompletionCriteria = 0,
                 Method = AssessmentMethodEnum.Online,
                 Duration = "20 phút",
                 QuestionType = "Trắc nghiệm",
@@ -314,7 +314,7 @@ namespace FranchiseProject.Infrastructures
                 Content = "Kiểm tra giữa khóa",
                 Quantity = 1,
                 Weight = 30, // 30%
-                CompletionCriteria = "0",
+                CompletionCriteria = 0,
                 Method = AssessmentMethodEnum.Offline,
                 Duration = "Tại nhà",
                 QuestionType = "Giáo viên tự chọn",
@@ -328,7 +328,7 @@ namespace FranchiseProject.Infrastructures
                 Content = "Kiểm tra cuối khóa",
                 Quantity = 1,
                 Weight = 40, // 40%
-                CompletionCriteria = "4",
+                CompletionCriteria = 4,
                 Method = AssessmentMethodEnum.Online,
                 Duration = "20 phút",
                 QuestionType = "Trắc nghiệm",

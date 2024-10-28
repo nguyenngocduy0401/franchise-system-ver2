@@ -164,6 +164,7 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<CreateChapterMaterialModel>, CreateChapterMaterialValidator>();
 
             services.AddTransient<IValidator<UpdateQuestionModel>, UpdateQuestionValidator>();
+            services.AddTransient<IValidator<List<CreateChapterModel>>, CreateListChapterValidator>();
             #endregion
 
             return services;
