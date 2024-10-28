@@ -11,11 +11,10 @@ namespace FranchiseProject.Application.ViewModels.ClassScheduleViewModels
     public class CreateClassScheduleDateRangeViewModel
     {
         
-        public string?  TermId {  get; set; }
         public string? Room { get; set; }
         public string? ClassId { get; set; }
         public string? SlotId { get; set; }
-     
+        public DateOnly startDate { get; set; }
         public List<DayOfWeekEnum>? dayOfWeeks { get; set; }
     }
 }

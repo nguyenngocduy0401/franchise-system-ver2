@@ -1,9 +1,11 @@
 ﻿using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,6 +33,9 @@ namespace FranchiseProject.Infrastructures.Repositories
                                            
                                             cs.SlotId == slotId);
         }
-      
+        public async Task<List<ClassSchedule>> GetAllAsync1(Expression<Func<ClassSchedule, bool>> predicate)
+        {
+            return await _dbContext.Set<ClassSchedule>().Where(predicate).ToListAsync();
+        }
     }
 }

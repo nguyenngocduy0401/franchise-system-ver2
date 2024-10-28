@@ -13,6 +13,7 @@ namespace FranchiseProject.Application.Repositories
         Task<bool> CheckNameExistAsync(string name);
         Task<Class> GetFirstOrDefaultAsync(Expression<Func<Class, bool>> filter);
         Task<int> CountAsync(Expression<Func<Class, bool>> filter = null);
+      
 
     }
 }

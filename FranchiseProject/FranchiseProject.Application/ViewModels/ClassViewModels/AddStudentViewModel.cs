@@ -8,8 +8,7 @@ namespace FranchiseProject.Application.ViewModels.ClassViewModels
 {
     public  class AddStudentViewModel
     {
+       
         public List<string> StudentId { get; set; }
-
-            public string? ClassId { get; set; }
     }
 }
