@@ -11,7 +11,8 @@ namespace FranchiseProject.Application.Repositories
     public interface IClassScheduleRepository : IGenericRepository<ClassSchedule>
     {
         Task<ClassSchedule?> GetExistingScheduleAsync(DateTime date, string room, Guid slotId);
-       
+        Task<List<ClassSchedule>> GetAllAsync1(Expression<Func<ClassSchedule, bool>> predicate);
+
 
     }
 }
