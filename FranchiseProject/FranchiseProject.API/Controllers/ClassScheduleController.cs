@@ -68,7 +68,7 @@ namespace FranchiseProject.API.Controllers
                 return await _classScheduleService.FilterClassScheduleAsync(filterClassScheduleViewModel);
             }
             [SwaggerOperation(Summary = "xóa tất cả lịch học của 1 lớp {Authorize = AgencyManager ,AgencyStaff}")]
-            [HttpGet]
+            [HttpDelete("{classId}")]
             public async Task<ApiResponse<bool>> DeleteClassSheduleAllByClassIdAsync(string classId)
             {
                 return await _classScheduleService.DeleteClassSheduleAllByClassIdAsync(classId);

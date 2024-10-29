@@ -47,9 +47,9 @@ namespace FranchiseProject.Application.Services
             _validatorUpdate = validatorUpdate;
         }
 
-        public async Task<ApiResponse<bool>> CreateClassAsync(CreateClassViewModel model)
+        public async Task<ApiResponse<Guid?>> CreateClassAsync(CreateClassViewModel model)
         {
-            var response = new ApiResponse<bool>();
+            var response = new ApiResponse<Guid?>();
             try
             {
                 var userCurrentId = _claimsService.GetCurrentUserId;
@@ -58,29 +58,29 @@ namespace FranchiseProject.Application.Services
                 FluentValidation.Results.ValidationResult validationResult = await _validator.ValidateAsync(model);
                 if (!validationResult.IsValid)
                 {
-                    return ValidatorHandler.HandleValidation<bool>(validationResult);
+                    return ValidatorHandler.HandleValidation<Guid?>(validationResult);
                 }
                 if (!string.IsNullOrEmpty(model.InstructorId))
                 {
                     var instructor = await _userManager.FindByIdAsync(model.InstructorId);
                     if (instructor == null || !await _userManager.IsInRoleAsync(instructor, "Instructor"))
                     {
-                        return ResponseHandler.Failure<bool>("Người hướng dẫn không hợp lệ hoặc không có vai trò là 'Instructor'!");
+                        return ResponseHandler.Failure<Guid?>("Người hướng dẫn không hợp lệ hoặc không có vai trò là 'Instructor'!");
                     }
                 }
                 //Check List Học sinh có có đủ điều kiện không ==>Student đó phải có Status là waitlisted 
                 if (model.StudentId == null || model.StudentId.Count == 0)
                 {
-                    return ResponseHandler.Failure<bool>("Danh sách học sinh không hợp lệ!");
+                    return ResponseHandler.Failure<Guid?>("Danh sách học sinh không hợp lệ!");
                 }
                 var classWithSameName = await _unitOfWork.ClassRepository.GetFirstOrDefaultAsync(c => c.Name == model.Name && !c.IsDeleted);
                 if (classWithSameName != null)
                 {
-                    return ResponseHandler.Failure<bool>($"Tên lớp '{model.Name}' đã tồn tại!");
+                    return ResponseHandler.Failure<Guid?>($"Tên lớp '{model.Name}' đã tồn tại!");
                 }
                 if (model.StudentId.Count > model.Capacity)
                 {
-                    return ResponseHandler.Failure<bool>($"Số lượng học sinh vượt quá sức chứa lớp học! Sức chứa tối đa: {model.Capacity}.");
+                    return ResponseHandler.Failure<Guid?>($"Số lượng học sinh vượt quá sức chứa lớp học! Sức chứa tối đa: {model.Capacity}.");
                 }
                 var invalidCourseRegistrations = await _unitOfWork.RegisterCourseRepository.GetAllAsync(rc =>
                     model.StudentId.Contains(rc.UserId) && rc.CourseId != Guid.Parse(model.CourseId) && rc.StudentCourseStatus != StudentCourseStatusEnum.Waitlisted);
@@ -94,7 +94,7 @@ namespace FranchiseProject.Application.Services
 
                     var invalidStudents = await _unitOfWork.ClassRoomRepository.GetInvalidStudentsAsync(model.StudentId);
                     var invalidStudentNames = string.Join(", ", invalidStudents);
-                    return ResponseHandler.Failure<bool>($"Không có học sinh nào có trạng thái 'waitlisted'! Các học sinh không hợp lệ: {invalidStudentNames}");
+                    return ResponseHandler.Failure<Guid?>($"Không có học sinh nào có trạng thái 'waitlisted'! Các học sinh không hợp lệ: {invalidStudentNames}");
                 }
            
                 foreach (var studentId in waitlistedStudents.Keys)
@@ -151,11 +151,11 @@ namespace FranchiseProject.Application.Services
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
 
-                response = ResponseHandler.Success(true, "Tạo lớp  học thành công!");
+                response = ResponseHandler.Success((Guid?)newClass.Id, "Tạo lớp  học thành công!");
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<bool>(ex.Message);
+                response = ResponseHandler.Failure<Guid?>(ex.Message);
             }
             return response;
         }

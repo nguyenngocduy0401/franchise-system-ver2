@@ -28,7 +28,7 @@ namespace FranchiseProject.API.Controllers
         [SwaggerOperation(Summary = "Tạo mới lớp học {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpPost()]
-        public async Task<ApiResponse<bool>> CreateClassAsync([FromBody] CreateClassViewModel createClassModel)
+        public async Task<ApiResponse<Guid?>> CreateClassAsync([FromBody] CreateClassViewModel createClassModel)
         {
             return await _classService.CreateClassAsync(createClassModel);
         }

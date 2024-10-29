@@ -16,7 +16,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IClassService
     {
-        Task<ApiResponse<bool>> CreateClassAsync(CreateClassViewModel model);
+        Task<ApiResponse<Guid?>> CreateClassAsync(CreateClassViewModel model);
         Task<ApiResponse<bool>> UpdateClassAsync(string id, UpdateClassViewModel model);
         Task<ApiResponse<Pagination<ClassViewModel>>> FilterClassAsync(FilterClassViewModel filterClassModel);
     
