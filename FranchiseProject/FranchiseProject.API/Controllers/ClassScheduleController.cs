@@ -63,8 +63,8 @@ namespace FranchiseProject.API.Controllers
             [SwaggerOperation(Summary = "tìm kiếm lịch học {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpGet]
-            public async Task<ApiResponse<Pagination<ClassScheduleViewModel>>> FilterClassScheduleAsync([FromQuery] FilterClassScheduleViewModel filterClassScheduleViewModel)
-            {
+            public async Task<ApiResponse<List<ClassScheduleViewModel>>> FilterClassScheduleAsync([FromQuery]FilterClassScheduleViewModel filterClassScheduleViewModel)
+        {
                 return await _classScheduleService.FilterClassScheduleAsync(filterClassScheduleViewModel);
             }
             [SwaggerOperation(Summary = "xóa tất cả lịch học của 1 lớp {Authorize = AgencyManager ,AgencyStaff}")]

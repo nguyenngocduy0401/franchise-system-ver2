@@ -603,19 +603,24 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<List<ClassScheduleViewModel>>> GetClassSchedulesByClassIdAsync(string classId)
+        public async Task<ApiResponse<List<ClassScheduleViewModel>>> GetClassSchedulesByClassIdAsync(string classId,DateTime startDate,DateTime endDate)
         {
             var response = new ApiResponse<List<ClassScheduleViewModel>>();
             try
             {
                 var classGuidId = Guid.Parse(classId);
-                // Lấy tất cả ClassSchedules cho Class với ID đã cho
-                var classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs => cs.ClassId == classGuidId);
-                var classE=await _unitOfWork.ClassRepository.GetByIdAsync(classGuidId);
+          
+                var classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs =>
+                    cs.ClassId == classGuidId && cs.Date >= startDate && cs.Date <= endDate);
+
+                var classE = await _unitOfWork.ClassRepository.GetByIdAsync(classGuidId);
+
                 if (classSchedules == null || !classSchedules.Any())
                 {
-                    return ResponseHandler.Failure<List<ClassScheduleViewModel>>("Không tìm thấy lịch học cho lớp này!");
+                    return ResponseHandler.Failure<List<ClassScheduleViewModel>>("Không tìm thấy lịch học cho lớp này trong khoảng thời gian đã cho!");
                 }
+
+
                 var classScheduleViewModels = new List<ClassScheduleViewModel>();
 
                 foreach (var schedule in classSchedules)
@@ -627,9 +632,9 @@ namespace FranchiseProject.Application.Services
                         Id = schedule.Id.ToString(),
                         Room = schedule.Room,
                         ClassName = classE.Name,
-                        SlotName = slot?.Name, 
-                        Date = schedule.Date.ToString(),
-                        StartTime = slot?.StartTime.ToString(),
+                        SlotName = slot?.Name,
+                        Date = schedule.Date.ToString(), 
+                        StartTime = slot?.StartTime.ToString(), 
                         EndTime = slot?.EndTime.ToString() 
                     });
                 }
