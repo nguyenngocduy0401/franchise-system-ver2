@@ -86,6 +86,33 @@ namespace FranchiseProject.Application.Utils
             };
         }
         #endregion
-
+        #region ClassSchedule
+        public static MessageModel ClassScheduleChange(string to, string name, string ClassName)
+        {
+            return new MessageModel
+            {
+                To = to,
+                Subject = "Lịch Học Thay Đổi [futuretech-noreply]",
+                Body = $"<p>Chào bạn {name},</p>" +
+                       $"<p>Lịch học của lớp {ClassName} đã thay đổi  </p>" +
+                       $"<p>chúng tôi sẻ thông tin đến bạn lịch học của Lớp {ClassName}  trong thời gian sớm nhất  </p>" +
+                       $"<p>Trân trọng,</p>" +
+                       $"<p>Đội ngũ FutureTech</p>"
+            };
+        }
+        public static MessageModel ClassScheduleCreated(string to, string name, string ClassName)
+        {
+            return new MessageModel
+            {
+                To = to,
+                Subject = "Thông báo lịch học  [futuretech-noreply]",
+                Body = $"<p>Chào bạn {name},</p>" +
+                       $"<p>Lịch học của lớp {ClassName} đã có! </p>" +
+                       $"<p>Hãy truy cập vào hệ thông để xem thông tin  lịch học của Lớp {ClassName}.</p>" +
+                       $"<p>Trân trọng,</p>" +
+                       $"<p>Đội ngũ FutureTech</p>"
+            };
+        }
+        #endregion
     }
 }

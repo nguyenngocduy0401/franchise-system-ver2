@@ -232,7 +232,8 @@ namespace FranchiseProject.Infrastructures.Mappers
            .ForMember(dest => dest.DateTime, opt => opt.MapFrom(src => src.CreationDate));
             #endregion
             #region Assignment
-            CreateMap<CreateAssignmentViewModel, Payment>();
+            CreateMap<CreateAssignmentViewModel, Assignment>();
+            CreateMap<Assignment, AssignmentViewModel>();
             #endregion
         }
     }

@@ -1,13 +1,18 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.InkML;
 using FluentValidation;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
+using FranchiseProject.Application.Hubs;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.Utils;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -24,13 +29,19 @@ namespace FranchiseProject.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<CreateClassScheduleViewModel> _validator1;
         private readonly IValidator<CreateClassScheduleDateRangeViewModel> _validator2;
+        private readonly UserManager<User> _userManager;
+        private readonly IEmailService _emailService;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public ClassScheduleService(IValidator<CreateClassScheduleDateRangeViewModel> validator2, IMapper mapper, IUnitOfWork unitOfWork, IValidator<CreateClassScheduleViewModel> validator1)
+        public ClassScheduleService(IEmailService emailService, IValidator<CreateClassScheduleDateRangeViewModel> validator2, IMapper mapper, IUnitOfWork unitOfWork, IValidator<CreateClassScheduleViewModel> validator1, UserManager<User> userManager, IHubContext<NotificationHub> hubContext)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _validator1 = validator1;
             _validator2 = validator2;
+            _userManager = userManager;
+            _emailService = emailService;
+            _hubContext = hubContext;
         }
 
         public async Task<ApiResponse<bool>> CreateClassScheduleAsync(CreateClassScheduleViewModel createClassScheduleViewModel)
@@ -59,6 +70,25 @@ namespace FranchiseProject.Application.Services
                 }
                 var classSchedule = _mapper.Map<ClassSchedule>(createClassScheduleViewModel);
                 await _unitOfWork.ClassScheduleRepository.AddAsync(classSchedule);
+                var classE = await _unitOfWork.ClassRepository.GetByIdAsync(Guid.Parse(createClassScheduleViewModel.ClassId));
+                var classRooms = await _unitOfWork.ClassRoomRepository.GetAllAsync(cr => cr.ClassId == classSchedule.ClassId);
+                var userIds = classRooms.Select(cr => cr.UserId).Distinct().ToList();
+                foreach (var userId in userIds)
+                {
+                    var user = await _userManager.FindByIdAsync(userId);
+                    if (user != null && !string.IsNullOrEmpty(user.Email))
+                    {
+                        var emailMessage = EmailTemplate.ClassScheduleCreated(user.Email, user.UserName,classE.Name);
+                        bool emailSent = await _emailService.SendEmailAsync(emailMessage);
+
+                        if (!emailSent)
+                        {
+                            response.Message += $" Lỗi khi gửi email đến {user.Email}.";
+                        }
+                    }
+                    await _hubContext.Clients.User(userId.ToString())
+                        .SendAsync("ReceivedNotification", $"Lịch học mới đã được tạo cho lớp {classE.Name} và sẻ bắt đầu từ ngày {classSchedule.Date}.");
+                }
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create fail!");
                 response.Data = true;
@@ -308,5 +338,49 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+
+        public async Task<ApiResponse<bool>> DeleteClassSheduleAllByClassIdAsync(string classId)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                
+               
+                var classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs => cs.ClassId == Guid.Parse(classId));
+                var classRooms = await _unitOfWork.ClassRoomRepository.GetAllAsync(cr => cr.ClassId == Guid.Parse(classId));
+                var userIds = classRooms.Select(cr => cr.UserId).Distinct().ToList();
+                var classE = await _unitOfWork.ClassRepository.GetExistByIdAsync(Guid.Parse(classId));
+                if (!classSchedules.Any())
+                {
+                    return ResponseHandler.Failure<bool>("Không có lịch học nào để xóa.");
+                }
+                _unitOfWork.ClassScheduleRepository.HardRemoveRange( classSchedules);
+                await _unitOfWork.SaveChangeAsync();
+                foreach (var userId in userIds)
+                {
+         
+                    var user = await _userManager.FindByIdAsync(userId);
+                    if (user != null && !string.IsNullOrEmpty(user.Email))
+                    {
+                        var emailMessage = EmailTemplate.ClassScheduleChange(user.Email, user.UserName, classE.Name);
+                        bool emailSent = await _emailService.SendEmailAsync(emailMessage);
+                        if (!emailSent)
+                        {
+                            return ResponseHandler.Failure<bool>("Lỗi khi gửi mail");
+                        }
+                    }
+                  
+                    await _hubContext.Clients.User(userId.ToString()).SendAsync("ReceivedNotification", $"Lịch học của lớp {classE.Name} đã bị thay đổi");
+                }
+
+                response = ResponseHandler.Success(true, "Xóa tất cả lịch học của lớp thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>($"Lỗi khi xóa lịch học: {ex.Message}");
+            }
+            return response;
+        }
+
     }
 }
