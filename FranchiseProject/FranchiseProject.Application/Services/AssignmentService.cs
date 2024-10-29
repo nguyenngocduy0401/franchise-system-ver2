@@ -59,5 +59,29 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<bool>> UpdateAssignmentAsync(CreateAssignmentViewModel assignment)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                FluentValidation.Results.ValidationResult validationResult = await _validator.ValidateAsync(assignment);
+                if (!validationResult.IsValid)
+                {
+                    return ValidatorHandler.HandleValidation<bool>(validationResult);
+
+                }
+                var ass = _mapper.Map<Assignment>(assignment);
+                await _unitOfWork.AssignmentRepository.Update(ass);
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Create failed!");
+
+                response = ResponseHandler.Success(true, "Tạo slot học thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
     }
 }
