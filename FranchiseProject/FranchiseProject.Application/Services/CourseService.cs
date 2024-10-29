@@ -319,7 +319,7 @@ namespace FranchiseProject.Application.Services
                         (e => e.Code == course.Code && e.Status != CourseStatusEnum.Draft
                         && e.Status != CourseStatusEnum.PendingApproval))
                         .OrderByDescending(e => e.Version).FirstOrDefault();
-                    if (oldCourse != null)
+                    if (oldCourse != null && oldCourse.Id != courseId)
                     {
                         oldCourse.Status = CourseStatusEnum.Closed;
                         course.Version = oldCourse.Version + 1;
