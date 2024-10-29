@@ -177,5 +177,91 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<bool>> SubmitAssignmentAsync(string  assignmentId, string fileSubmitUrl)
+        {
+            var response = new ApiResponse<bool>();
+
+            try
+            {
+                var assId = Guid.Parse(assignmentId);
+                var currentUserId = _claimsService.GetCurrentUserId.ToString();
+                if (currentUserId == null)
+                {
+                    return ResponseHandler.Failure<bool>("User chưa đăng nhập!");
+                }
+                var assignment = await _unitOfWork.AssignmentRepository.GetFirstOrDefaultAsync(a => a.Id == assId);
+                if (assignment == null)
+                {
+                    return ResponseHandler.Failure<bool>("Bài tập không tồn tại!");
+                }
+                var existingSubmission = await _unitOfWork.AssignmentSubmitRepository.GetFirstOrDefaultAsync(rc => rc.UserId==currentUserId &&rc.AssignmentId==assId);
+
+                if (existingSubmission != null)
+                {
+
+                    await _unitOfWork.AssignmentSubmitRepository.DeleteAsync(existingSubmission);
+                }
+                var assignmentSubmit = new AssignmentSubmit
+                {
+                    AssignmentId = Guid.Parse(assignmentId),
+                    UserId = currentUserId.ToString(),
+                    FileSubmitURL = fileSubmitUrl,
+                    SubmitDate = DateTime.UtcNow
+                };
+                await _unitOfWork.AssignmentSubmitRepository.AddAsync(assignmentSubmit);
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+
+                if (!isSuccess)
+                {
+                    throw new Exception("Nộp bài thất bại!");
+                }
+
+                response = ResponseHandler.Success(true, "Nộp bài thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+
+            return response;
+        }
+        public async Task<ApiResponse<AssignmentSubmitViewModel>> GetAssignmentSubmissionAsync(string assignmentId)
+        {
+            var response = new ApiResponse<AssignmentSubmitViewModel>();
+
+            try
+            {
+                var assId= Guid.Parse(assignmentId);
+                var currentUserId = _claimsService.GetCurrentUserId.ToString();
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return ResponseHandler.Failure<AssignmentSubmitViewModel>("User chưa đăng nhập!");
+                }
+                var submission = await _unitOfWork.AssignmentSubmitRepository.GetFirstOrDefaultAsync(
+        
+                    rc => rc.AssignmentId == assId && rc.UserId == currentUserId);
+
+                if (submission == null)
+                {
+                    return ResponseHandler.Failure<AssignmentSubmitViewModel>("Bài nộp không tồn tại!");
+                }
+                var assignmentSubmitViewModel = new AssignmentSubmitViewModel
+                {
+                    AssignmentId = submission.AssignmentId,
+                    AssignmentName = submission.Assignment?.Title, 
+                    FileSubmitURL = submission.FileSubmitURL,
+                    SubmitDate = submission.SubmitDate
+                };
+
+                response = ResponseHandler.Success(assignmentSubmitViewModel, "Lấy thông tin bài nộp thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<AssignmentSubmitViewModel>(ex.Message);
+            }
+
+            return response;
+        }
+
     }
 }

@@ -17,5 +17,6 @@ namespace FranchiseProject.Domain.Entity
         [ForeignKey("AssignmentId")]
         public Assignment? Assignment { get; set; }
         public DateTime? SubmitDate { get; set; }
+        
     }
 }
