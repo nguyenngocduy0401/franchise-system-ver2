@@ -110,6 +110,6 @@ namespace FranchiseProject.API.Controllers
         [SwaggerOperation(Summary = "tạo người dùng {Authorize = AgencyManager}")]
         [HttpPost("api/v1/courses/files")]
         public async Task<ApiResponse<bool>> CreateListUserByAgencyAsync(IFormFile file)
-            => await _courseService.CreateCouresByFileAsync(file);
+            => await _courseService.CreateCourseByFileAsync(file);
     }
 }
