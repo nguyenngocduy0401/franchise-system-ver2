@@ -97,7 +97,7 @@ namespace FranchiseProject.API.Controllers
         }
         [SwaggerOperation(Summary = "lấy danh sách giáo viên  {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
-        [HttpPost("~/api/v1/agencies/users")]
+        [HttpPost("~/api/v1/agencies/instructors")]
         public async Task<ApiResponse<List<InstructorViewModel>>> GetInstructorsByAgencyAsync()
         {
             return await _classService.GetInstructorsByAgencyAsync();
