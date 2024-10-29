@@ -89,6 +89,36 @@ namespace FranchiseProject.Infrastructures.Repositories
             _dbContext.Set<ClassRoom>().Remove(entity);
             await _dbContext.SaveChangesAsync();
         }
+        public async Task<Dictionary<string, bool>> CheckWaitlistedStatusForStudentsAsync(List<string> studentIds, Guid courseId)
+        {
+            
+            var waitlistedRecords = await _dbContext.Set<RegisterCourse>()
+                .Where(rc => studentIds.Contains(rc.UserId) && rc.CourseId == courseId && rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted)
+                .ToListAsync();
+            var result = studentIds.ToDictionary(studentId => studentId, studentId =>
+                waitlistedRecords.Any(rc => rc.UserId == studentId)
+            );
 
+            return result;
+        }
+        public async Task<Dictionary<string, bool>> CheckEnrollStatusForStudentsAsync(List<string> studentIds, Guid courseId)
+        {
+
+            var waitlistedRecords = await _dbContext.Set<RegisterCourse>()
+                .Where(rc => studentIds.Contains(rc.UserId) && rc.CourseId == courseId && rc.StudentCourseStatus == StudentCourseStatusEnum.Enrolled)
+                .ToListAsync();
+            var result = studentIds.ToDictionary(studentId => studentId, studentId =>
+                waitlistedRecords.Any(rc => rc.UserId == studentId)
+            );
+
+            return result;
+        }
+        public async Task<List<string>> GetUserIdsByClassIdAsync(Guid classId)
+        {
+            return await _dbContext.ClassRooms
+                                 .Where(cr => cr.ClassId == classId)
+                                 .Select(cr => cr.UserId)
+                                 .ToListAsync();
+        }
     }
 }

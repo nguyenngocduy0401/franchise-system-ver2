@@ -131,8 +131,11 @@ namespace FranchiseProject.Application.Services
                     await _unitOfWork.ClassScheduleRepository.AddAsync(classSchedule);
                     createdSchedules.Add(date);
                 }
+                var dateClass = "";
+                foreach (var date in createClassScheduleDateRangeViewModel.dayOfWeeks) { dateClass = dateClass + date.ToString(); }
+                var slot = await _unitOfWork.SlotRepository.GetByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.SlotId));
                 var classE = await _unitOfWork.ClassRepository.GetByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.ClassId));
-                classE.DayOfWeek = createClassScheduleDateRangeViewModel.dayOfWeeks.ToString();
+                classE.DayOfWeek = dateClass + " - " + slot.StartTime.ToString() +"-"+ slot.EndTime.ToString();
                 _unitOfWork.ClassRepository.Update(classE);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Tạo lịch học thất bại!");

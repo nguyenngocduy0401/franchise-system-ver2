@@ -26,7 +26,7 @@ namespace FranchiseProject.Application.Interfaces
          Task<ApiResponse<bool>> RemoveStudentAsync(string studentId, string classId);
         Task<ApiResponse<bool>> DeleteClassAsync(string classId);
         Task<ApiResponse<List<ClassScheduleViewModel>>> GetClassSchedulesByClassIdAsync(string classId);
-
+        Task<ApiResponse<List<InstructorViewModel>>> GetInstructorsByAgencyAsync();
 
     }
 }

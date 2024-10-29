@@ -27,11 +27,11 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpPut("{id}")]
 
-        public async  Task<ApiResponse<bool>> UpdateStatusStudentAsync( string id,StudentStatusEnum status) => await _registerCourseService.UpdateStatusStudentAsync(id,status);
+        public async  Task<ApiResponse<bool>> UpdateStatusStudentAsync( string id,string courseId,StudentCourseStatusEnum status) => await _registerCourseService.UpdateStatusStudentAsync(id,courseId,status);
         [SwaggerOperation(Summary = "lấy thông tin học sinh by Id   {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpGet("{id}")]
-        public async Task<ApiResponse<StudentRegisterViewModel>> GetStudentRegisterByIdAsync(string id) => await _registerCourseService.GetStudentRegisterByIdAsync(id);
+        public async Task<ApiResponse<StudentRegisterViewModel>> GetStudentRegisterByIdAsync(string id, string courseId) => await _registerCourseService.GetStudentRegisterByIdAsync(id,courseId);
         [SwaggerOperation(Summary = "Lấy thông tin đăng kí học sinh {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpGet("filter")]

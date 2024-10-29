@@ -24,7 +24,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         public  Task<List<string>> GetCourseNamesByUserIdAsync(string userId)
         {
             return  _dbContext.RegisterCourses
-            .Where(rc => rc.UserId == userId && rc.StudentCourseStatus == StudentCourseStatusEnum.NotStudied) 
+            .Where(rc => rc.UserId == userId && rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted) 
             .Include(rc => rc.Course) 
             .Select(rc => rc.Course.Name) 
             .ToListAsync();

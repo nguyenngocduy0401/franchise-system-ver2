@@ -45,7 +45,7 @@ namespace FranchiseProject.Application.Services
             _userManager = userManager;
         }
 
-        public async Task<ApiResponse<bool>> CreatePaymentStudent(CreateStudentPaymentViewModel create,   StudentPaymentStatusEnum status )
+        public async Task<ApiResponse<bool>> CreatePaymentStudent(CreateStudentPaymentViewModel create,  StudentPaymentStatusEnum status )
         {
             var response = new ApiResponse<bool>();
             try
@@ -53,6 +53,7 @@ namespace FranchiseProject.Application.Services
                 var userCurrentId = _claimsService.GetCurrentUserId;
                 var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
                 var student = await _userManager.FindByIdAsync(create.UserId);
+                var courseGuidId = Guid.Parse(create.CourseId);
                 if (student == null) throw new Exception("Student does not exist!");
 
                 //cần check Student thuộc agency 
@@ -61,32 +62,17 @@ namespace FranchiseProject.Application.Services
                 {
                     throw new Exception("Student does not belong to your agency!");
                 }
+
                 FluentValidation.Results.ValidationResult validationResult = await _validator.ValidateAsync(create);
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+                var registerCourse = await _unitOfWork.RegisterCourseRepository
+                   .GetFirstOrDefaultAsync(rc => rc.UserId == create.UserId && rc.CourseId == courseGuidId);
                 if (status == StudentPaymentStatusEnum.Completed)
                 {
-                    if (student.StudentStatus == StudentStatusEnum.Pending)
+                    if (registerCourse.StudentCourseStatus == StudentCourseStatusEnum.Pending)
                     {
-                        student.StudentStatus = StudentStatusEnum.Waitlisted;
-                        await _userManager.UpdateAsync(student);
-                        var registerCourses = await _unitOfWork.RegisterCourseRepository
-                             .GetRegisterCoursesByUserIdAndStatusNullAsync(student.Id); 
-
-                        if (registerCourses == null || !registerCourses.Any())
-                        {
-                            response = ResponseHandler.Failure<bool>("Không có khóa học nào với trạng thái null cho học sinh này.");
-                            return response;
-                        }
-
-                        foreach (var registerCourse in registerCourses)
-                        {
-                            if (registerCourse.StudentCourseStatus == StudentCourseStatusEnum.Pending)
-                            {
-                                registerCourse.StudentCourseStatus = StudentCourseStatusEnum.NotStudied;
-                                await _unitOfWork.RegisterCourseRepository.Update1Async(registerCourse);
-                                break; // Stop after updating the first "Pending" status
-                            }
-                        }
+                        registerCourse.StudentCourseStatus = StudentCourseStatusEnum.Waitlisted;
+                        await _unitOfWork.RegisterCourseRepository.UpdateAsync(registerCourse);
                         var courseNames = await _unitOfWork.RegisterCourseRepository
                       .GetCourseNamesByUserIdAsync(create.UserId);
                         var random = new Random();
@@ -128,7 +114,7 @@ namespace FranchiseProject.Application.Services
                     }
                 }
                 var payment = _mapper.Map<Payment>(create);
-                student.StudentPaymentStatus = status;
+              //  student.StudentPaymentStatus = status;
                 await _unitOfWork.PaymentRepository.AddAsync(payment);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
