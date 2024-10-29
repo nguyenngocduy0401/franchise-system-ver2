@@ -341,7 +341,7 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<ApiResponse<bool>> CreateCouresByFileAsync(IFormFile file)
+        public async Task<ApiResponse<bool>> CreateCourseByFileAsync(IFormFile file)
         {
             var response = new ApiResponse<bool>();
             try
