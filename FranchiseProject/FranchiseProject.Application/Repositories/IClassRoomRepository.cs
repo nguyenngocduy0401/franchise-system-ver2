@@ -16,5 +16,8 @@ namespace FranchiseProject.Application.Repositories
         Task<List<ClassRoom>> GetAllAsync(Expression<Func<ClassRoom, bool>> predicate);
         Task<ClassRoom> GetFirstOrDefaultAsync(Expression<Func<ClassRoom, bool>> predicate);
         Task DeleteAsync(ClassRoom entity);
+        Task<Dictionary<string, bool>> CheckWaitlistedStatusForStudentsAsync(List<string> studentIds, Guid courseId);
+        Task<Dictionary<string, bool>> CheckEnrollStatusForStudentsAsync(List<string> studentIds, Guid courseId);
+        Task<List<string>> GetUserIdsByClassIdAsync(Guid classId);
     }
 }

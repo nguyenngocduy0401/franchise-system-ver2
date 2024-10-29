@@ -18,7 +18,8 @@ namespace FranchiseProject.Application.ViewModels.ClassViewModel
         public string? CourseName { get; set; }
         public string? DayOfWeek { get; set; }
         public string? InstructorName { get; set; }
-        public List<StudentClassViewModel>? StudentInfo { get; set; }
         public SlotViewModel? SlotViewModels { get; set; }
+        public List<StudentClassViewModel>? StudentInfo { get; set; }
+     
     }
 }

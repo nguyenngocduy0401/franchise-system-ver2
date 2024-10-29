@@ -193,5 +193,17 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.Users.Where(filter).ToListAsync();
         }
+        public async Task<List<User>> GetInstructorsByAgencyIdAsync(Guid agencyId)
+        {
+            var instructorRoleId = await _dbContext.Roles
+                                                 .Where(r => r.Name == AppRole.Instructor )
+                                                 .Select(r => r.Id)
+                                                 .FirstOrDefaultAsync();
+
+            return await _dbContext.Users
+                                 .Where(u => u.AgencyId == agencyId&&u.Status==UserStatusEnum.active && u.UserRoles.Any(ur => ur.RoleId == instructorRoleId))
+                                 .ToListAsync();
+        }
+
     }
 }

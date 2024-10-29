@@ -18,6 +18,7 @@ namespace FranchiseProject.Domain.Entity
         public Course? Course { get; set; }
         public string? DateTime {  get; set; }
         public StudentCourseStatusEnum? StudentCourseStatus { get; set; }
+
         public DateTime? CreatDate { get; set; }
     }
 }

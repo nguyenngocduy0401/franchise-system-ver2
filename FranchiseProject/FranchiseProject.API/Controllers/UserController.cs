@@ -15,10 +15,12 @@ namespace FranchiseProject.API.Controllers
     {
         private readonly IUserService _userService;
         private readonly IClassService _classService;
-        public UserController(IUserService userService, IClassService classService)
+        private readonly IRegisterCourseService _registerCourseService;
+        public UserController(IUserService userService, IClassService classService, IRegisterCourseService registerCourseService)
         {
             _userService = userService;
             _classService = classService;
+            _registerCourseService = registerCourseService;
         }
 
         [SwaggerOperation(Summary = "lấy thông tin User bằng đăng nhập")]
@@ -68,10 +70,14 @@ namespace FranchiseProject.API.Controllers
         [HttpPost("~/agency-manager/api/v1/users/files")]
         public async Task<ApiResponse<List<CreateUserByAgencyModel>>> CreateListUserByAgencyAsync(IFormFile file)
             => await _userService.CreateListUserByAgencyAsync(file);
+        [Authorize(Roles = AppRole.Student)]
+        [SwaggerOperation(Summary = "học sinh đăng kí khóa học  {Authorize = Student}")]
+        [HttpPost("mine/courses")]
+        public async Task<ApiResponse<bool>> StudentExistRegisterCourse(string courseId)
+           => await _registerCourseService.StudentExistRegisterCourse(courseId);
 
-
-       /* [SwaggerOperation(Summary = "Người dùng lấy lịch học bằng by login")]
-        [HttpGet("mine/class-schedules/{id}")]
-        public async Task<ApiResponse<Pagination<StudentClassScheduleViewModel>>> GetClassSchedulesForCurrentUserByTermAsync(string id, int pageIndex, int pageSize) => await _classService.GetClassSchedulesForCurrentUserByTermAsync(id, pageIndex, pageSize);*/
+        /* [SwaggerOperation(Summary = "Người dùng lấy lịch học bằng by login")]
+         [HttpGet("mine/class-schedules/{id}")]
+         public async Task<ApiResponse<Pagination<StudentClassScheduleViewModel>>> GetClassSchedulesForCurrentUserByTermAsync(string id, int pageIndex, int pageSize) => await _classService.GetClassSchedulesForCurrentUserByTermAsync(id, pageIndex, pageSize);*/
     }
 }
