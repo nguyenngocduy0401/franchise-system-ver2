@@ -184,6 +184,29 @@ namespace FranchiseProject.Application.Services
 
                 existingClass.Name = model.Name;
                 existingClass.Capacity = model.Capacity;
+                if (model.InstructorId != null)
+                {
+                    var rc = await _unitOfWork.ClassRoomRepository.GetFirstOrDefaultAsync(rc => rc.ClassId == classId && rc.UserId == model.InstructorId);
+                    if (rc == null)
+                    {
+                        var classRoom = new ClassRoom
+                        {
+                            ClassId = classId,
+                            UserId = model.InstructorId,
+                        };
+                      await  _unitOfWork.ClassRoomRepository.AddAsync(classRoom);
+                    } else
+                    {
+                        await _unitOfWork.ClassRoomRepository.DeleteAsync(rc);
+                        var classRoom1 = new ClassRoom
+                        {
+                            ClassId = classId,
+                            UserId = model.InstructorId,
+                        };
+                        await _unitOfWork.ClassRoomRepository.AddAsync(classRoom1);
+                    }
+                  
+                }
                 _unitOfWork.ClassRepository.Update(existingClass);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
 
@@ -222,26 +245,49 @@ namespace FranchiseProject.Application.Services
                     pageIndex: filterClassModel.PageIndex,
                     pageSize: filterClassModel.PageSize
                 );
-
-                var classViewModels = new Pagination<ClassViewModel>
+                foreach (var c in classes.Items)
                 {
 
-                    Items = classes.Items.Select(c => new ClassViewModel
-                    {
-                        Id = c.Id,
-                        Name = c.Name,
-                        Capacity = c.Capacity,
-                        CurrentEnrollment = c.CurrentEnrollment,
-                        DayOfWeek=c.DayOfWeek,
-                        CourseName = c.Course.Name,
-                        Status = c.Status.Value
-                    }).ToList(),
-                    TotalItemsCount = classes.TotalItemsCount,
-                    PageIndex = classes.PageIndex,
-                    PageSize = classes.PageSize
-                };
+                    var classRoomInstructors = await _unitOfWork.ClassRoomRepository
+                        .GetAllAsync(cr => cr.ClassId == c.Id);
 
-                response = ResponseHandler.Success(classViewModels, "Lọc lớp học thành công!");
+                    string instructorName = null;
+
+                    foreach (var cr in classRoomInstructors)
+                    {
+
+                        var user = await _userManager.FindByIdAsync(cr.UserId);
+                        if (user != null)
+                        {
+                            var roles = await _userManager.GetRolesAsync(user);
+                            if (roles.Contains(AppRole.Instructor))
+                            {
+                                instructorName = user.UserName;
+                                break;
+                            }
+                        }
+                    }
+                    var classViewModels = new Pagination<ClassViewModel>
+                    {
+
+                        Items = classes.Items.Select(c => new ClassViewModel
+                        {
+                            Id = c.Id,
+                            Name = c.Name,
+                            Capacity = c.Capacity,
+                            CurrentEnrollment = c.CurrentEnrollment,
+                            DayOfWeek = c.DayOfWeek,
+                            CourseName = c.Course.Name,
+                            Status = c.Status.Value,
+                            InstructorName = instructorName
+                        }).ToList(),
+                        TotalItemsCount = classes.TotalItemsCount,
+                        PageIndex = classes.PageIndex,
+                        PageSize = classes.PageSize
+                    };
+
+                    response = ResponseHandler.Success(classViewModels, "Lọc lớp học thành công!");
+                }
             }
             catch (Exception ex)
             {
@@ -340,21 +386,26 @@ namespace FranchiseProject.Application.Services
                     var user = await _userManager.FindByIdAsync(cr.UserId);
                     if (user != null)
                     {
-                        if (!studentIdsAdded.Contains(cr.UserId))
+                        var roles = await _userManager.GetRolesAsync(user);
+
+                        if (roles.Contains(AppRole.Student) && !studentIdsAdded.Contains(cr.UserId))
                         {
                             studentInfo.Add(new StudentClassViewModel
                             {
+
                                 UserId = cr.UserId,
+                                UserName=user.UserName,
                                 StudentName = user.FullName,
                                 DateOfBirth = user.DateOfBirth,
                                 URLImage = user.URLImage
                             });
-                            studentIdsAdded.Add(cr.UserId); 
+
+                            studentIdsAdded.Add(cr.UserId);
                         }
-                        var roles = await _userManager.GetRolesAsync(user);
-                        if (roles.Contains("Instructor"))
+                       
+                        if (roles.Contains(AppRole.Instructor))
                         {
-                            instructorName = user.FullName;
+                            instructorName = user.UserName;
                         }
                     }
                 }
@@ -440,6 +491,9 @@ namespace FranchiseProject.Application.Services
                             await _unitOfWork.ClassRoomRepository.AddAsync(classRoom);
                             classE.CurrentEnrollment = classE.CurrentEnrollment + 1;
                         }
+                    }else
+                    {
+                        return ResponseHandler.Failure<bool>("thêm học sinh không thành công!");
                     }
                 }
                 await _unitOfWork.SaveChangeAsync();

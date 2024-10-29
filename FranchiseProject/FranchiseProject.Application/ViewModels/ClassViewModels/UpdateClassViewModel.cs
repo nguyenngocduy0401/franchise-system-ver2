@@ -10,5 +10,6 @@ namespace FranchiseProject.Application.ViewModels.ClassViewModels
     {
         public string? Name { get; set; }
         public int Capacity { get; set; }
+        public string? InstructorId {  get; set; }
     }
 }
