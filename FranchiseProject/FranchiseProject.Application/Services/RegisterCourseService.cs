@@ -271,16 +271,12 @@ namespace FranchiseProject.Application.Services
                      u.RegisterCourses.Any(rc => rc.CourseId.ToString() == filterStudentModel.CourseId)) &&
                     (!filterStudentModel.Status.HasValue ||
                      u.RegisterCourses.Any(rc => rc.StudentCourseStatus == filterStudentModel.Status));
-
-                // Lấy danh sách sinh viên theo bộ lọc
                 var students = await _unitOfWork.UserRepository.GetFilterAsync(
                     filter: filter,
                     pageIndex: filterStudentModel.PageIndex,
                     pageSize: filterStudentModel.PageSize,
                     includeProperties: "RegisterCourses.Course"
                 );
-
-                // Chuyển đổi dữ liệu sinh viên thành StudentRegisterViewModel
                 var studentViewModels = students.Items
                     .Select(s => {
                         var firstValidRegisterCourse = s.RegisterCourses
