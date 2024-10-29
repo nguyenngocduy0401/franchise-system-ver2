@@ -9,6 +9,7 @@ using FranchiseProject.Application.ViewModels.QuestionViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Pqc.Crypto.Frodo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,15 +25,63 @@ namespace FranchiseProject.Application.Services
         private readonly IMapper _mapper;
         private readonly IValidator<CreateQuestionArrangeModel> _createQuestionValidator;
         private readonly IValidator<List<CreateQuestionArrangeModel>> _createQuestionArrangeValidator;
+        private readonly IValidator<UpdateQuestionModel> _updateQuestionValidator;
         public QuestionService(IUnitOfWork unitOfWork, ICourseService courseService,
-            IValidator<CreateQuestionArrangeModel> createQuestionValidator,
-            IMapper mapper, IValidator<List<CreateQuestionArrangeModel>> createQuestionArrangeValidator)
+            IValidator<CreateQuestionArrangeModel> createQuestionValidator, IValidator<UpdateQuestionModel> updateQuestionValidator,
+        IMapper mapper, IValidator<List<CreateQuestionArrangeModel>> createQuestionArrangeValidator)
         {
             _courseService = courseService;
             _unitOfWork = unitOfWork;
             _createQuestionValidator = createQuestionValidator;
             _mapper = mapper;
             _createQuestionArrangeValidator = createQuestionArrangeValidator;
+            _updateQuestionValidator = updateQuestionValidator;
+        }
+        public async Task<ApiResponse<bool>> UpdateQuestionByIdAsync(Guid id, UpdateQuestionModel updateQuestionModel)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+
+                ValidationResult validationResult = await _updateQuestionValidator.ValidateAsync(updateQuestionModel);
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+
+                var question = await _unitOfWork.QuestionRepository.GetExistByIdAsync(id);
+                if (question == null) throw new Exception("Question does not exist!");
+
+                var chapter = await _unitOfWork.ChapterRepository.GetExistByIdAsync((Guid)question.ChapterId);
+                if (chapter == null) throw new Exception("Chapter does not exist!");
+
+                var checkCourse = await _courseService.CheckCourseAvailableAsync(chapter.CourseId, CourseStatusEnum.Draft);
+                if (!checkCourse.Data) return checkCourse;
+
+                question = _mapper.Map(updateQuestionModel, question);
+
+                var deleteQuestionOptions = (await _unitOfWork.QuestionOptionRepository.FindAsync(e => e.Question.Id == question.Id && e.IsDeleted != true)).ToList();
+                if (!deleteQuestionOptions.IsNullOrEmpty()) _unitOfWork.QuestionOptionRepository.HardRemoveRange(deleteQuestionOptions);
+
+                var questionOptions = _mapper.Map<List<QuestionOption>>(updateQuestionModel.QuestionOptions);
+                foreach (var questionOption in questionOptions)
+                {
+                    questionOption.QuestionId = question.Id;
+                }
+
+                await _unitOfWork.QuestionOptionRepository.AddRangeAsync(questionOptions);
+
+
+                _unitOfWork.QuestionRepository.Update(question);
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Update failed!");
+                response = ResponseHandler.Success(true, "Cập nhật câu hỏi thành công!");
+
+            }
+
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
         }
         public async Task<ApiResponse<bool>> CreateQuestionByChapterIdAsync(Guid chapterId, CreateQuestionArrangeModel createQuestionArrangeModel)
         {

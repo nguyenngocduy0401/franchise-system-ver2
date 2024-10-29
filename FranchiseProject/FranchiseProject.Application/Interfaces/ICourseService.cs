@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace FranchiseProject.Application.Interfaces
 {
@@ -22,5 +23,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> UpdateCourseAsync(Guid courseId, UpdateCourseModel updateCourseModel);
         Task<ApiResponse<bool>> CreateCourseAsync(CreateCourseModel createCourseModel);
         Task<ApiResponse<bool>> CheckCourseAvailableAsync(Guid? courseId, CourseStatusEnum courseStatus);
+        Task<ApiResponse<bool>> CreateCouresByFileAsync(IFormFile file);
     }
 }

@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using FranchiseProject.Domain.Enums;
+using FranchiseProject.Application.ViewModels.UserViewModels;
+using DocumentFormat.OpenXml;
 
 namespace FranchiseProject.API.Controllers
 {
@@ -105,5 +107,9 @@ namespace FranchiseProject.API.Controllers
         {
             return await _courseService.FilterCourseAsync(filterCourseModel);
         }
+        [SwaggerOperation(Summary = "tạo người dùng {Authorize = AgencyManager}")]
+        [HttpPost("api/v1/courses/files")]
+        public async Task<ApiResponse<bool>> CreateListUserByAgencyAsync(IFormFile file)
+            => await _courseService.CreateCouresByFileAsync(file);
     }
 }
