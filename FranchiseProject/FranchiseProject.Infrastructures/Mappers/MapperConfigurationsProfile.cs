@@ -30,6 +30,7 @@ using FranchiseProject.Application.ViewModels.QuestionViewModels;
 using FranchiseProject.Application.ViewModels.QuestionOptionViewModels;
 using FranchiseProject.Application.ViewModels.PaymentViewModel;
 using FranchiseProject.Application.ViewModels.AgenciesViewModels;
+using FranchiseProject.Application.ViewModels.AssignmentViewModels;
 
 
 
@@ -232,6 +233,10 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Payment, PaymentStudentViewModel>()
            .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.User.FullName))
            .ForMember(dest => dest.DateTime, opt => opt.MapFrom(src => src.CreationDate));
+            #endregion
+            #region Assignment
+            CreateMap<CreateAssignmentViewModel, Assignment>();
+            CreateMap<Assignment, AssignmentViewModel>();
             #endregion
         }
     }

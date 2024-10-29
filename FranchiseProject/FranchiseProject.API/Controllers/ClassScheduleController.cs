@@ -20,47 +20,58 @@ namespace FranchiseProject.API.Controllers
             }
 
        // [Authorize(Roles = AppRole.FranchiseManager)]
-        [SwaggerOperation(Summary = "xóa lịch học bằng id {Authorize = AgencyManager}")]
-            [HttpDelete("{id}")]
+        [SwaggerOperation(Summary = "xóa lịch học bằng id  {Authorize = AgencyManager ,AgencyStaff}")]
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
+        [HttpDelete("{id}")]
             public async Task<ApiResponse<bool>> DeleteClassScheduleAsync(string id)
             {
                 return await _classScheduleService.DeleteClassScheduleByIdAsync(id);
             }
 
-            [SwaggerOperation(Summary = "tạo mới lịch học {Authorize = AgencyManager}")]
-            [HttpPost]
+            [SwaggerOperation(Summary = "tạo mới lịch học  {Authorize = AgencyManager ,AgencyStaff}")]
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
+        [HttpPost]
             public async Task<ApiResponse<bool>> CreateClassScheduleAsync(CreateClassScheduleViewModel createClassScheduleViewModel)
             {
                 return await _classScheduleService.CreateClassScheduleAsync(createClassScheduleViewModel);
             }
 
-            [SwaggerOperation(Summary = "tạo mới lịch học theo khoảng thời gian {Authorize = AgencyManager}")]
-            [HttpPost("date-range")]
+            [SwaggerOperation(Summary = "tạo mới lịch học theo khoảng thời gian  {Authorize = AgencyManager ,AgencyStaff}")]
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
+        [HttpPost("date-range")]
             public async Task<ApiResponse<bool>> CreateClassScheduleDateRangeAsync([FromBody] CreateClassScheduleDateRangeViewModel createClassScheduleDateRangeViewModel)
             {
                 return await _classScheduleService.CreateClassScheduleDateRangeAsync(createClassScheduleDateRangeViewModel);
             }
 
-            [SwaggerOperation(Summary = "cập nhật lịch học {Authorize = AgencyManager}")]
-            [HttpPut("{id}")]
+            [SwaggerOperation(Summary = "cập nhật lịch học {Authorize = AgencyManager ,AgencyStaff}")]
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
+        [HttpPut("{id}")]
             public async Task<ApiResponse<bool>> UpdateClassScheduleAsync(string id, CreateClassScheduleViewModel updateClassScheduleViewModel)
             {
                 return await _classScheduleService.UpdateClassScheduleAsync(updateClassScheduleViewModel, id);
             }
 
-            [SwaggerOperation(Summary = "tìm lịch học bằng id{Authorize = AgencyManager}")]
-            [HttpGet("{id}")]
+            [SwaggerOperation(Summary = "tìm lịch học bằng id {Authorize = AgencyManager ,AgencyStaff}")]
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
+        [HttpGet("{id}")]
             public async Task<ApiResponse<ClassScheduleViewModel>> GetClassScheduleByIdAsync(string id)
             {
                 return await _classScheduleService.GetClassScheduleByIdAsync(id);
             }
 
-            [SwaggerOperation(Summary = "tìm kiếm lịch học{Authorize = AgencyManager}")]
-            [HttpGet]
+            [SwaggerOperation(Summary = "tìm kiếm lịch học {Authorize = AgencyManager ,AgencyStaff}")]
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
+        [HttpGet]
             public async Task<ApiResponse<Pagination<ClassScheduleViewModel>>> FilterClassScheduleAsync([FromQuery] FilterClassScheduleViewModel filterClassScheduleViewModel)
             {
                 return await _classScheduleService.FilterClassScheduleAsync(filterClassScheduleViewModel);
             }
-
+            [SwaggerOperation(Summary = "xóa tất cả lịch học của 1 lớp {Authorize = AgencyManager ,AgencyStaff}")]
+            [HttpGet]
+            public async Task<ApiResponse<bool>> DeleteClassSheduleAllByClassIdAsync(string classId)
+            {
+                return await _classScheduleService.DeleteClassSheduleAllByClassIdAsync(classId);
+            }
         }
     }

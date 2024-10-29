@@ -1,6 +1,8 @@
-﻿using FranchiseProject.Application.Interfaces;
+﻿using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -47,6 +49,19 @@ namespace FranchiseProject.Infrastructures.Repositories
 
             return await query.CountAsync();
         }
-      
+        public async Task<List<User>> GetStudentsByClassIdAsync(Guid classId)
+        {
+            var studentRoleId = await _dbContext.Roles
+                                                 .Where(r => r.Name == AppRole.Student)
+                                                 .Select(r => r.Id)
+                                                 .FirstOrDefaultAsync();
+
+            return await _dbContext.Users
+                                 .Where(u => u.Status == UserStatusEnum.active
+                                              && u.UserRoles.Any(ur => ur.RoleId == studentRoleId)
+                                              && u.ClassRooms.Any(cr => cr.ClassId == classId))
+                                 .ToListAsync();
+        }
+
     }
 }

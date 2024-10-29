@@ -16,5 +16,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<Pagination<ClassScheduleViewModel>>> FilterClassScheduleAsync(FilterClassScheduleViewModel filterClassScheduleViewModel);
         Task<ApiResponse<ClassScheduleViewModel>> GetClassScheduleByIdAsync(string id);
         Task<ApiResponse<bool>> UpdateClassScheduleAsync(CreateClassScheduleViewModel updateClassScheduleViewModel, string id);
+        Task<ApiResponse<bool>> DeleteClassSheduleAllByClassIdAsync(string classId);
     }
 }
