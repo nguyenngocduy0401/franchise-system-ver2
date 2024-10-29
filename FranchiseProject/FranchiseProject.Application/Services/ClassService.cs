@@ -726,6 +726,64 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<List<ClassViewModel>>> GetAllClassByCourseId(string courseId)
+        {
+            var response = new ApiResponse<List<ClassViewModel>>();
+            try
+            {
+                if (!Guid.TryParse(courseId, out Guid parsedCourseId))
+                {
+                    return ResponseHandler.Failure<List<ClassViewModel>>("CourseId không hợp lệ.");
+                }
+                var classIds = await _unitOfWork.ClassRoomRepository.GetClassIdsByCourseIdAsync(Guid.Parse(courseId));
+                foreach (var classId in classIds) 
+                { 
+                }
+                Expression<Func<Class, bool>> filter = c =>
+                    c.CourseId == parsedCourseId &&
+                    c.Status == ClassStatusEnum.Active; 
+
+                var classes = await _unitOfWork.ClassRepository.GetFilterAsync(
+                    filter: filter,
+                    includeProperties: "Course,User,RegisterCourse"
+                );
+
+
+                var classViewModels = new List<ClassViewModel>();
+                foreach (var c in classes.Items)
+                {
+                    var instructorIds = await _unitOfWork.ClassRoomRepository.GetClassIdsByCourseIdAsync(c.Id);
+
+                    string instructorName = null;
+                    if (instructorIds.Any())
+                    {
+                        var instructor = await _userManager.FindByIdAsync(instructorIds.First().ToString());
+                        instructorName = instructor?.FullName;
+                    }
+
+                    var classViewModel = new ClassViewModel
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        Capacity = c.Capacity,
+                        CurrentEnrollment = c.CurrentEnrollment,
+                        InstructorName = instructorName,
+                        CourseName = c.Course?.Name,
+                        DayOfWeek = c.DayOfWeek
+                    };
+
+                    classViewModels.Add(classViewModel);
+                }
+
+                response = ResponseHandler.Success(classViewModels, "Lấy danh sách lớp học thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<List<ClassViewModel>>(ex.Message);
+            }
+            return response;
+        }
+
 
 
 

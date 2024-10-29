@@ -272,7 +272,6 @@ namespace FranchiseProject.Application.Services
                     (!filterStudentModel.Status.HasValue ||
                      u.RegisterCourses.Any(rc => rc.StudentCourseStatus == filterStudentModel.Status));
 
-                // Lấy danh sách sinh viên theo bộ lọc
                 var students = await _unitOfWork.UserRepository.GetFilterAsync(
                     filter: filter,
                     pageIndex: filterStudentModel.PageIndex,
@@ -280,7 +279,6 @@ namespace FranchiseProject.Application.Services
                     includeProperties: "RegisterCourses.Course"
                 );
 
-                // Chuyển đổi dữ liệu sinh viên thành StudentRegisterViewModel
                 var studentViewModels = students.Items
                     .Select(s => {
                         var firstValidRegisterCourse = s.RegisterCourses
