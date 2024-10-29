@@ -666,13 +666,13 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync()
+        public async Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync(DateTime startTime, DateTime endTime)
         {
             var response = new ApiResponse<List<StudentScheduleViewModel>>();
             try
             {
                 var studentId = _claimsService.GetCurrentUserId.ToString();
-                
+
                 var classRooms = await _unitOfWork.ClassRoomRepository.GetAllAsync(cr => cr.UserId == studentId);
 
                 if (!classRooms.Any())
@@ -682,13 +682,20 @@ namespace FranchiseProject.Application.Services
 
                 var classIds = classRooms.Select(cr => cr.ClassId).Distinct().ToList();
                 var activeClassIds = new List<Guid>();
+
                 foreach (var classId in classIds)
                 {
                     var check1 = await _unitOfWork.ClassRepository.GetByIdAsync(classId.Value);
-                    if (check1 != null) { activeClassIds.Add(classId.Value); }
-
+                    if (check1 != null)
+                    {
+                        activeClassIds.Add(classId.Value);
+                    }
                 }
-                var schedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs => activeClassIds.Contains(cs.ClassId.Value));
+
+                
+                var schedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs =>
+                    activeClassIds.Contains(cs.ClassId.Value) &&
+                    cs.Date >= startTime.Date && cs.Date <= endTime.Date);
 
                 var scheduleViewModels = new List<StudentScheduleViewModel>();
 
@@ -703,7 +710,7 @@ namespace FranchiseProject.Application.Services
                         ScheduleId = schedule.Id,
                         ClassId = schedule.ClassId.Value,
                         SlotId = schedule.SlotId ?? Guid.Empty,
-                        Room = schedule.Room, 
+                        Room = schedule.Room,
                         ClassName = schedule.Class.Name,
                         SlotName = slot?.Name,
                         Date = schedule.Date,
@@ -720,6 +727,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+
 
 
 
