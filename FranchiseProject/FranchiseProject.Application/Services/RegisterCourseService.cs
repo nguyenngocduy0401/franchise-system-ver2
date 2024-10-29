@@ -277,13 +277,19 @@ namespace FranchiseProject.Application.Services
                     includeProperties: "RegisterCourses.Course" 
                 );
                 var studentViewModels = students.Items
-                    .AsEnumerable()
-                .OrderByDescending(s => s.RegisterCourses
-                .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
-                             rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted)
-                .Select(rc => rc.CreatDate)
-                .FirstOrDefault()).Select(s => new StudentRegisterViewModel
-                {
+     .AsEnumerable()
+     .Where(s => s.RegisterCourses.Any(rc =>
+         rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
+         rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted ||
+         rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel))
+     .OrderByDescending(s => s.RegisterCourses
+         .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
+                      rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted ||
+                      rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel)
+         .Select(rc => rc.CreatDate)
+         .FirstOrDefault())
+     .Select(s => new StudentRegisterViewModel
+     {
                     Id = s.Id,
                    
                     FullName = s.FullName,
@@ -326,7 +332,7 @@ namespace FranchiseProject.Application.Services
                 var paginatedResult = new Pagination<StudentRegisterViewModel>
                 {
                     Items = studentViewModels,
-                    TotalItemsCount = students.TotalItemsCount,
+                    TotalItemsCount = studentViewModels.Count,
                     PageIndex = students.PageIndex,
                     PageSize = students.PageSize
                 };
