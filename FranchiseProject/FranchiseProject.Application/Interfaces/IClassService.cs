@@ -22,13 +22,13 @@ namespace FranchiseProject.Application.Interfaces
     
          Task<ApiResponse<ClassViewModel>> GetClassByIdAsync(string id);
         Task<ApiResponse<bool>> UpdateClassStatusAsync(ClassStatusEnum status,string id);
-         Task<ApiResponse<Pagination<ClassStudentViewModel>>> GetClassDetailAsync(string id);
+        Task<ApiResponse<ClassStudentViewModel>> GetClassDetailAsync(string id);
         Task<ApiResponse<bool>> AddStudentAsync(string ClassId, AddStudentViewModel model);
          Task<ApiResponse<bool>> RemoveStudentAsync(string studentId, string classId);
         Task<ApiResponse<bool>> DeleteClassAsync(string classId);
         Task<ApiResponse<List<ClassScheduleViewModel>>> GetClassSchedulesByClassIdAsync(string classId);
         Task<ApiResponse<List<InstructorViewModel>>> GetInstructorsByAgencyAsync();
-        Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync();
+        Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync(DateTime startTime, DateTime endTime);
 
     }
 }

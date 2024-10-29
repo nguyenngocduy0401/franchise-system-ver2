@@ -60,7 +60,7 @@ namespace FranchiseProject.API.Controllers
         [SwaggerOperation(Summary = "Lấy thông tin chi tiết lớp học {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpGet("{id}")]
-        public async Task<ApiResponse<Pagination<ClassStudentViewModel>>> GetClassDetailAsync(string id)
+        public async Task<ApiResponse<ClassStudentViewModel>> GetClassDetailAsync(string id)
         {
             return await _classService.GetClassDetailAsync(id);
         }

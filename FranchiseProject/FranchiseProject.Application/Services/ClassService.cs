@@ -343,16 +343,16 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<Pagination<ClassStudentViewModel>>> GetClassDetailAsync(string id)
+        public async Task<ApiResponse<ClassStudentViewModel>> GetClassDetailAsync(string id)
         {
-            var response = new ApiResponse<Pagination<ClassStudentViewModel>>();
+            var response = new ApiResponse<ClassStudentViewModel>();
             try
             {
                 var classId = Guid.Parse(id);
                 var classEntity = await _unitOfWork.ClassRepository.GetExistByIdAsync(classId);
                 if (classEntity == null)
                 {
-                    return ResponseHandler.Failure<Pagination<ClassStudentViewModel>>("Không tìm thấy lớp học!");
+                    return ResponseHandler.Failure<ClassStudentViewModel>("Không tìm thấy lớp học!");
                 }
 
                 var classRooms = await _unitOfWork.ClassRoomRepository.GetAllAsync(cr => cr.ClassId == classEntity.Id);
@@ -441,19 +441,13 @@ namespace FranchiseProject.Application.Services
                     SlotViewModels = slotViewModels.FirstOrDefault()
                 };
 
-                var pagination = new Pagination<ClassStudentViewModel>
-                {
-                    Items = new List<ClassStudentViewModel> { classDetail },
-                    TotalItemsCount = 1,
-                    PageIndex = 1,
-                    PageSize = 1
-                };
+              
 
-                response = ResponseHandler.Success(pagination, "Lấy thông tin lớp học thành công!");
+                response = ResponseHandler.Success(classDetail, "Lấy thông tin lớp học thành công!");
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<Pagination<ClassStudentViewModel>>(ex.Message);
+                response = ResponseHandler.Failure<ClassStudentViewModel>(ex.Message);
             }
             return response;
         }
@@ -672,13 +666,13 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync()
+        public async Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync(DateTime startTime, DateTime endTime)
         {
             var response = new ApiResponse<List<StudentScheduleViewModel>>();
             try
             {
                 var studentId = _claimsService.GetCurrentUserId.ToString();
-                
+
                 var classRooms = await _unitOfWork.ClassRoomRepository.GetAllAsync(cr => cr.UserId == studentId);
 
                 if (!classRooms.Any())
@@ -688,13 +682,20 @@ namespace FranchiseProject.Application.Services
 
                 var classIds = classRooms.Select(cr => cr.ClassId).Distinct().ToList();
                 var activeClassIds = new List<Guid>();
+
                 foreach (var classId in classIds)
                 {
                     var check1 = await _unitOfWork.ClassRepository.GetByIdAsync(classId.Value);
-                    if (check1 != null) { activeClassIds.Add(classId.Value); }
-
+                    if (check1 != null)
+                    {
+                        activeClassIds.Add(classId.Value);
+                    }
                 }
-                var schedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs => activeClassIds.Contains(cs.ClassId.Value));
+
+                
+                var schedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs =>
+                    activeClassIds.Contains(cs.ClassId.Value) &&
+                    cs.Date >= startTime.Date && cs.Date <= endTime.Date);
 
                 var scheduleViewModels = new List<StudentScheduleViewModel>();
 
@@ -709,7 +710,7 @@ namespace FranchiseProject.Application.Services
                         ScheduleId = schedule.Id,
                         ClassId = schedule.ClassId.Value,
                         SlotId = schedule.SlotId ?? Guid.Empty,
-                        Room = schedule.Room, 
+                        Room = schedule.Room,
                         ClassName = schedule.Class.Name,
                         SlotName = slot?.Name,
                         Date = schedule.Date,
@@ -783,6 +784,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+
 
 
 
