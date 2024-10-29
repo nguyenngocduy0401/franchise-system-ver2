@@ -79,6 +79,6 @@ namespace FranchiseProject.API.Controllers
 
          [SwaggerOperation(Summary = "Người dùng lấy lịch học bằng by login")]
          [HttpGet("mine/class-schedules")]
-         public async Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync() => await _classService.GetStudentSchedulesAsync();
+         public async Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync(DateTime startTime, DateTime endTime) => await _classService.GetStudentSchedulesAsync(startTime,endTime);
     }
 }
