@@ -281,11 +281,13 @@ namespace FranchiseProject.Application.Services
      .Where(s => s.RegisterCourses.Any(rc =>
          rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
          rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted ||
-         rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel))
+         rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel
+         ||rc.StudentCourseStatus==StudentCourseStatusEnum.NotConsult))
      .OrderByDescending(s => s.RegisterCourses
          .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
                       rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted ||
-                      rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel)
+                      rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel||
+                      rc.StudentCourseStatus == StudentCourseStatusEnum.NotConsult)
          .Select(rc => rc.CreatDate)
          .FirstOrDefault())
      .Select(s => new StudentRegisterViewModel
@@ -297,7 +299,8 @@ namespace FranchiseProject.Application.Services
                     StudentStatus = s.RegisterCourses
                         .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
                                      rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
-                                     || rc.StudentCourseStatus==StudentCourseStatusEnum.Cancel)
+                                     || rc.StudentCourseStatus==StudentCourseStatusEnum.Cancel
+                                     || rc.StudentCourseStatus==StudentCourseStatusEnum.NotConsult)
                         .Select(rc => rc.StudentCourseStatus)
                         .FirstOrDefault(),
                     PhoneNumber = s.PhoneNumber,
@@ -305,31 +308,36 @@ namespace FranchiseProject.Application.Services
                     CourseId = s.RegisterCourses
                         .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
                                      rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
-                                      || rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel)
+                                      || rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel
+                                       || rc.StudentCourseStatus == StudentCourseStatusEnum.NotConsult)
                         .Select(rc => rc.CourseId)
                         .FirstOrDefault(),
                     DateTime = s.RegisterCourses
                         .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
                                      rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
-                                      || rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel)
+                                      || rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel
+                                       || rc.StudentCourseStatus == StudentCourseStatusEnum.NotConsult)
                         .Select(rc => rc.DateTime)
                         .FirstOrDefault(),
                     CourseName = s.RegisterCourses
                         .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
                                      rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
-                                      || rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel)
+                                      || rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel
+                                       || rc.StudentCourseStatus == StudentCourseStatusEnum.NotConsult)
                         .Select(rc => rc.Course?.Name)
                         .FirstOrDefault(),
                     CoursePrice= s.RegisterCourses
                         .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
                                      rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
-                                      || rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel)
+                                      || rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel
+                                       || rc.StudentCourseStatus == StudentCourseStatusEnum.NotConsult)
                         .Select(rc => rc.Course?.Price)
                         .FirstOrDefault(),
                     RegisterDate = s.RegisterCourses
                         .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
                                      rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
-                                      || rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel)
+                                      || rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel
+                                       || rc.StudentCourseStatus == StudentCourseStatusEnum.NotConsult)
                         .Select(rc => rc.CreatDate)
                         .FirstOrDefault().ToString(),
 

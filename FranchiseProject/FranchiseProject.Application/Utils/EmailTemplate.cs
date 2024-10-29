@@ -114,5 +114,8 @@ namespace FranchiseProject.Application.Utils
             };
         }
         #endregion
+        #region Assignment
+
+        #endregion
     }
 }

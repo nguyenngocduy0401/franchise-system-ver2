@@ -1,21 +1,26 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
+using FranchiseProject.Application.Hubs;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.Utils;
 using FranchiseProject.Application.ViewModels.AssignmentViewModels;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace FranchiseProject.Application.Services
 {
@@ -27,7 +32,9 @@ namespace FranchiseProject.Application.Services
         private readonly IValidator<CreateAssignmentViewModel> _validator;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
-        public AssignmentService( IMapper mapper, IUnitOfWork unitOfWork, IClaimsService claimsService, IValidator<CreateAssignmentViewModel> validator, UserManager<User> userManager, RoleManager<Role> roleManager)
+        private readonly IEmailService _emailService;
+        private readonly IHubContext<NotificationHub> _hubContext;
+        public AssignmentService(IEmailService emailService,IHubContext<NotificationHub> hubContext ,IMapper mapper, IUnitOfWork unitOfWork, IClaimsService claimsService, IValidator<CreateAssignmentViewModel> validator, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -35,6 +42,8 @@ namespace FranchiseProject.Application.Services
             _validator = validator;
             _roleManager = roleManager;
             _userManager = userManager;
+            _hubContext = hubContext;
+            _emailService = emailService;
          
         }
         public async Task<ApiResponse<bool>> CreateAssignmentAsync(CreateAssignmentViewModel assignment)
@@ -50,11 +59,17 @@ namespace FranchiseProject.Application.Services
                 }
                 var ass = _mapper.Map<Assignment>(assignment);
                 await _unitOfWork.AssignmentRepository.AddAsync(ass);
-                var studentIds = _unitOfWork.ClassRepository.GetStudentsByClassIdAsync(Guid.Parse(assignment.ClassId));
+                var students = await _unitOfWork.ClassRepository.GetStudentsByClassIdAsync(Guid.Parse(assignment.ClassId));
+                foreach (var student in students)
+                {
+                   
+                    await _hubContext.Clients.User(student.Id.ToString())
+                        .SendAsync("ReceivedNotification", $"Bạn có bài Tập mới bắt đầu lúc {assignment.StartTime.ToString()}.");
+                }
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
 
-                response = ResponseHandler.Success(true, "Tạo slot học thành công!");
+                response = ResponseHandler.Success(true, "Tạo bài tập thành công!");
             }
             catch (Exception ex)
             {
