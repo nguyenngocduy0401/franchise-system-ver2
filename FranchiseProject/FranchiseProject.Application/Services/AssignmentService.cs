@@ -50,6 +50,7 @@ namespace FranchiseProject.Application.Services
                 }
                 var ass = _mapper.Map<Assignment>(assignment);
                 await _unitOfWork.AssignmentRepository.AddAsync(ass);
+                var studentIds = _unitOfWork.ClassRepository.GetStudentsByClassIdAsync(Guid.Parse(assignment.ClassId));
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
 
