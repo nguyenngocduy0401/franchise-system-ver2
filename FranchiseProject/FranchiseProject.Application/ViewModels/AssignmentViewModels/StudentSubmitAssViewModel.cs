@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Domain.Enums
+namespace FranchiseProject.Application.ViewModels.AssignmentViewModels
 {
-    public enum ClassRoomStatusEnum
+    public class StudentSubmitAssViewModel
     {
-        Active=0, InActive=1,
     }
 }
