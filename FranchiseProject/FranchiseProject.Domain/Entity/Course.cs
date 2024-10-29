@@ -27,7 +27,6 @@ namespace FranchiseProject.Domain.Entity
         public virtual ICollection<RegisterCourse>? RegisterCourses { get; set; }
         public virtual ICollection<Session>? Sessions {get; set;}
         public virtual ICollection<Chapter>? Chapters {get; set;}
-    //    public virtual ICollection<StudentCourse>? StudentCourses { get; set; }
         public virtual ICollection<Report>? Reports {get; set;}
         public virtual ICollection<Class>? Classes {get; set;}
         public virtual ICollection<Assessment>? Assessments {get; set;}

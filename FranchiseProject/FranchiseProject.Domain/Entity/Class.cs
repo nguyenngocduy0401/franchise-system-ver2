@@ -19,7 +19,7 @@ namespace FranchiseProject.Domain.Entity
         public Guid? AgencyId {  get; set; }
         [ForeignKey("AgencyId")]
         public Agency? Agency { get; set; }
-
+        public string? DayOfWeek {  get; set; }
         public ClassStatusEnum? Status { get; set; }
         public virtual ICollection<ClassRoom>? ClassRooms { get; set; }
         public virtual ICollection<Assignment>? Assignments { get; set; }

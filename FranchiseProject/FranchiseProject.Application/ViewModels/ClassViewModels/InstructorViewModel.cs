@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.ViewModels.ClassViewModels
 {
-    public  class AddStudentViewModel
+    public  class InstructorViewModel
     {
-       
-        public List<string> StudentId { get; set; }
+        public string? Id {  get; set; }
+        public string? UserName {  get; set; }
     }
 }

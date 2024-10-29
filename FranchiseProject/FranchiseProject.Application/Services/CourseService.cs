@@ -1,13 +1,21 @@
 ﻿using AutoMapper;
+using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.ViewModels.AssessmentViewModels;
+using FranchiseProject.Application.ViewModels.ChapterViewModels;
+using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
 using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
+using FranchiseProject.Application.ViewModels.SessionViewModels;
+using FranchiseProject.Application.ViewModels.SyllabusViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
@@ -23,9 +31,17 @@ namespace FranchiseProject.Application.Services
         private readonly RoleManager<Role> _roleManager;
         private readonly IValidator<CreateCourseModel> _createCourseValidator;
         private readonly IValidator<UpdateCourseModel> _updateCourseValidator;
+        private readonly IValidator<CreateSyllabusModel> _createSyllabusValidator;
+        private readonly IValidator<List<CreateChapterModel>> _createChapterValidator;
+        private readonly IValidator<List<CreateSessionArrangeModel>> _createSessionArrangeValidator;
+        private readonly IValidator<List<CreateAssessmentArrangeModel>> _createAssessmentArrangeValidator;
+        private readonly IValidator<List<CreateCourseMaterialArrangeModel>> _createCourseMaterialArrangeValidator;
         public CourseService(IUnitOfWork unitOfWork, IMapper mapper,
             IValidator<UpdateCourseModel> updateCourseValidator, IValidator<CreateCourseModel> createCourseValidator,
-            IClaimsService claimsService, UserManager<User> userManager, RoleManager<Role> roleManager)
+            IClaimsService claimsService, UserManager<User> userManager, RoleManager<Role> roleManager,
+            IValidator<CreateSyllabusModel> createSyllabusValidator, IValidator<List<CreateChapterModel>> createChapterValidator,
+            IValidator<List<CreateSessionArrangeModel>> createSessionArrangeValidator, IValidator<List<CreateAssessmentArrangeModel>> createAssessmentArrangeValidator,
+            IValidator<List<CreateCourseMaterialArrangeModel>> createCourseMaterialArrangeModel)
         {
             _createCourseValidator = createCourseValidator;
             _mapper = mapper;
@@ -34,6 +50,11 @@ namespace FranchiseProject.Application.Services
             _claimsService = claimsService;
             _userManager = userManager;
             _roleManager = roleManager;
+            _createSyllabusValidator = createSyllabusValidator;
+            _createChapterValidator = createChapterValidator;
+            _createSessionArrangeValidator = createSessionArrangeValidator;
+            _createAssessmentArrangeValidator = createAssessmentArrangeValidator;
+            _createCourseMaterialArrangeValidator = createCourseMaterialArrangeModel;
         }
         public async Task<ApiResponse<CourseDetailViewModel>> CreateCourseVersionAsync(Guid courseId)
         {
@@ -113,23 +134,7 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<ApiResponse<IEnumerable<CourseViewModel>>> GetAllCoursesAvailableAsync()
-        {
-			var response = new ApiResponse<IEnumerable<CourseViewModel>>();
-			try
-			{
-				var courses = await _unitOfWork.CourseRepository.FindAsync(x => x.Status == CourseStatusEnum.AvailableForFranchise);
-				var courseViewModel = _mapper.Map<IEnumerable<CourseViewModel>>(courses);
-				if (courseViewModel.IsNullOrEmpty()) return ResponseHandler.Success(courseViewModel, "Không có khóa học nào khả dụng!");
-				response = ResponseHandler.Success(courseViewModel, "Lấy tất cả khóa học khả dụng thành công!");
-			}
-			catch (Exception ex)
-			{
-				response = ResponseHandler.Failure<IEnumerable<CourseViewModel>>(ex.Message);
-			}
-			return response;
-		}
-
+        
         public async Task<ApiResponse<CourseDetailViewModel>> GetCourseByIdAsync(Guid courseId)
         {
             var response = new ApiResponse<CourseDetailViewModel>();
@@ -328,5 +333,310 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-    }
+
+        public async Task<ApiResponse<bool>> CreateCouresByFileAsync(IFormFile file)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                if (file == null || file.Length == 0) throw new Exception("File is empty.");
+                using (var stream = new MemoryStream())
+                {
+                    var course = new Course();
+                    await file.CopyToAsync(stream);
+                    stream.Position = 0;
+
+                    using (var workbook = new XLWorkbook(stream))
+                    {
+                        course = await ExtractCourseFromWorksheetAsync(workbook.Worksheets.First(), course);
+                        course = await ExtractSyllabusFromWorksheetAsync(workbook.Worksheets.Skip(1).First(), course);
+                        course = await ExtractChapterFromWorksheetAsync(workbook.Worksheets.Skip(2).First(), course);
+                        course = await ExtractSessionFromWorksheetAsync(workbook.Worksheets.Skip(3).First(), course);
+                        course = await ExtractAssessmentFromWorksheetAsync(workbook.Worksheets.Skip(4).First(), course);
+                        course = await ExtractMaterialFromWorksheetAsync(workbook.Worksheets.Skip(5).First(), course);
+                        course = _mapper.Map<Course>(course);
+                        await _unitOfWork.CourseRepository.AddAsync(course);
+                         
+                        var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                        if (!isSuccess) throw new Exception("Create failed!");
+                    }
+                }
+
+                response = ResponseHandler.Success(true);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
+        private async Task<Course> ExtractCourseFromWorksheetAsync(IXLWorksheet worksheet, Course course)
+        {
+            var rows = worksheet.RangeUsed().RowsUsed();
+            var headerRow = rows.First();
+            var courseModel = new CreateCourseModel();
+            var categoryName = "";
+            foreach (var row in rows.Skip(1))
+            {
+                foreach (var cell in row.Cells())
+                {
+                    var columnIndex = cell.Address.ColumnNumber - 1;
+
+                    switch (columnIndex)
+                    {
+                        case 0:
+                            courseModel.Name = cell.Value.ToString();
+                            break;
+                        case 1:
+                            courseModel.Description = cell.Value.ToString();
+                            break;
+                        case 2:
+                            courseModel.URLImage = cell.Value.ToString();
+                            break;
+                        case 3:
+                            courseModel.NumberOfLession = (int)cell.Value;
+                            break;
+                        case 4:
+                            courseModel.Price = (int)cell.Value;
+                            break;
+                        case 5:
+                            courseModel.Code = cell.Value.ToString();
+                            break;
+                        case 6:
+                            categoryName = cell.Value.ToString();
+                            break;
+                    }
+                }
+            }
+            ValidationResult validationResult = await _createCourseValidator.ValidateAsync(courseModel);
+            if (!validationResult.IsValid) throw new Exception(ValidatorHandler.HandleValidation<bool>(validationResult).Message);
+            if (!categoryName.IsNullOrEmpty()) 
+            { 
+                var category = (await _unitOfWork.CourseCategoryRepository.FindAsync(e => e.Name.Contains(categoryName))).FirstOrDefault();
+                if(category != null) courseModel.CourseCategoryId = category.Id;
+            }
+            course = _mapper.Map<Course>(courseModel);
+
+            return course;
+        }
+        private async Task<Course> ExtractSyllabusFromWorksheetAsync(IXLWorksheet worksheet, Course course)
+        {
+            var rows = worksheet.RangeUsed().RowsUsed();
+            var headerRow = rows.First();
+            var syllabusModel = new CreateSyllabusModel();
+            foreach (var row in rows.Skip(1))
+            {
+                foreach (var cell in row.Cells())
+                {
+                    var columnIndex = cell.Address.ColumnNumber - 1;
+
+                    switch (columnIndex)
+                    {
+                        case 0:
+                            syllabusModel.Description = cell.Value.ToString();
+                            break;
+                        case 1:
+                            syllabusModel.StudentTask = cell.Value.ToString();
+                            break;
+                        case 2:
+                            syllabusModel.TimeAllocation = cell.Value.ToString();
+                            break;
+                        case 3:
+                            syllabusModel.ToolsRequire = cell.Value.ToString();
+                            break;
+                        case 4:
+                            if (double.TryParse(cell.Value.ToString(), out double scaleValue))
+                            {
+                                syllabusModel.Scale = scaleValue;
+                            }
+                            break;
+                        case 5:
+                            if (double.TryParse(cell.Value.ToString(), out double minAvgMarkValue))
+                            {
+                                syllabusModel.MinAvgMarkToPass = minAvgMarkValue;
+                            }
+                            break;
+                    }
+                }
+            }
+            ValidationResult validationResult = await _createSyllabusValidator.ValidateAsync(syllabusModel);
+            if (!validationResult.IsValid) throw new Exception(ValidatorHandler.HandleValidation<bool>(validationResult).Message);
+            var syllabus = _mapper.Map<Syllabus>(syllabusModel);
+            course.Syllabus = syllabus;
+            return course;
+        }
+        private async Task<Course> ExtractChapterFromWorksheetAsync(IXLWorksheet worksheet, Course course)
+        {
+            var rows = worksheet.RangeUsed().RowsUsed();
+            var headerRow = rows.First();
+            var chapterModels = new List<CreateChapterModel>();
+            foreach (var row in rows.Skip(1))
+            {
+                var chapterModel = new CreateChapterModel();
+                foreach (var cell in row.Cells())
+                {
+                    var columnIndex = cell.Address.ColumnNumber - 1;
+                    switch (columnIndex)
+                    {
+                        case 0:
+                            chapterModel.Number = (int)cell.Value;
+                            break;
+                        case 1:
+                            chapterModel.Topic = cell.Value.ToString();
+                            break;
+                        case 2:
+                            chapterModel.Description = cell.Value.ToString();
+                            break;
+                    }
+                }
+                chapterModels.Add(chapterModel);
+            }
+            ValidationResult validationResult = await _createChapterValidator.ValidateAsync(chapterModels);
+            if (!validationResult.IsValid) throw new Exception(ValidatorHandler.HandleValidation<bool>(validationResult).Message);
+            var chapters = _mapper.Map<List<Chapter>>(chapterModels);
+            course.Chapters = chapters;
+            return course;
+        }
+        private async Task<Course> ExtractSessionFromWorksheetAsync(IXLWorksheet worksheet, Course course)
+        {
+            var rows = worksheet.RangeUsed().RowsUsed();
+            var headerRow = rows.First();
+            var sessionModels = new List<CreateSessionArrangeModel>();
+            foreach (var row in rows.Skip(1))
+            {
+                var session = new CreateSessionArrangeModel();
+                foreach (var cell in row.Cells())
+                {
+                    var columnIndex = cell.Address.ColumnNumber - 1;
+                    switch (columnIndex)
+                    {
+                        case 0:
+                            session.Number = (int)cell.Value;
+                            break;
+                        case 1:
+                            session.Topic = cell.Value.ToString();
+                            break;
+                        case 2:
+                            session.Chapter = cell.Value.ToString();
+                            break;
+                        case 3:
+                            session.Description = cell.Value.ToString();
+                            break;
+                    }
+                }
+                sessionModels.Add(session);
+            }
+            ValidationResult validationResult = await _createSessionArrangeValidator.ValidateAsync(sessionModels);
+            if (!validationResult.IsValid) throw new Exception(ValidatorHandler.HandleValidation<bool>(validationResult).Message);
+            var sessions = _mapper.Map<List<Session>>(sessionModels);
+            course.Sessions = sessions;
+            return course;
+        }
+        private async Task<Course> ExtractAssessmentFromWorksheetAsync(IXLWorksheet worksheet, Course course)
+        {
+            var rows = worksheet.RangeUsed().RowsUsed();
+            var headerRow = rows.First();
+            var assessmentModels = new List<CreateAssessmentArrangeModel>();
+            foreach (var row in rows.Skip(1))
+            {
+                var assessment = new CreateAssessmentArrangeModel();
+                foreach (var cell in row.Cells())
+                {
+                    var columnIndex = cell.Address.ColumnNumber - 1;
+                    switch (columnIndex)
+                    {
+                        case 0:
+                            assessment.Number = (int)cell.Value;
+                            break;
+                        case 1:
+                            assessment.Type = cell.Value.ToString();
+                            break;
+                        case 2:
+                            assessment.Content = cell.Value.ToString();
+                            break;
+                        case 3:
+                            assessment.Quantity = (int)cell.Value;
+                            break;
+                        case 4:
+                            if (double.TryParse(cell.Value.ToString(), out double weightValue))
+                            {
+                                assessment.Weight = weightValue;
+                            }
+                            break;
+                        case 5:
+                            if (double.TryParse(cell.Value.ToString(), out double completionCriteriaValue))
+                            {
+                                assessment.CompletionCriteria = completionCriteriaValue;
+                            }
+                            break;
+                        case 6:
+                            if (int.TryParse(cell.Value.ToString(), out int enumValue) &&
+                                Enum.IsDefined(typeof(AssessmentMethodEnum), enumValue))
+                            {
+                                assessment.Method = (AssessmentMethodEnum)enumValue;
+                            }
+                            break;
+                        case 7:
+                            assessment.Duration = cell.Value.ToString();
+                            break;
+                        case 8:
+                            assessment.QuestionType = cell.Value.ToString();
+                            break;
+                    }
+                }
+                assessmentModels.Add(assessment);
+            }
+            ValidationResult validationResult = await _createAssessmentArrangeValidator.ValidateAsync(assessmentModels);
+            if (!validationResult.IsValid) throw new Exception(ValidatorHandler.HandleValidation<bool>(validationResult).Message);
+            var assessments = _mapper.Map<List<Assessment>>(assessmentModels);
+            course.Assessments = assessments;
+            return course;
+        }
+        private async Task<Course> ExtractMaterialFromWorksheetAsync(IXLWorksheet worksheet, Course course)
+        {
+            var rows = worksheet.RangeUsed().RowsUsed();
+            var headerRow = rows.First();
+            var courseMaterialModels = new List<CreateCourseMaterialArrangeModel>();
+            foreach (var row in rows.Skip(1))
+            {
+                var courseMaterial = new CreateCourseMaterialArrangeModel();
+                foreach (var cell in row.Cells())
+                {
+                    var columnIndex = cell.Address.ColumnNumber - 1;
+                    switch (columnIndex)
+                    {
+                        case 0:
+                            courseMaterial.URL = cell.Value.ToString();
+                            break;
+                        case 1:
+                            courseMaterial.Description = cell.Value.ToString();
+                            break;
+                    }
+                }
+                courseMaterialModels.Add(courseMaterial);
+            }
+            ValidationResult validationResult = await _createCourseMaterialArrangeValidator.ValidateAsync(courseMaterialModels);
+            if (!validationResult.IsValid) throw new Exception(ValidatorHandler.HandleValidation<bool>(validationResult).Message);
+            var courseMaterials = _mapper.Map<List<CourseMaterial>>(courseMaterialModels);
+            course.CourseMaterials = courseMaterials;
+            return course;
+        }
+
+		public async Task<ApiResponse<IEnumerable<CourseViewModel>>> GetAllCoursesAvailableAsync()
+		{
+			var response = new ApiResponse<IEnumerable<CourseViewModel>>();
+			try
+			{
+				var courses = await _unitOfWork.CourseRepository.FindAsync(x => x.Status == CourseStatusEnum.AvailableForFranchise);
+				var courseViewModel = _mapper.Map<IEnumerable<CourseViewModel>>(courses);
+				if (courseViewModel.IsNullOrEmpty()) return ResponseHandler.Success(courseViewModel, "Không có khóa học nào khả dụng!");
+				response = ResponseHandler.Success(courseViewModel, "Lấy tất cả khóa học khả dụng thành công!");
+			}
+			catch (Exception ex)
+			{
+				response = ResponseHandler.Failure<IEnumerable<CourseViewModel>>(ex.Message);
+			}
+			return response;
+		}
+	}
 }

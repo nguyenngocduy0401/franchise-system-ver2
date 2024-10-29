@@ -1,7 +1,9 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
+using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
+using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -20,12 +22,11 @@ namespace FranchiseProject.Application.Interfaces
          Task<ApiResponse<ClassViewModel>> GetClassByIdAsync(string id);
         Task<ApiResponse<bool>> UpdateClassStatusAsync(ClassStatusEnum status,string id);
          Task<ApiResponse<Pagination<ClassStudentViewModel>>> GetClassDetailAsync(string id);
-        Task<ApiResponse<bool>>AddStudentAsync(AddStudentViewModel model);
-         Task<ApiResponse<bool>> RemoveStudentAsync(string studentId, Guid classId);
+        Task<ApiResponse<bool>> AddStudentAsync(string ClassId, AddStudentViewModel model);
+         Task<ApiResponse<bool>> RemoveStudentAsync(string studentId, string classId);
         Task<ApiResponse<bool>> DeleteClassAsync(string classId);
-        /* Task<ApiResponse<ClassViewModel>>GetClassByCourseId(string courseId);
+        Task<ApiResponse<List<ClassScheduleViewModel>>> GetClassSchedulesByClassIdAsync(string classId);
+        Task<ApiResponse<List<InstructorViewModel>>> GetInstructorsByAgencyAsync();
 
-          Task<ApiResponse<bool>> DeleteClassAsync(string id);
-          Task<ApiResponse<Pagination<ClassViewModel>>> GetClassesWithoutScheduleAsync(int pageIndex, int pageSize);*/
     }
 }

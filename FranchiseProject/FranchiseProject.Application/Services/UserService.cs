@@ -593,5 +593,6 @@ namespace FranchiseProject.Application.Services
 
             return new UserLoginModel { Password = password, UserName = username };
         }
+        
     }
 }

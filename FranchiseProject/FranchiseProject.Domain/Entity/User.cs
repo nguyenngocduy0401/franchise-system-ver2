@@ -24,7 +24,7 @@ namespace FranchiseProject.Domain.Entity
         [ForeignKey("AgencyId")]
         public Agency? Agency { get; set; }
         public UserStatusEnum? Status { get; set; }
-        public StudentStatusEnum? StudentStatus { get; set; }
+        public StudentStatusEnum? StudentStatus { get; set; }           
         public StudentPaymentStatusEnum? StudentPaymentStatus { get; set; }
         public virtual ICollection<Score>? Scores { get; set; } 
         public virtual ICollection<Report>? Reports { get; set; }

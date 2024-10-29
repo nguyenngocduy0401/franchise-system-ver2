@@ -47,5 +47,6 @@ namespace FranchiseProject.Infrastructures.Repositories
 
             return await query.CountAsync();
         }
+      
     }
 }

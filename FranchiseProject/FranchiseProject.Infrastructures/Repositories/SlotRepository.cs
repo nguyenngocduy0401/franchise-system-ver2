@@ -30,5 +30,9 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.Slots.FirstOrDefaultAsync(filter);
         }
+        public async Task<IEnumerable<ClassSchedule>> GetAllAsync1(Expression<Func<ClassSchedule, bool>> predicate)
+        {
+            return await _dbContext.ClassSchedules.Where(predicate).ToListAsync();
+        }
     }
 }

@@ -15,7 +15,7 @@ namespace FranchiseProject.Domain.Entity
         public string? Content { get; set; }
         public int Quantity { get; set; }
         public double? Weight { get; set; }
-        public string? CompletionCriteria { get; set; }
+        public double? CompletionCriteria { get; set; }
         public AssessmentMethodEnum Method { get; set; }
         public string? Duration { get; set; }
         public string? QuestionType { get; set; }
