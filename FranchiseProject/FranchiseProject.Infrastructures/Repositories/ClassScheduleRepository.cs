@@ -37,5 +37,24 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.Set<ClassSchedule>().Where(predicate).ToListAsync();
         }
+        public async Task<IEnumerable<ClassSchedule>> GetAllAsync1(Expression<Func<ClassSchedule, bool>> filter = null, string includeProperties = "")
+        {
+            IQueryable<ClassSchedule> query = _dbContext.ClassSchedules;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var property in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(property.Trim());
+                }
+            }
+
+            return await query.ToListAsync();
+        }
     }
 }

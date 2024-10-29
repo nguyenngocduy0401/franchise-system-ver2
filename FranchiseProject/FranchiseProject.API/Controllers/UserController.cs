@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
+using FranchiseProject.Application.ViewModels.StudentViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -76,8 +77,8 @@ namespace FranchiseProject.API.Controllers
         public async Task<ApiResponse<bool>> StudentExistRegisterCourse(string courseId)
            => await _registerCourseService.StudentExistRegisterCourse(courseId);
 
-        /* [SwaggerOperation(Summary = "Người dùng lấy lịch học bằng by login")]
-         [HttpGet("mine/class-schedules/{id}")]
-         public async Task<ApiResponse<Pagination<StudentClassScheduleViewModel>>> GetClassSchedulesForCurrentUserByTermAsync(string id, int pageIndex, int pageSize) => await _classService.GetClassSchedulesForCurrentUserByTermAsync(id, pageIndex, pageSize);*/
+         [SwaggerOperation(Summary = "Người dùng lấy lịch học bằng by login")]
+         [HttpGet("mine/class-schedules")]
+         public async Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync() => await _classService.GetStudentSchedulesAsync();
     }
 }

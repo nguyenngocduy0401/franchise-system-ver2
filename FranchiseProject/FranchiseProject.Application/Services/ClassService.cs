@@ -10,6 +10,7 @@ using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
+using FranchiseProject.Application.ViewModels.StudentViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using iText.Kernel.Geom;
@@ -617,6 +618,61 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync()
+        {
+            var response = new ApiResponse<List<StudentScheduleViewModel>>();
+            try
+            {
+                var studentId = _claimsService.GetCurrentUserId.ToString();
+                
+                var classRooms = await _unitOfWork.ClassRoomRepository.GetAllAsync(cr => cr.UserId == studentId);
+
+                if (!classRooms.Any())
+                {
+                    return ResponseHandler.Failure<List<StudentScheduleViewModel>>("Không tìm thấy lịch học cho sinh viên này.");
+                }
+
+                var classIds = classRooms.Select(cr => cr.ClassId).Distinct().ToList();
+                var activeClassIds = new List<Guid>();
+                foreach (var classId in classIds)
+                {
+                    var check1 = await _unitOfWork.ClassRepository.GetByIdAsync(classId.Value);
+                    if (check1 != null) { activeClassIds.Add(classId.Value); }
+
+                }
+                var schedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs => activeClassIds.Contains(cs.ClassId.Value));
+
+                var scheduleViewModels = new List<StudentScheduleViewModel>();
+
+                foreach (var schedule in schedules)
+                {
+                    var slot = schedule.SlotId.HasValue
+                        ? await _unitOfWork.SlotRepository.GetByIdAsync(schedule.SlotId.Value)
+                        : null;
+
+                    scheduleViewModels.Add(new StudentScheduleViewModel
+                    {
+                        ScheduleId = schedule.Id,
+                        ClassId = schedule.ClassId.Value,
+                        SlotId = schedule.SlotId ?? Guid.Empty,
+                        Room = schedule.Room, 
+                        ClassName = schedule.Class.Name,
+                        SlotName = slot?.Name,
+                        Date = schedule.Date,
+                        StartTime = slot?.StartTime ?? TimeSpan.Zero,
+                        EndTime = slot?.EndTime ?? TimeSpan.Zero
+                    });
+                }
+
+                response = ResponseHandler.Success(scheduleViewModels, "Lấy danh sách lịch học thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<List<StudentScheduleViewModel>>(ex.Message);
+            }
+            return response;
+        }
+
 
 
     }

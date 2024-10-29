@@ -3,6 +3,7 @@ using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
+using FranchiseProject.Application.ViewModels.StudentViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using System;
@@ -27,6 +28,7 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> DeleteClassAsync(string classId);
         Task<ApiResponse<List<ClassScheduleViewModel>>> GetClassSchedulesByClassIdAsync(string classId);
         Task<ApiResponse<List<InstructorViewModel>>> GetInstructorsByAgencyAsync();
+        Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync();
 
     }
 }

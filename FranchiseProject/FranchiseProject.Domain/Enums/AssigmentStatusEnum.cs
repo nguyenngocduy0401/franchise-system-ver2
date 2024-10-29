@@ -8,5 +8,7 @@ namespace FranchiseProject.Domain.Enums
 {
     public enum AssigmentStatusEnum
     {
+
+        Open=0, Close=1
     }
 }

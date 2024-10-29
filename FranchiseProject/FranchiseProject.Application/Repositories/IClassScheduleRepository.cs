@@ -13,6 +13,6 @@ namespace FranchiseProject.Application.Repositories
         Task<ClassSchedule?> GetExistingScheduleAsync(DateTime date, string room, Guid slotId);
         Task<List<ClassSchedule>> GetAllAsync1(Expression<Func<ClassSchedule, bool>> predicate);
 
-
+        Task<IEnumerable<ClassSchedule>> GetAllAsync1(Expression<Func<ClassSchedule, bool>> filter = null, string includeProperties = "");
     }
 }
