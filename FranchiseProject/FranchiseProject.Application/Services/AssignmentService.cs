@@ -71,11 +71,11 @@ namespace FranchiseProject.Application.Services
 
                 }
                 var ass = _mapper.Map<Assignment>(assignment);
-                await _unitOfWork.AssignmentRepository.Update(ass);
+                _unitOfWork.AssignmentRepository.Update(ass);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Create failed!");
+                if (!isSuccess) throw new Exception("Update failed!");
 
-                response = ResponseHandler.Success(true, "Tạo slot học thành công!");
+                response = ResponseHandler.Success(true, "cập nhật bài tập  thành công!");
             }
             catch (Exception ex)
             {
