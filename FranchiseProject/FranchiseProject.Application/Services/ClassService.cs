@@ -47,9 +47,9 @@ namespace FranchiseProject.Application.Services
             _validatorUpdate = validatorUpdate;
         }
 
-        public async Task<ApiResponse<bool>> CreateClassAsync(CreateClassViewModel model)
+        public async Task<ApiResponse<Guid?>> CreateClassAsync(CreateClassViewModel model)
         {
-            var response = new ApiResponse<bool>();
+            var response = new ApiResponse<Guid?>();
             try
             {
                 var userCurrentId = _claimsService.GetCurrentUserId;
@@ -58,29 +58,29 @@ namespace FranchiseProject.Application.Services
                 FluentValidation.Results.ValidationResult validationResult = await _validator.ValidateAsync(model);
                 if (!validationResult.IsValid)
                 {
-                    return ValidatorHandler.HandleValidation<bool>(validationResult);
+                    return ValidatorHandler.HandleValidation<Guid?>(validationResult);
                 }
                 if (!string.IsNullOrEmpty(model.InstructorId))
                 {
                     var instructor = await _userManager.FindByIdAsync(model.InstructorId);
                     if (instructor == null || !await _userManager.IsInRoleAsync(instructor, "Instructor"))
                     {
-                        return ResponseHandler.Failure<bool>("Người hướng dẫn không hợp lệ hoặc không có vai trò là 'Instructor'!");
+                        return ResponseHandler.Failure<Guid?>("Người hướng dẫn không hợp lệ hoặc không có vai trò là 'Instructor'!");
                     }
                 }
                 //Check List Học sinh có có đủ điều kiện không ==>Student đó phải có Status là waitlisted 
                 if (model.StudentId == null || model.StudentId.Count == 0)
                 {
-                    return ResponseHandler.Failure<bool>("Danh sách học sinh không hợp lệ!");
+                    return ResponseHandler.Failure<Guid?>("Danh sách học sinh không hợp lệ!");
                 }
                 var classWithSameName = await _unitOfWork.ClassRepository.GetFirstOrDefaultAsync(c => c.Name == model.Name && !c.IsDeleted);
                 if (classWithSameName != null)
                 {
-                    return ResponseHandler.Failure<bool>($"Tên lớp '{model.Name}' đã tồn tại!");
+                    return ResponseHandler.Failure<Guid?>($"Tên lớp '{model.Name}' đã tồn tại!");
                 }
                 if (model.StudentId.Count > model.Capacity)
                 {
-                    return ResponseHandler.Failure<bool>($"Số lượng học sinh vượt quá sức chứa lớp học! Sức chứa tối đa: {model.Capacity}.");
+                    return ResponseHandler.Failure<Guid?>($"Số lượng học sinh vượt quá sức chứa lớp học! Sức chứa tối đa: {model.Capacity}.");
                 }
                 var invalidCourseRegistrations = await _unitOfWork.RegisterCourseRepository.GetAllAsync(rc =>
                     model.StudentId.Contains(rc.UserId) && rc.CourseId != Guid.Parse(model.CourseId) && rc.StudentCourseStatus != StudentCourseStatusEnum.Waitlisted);
@@ -94,7 +94,7 @@ namespace FranchiseProject.Application.Services
 
                     var invalidStudents = await _unitOfWork.ClassRoomRepository.GetInvalidStudentsAsync(model.StudentId);
                     var invalidStudentNames = string.Join(", ", invalidStudents);
-                    return ResponseHandler.Failure<bool>($"Không có học sinh nào có trạng thái 'waitlisted'! Các học sinh không hợp lệ: {invalidStudentNames}");
+                    return ResponseHandler.Failure<Guid?>($"Không có học sinh nào có trạng thái 'waitlisted'! Các học sinh không hợp lệ: {invalidStudentNames}");
                 }
            
                 foreach (var studentId in waitlistedStudents.Keys)
@@ -151,11 +151,11 @@ namespace FranchiseProject.Application.Services
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
 
-                response = ResponseHandler.Success(true, "Tạo lớp  học thành công!");
+                response = ResponseHandler.Success((Guid?)newClass.Id, "Tạo lớp  học thành công!");
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<bool>(ex.Message);
+                response = ResponseHandler.Failure<Guid?>(ex.Message);
             }
             return response;
         }
@@ -343,16 +343,16 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<Pagination<ClassStudentViewModel>>> GetClassDetailAsync(string id)
+        public async Task<ApiResponse<ClassStudentViewModel>> GetClassDetailAsync(string id)
         {
-            var response = new ApiResponse<Pagination<ClassStudentViewModel>>();
+            var response = new ApiResponse<ClassStudentViewModel>();
             try
             {
                 var classId = Guid.Parse(id);
                 var classEntity = await _unitOfWork.ClassRepository.GetExistByIdAsync(classId);
                 if (classEntity == null)
                 {
-                    return ResponseHandler.Failure<Pagination<ClassStudentViewModel>>("Không tìm thấy lớp học!");
+                    return ResponseHandler.Failure<ClassStudentViewModel>("Không tìm thấy lớp học!");
                 }
 
                 var classRooms = await _unitOfWork.ClassRoomRepository.GetAllAsync(cr => cr.ClassId == classEntity.Id);
@@ -441,19 +441,13 @@ namespace FranchiseProject.Application.Services
                     SlotViewModels = slotViewModels.FirstOrDefault()
                 };
 
-                var pagination = new Pagination<ClassStudentViewModel>
-                {
-                    Items = new List<ClassStudentViewModel> { classDetail },
-                    TotalItemsCount = 1,
-                    PageIndex = 1,
-                    PageSize = 1
-                };
+              
 
-                response = ResponseHandler.Success(pagination, "Lấy thông tin lớp học thành công!");
+                response = ResponseHandler.Success(classDetail, "Lấy thông tin lớp học thành công!");
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<Pagination<ClassStudentViewModel>>(ex.Message);
+                response = ResponseHandler.Failure<ClassStudentViewModel>(ex.Message);
             }
             return response;
         }
@@ -672,13 +666,13 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync()
+        public async Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync(DateTime startTime, DateTime endTime)
         {
             var response = new ApiResponse<List<StudentScheduleViewModel>>();
             try
             {
                 var studentId = _claimsService.GetCurrentUserId.ToString();
-                
+
                 var classRooms = await _unitOfWork.ClassRoomRepository.GetAllAsync(cr => cr.UserId == studentId);
 
                 if (!classRooms.Any())
@@ -688,13 +682,20 @@ namespace FranchiseProject.Application.Services
 
                 var classIds = classRooms.Select(cr => cr.ClassId).Distinct().ToList();
                 var activeClassIds = new List<Guid>();
+
                 foreach (var classId in classIds)
                 {
                     var check1 = await _unitOfWork.ClassRepository.GetByIdAsync(classId.Value);
-                    if (check1 != null) { activeClassIds.Add(classId.Value); }
-
+                    if (check1 != null)
+                    {
+                        activeClassIds.Add(classId.Value);
+                    }
                 }
-                var schedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs => activeClassIds.Contains(cs.ClassId.Value));
+
+                
+                var schedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs =>
+                    activeClassIds.Contains(cs.ClassId.Value) &&
+                    cs.Date >= startTime.Date && cs.Date <= endTime.Date);
 
                 var scheduleViewModels = new List<StudentScheduleViewModel>();
 
@@ -709,7 +710,7 @@ namespace FranchiseProject.Application.Services
                         ScheduleId = schedule.Id,
                         ClassId = schedule.ClassId.Value,
                         SlotId = schedule.SlotId ?? Guid.Empty,
-                        Room = schedule.Room, 
+                        Room = schedule.Room,
                         ClassName = schedule.Class.Name,
                         SlotName = slot?.Name,
                         Date = schedule.Date,
@@ -726,6 +727,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+
 
 
 

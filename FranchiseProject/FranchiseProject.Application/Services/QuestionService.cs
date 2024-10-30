@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ClosedXML.Excel;
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
@@ -8,6 +9,7 @@ using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.Application.ViewModels.QuestionViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Pqc.Crypto.Frodo;
 using System;
@@ -36,6 +38,60 @@ namespace FranchiseProject.Application.Services
             _mapper = mapper;
             _createQuestionArrangeValidator = createQuestionArrangeValidator;
             _updateQuestionValidator = updateQuestionValidator;
+        }
+        public async Task<ApiResponse<bool>> CreateQuestionByFileAsync(Guid id, IFormFile file)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                if (file == null || file.Length == 0) throw new Exception("File is empty.");
+                var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(id);
+                if (course == null) throw new Exception("Course does not exist!");
+
+                var checkCourse = await _courseService.CheckCourseAvailableAsync(course.Id, CourseStatusEnum.Draft);
+                if (!checkCourse.Data) return checkCourse;
+
+                var chapter = (await _unitOfWork.ChapterRepository
+                    .FindAsync(e => e.CourseId == course.Id && e.IsDeleted != true))
+                    .OrderBy(e => e.Number);
+
+                using (var stream = new MemoryStream())
+                {
+                    
+
+                    var question = new Question();
+                    await file.CopyToAsync(stream);
+                    stream.Position = 0;
+                    using (var workbook = new XLWorkbook(stream))
+                    {
+                        for (var i = 0; i <= chapter.Count(); i++)
+                        {
+                            var worksheet = workbook.Worksheets.Skip(i).First();
+                            var rows = worksheet.RangeUsed().RowsUsed();
+
+                            var headerRow = rows.First();
+                            var headers = headerRow.Cells().Select(c => c.Value.ToString()).ToList();
+
+
+                            foreach (var row in rows.Skip(1))
+                            {
+                                foreach (var cell in row.Cells())
+                                {
+                                    var columnIndex = cell.Address.ColumnNumber - 1;
+
+                                   
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
         }
         public async Task<ApiResponse<bool>> UpdateQuestionByIdAsync(Guid id, UpdateQuestionModel updateQuestionModel)
         {

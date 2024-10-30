@@ -312,7 +312,7 @@ namespace FranchiseProject.Application.Services
                         (e => e.Code == course.Code && e.Status != CourseStatusEnum.Draft
                         && e.Status != CourseStatusEnum.PendingApproval))
                         .OrderByDescending(e => e.Version).FirstOrDefault();
-                    if (oldCourse != null)
+                    if (oldCourse != null && oldCourse.Id != courseId)
                     {
                         oldCourse.Status = CourseStatusEnum.Closed;
                         course.Version = oldCourse.Version + 1;
@@ -334,7 +334,7 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<ApiResponse<bool>> CreateCouresByFileAsync(IFormFile file)
+        public async Task<ApiResponse<bool>> CreateCourseByFileAsync(IFormFile file)
         {
             var response = new ApiResponse<bool>();
             try

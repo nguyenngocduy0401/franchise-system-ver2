@@ -254,93 +254,64 @@ namespace FranchiseProject.Application.Services
                 var userCurrentId = _claimsService.GetCurrentUserId;
                 var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
                 var studentRole = await _roleManager.FindByNameAsync(AppRole.Student);
+
                 if (studentRole == null)
                 {
                     return ResponseHandler.Failure<Pagination<StudentRegisterViewModel>>("Không tìm thấy vai trò sinh viên.");
                 }
+
                 var studentRoleId = studentRole.Id;
                 var currentAgencyId = userCurrent.AgencyId;
-                Expression<Func<User, bool>> filter = u =>
-                     (u.AgencyId == currentAgencyId) &&
-                     (u.UserRoles.Any(r => r.RoleId == studentRoleId)) &&
-                     (u.StudentStatus != StudentStatusEnum.Enrolled) &&
-                     (string.IsNullOrEmpty(filterStudentModel.CourseId) ||
-                      u.RegisterCourses.Any(rc => rc.CourseId.ToString() == filterStudentModel.CourseId)) &&
-                     (!filterStudentModel.Status.HasValue ||
-                      u.RegisterCourses.Any(rc => rc.StudentCourseStatus == filterStudentModel.Status));
 
+                Expression<Func<User, bool>> filter = u =>
+                    (u.AgencyId == currentAgencyId) &&
+                    (u.UserRoles.Any(r => r.RoleId == studentRoleId)) &&
+                    (u.StudentStatus != StudentStatusEnum.Enrolled) &&
+                    (string.IsNullOrEmpty(filterStudentModel.CourseId) ||
+                     u.RegisterCourses.Any(rc => rc.CourseId.ToString() == filterStudentModel.CourseId)) &&
+                    (!filterStudentModel.Status.HasValue ||
+                     u.RegisterCourses.Any(rc => rc.StudentCourseStatus == filterStudentModel.Status));
                 var students = await _unitOfWork.UserRepository.GetFilterAsync(
                     filter: filter,
-                 
                     pageIndex: filterStudentModel.PageIndex,
                     pageSize: filterStudentModel.PageSize,
-                    includeProperties: "RegisterCourses.Course" 
+                    includeProperties: "RegisterCourses.Course"
                 );
                 var studentViewModels = students.Items
-     .AsEnumerable()
-     .Where(s => s.RegisterCourses.Any(rc =>
-         rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
-         rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted ||
-         rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel))
-     .OrderByDescending(s => s.RegisterCourses
-         .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
-                      rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted ||
-                      rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel)
-         .Select(rc => rc.CreatDate)
-         .FirstOrDefault())
-     .Select(s => new StudentRegisterViewModel
-     {
-                    Id = s.Id,
-                   
-                    FullName = s.FullName,
-                /*    StatusPayment=s.StudentPaymentStatus,*/
-                    StudentStatus = s.RegisterCourses
-                        .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
-                                     rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
-                                     || rc.StudentCourseStatus==StudentCourseStatusEnum.Cancel)
-                        .Select(rc => rc.StudentCourseStatus)
-                        .FirstOrDefault(),
-                    PhoneNumber = s.PhoneNumber,
-                    Email = s.Email,
-                    CourseId = s.RegisterCourses
-                        .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
-                                     rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
-                                      || rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel)
-                        .Select(rc => rc.CourseId)
-                        .FirstOrDefault(),
-                    DateTime = s.RegisterCourses
-                        .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
-                                     rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
-                                      || rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel)
-                        .Select(rc => rc.DateTime)
-                        .FirstOrDefault(),
-                    CourseName = s.RegisterCourses
-                        .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
-                                     rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
-                                      || rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel)
-                        .Select(rc => rc.Course?.Name)
-                        .FirstOrDefault(),
-                    CoursePrice= s.RegisterCourses
-                        .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
-                                     rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
-                                      || rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel)
-                        .Select(rc => rc.Course?.Price)
-                        .FirstOrDefault(),
-                    RegisterDate = s.RegisterCourses
-                        .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
-                                     rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
-                                      || rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel)
-                        .Select(rc => rc.CreatDate)
-                        .FirstOrDefault().ToString(),
+                    .Select(s => {
+                        var firstValidRegisterCourse = s.RegisterCourses
+                            .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
+                                         rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted ||
+                                         rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel ||
+                                         rc.StudentCourseStatus == StudentCourseStatusEnum.NotConsult||
+                                          rc.StudentCourseStatus != StudentCourseStatusEnum.Enrolled)
+                            .OrderByDescending(rc => rc.CreatDate)
+                            .FirstOrDefault();
 
-                }).ToList();
+                        return new StudentRegisterViewModel
+                        {
+                            Id = s.Id,
+                            FullName = s.FullName,
+                            StudentStatus = firstValidRegisterCourse?.StudentCourseStatus,
+                            PhoneNumber = s.PhoneNumber,
+                            Email = s.Email,
+                            CourseId = firstValidRegisterCourse?.CourseId,
+                            DateTime = firstValidRegisterCourse?.DateTime,
+                            CourseName = firstValidRegisterCourse?.Course?.Name,
+                            CoursePrice = firstValidRegisterCourse?.Course?.Price,
+                            RegisterDate = firstValidRegisterCourse?.CreatDate.ToString()
+                        };
+                    })
+                    .ToList();
+
+                var totalItemsCount = students.TotalItemsCount;
 
                 var paginatedResult = new Pagination<StudentRegisterViewModel>
                 {
                     Items = studentViewModels,
-                    TotalItemsCount = studentViewModels.Count,
-                    PageIndex = students.PageIndex,
-                    PageSize = students.PageSize
+                    TotalItemsCount = totalItemsCount,
+                    PageIndex = filterStudentModel.PageIndex,
+                    PageSize = filterStudentModel.PageSize
                 };
 
                 if (!studentViewModels.Any())
@@ -354,6 +325,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+
 
         public async Task<ApiResponse<bool>> UpdateRegisterCourseDateTimeAsync(string userId, string courseId, UpdateRegisterCourseViewModel update)
         {
