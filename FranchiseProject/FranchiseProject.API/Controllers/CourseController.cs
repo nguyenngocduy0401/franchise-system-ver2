@@ -26,15 +26,17 @@ namespace FranchiseProject.API.Controllers
         private readonly IAssessmentService _assessmentService;
         private readonly ISessionService _sessionService;
         private readonly IChapterService _chapterService;
+        private readonly IQuestionService _questionService;
         public CourseController(ICourseService courseService, ICourseMaterialService materialService,
-            IAssessmentService assessmentService, ISessionService sessionService, 
-            IChapterService chapterService)
+            IAssessmentService assessmentService, ISessionService sessionService,
+            IChapterService chapterService, IQuestionService questionService)
         {
             _courseService = courseService;
             _materialService = materialService;
             _assessmentService = assessmentService;
             _sessionService = sessionService;
             _chapterService = chapterService;
+            _questionService = questionService;
         }
         [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "cập nhật trạng thái của học bằng id {Authorize = SystemInstructor, Manager}")]
@@ -43,46 +45,49 @@ namespace FranchiseProject.API.Controllers
         {
             return await _courseService.UpdateCourseStatusAsync(id, courseStatusEnum);
         }
-        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "xóa khoá học bằng id {Authorize = SystemInstructor, Manager}")]
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteCourseAsync(Guid id)
         {
             return await _courseService.DeleteCourseByIdAsync(id);
         }
-        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "dupliate khoá học bằng id {Authorize = SystemInstructor, Manager}")]
         [HttpPost("{id}/versions")]
         public async Task<ApiResponse<CourseDetailViewModel>> DuplicateCourseAsync(Guid id)
         {
             return await _courseService.CreateCourseVersionAsync(id);
         }
-        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo mới khoá học {Authorize = SystemInstructor, Manager}")]
         [HttpPost()]
         public async Task<ApiResponse<bool>> CreateCourseAsync(CreateCourseModel createCourseModel)
         {
             return await _courseService.CreateCourseAsync(createCourseModel);
         }
-        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "cập nhật khoá học {Authorize = SystemInstructor, Manager}")]
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> UpdateCourseAsync(Guid id, UpdateCourseModel updateCourseModel)
         {
             return await _courseService.UpdateCourseAsync(id, updateCourseModel);
         }
+        [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "cập nhật tài nguyên của khoá học {Authorize = SystemInstructor, Manager}")]
         [HttpPost("{id}/course-materials")]
         public async Task<ApiResponse<bool>> CreateMaterialByCourseIdAsync(Guid id, List<CreateCourseMaterialArrangeModel> createMaterialArrangeModel)
         {
             return await _materialService.CreateMaterialArrangeAsync(id, createMaterialArrangeModel);
         }
+        [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "cập nhật đánh giá của khoá học {Authorize = SystemInstructor, Manager}")]
         [HttpPost("{id}/assessments")]
         public async Task<ApiResponse<bool>> CreateAssessmentByCourseIdAsync(Guid id, List<CreateAssessmentArrangeModel> createAssessmentArrangeModel)
         {
             return await _assessmentService.CreateAssessmentArangeAsync(id, createAssessmentArrangeModel);
         }
+        [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "cập nhật phiên của khoá học {Authorize = SystemInstructor, Manager}")]
         [HttpPost("{id}/sessions")]
         public async Task<ApiResponse<bool>> CreateSessionByCourseIdAsync(Guid id, List<CreateSessionArrangeModel> createSessionArrangeModel)
@@ -107,9 +112,15 @@ namespace FranchiseProject.API.Controllers
         {
             return await _courseService.FilterCourseAsync(filterCourseModel);
         }
-        [SwaggerOperation(Summary = "tạo người dùng {Authorize = AgencyManager}")]
+        [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
+        [SwaggerOperation(Summary = "tạo chương trình học bằng file {Authorize = SystemIntructor, Manager}")]
         [HttpPost("api/v1/courses/files")]
-        public async Task<ApiResponse<bool>> CreateListUserByAgencyAsync(IFormFile file)
+        public async Task<ApiResponse<bool>> CreateCourseByFileAsync(IFormFile file)
             => await _courseService.CreateCourseByFileAsync(file);
+        //[Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
+        [SwaggerOperation(Summary = "tạo bộ câu hỏi cho khóa học bằng file {Authorize = SystemIntructor, Manager}")]
+        [HttpPost("api/v1/courses/{id}/questions/files")]
+        public async Task<ApiResponse<bool>> CreateQuestionByFileAsync(Guid id, IFormFile file)
+            => await _questionService.CreateQuestionByFileAsync(id, file);
     }
 }

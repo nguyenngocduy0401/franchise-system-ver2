@@ -6,6 +6,7 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AssessmentViewModels;
+using FranchiseProject.Application.ViewModels.QuestionOptionViewModels;
 using FranchiseProject.Application.ViewModels.QuestionViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
@@ -41,7 +42,6 @@ namespace FranchiseProject.Application.Services
         }
         public async Task<ApiResponse<bool>> CreateQuestionByFileAsync(Guid id, IFormFile file)
         {
-            var response = new ApiResponse<bool>();
             try
             {
                 if (file == null || file.Length == 0) throw new Exception("File is empty.");
@@ -51,47 +51,90 @@ namespace FranchiseProject.Application.Services
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(course.Id, CourseStatusEnum.Draft);
                 if (!checkCourse.Data) return checkCourse;
 
-                var chapter = (await _unitOfWork.ChapterRepository
+                var chapters = (await _unitOfWork.ChapterRepository
                     .FindAsync(e => e.CourseId == course.Id && e.IsDeleted != true))
-                    .OrderBy(e => e.Number);
+                    .OrderBy(e => e.Number)
+                    .ToList();
 
                 using (var stream = new MemoryStream())
                 {
-                    
-
-                    var question = new Question();
                     await file.CopyToAsync(stream);
                     stream.Position = 0;
                     using (var workbook = new XLWorkbook(stream))
                     {
-                        for (var i = 0; i <= chapter.Count(); i++)
+                        int sheetCount = workbook.Worksheets.Count();
+                        if (sheetCount != chapters.Count)
+                            return ResponseHandler.Failure<bool>(
+                                sheetCount < chapters.Count ? "Số lượng bảng tính ít hơn số lượng chapters trong khoá học." :
+                                                              "Số lượng bảng tính nhiều hơn số lượng chapters trong khoá học."
+                            );
+                        for (var i = 0; i < chapters.Count; i++)
                         {
+                            var questionModels = new List<CreateQuestionArrangeModel>();
                             var worksheet = workbook.Worksheets.Skip(i).First();
                             var rows = worksheet.RangeUsed().RowsUsed();
-
-                            var headerRow = rows.First();
-                            var headers = headerRow.Cells().Select(c => c.Value.ToString()).ToList();
-
+                            var chapterId = chapters[i].Id;
 
                             foreach (var row in rows.Skip(1))
                             {
-                                foreach (var cell in row.Cells())
+                                var questionModel = new CreateQuestionArrangeModel
                                 {
-                                    var columnIndex = cell.Address.ColumnNumber - 1;
+                                    Description = row.Cell(1).Value.ToString(),
+                                    ImageURL = row.Cell(2).Value.ToString(),
+                                    QuestionOptions = new List<CreateQuestionOptionArrangeModel>()
+                                };
 
-                                   
+                                for (var j = 3; j <= row.Cells().Count(); j += 3)
+                                {
+                                    string cellValue = row.Cell(j + 2).Value.ToString().Trim().ToLowerInvariant();
+                                    bool status;
+
+                                    if (cellValue == "true")
+                                    {
+                                        status = true;
+                                    }
+                                    else if (cellValue == "false")
+                                    {
+                                        status = false;
+                                    }
+                                    else
+                                    {
+                                        throw new Exception($"Invalid boolean value '{cellValue}' in cell.");
+                                    }
+                                    var questionOption = new CreateQuestionOptionArrangeModel
+                                    {
+                                        Description = row.Cell(j).Value.ToString(),
+                                        ImageURL = row.Cell(j + 1).Value.ToString(),
+                                        Status = status
+                                    };
+                                    questionModel.QuestionOptions.Add(questionOption);
                                 }
 
+                                questionModels.Add(questionModel);
                             }
+
+                            var validationResult = await _createQuestionArrangeValidator.ValidateAsync(questionModels);
+                            if (!validationResult.IsValid) throw new Exception(ValidatorHandler.HandleValidation<bool>(validationResult).Message);
+
+                            var questions = _mapper.Map<List<Question>>(questionModels);
+                            foreach (var question in questions)
+                            {
+                                question.ChapterId = chapterId;
+                            }
+                            await _unitOfWork.QuestionRepository.AddRangeAsync(questions);
                         }
                     }
+
+                    var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                    if (!isSuccess) throw new Exception("Create failed!");
                 }
+
+                return ResponseHandler.Success(true);
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<bool>(ex.Message);
+                return ResponseHandler.Failure<bool>(ex.Message);
             }
-            return response;
         }
         public async Task<ApiResponse<bool>> UpdateQuestionByIdAsync(Guid id, UpdateQuestionModel updateQuestionModel)
         {

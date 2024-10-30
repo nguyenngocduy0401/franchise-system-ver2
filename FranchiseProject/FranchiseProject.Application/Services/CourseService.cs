@@ -324,6 +324,9 @@ namespace FranchiseProject.Application.Services
                         oldCourse.Status = CourseStatusEnum.Closed;
                         course.Version = oldCourse.Version + 1;
                         _unitOfWork.CourseRepository.Update(oldCourse);
+
+
+                        // Sửa danh sách học sinh đang ở code cũ (Phần này Tính thêm vào)
                     }
                     else course.Version = 1;
                 }
@@ -355,6 +358,12 @@ namespace FranchiseProject.Application.Services
 
                     using (var workbook = new XLWorkbook(stream))
                     {
+                        int sheetCount = workbook.Worksheets.Count();
+                        if (sheetCount != 6)
+                            return ResponseHandler.Failure<bool>(
+                                sheetCount < 6 ? "Số lượng bảng tính ít hơn số lượng thành phần trong khoá học." :
+                                                              "Số lượng bảng tính nhiều hơn số lượng thành phần trong khoá học."
+                            );
                         course = await ExtractCourseFromWorksheetAsync(workbook.Worksheets.First(), course);
                         course = await ExtractSyllabusFromWorksheetAsync(workbook.Worksheets.Skip(1).First(), course);
                         course = await ExtractChapterFromWorksheetAsync(workbook.Worksheets.Skip(2).First(), course);
