@@ -21,14 +21,22 @@ namespace FranchiseProject.Infrastructures.Repositories
            
         }
 
-        public  Task<List<string>> GetCourseNamesByUserIdAsync(string userId)
+        public  Task<List<string>> GetCourseCodeByUserIdAsync(string userId)
         {
             return  _dbContext.RegisterCourses
             .Where(rc => rc.UserId == userId && rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted) 
             .Include(rc => rc.Course) 
-            .Select(rc => rc.Course.Name) 
+            .Select(rc => rc.Course.Code) 
             .ToListAsync();
             }
+        public Task<List<string>> GetCourseNamesByUserIdAsync(string userId)
+        {
+            return _dbContext.RegisterCourses
+            .Where(rc => rc.UserId == userId && rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted)
+            .Include(rc => rc.Course)
+            .Select(rc => rc.Course.Name)
+            .ToListAsync();
+        }
         public async Task AddAsync(RegisterCourse registerCourse)
         {
             await _dbContext.Set<RegisterCourse>().AddAsync(registerCourse);

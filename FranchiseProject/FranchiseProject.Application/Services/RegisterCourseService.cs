@@ -221,7 +221,7 @@ namespace FranchiseProject.Application.Services
                     return ResponseHandler.Failure<StudentRegisterViewModel>("Học sinh chưa đăng ký khóa học này!");
                 }
                 var rc = await _unitOfWork.RegisterCourseRepository.GetFirstOrDefaultAsync(rc=> rc.UserId==id&&rc.CourseId==Guid.Parse(courseId));
-                var courseNames = await _unitOfWork.RegisterCourseRepository.GetCourseNamesByUserIdAsync(id);
+                var courseCodes = await _unitOfWork.RegisterCourseRepository.GetCourseCodeByUserIdAsync(id);
 
                 var studentViewModel = new StudentRegisterViewModel
                 {
@@ -229,7 +229,7 @@ namespace FranchiseProject.Application.Services
                     FullName = student.FullName,
                     Email = student.Email,
                     PhoneNumber = student.PhoneNumber,
-                    CourseName = courseNames.FirstOrDefault(),
+                    CourseCode = courseCodes.FirstOrDefault(),
                     StudentStatus = rc.StudentCourseStatus,
                     CourseId = registerCourse.CourseId,
                     DateTime = await GetDateTimeFromRegisterCourseAsync(id, registerCourse.CourseId.Value),
@@ -299,7 +299,7 @@ namespace FranchiseProject.Application.Services
                             Email = s.Email,
                             CourseId = firstValidRegisterCourse?.CourseId,
                             DateTime = firstValidRegisterCourse?.DateTime,
-                            CourseName = firstValidRegisterCourse?.Course?.Name,
+                            CourseCode = firstValidRegisterCourse?.Course?.Code,
                             CoursePrice = firstValidRegisterCourse?.Course?.Price,
                             RegisterDate = firstValidRegisterCourse?.CreatDate.ToString()
                         };

@@ -10,6 +10,8 @@ namespace FranchiseProject.Application.ViewModels.AssignmentViewModels
     {
         public Guid? AssignmentId { get; set; }
         public string? AssignmentName { get; set; }
+        public string?UserId { get; set; }
+        public string? UserName {  get; set; }
         public string? FileSubmitURL { get; set; }
         public DateTime? SubmitDate { get; set; }
     }

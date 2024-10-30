@@ -52,5 +52,17 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.Set<AssignmentSubmit>().FirstOrDefaultAsync(predicate);
         }
+        public async Task<List<AssignmentSubmit>> GetFilterAsync(Expression<Func<AssignmentSubmit, bool>> filter)
+        {
+            return await _dbContext.AssignmentSubmits
+                .Include(sc => sc.User)
+                .Include(sc => sc.Assignment)
+                .Where(filter)
+                .ToListAsync();
+        }
+        public async Task<List<AssignmentSubmit>> GetAllAsync1(Expression<Func<AssignmentSubmit, bool>> predicate)
+        {
+            return await _dbContext.Set<AssignmentSubmit>().Where(predicate).ToListAsync();
+        }
     }
 }

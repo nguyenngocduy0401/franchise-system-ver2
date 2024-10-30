@@ -233,8 +233,8 @@ namespace FranchiseProject.Application.Services
                     end = DateTime.Parse(filterClassScheduleViewModel.EndDate);
                 }
                 Expression<Func<ClassSchedule, bool>> filter = s =>
-                    (!start.HasValue || s.Date >= start.Value) &&
-                    (!end.HasValue || s.Date <= end.Value);
+                    (!start.HasValue || s.Date.Value.Date >= start.Value.Date) &&
+                    (!end.HasValue || s.Date.Value.Date <= end.Value.Date);
                 var schedules = await _unitOfWork.ClassScheduleRepository.GetFilterAsync(
                     filter: filter,
                     includeProperties: "Class,Slot"

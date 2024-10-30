@@ -609,20 +609,28 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var classGuidId = Guid.Parse(classId);
-          
-                var classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs =>
-                    cs.ClassId == classGuidId && cs.Date >= startDate && cs.Date <= endDate);
+
+                List<ClassSchedule> classSchedules;
+
+                if (startDate == default(DateTime) && endDate == default(DateTime))
+
+                {
+                    classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs => cs.ClassId == classGuidId);
+                }
+                else
+                {
+                    classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs =>
+                        cs.ClassId == classGuidId && cs.Date.Value.Date >= startDate.Date && cs.Date.Value.Date <= endDate.Date);
+                }
 
                 var classE = await _unitOfWork.ClassRepository.GetByIdAsync(classGuidId);
 
+                var classScheduleViewModels = new List<ClassScheduleViewModel>();
                 if (classSchedules == null || !classSchedules.Any())
                 {
                     return ResponseHandler.Failure<List<ClassScheduleViewModel>>("Không tìm thấy lịch học cho lớp này trong khoảng thời gian đã cho!");
                 }
-
-
-                var classScheduleViewModels = new List<ClassScheduleViewModel>();
-
+            
                 foreach (var schedule in classSchedules)
                 {
                     var slot = await _unitOfWork.SlotRepository.GetByIdAsync(schedule.SlotId.Value);
@@ -633,9 +641,9 @@ namespace FranchiseProject.Application.Services
                         Room = schedule.Room,
                         ClassName = classE.Name,
                         SlotName = slot?.Name,
-                        Date = schedule.Date.ToString(), 
-                        StartTime = slot?.StartTime.ToString(), 
-                        EndTime = slot?.EndTime.ToString() 
+                        Date = schedule.Date.ToString(),
+                        StartTime = slot?.StartTime.ToString(),
+                        EndTime = slot?.EndTime.ToString()
                     });
                 }
 
@@ -700,7 +708,7 @@ namespace FranchiseProject.Application.Services
                 
                 var schedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs =>
                     activeClassIds.Contains(cs.ClassId.Value) &&
-                    cs.Date >= startTime.Date && cs.Date <= endTime.Date);
+                    cs.Date.Value.Date >= startTime.Date.Date && cs.Date.Value.Date <= endTime.Date.Date);
 
                 var scheduleViewModels = new List<StudentScheduleViewModel>();
 

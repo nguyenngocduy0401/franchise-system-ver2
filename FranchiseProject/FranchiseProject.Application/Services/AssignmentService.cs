@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Math;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation;
@@ -15,9 +16,11 @@ using FranchiseProject.Domain.Entity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
@@ -225,43 +228,124 @@ namespace FranchiseProject.Application.Services
 
             return response;
         }
-        public async Task<ApiResponse<AssignmentSubmitViewModel>> GetAssignmentSubmissionAsync(string assignmentId)
+        public async Task<ApiResponse<Pagination<AssignmentSubmitViewModel>>> GetAssignmentSubmissionAsync(string assignmentId, int pageIndex, int pageSize)
         {
-            var response = new ApiResponse<AssignmentSubmitViewModel>();
+            var response = new ApiResponse<Pagination<AssignmentSubmitViewModel>>();
 
             try
             {
-                var assId= Guid.Parse(assignmentId);
+                var assId = Guid.Parse(assignmentId);
                 var currentUserId = _claimsService.GetCurrentUserId.ToString();
+
                 if (string.IsNullOrEmpty(currentUserId))
                 {
-                    return ResponseHandler.Failure<AssignmentSubmitViewModel>("User chưa đăng nhập!");
+                    return ResponseHandler.Failure<Pagination<AssignmentSubmitViewModel>>("User chưa đăng nhập!");
                 }
-                var submission = await _unitOfWork.AssignmentSubmitRepository.GetFirstOrDefaultAsync(
-        
-                    rc => rc.AssignmentId == assId && rc.UserId == currentUserId);
+                var submissions = await _unitOfWork.AssignmentSubmitRepository.GetAllAsync1(rs => rs.AssignmentId == assId);
 
-                if (submission == null)
+                if (submissions == null)
                 {
-                    return ResponseHandler.Failure<AssignmentSubmitViewModel>("Bài nộp không tồn tại!");
+                    return ResponseHandler.Failure<Pagination<AssignmentSubmitViewModel>>("Bài nộp không tồn tại!");
                 }
-                var assignmentSubmitViewModel = new AssignmentSubmitViewModel
+
+                var assignmentSubmitViewModels = new List<AssignmentSubmitViewModel>();
+
+                foreach (var submission in submissions)
                 {
-                    AssignmentId = submission.AssignmentId,
-                    AssignmentName = submission.Assignment?.Title, 
-                    FileSubmitURL = submission.FileSubmitURL,
-                    SubmitDate = submission.SubmitDate
+                    var user = await _userManager.FindByIdAsync(submission.UserId);
+                    assignmentSubmitViewModels.Add(new AssignmentSubmitViewModel
+                    {
+                        AssignmentId = submission.AssignmentId,
+                        AssignmentName = submission.Assignment?.Title,
+                        UserId = user?.Id, 
+                        UserName = user?.UserName, 
+                        FileSubmitURL = submission.FileSubmitURL,
+                        SubmitDate = submission.SubmitDate
+                    });
+                }
+
+                var totalItemsCount = assignmentSubmitViewModels.Count();
+                var paginatedAssignments = assignmentSubmitViewModels.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+                var assignmentPagination = new Pagination<AssignmentSubmitViewModel>
+                {
+                    Items = paginatedAssignments,
+                    TotalItemsCount = totalItemsCount,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize
                 };
+                var assignmentViewModelPagination = _mapper.Map<Pagination<AssignmentViewModel>>(assignmentPagination);
 
-                response = ResponseHandler.Success(assignmentSubmitViewModel, "Lấy thông tin bài nộp thành công!");
+                response = ResponseHandler.Success(assignmentPagination, "Lấy thông tin bài nộp thành công!");
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<AssignmentSubmitViewModel>(ex.Message);
+                response = ResponseHandler.Failure<Pagination<AssignmentSubmitViewModel>>(ex.Message);
             }
 
             return response;
         }
 
+        /*    public async Task<ApiResponse<Pagination<AssignmentSubmitViewModel>>> FilterAsignmentAsync(FilterAssignmentViewModel filterModel)
+            {
+                var response = new ApiResponse<Pagination<AssignmentSubmitViewModel>>();
+                try
+                {
+                    var userCurrentId = _claimsService.GetCurrentUserId;
+                    var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
+
+                    if (userCurrent == null || !userCurrent.AgencyId.HasValue)
+                    {
+                        return ResponseHandler.Failure<Pagination<AssignmentSubmitViewModel>>("User hoặc Agency không khả dụng!");
+                    }
+                    Expression<Func<Assignment, bool>> filter = s =>
+                    (!filterModel.StartTime.HasValue || filterModel.StartTime <= s.StartTime) &&
+                    (!filterModel.StartTime.HasValue || filterModel.EndTime >= s.EndTime) &&
+                     (s.AgencyId == userCurrent.AgencyId);
+                    var ass = await _unitOfWork.AssignmentRepository.GetFilterAsync(
+                        filter: filter,
+                        pageIndex: filterModel.PageIndex,
+                        pageSize: filterModel.PageSize
+                        );
+                    var assViewModels = _mapper.Map<Pagination<AssignmentSubmitViewModel>>(ass);
+                    if (assViewModels.Items.IsNullOrEmpty()) return ResponseHandler.Success(assViewModels, "Không tìm thấy slot phù hợp!");
+
+                    response = ResponseHandler.Success(assViewModels, "Successful!");
+
+                }
+                catch (Exception ex)
+                {
+                    response = ResponseHandler.Failure<Pagination<AssignmentSubmitViewModel>>(ex.Message);
+                }
+                return response;
+            }*/
+
+        public async Task<ApiResponse<bool>> GradeStudentAssAsync(StudentAssScorseNumberViewModel model)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+               if(model.ScoreNumber<0 || model.ScoreNumber > 10)
+                {
+                    response = ResponseHandler.Success(false, "điểm không hợp lệ");
+                }
+                var ass = _mapper.Map<Score>(model);
+                await _unitOfWork.ScoreRepository.AddAsync(ass);
+                var students = await _userManager.FindByIdAsync(model.UserId);
+               var assignment = await _unitOfWork.AssignmentRepository.GetByIdAsync(Guid.Parse(model.AssignmentId));
+                    await _hubContext.Clients.User(students.Id.ToString())
+                        .SendAsync("ReceivedNotification", $" bài Tập {assignment.Title.ToString()} đã được chấm điểm.");
+                
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Create failed!");
+
+                response = ResponseHandler.Success(true, "Chấm điểm thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+
+        }
     }
 }

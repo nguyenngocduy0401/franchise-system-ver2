@@ -199,6 +199,7 @@ namespace FranchiseProject.Application.Services
                 user.UserName = userAccount.UserName;
                 user.PasswordHash = userAccount.Password;
                 user.AgencyId = userAgency.AgencyId;
+                user.Status = UserStatusEnum.active;
                 await _unitOfWork.UserRepository.CreateUserAndAssignRoleAsync(user, createUserModel.Role);
 
                 var userModel = _mapper.Map<CreateUserViewModel>(user);
