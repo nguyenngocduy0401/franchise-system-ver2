@@ -57,8 +57,8 @@ namespace FranchiseProject.API.Controllers
             return await _classService.UpdateClassStatusAsync(status, id);
         }
 
-        [SwaggerOperation(Summary = "Lấy thông tin chi tiết lớp học {Authorize = AgencyManager ,AgencyStaff}")]
-        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
+        [SwaggerOperation(Summary = "Lấy thông tin chi tiết lớp học {Authorize = AgencyManager ,AgencyStaff,Instructor}")]
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff+"," + AppRole.Instructor)]
         [HttpGet("{id}")]
         public async Task<ApiResponse<ClassStudentViewModel>> GetClassDetailAsync(string id)
         {
