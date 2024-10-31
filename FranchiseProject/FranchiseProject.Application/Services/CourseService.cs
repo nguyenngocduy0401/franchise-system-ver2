@@ -7,9 +7,12 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AssessmentViewModels;
+using FranchiseProject.Application.ViewModels.ChapterMaterialViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
+using FranchiseProject.Application.ViewModels.QuestionOptionViewModels;
+using FranchiseProject.Application.ViewModels.QuestionViewModels;
 using FranchiseProject.Application.ViewModels.SessionViewModels;
 using FranchiseProject.Application.ViewModels.SyllabusViewModels;
 using FranchiseProject.Domain.Entity;
@@ -39,12 +42,13 @@ namespace FranchiseProject.Application.Services
         private readonly IValidator<List<CreateSessionArrangeModel>> _createSessionArrangeValidator;
         private readonly IValidator<List<CreateAssessmentArrangeModel>> _createAssessmentArrangeValidator;
         private readonly IValidator<List<CreateCourseMaterialArrangeModel>> _createCourseMaterialArrangeValidator;
+        private readonly IValidator<List<CreateChapterFileModel>> _createChapterFileValidator;
         public CourseService(IUnitOfWork unitOfWork, IMapper mapper,
             IValidator<UpdateCourseModel> updateCourseValidator, IValidator<CreateCourseModel> createCourseValidator,
             IClaimsService claimsService, UserManager<User> userManager, RoleManager<Role> roleManager,
             IValidator<CreateSyllabusModel> createSyllabusValidator, IValidator<List<CreateChapterModel>> createChapterValidator,
             IValidator<List<CreateSessionArrangeModel>> createSessionArrangeValidator, IValidator<List<CreateAssessmentArrangeModel>> createAssessmentArrangeValidator,
-            IValidator<List<CreateCourseMaterialArrangeModel>> createCourseMaterialArrangeModel)
+            IValidator<List<CreateCourseMaterialArrangeModel>> createCourseMaterialArrangeModel, IValidator<List<CreateChapterFileModel>> createChapterFileValidator)
         {
             _createCourseValidator = createCourseValidator;
             _mapper = mapper;
@@ -58,6 +62,7 @@ namespace FranchiseProject.Application.Services
             _createSessionArrangeValidator = createSessionArrangeValidator;
             _createAssessmentArrangeValidator = createAssessmentArrangeValidator;
             _createCourseMaterialArrangeValidator = createCourseMaterialArrangeModel;
+            _createChapterFileValidator = createChapterFileValidator;
         }
         public async Task<ApiResponse<CourseDetailViewModel>> CreateCourseVersionAsync(Guid courseId)
         {
@@ -344,16 +349,18 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<ApiResponse<bool>> CreateCourseByFileAsync(IFormFile file)
+        public async Task<ApiResponse<bool>> CreateCourseByFileAsync(CourseFilesModel courseFilesModel)
         {
             var response = new ApiResponse<bool>();
             try
             {
-                if (file == null || file.Length == 0) throw new Exception("File is empty.");
+                if (courseFilesModel.CourseFile == null || courseFilesModel.CourseFile.Length == 0) throw new Exception("Course file is empty.");
+                if (courseFilesModel.QuestionFile == null || courseFilesModel.QuestionFile.Length == 0) throw new Exception("Question file is empty.");
+                if (courseFilesModel.ChapterMaterialFile == null || courseFilesModel.ChapterMaterialFile.Length == 0) throw new Exception("ChapterMaterial file is empty.");
                 using (var stream = new MemoryStream())
                 {
                     var course = new Course();
-                    await file.CopyToAsync(stream);
+                    await courseFilesModel.CourseFile.CopyToAsync(stream);
                     stream.Position = 0;
 
                     using (var workbook = new XLWorkbook(stream))
@@ -366,7 +373,11 @@ namespace FranchiseProject.Application.Services
                             );
                         course = await ExtractCourseFromWorksheetAsync(workbook.Worksheets.First(), course);
                         course = await ExtractSyllabusFromWorksheetAsync(workbook.Worksheets.Skip(1).First(), course);
-                        course = await ExtractChapterFromWorksheetAsync(workbook.Worksheets.Skip(2).First(), course);
+                        var courseCheck = await ExtractChapterFromWorksheetAsync(workbook.Worksheets.Skip(2).First(),
+                            courseFilesModel.QuestionFile, courseFilesModel.ChapterMaterialFile, course);
+                        if (!courseCheck.isSuccess && courseCheck.Message != null) 
+                            return ResponseHandler.Failure<bool>(courseCheck.Message);
+                        course = courseCheck.Data;
                         course = await ExtractSessionFromWorksheetAsync(workbook.Worksheets.Skip(3).First(), course);
                         course = await ExtractAssessmentFromWorksheetAsync(workbook.Worksheets.Skip(4).First(), course);
                         course = await ExtractMaterialFromWorksheetAsync(workbook.Worksheets.Skip(5).First(), course);
@@ -481,37 +492,109 @@ namespace FranchiseProject.Application.Services
             course.Syllabus = syllabus;
             return course;
         }
-        private async Task<Course> ExtractChapterFromWorksheetAsync(IXLWorksheet worksheet, Course course)
+        private async Task<ApiResponse<Course>> ExtractChapterFromWorksheetAsync(IXLWorksheet worksheet, IFormFile questionsFile, IFormFile materialsFile, Course course)
         {
+            var response = new ApiResponse<Course>();
             var rows = worksheet.RangeUsed().RowsUsed();
-            var headerRow = rows.First();
-            var chapterModels = new List<CreateChapterModel>();
-            foreach (var row in rows.Skip(1))
+            var chapterModels = new List<CreateChapterFileModel>();
+            using (var questionsStream = new MemoryStream())
+            using (var materialsStream = new MemoryStream())
             {
-                var chapterModel = new CreateChapterModel();
-                foreach (var cell in row.Cells())
+                await questionsFile.CopyToAsync(questionsStream);
+                await materialsFile.CopyToAsync(materialsStream);
+                questionsStream.Position = 0;
+                materialsStream.Position = 0;
+                using (var questionWorkbook = new XLWorkbook(questionsStream))
+                using (var materialWorkbook = new XLWorkbook(materialsStream))
                 {
-                    var columnIndex = cell.Address.ColumnNumber - 1;
-                    switch (columnIndex)
+                    int sheetQuestionCount = questionWorkbook.Worksheets.Count();
+                    int sheetMaterialCount = materialWorkbook.Worksheets.Count();
+                    int rowCount = rows.Skip(1).Count();
+                    if (sheetQuestionCount != rowCount)
+                        return ResponseHandler.Failure<Course>(
+                            sheetQuestionCount < rowCount ? "Số lượng bảng tính của files câu hỏi ít hơn số lượng chapters trong khoá học." :
+                                                          "Số lượng bảng tính của files câu hỏi nhiều hơn số lượng chapters trong khoá học."
+                        );
+
+                    if (sheetMaterialCount != rowCount)
+                        return ResponseHandler.Failure<Course>(
+                            sheetQuestionCount < rowCount ? "Số lượng bảng tính của files tài nguyên ít hơn số lượng chapters trong khoá học." :
+                                                          "Số lượng bảng tính của files tài nguyên nhiều hơn số lượng chapters trong khoá học."
+                        );
+                    var chapterIndex = 0;
+                    foreach (var row in rows.Skip(1))
                     {
-                        case 0:
-                            chapterModel.Number = (int)cell.Value;
-                            break;
-                        case 1:
-                            chapterModel.Topic = cell.Value.ToString();
-                            break;
-                        case 2:
-                            chapterModel.Description = cell.Value.ToString();
-                            break;
+                        var chapterModel = new CreateChapterFileModel
+                        {
+                            Number = (int)row.Cell(1).Value,
+                            Topic = row.Cell(2).Value.ToString(),
+                            Description = row.Cell(3).Value.ToString(),
+                            Questions = new List<CreateQuestionArrangeModel>(),
+                            ChapterMaterials = new List<CreateChapterMaterialArrangeModel>()
+                        };
+                        var questionWorksheet = questionWorkbook.Worksheets.Skip(chapterIndex).First();
+                        var questionRows = questionWorksheet.RangeUsed().RowsUsed();
+                        foreach (var questionRow in questionRows.Skip(1)) 
+                        {
+                            var questionModel = new CreateQuestionArrangeModel
+                            {
+                                Description = questionRow.Cell(1).Value.ToString(),
+                                ImageURL = questionRow.Cell(2).Value.ToString(),
+                                QuestionOptions = new List<CreateQuestionOptionArrangeModel>()
+                            };
+                            for (var j = 3; j <= questionRow.Cells().Count(); j += 3)
+                            {
+                                string cellValue = questionRow.Cell(j + 2).Value.ToString().Trim().ToLowerInvariant();
+                                bool status;
+
+                                if (cellValue == "true")
+                                {
+                                    status = true;
+                                }
+                                else if (cellValue == "false")
+                                {
+                                    status = false;
+                                }
+                                else
+                                {
+                                    throw new Exception($"Invalid boolean value '{cellValue}' in cell.");
+                                }
+                                var questionOption = new CreateQuestionOptionArrangeModel
+                                {
+                                    Description = questionRow.Cell(j).Value.ToString(),
+                                    ImageURL = questionRow.Cell(j + 1).Value.ToString(),
+                                    Status = status
+                                };
+                                questionModel.QuestionOptions.Add(questionOption);
+                            }
+                            chapterModel.Questions.Add(questionModel);
+                        }
+                        var materialWorksheet = materialWorkbook.Worksheets.Skip(chapterIndex).First();
+                        var materialRows = materialWorksheet.RangeUsed().RowsUsed();
+                        var materialIndex = 0;
+                        foreach (var materialRow in materialRows.Skip(1))
+                        {
+                            var materialModel = new CreateChapterMaterialArrangeModel
+                            {
+                                Number = materialIndex + 1,
+                                URL = materialRow.Cell(1).Value.ToString(),
+                                Description = materialRow.Cell(2).Value.ToString(),
+                            };
+                            materialIndex++;
+                            chapterModel.ChapterMaterials.Add(materialModel);
+                        }
+                        chapterModels.Add(chapterModel);
+                        chapterIndex++;
                     }
                 }
-                chapterModels.Add(chapterModel);
             }
-            ValidationResult validationResult = await _createChapterValidator.ValidateAsync(chapterModels);
+            ValidationResult validationResult = await _createChapterFileValidator.ValidateAsync(chapterModels);
             if (!validationResult.IsValid) throw new Exception(ValidatorHandler.HandleValidation<bool>(validationResult).Message);
             var chapters = _mapper.Map<List<Chapter>>(chapterModels);
             course.Chapters = chapters;
-            return course;
+            response.isSuccess = true;
+            response.Data = course;
+            return response;
         }
         private async Task<Course> ExtractSessionFromWorksheetAsync(IXLWorksheet worksheet, Course course)
         {

@@ -139,6 +139,9 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<UpdateChapterModel, Chapter>();
             CreateMap<CreateChapterArrangeModel, Chapter>()
                 .ForMember(dest => dest.ChapterMaterials, opt => opt.MapFrom(src => src.ChapterMaterials));
+            CreateMap<CreateChapterFileModel, Chapter>()
+                .ForMember(dest => dest.ChapterMaterials, opt => opt.MapFrom(src => src.ChapterMaterials))                    
+                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions));
             #endregion
             #region Session
             CreateMap<Session, SessionViewModel>();
@@ -182,12 +185,11 @@ namespace FranchiseProject.Infrastructures.Mappers
 
             CreateMap<Assessment, Assessment>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore()) 
-                .ForMember(dest => dest.CourseId, opt => opt.Ignore()); 
+                .ForMember(dest => dest.CourseId, opt => opt.Ignore());
 
             CreateMap<Chapter, Chapter>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore()) 
-                .ForMember(dest => dest.CourseId, opt => opt.Ignore()) 
-                .ForMember(dest => dest.ChapterMaterials, opt => opt.Ignore()); 
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CourseId, opt => opt.Ignore());
             #endregion
             #region Syllabus
             CreateMap<CreateSyllabusModel, Syllabus>();

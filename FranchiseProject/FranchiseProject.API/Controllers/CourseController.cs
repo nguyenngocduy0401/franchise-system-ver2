@@ -115,12 +115,7 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo chương trình học bằng file {Authorize = SystemIntructor, Manager}")]
         [HttpPost("api/v1/courses/files")]
-        public async Task<ApiResponse<bool>> CreateCourseByFileAsync(IFormFile file)
+        public async Task<ApiResponse<bool>> CreateCourseByFileAsync(CourseFilesModel file)
             => await _courseService.CreateCourseByFileAsync(file);
-        //[Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
-        [SwaggerOperation(Summary = "tạo bộ câu hỏi cho khóa học bằng file {Authorize = SystemIntructor, Manager}")]
-        [HttpPost("api/v1/courses/{id}/questions/files")]
-        public async Task<ApiResponse<bool>> CreateQuestionByFileAsync(Guid id, IFormFile file)
-            => await _questionService.CreateQuestionByFileAsync(id, file);
     }
 }
