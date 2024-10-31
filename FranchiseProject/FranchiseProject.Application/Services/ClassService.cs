@@ -99,7 +99,7 @@ namespace FranchiseProject.Application.Services
            
                 foreach (var studentId in waitlistedStudents.Keys)
                 {
-                    if (waitlistedStudents[studentId]) 
+                    if (!waitlistedStudents[studentId]) 
                     {                        var registerCourse = await _unitOfWork.RegisterCourseRepository.GetFirstOrDefaultAsync(rc =>
                             rc.UserId == studentId && rc.CourseId == courseId);
 
@@ -124,8 +124,10 @@ namespace FranchiseProject.Application.Services
                     CurrentEnrollment = model.StudentId.Count
                 };
                 await _unitOfWork.ClassRepository.AddAsync(newClass);
-                if (model.InstructorId != null)
+               
+                if (!string.IsNullOrEmpty(model .InstructorId))
                 {
+                    
                     var classRoom1 = new ClassRoom
                     {
                         ClassId = newClass.Id,
@@ -136,7 +138,7 @@ namespace FranchiseProject.Application.Services
                 }
                 foreach (var studentId in waitlistedStudents.Keys)
                 {
-                    if (waitlistedStudents[studentId]) 
+                    if (!waitlistedStudents[studentId]) 
                     {
                         var newClassRoom = new ClassRoom
                         {
@@ -179,12 +181,15 @@ namespace FranchiseProject.Application.Services
                 var isNameExist = await _unitOfWork.ClassRepository.AnyAsync(c => c.Name == model.Name && !c.IsDeleted && c.Id != classId);
                 if (isNameExist)
                 {
-                    return ResponseHandler.Failure<bool>("Tên lớp học đã tồn tại.");
+                    return ResponseHandler.Success<bool>(true,"Tên lớp học đã tồn tại.");
                 }
-
+                if (model.Capacity< existingClass.CurrentEnrollment)
+                {
+                    return ResponseHandler.Success<bool>(true, "Số lượng không thể nhỏ hơn số học sinh đang trong lớp ");
+                }
                 existingClass.Name = model.Name;
                 existingClass.Capacity = model.Capacity;
-                if (model.InstructorId != null)
+                if (!string.IsNullOrEmpty(model.InstructorId))
                 {
                     var rc = await _unitOfWork.ClassRoomRepository.GetFirstOrDefaultAsync(rc => rc.ClassId == classId && rc.UserId == model.InstructorId);
                     if (rc == null)
@@ -380,7 +385,7 @@ namespace FranchiseProject.Application.Services
                 var slotViewModels = new List<SlotViewModel>();
                 string instructorName = string.Empty;
                 var studentIdsAdded = new HashSet<string>(); 
-
+                string insId= string.Empty;
                 foreach (var cr in classRooms)
                 {
                     var user = await _userManager.FindByIdAsync(cr.UserId);
@@ -406,6 +411,7 @@ namespace FranchiseProject.Application.Services
                         if (roles.Contains(AppRole.Instructor))
                         {
                             instructorName = user.UserName;
+                            insId=user.Id;
                         }
                     }
                 }
@@ -433,9 +439,11 @@ namespace FranchiseProject.Application.Services
                     ClassName = classEntity.Name,
                     Capacity = classEntity.Capacity,
                     CurrentEnrollment = classEntity.CurrentEnrollment,
-                    DayOfWeek=classEntity.DayOfWeek,
+                    DayOfWeek = classEntity.DayOfWeek,
                     CourseId = classEntity.CourseId,
+                    CourseCode=courseEntity?.Code , 
                     CourseName = courseEntity?.Name,
+                    InstructorId = insId,
                     InstructorName = instructorName,
                     StudentInfo = studentInfo,
                     SlotViewModels = slotViewModels.FirstOrDefault()
