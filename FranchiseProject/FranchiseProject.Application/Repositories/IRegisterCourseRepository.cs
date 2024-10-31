@@ -11,6 +11,7 @@ namespace FranchiseProject.Application.Repositories
     public interface IRegisterCourseRepository
     {
         Task<List<string>> GetCourseNamesByUserIdAsync(string userId);
+        Task<List<string>> GetCourseCodeByUserIdAsync(string userId);
         Task AddAsync(RegisterCourse registerCourse);
         Task UpdateAsync(RegisterCourse registerCourse);
         Task<RegisterCourse?> GetFirstOrDefaultAsync(Expression<Func<RegisterCourse, bool>> filter);

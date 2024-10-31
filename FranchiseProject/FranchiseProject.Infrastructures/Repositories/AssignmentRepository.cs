@@ -30,5 +30,10 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.Set<Assignment>().Where(predicate).ToListAsync();
         }
+        public async Task<Assignment> GetFirstOrDefaultAsync(Expression<Func<Assignment, bool>> predicate)
+        {
+            return await _dbContext.Set<Assignment>().FirstOrDefaultAsync(predicate);
+        }
+       
     }
 }

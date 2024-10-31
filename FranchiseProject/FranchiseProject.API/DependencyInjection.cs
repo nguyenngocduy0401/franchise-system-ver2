@@ -51,6 +51,8 @@ using FranchiseProject.Application.ViewModels.ChapterMaterialViewModels;
 using FranchiseProject.API.Validator.ChapterMaterialValidator;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
 using FranchiseProject.Application.ViewModels.AssignmentViewModels;
+using FranchiseProject.Application.ViewModels.FeedBackViewModels;
+using FranchiseProject.API.Validator.FeedBackValidator;
 
 
 namespace FranchiseProject.API
@@ -177,6 +179,7 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<UpdateClassViewModel>, UpdateClassValidator>();
 
             services.AddTransient<IValidator<CreateAssignmentViewModel>,CreateAssignmentValidator>();
+            services.AddTransient<IValidator<CreateFeedBackViewModel>,CreateFeedBackValidator>();
             #endregion
 
             return services;

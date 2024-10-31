@@ -1,5 +1,6 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.QuestionViewModels;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> CreateQuestionByChapterIdAsync(Guid chapterId, CreateQuestionArrangeModel createQuestionArrangeModel);
         Task<ApiResponse<bool>> DeleteQuestionByIdAsync(Guid questionId);
         Task<ApiResponse<bool>> UpdateQuestionByIdAsync(Guid id, UpdateQuestionModel updateQuestionModel);
+        Task<ApiResponse<bool>> CreateQuestionByFileAsync(Guid id, IFormFile file);
     }
 }

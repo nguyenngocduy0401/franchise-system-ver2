@@ -16,5 +16,8 @@ namespace FranchiseProject.Domain.Entity
         public string? UserId { get; set; }
         [ForeignKey("UserId")]
         public User? User { get; set; }
+        public Guid? AssignmentId {  get; set; }
+        [ForeignKey("AssignmentId")]
+        public Assignment? Assignment { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.ViewModels.AssignmentViewModels;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
 using FranchiseProject.Application.ViewModels.StudentViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
@@ -17,11 +18,13 @@ namespace FranchiseProject.API.Controllers
         private readonly IUserService _userService;
         private readonly IClassService _classService;
         private readonly IRegisterCourseService _registerCourseService;
-        public UserController(IUserService userService, IClassService classService, IRegisterCourseService registerCourseService)
+        private readonly IAssignmentService _assignmentService;
+        public UserController(IUserService userService, IClassService classService, IRegisterCourseService registerCourseService,IAssignmentService assignmentService)
         {
             _userService = userService;
             _classService = classService;
             _registerCourseService = registerCourseService;
+            _assignmentService = assignmentService;
         }
 
         [SwaggerOperation(Summary = "lấy thông tin User bằng đăng nhập")]
@@ -77,8 +80,14 @@ namespace FranchiseProject.API.Controllers
         public async Task<ApiResponse<bool>> StudentExistRegisterCourse(string courseId)
            => await _registerCourseService.StudentExistRegisterCourse(courseId);
 
-         [SwaggerOperation(Summary = "Người dùng lấy lịch học bằng by login")]
+         [SwaggerOperation(Summary = "người dùng lấy lịch học bằng by login")]
          [HttpGet("mine/class-schedules")]
          public async Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync(DateTime startTime, DateTime endTime) => await _classService.GetStudentSchedulesAsync(startTime,endTime);
+        [SwaggerOperation(Summary = "giáo viên chấm điểm bài tập (assignement){Authorize = Instructor}")]
+        [HttpPost("mine/scores")]
+        public async Task<ApiResponse<bool>> GradeStudentAssAsync(StudentAssScorseNumberViewModel model) => await _assignmentService.GradeStudentAssAsync(model);
+        [SwaggerOperation(Summary = "học sinh nộp bài tập (assignement){Authorize = Student}")]
+        [HttpPost("mine/assignments")]
+        public async Task<ApiResponse<bool>> SubmitAssignmentAsync(string assignmentId, string fileSubmitUrl)=> await _assignmentService.SubmitAssignmentAsync(assignmentId, fileSubmitUrl);
     }
 }
