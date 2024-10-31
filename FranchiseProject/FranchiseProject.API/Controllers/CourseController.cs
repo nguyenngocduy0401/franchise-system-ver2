@@ -94,12 +94,6 @@ namespace FranchiseProject.API.Controllers
         {
             return await _sessionService.CreateSessionArrangeAsync(id, createSessionArrangeModel);
         }
-        /*[SwaggerOperation(Summary = "cập nhật chương của khoá học {Authorize = SystemInstructor, Manager}")]
-        [HttpPost("{id}/chapters")]
-        public async Task<ApiResponse<bool>> CreateChapterByCourseIdAsync(Guid id, List<CreateChapterArrangeModel> createChapterArrangeModel)
-        {
-            return await _chapterService.CreateChapterArrangeAsync(id, createChapterArrangeModel);
-        }*/
         [SwaggerOperation(Summary = "tìm khoá học bằng id")]
         [HttpGet("{id}")]
         public async Task<ApiResponse<CourseDetailViewModel>> GetCourseByIdAsync(Guid id)
@@ -114,8 +108,14 @@ namespace FranchiseProject.API.Controllers
         }
         [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo chương trình học bằng file {Authorize = SystemIntructor, Manager}")]
-        [HttpPost("api/v1/courses/files")]
+        [HttpPost("files")]
         public async Task<ApiResponse<bool>> CreateCourseByFileAsync(CourseFilesModel file)
             => await _courseService.CreateCourseByFileAsync(file);
+        [SwaggerOperation(Summary = "lấy tất cả chương của khóa học bằng courseId")]
+        [HttpGet("{id}/chapters")]
+        public async Task<ApiResponse<List<ChapterViewModel>>> GetChapterByCourseIdAsync(Guid id)
+        {
+            return await _chapterService.GetChapterByCourseIdAsync(id);
+        }
     }
 }
