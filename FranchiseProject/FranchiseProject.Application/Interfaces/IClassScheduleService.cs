@@ -13,7 +13,7 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> CreateClassScheduleAsync(CreateClassScheduleViewModel createClassScheduleViewModel);
         Task<ApiResponse<bool>> CreateClassScheduleDateRangeAsync(CreateClassScheduleDateRangeViewModel createClassScheduleDateRangeViewModel);
         Task<ApiResponse<bool>> DeleteClassScheduleByIdAsync(string id);
-        Task<ApiResponse<Pagination<ClassScheduleViewModel>>> FilterClassScheduleAsync(FilterClassScheduleViewModel filterClassScheduleViewModel);
+        Task<ApiResponse<List<ClassScheduleViewModel>>> FilterClassScheduleAsync(FilterClassScheduleViewModel filterClassScheduleViewModel);
         Task<ApiResponse<ClassScheduleViewModel>> GetClassScheduleByIdAsync(string id);
         Task<ApiResponse<bool>> UpdateClassScheduleAsync(CreateClassScheduleViewModel updateClassScheduleViewModel, string id);
         Task<ApiResponse<bool>> DeleteClassSheduleAllByClassIdAsync(string classId);

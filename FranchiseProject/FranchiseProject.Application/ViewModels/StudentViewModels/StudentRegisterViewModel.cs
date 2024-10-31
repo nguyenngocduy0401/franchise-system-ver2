@@ -14,7 +14,7 @@ namespace FranchiseProject.Application.ViewModels.StudentViewModels
         public string? FullName { get; set; }
         public string? Email {  get; set; }
         public string? PhoneNumber {  get; set; }
-        public string? CourseName { get; set; }
+        public string? CourseCode { get; set; }
         public int? CoursePrice { get; set; }
         public string? RegisterDate { get; set; }
         public StudentCourseStatusEnum? StudentStatus { get; set; }

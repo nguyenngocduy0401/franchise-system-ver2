@@ -215,9 +215,9 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<ApiResponse<Pagination<ClassScheduleViewModel>>> FilterClassScheduleAsync(FilterClassScheduleViewModel filterClassScheduleViewModel)
+        public async Task<ApiResponse<List<ClassScheduleViewModel>>> FilterClassScheduleAsync(FilterClassScheduleViewModel filterClassScheduleViewModel)
         {
-            var response = new ApiResponse<Pagination<ClassScheduleViewModel>>();
+            var response = new ApiResponse<List<ClassScheduleViewModel>>();
             try
             {
                 DateTime? start = null;
@@ -232,36 +232,26 @@ namespace FranchiseProject.Application.Services
                 {
                     end = DateTime.Parse(filterClassScheduleViewModel.EndDate);
                 }
-
                 Expression<Func<ClassSchedule, bool>> filter = s =>
-                    (!start.HasValue || s.Date >= start.Value) &&
-                    (!end.HasValue || s.Date <= end.Value);
-
+                    (!start.HasValue || s.Date.Value.Date >= start.Value.Date) &&
+                    (!end.HasValue || s.Date.Value.Date <= end.Value.Date);
                 var schedules = await _unitOfWork.ClassScheduleRepository.GetFilterAsync(
                     filter: filter,
-                    includeProperties: "Class,Slot",
-                    pageIndex: filterClassScheduleViewModel.PageIndex,
-                    pageSize: filterClassScheduleViewModel.PageSize
+                    includeProperties: "Class,Slot"
                 );
 
                 var scheduleViewModels = schedules.Items.Select(s => new ClassScheduleViewModel
                 {
                     Id = s.Id.ToString(),
                     Room = s.Room,
-                    ClassName = s.Class.Name, 
-                    SlotName = s.Slot.Name, 
-                    Date = s.Date?.ToString("yyyy-MM-dd"), 
-                    StartTime = s.Slot.StartTime?.ToString(@"hh\:mm"), 
+                    ClassName = s.Class.Name,
+                    SlotName = s.Slot.Name,
+                    Date = s.Date?.ToString("yyyy-MM-dd"),
+                    StartTime = s.Slot.StartTime?.ToString(@"hh\:mm"),
                     EndTime = s.Slot.EndTime?.ToString(@"hh\:mm")
                 }).ToList();
 
-                response.Data = new Pagination<ClassScheduleViewModel>
-                {
-                    Items = scheduleViewModels,
-                    TotalItemsCount = schedules.TotalItemsCount,
-                    PageIndex = schedules.PageIndex,
-                    PageSize = schedules.PageSize
-                };
+                response.Data = scheduleViewModels; 
                 response.isSuccess = true;
                 response.Message = "Lấy danh sách ClassSchedule thành công!";
             }
@@ -274,6 +264,7 @@ namespace FranchiseProject.Application.Services
 
             return response;
         }
+
 
         public async Task<ApiResponse<ClassScheduleViewModel>> GetClassScheduleByIdAsync(string id)
         {

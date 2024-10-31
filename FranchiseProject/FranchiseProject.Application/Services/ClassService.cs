@@ -603,21 +603,34 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<List<ClassScheduleViewModel>>> GetClassSchedulesByClassIdAsync(string classId)
+        public async Task<ApiResponse<List<ClassScheduleViewModel>>> GetClassSchedulesByClassIdAsync(string classId,DateTime startDate,DateTime endDate)
         {
             var response = new ApiResponse<List<ClassScheduleViewModel>>();
             try
             {
                 var classGuidId = Guid.Parse(classId);
-                // Lấy tất cả ClassSchedules cho Class với ID đã cho
-                var classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs => cs.ClassId == classGuidId);
-                var classE=await _unitOfWork.ClassRepository.GetByIdAsync(classGuidId);
+
+                List<ClassSchedule> classSchedules;
+
+                if (startDate == default(DateTime) && endDate == default(DateTime))
+
+                {
+                    classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs => cs.ClassId == classGuidId);
+                }
+                else
+                {
+                    classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs =>
+                        cs.ClassId == classGuidId && cs.Date.Value.Date >= startDate.Date && cs.Date.Value.Date <= endDate.Date);
+                }
+
+                var classE = await _unitOfWork.ClassRepository.GetByIdAsync(classGuidId);
+
+                var classScheduleViewModels = new List<ClassScheduleViewModel>();
                 if (classSchedules == null || !classSchedules.Any())
                 {
-                    return ResponseHandler.Failure<List<ClassScheduleViewModel>>("Không tìm thấy lịch học cho lớp này!");
+                    return ResponseHandler.Failure<List<ClassScheduleViewModel>>("Không tìm thấy lịch học cho lớp này trong khoảng thời gian đã cho!");
                 }
-                var classScheduleViewModels = new List<ClassScheduleViewModel>();
-
+            
                 foreach (var schedule in classSchedules)
                 {
                     var slot = await _unitOfWork.SlotRepository.GetByIdAsync(schedule.SlotId.Value);
@@ -627,10 +640,10 @@ namespace FranchiseProject.Application.Services
                         Id = schedule.Id.ToString(),
                         Room = schedule.Room,
                         ClassName = classE.Name,
-                        SlotName = slot?.Name, 
+                        SlotName = slot?.Name,
                         Date = schedule.Date.ToString(),
                         StartTime = slot?.StartTime.ToString(),
-                        EndTime = slot?.EndTime.ToString() 
+                        EndTime = slot?.EndTime.ToString()
                     });
                 }
 
@@ -695,7 +708,7 @@ namespace FranchiseProject.Application.Services
                 
                 var schedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs =>
                     activeClassIds.Contains(cs.ClassId.Value) &&
-                    cs.Date >= startTime.Date && cs.Date <= endTime.Date);
+                    cs.Date.Value.Date >= startTime.Date.Date && cs.Date.Value.Date <= endTime.Date.Date);
 
                 var scheduleViewModels = new List<StudentScheduleViewModel>();
 
@@ -727,6 +740,64 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<List<ClassViewModel>>> GetAllClassByCourseId(string courseId)
+        {
+            var response = new ApiResponse<List<ClassViewModel>>();
+            try
+            {
+                if (!Guid.TryParse(courseId, out Guid parsedCourseId))
+                {
+                    return ResponseHandler.Failure<List<ClassViewModel>>("CourseId không hợp lệ.");
+                }
+                var classIds = await _unitOfWork.ClassRoomRepository.GetClassIdsByCourseIdAsync(Guid.Parse(courseId));
+                foreach (var classId in classIds) 
+                { 
+                }
+                Expression<Func<Class, bool>> filter = c =>
+                    c.CourseId == parsedCourseId &&
+                    c.Status == ClassStatusEnum.Active; 
+
+                var classes = await _unitOfWork.ClassRepository.GetFilterAsync(
+                    filter: filter,
+                    includeProperties: "Course,User,RegisterCourse"
+                );
+
+
+                var classViewModels = new List<ClassViewModel>();
+                foreach (var c in classes.Items)
+                {
+                    var instructorIds = await _unitOfWork.ClassRoomRepository.GetClassIdsByCourseIdAsync(c.Id);
+
+                    string instructorName = null;
+                    if (instructorIds.Any())
+                    {
+                        var instructor = await _userManager.FindByIdAsync(instructorIds.First().ToString());
+                        instructorName = instructor?.FullName;
+                    }
+
+                    var classViewModel = new ClassViewModel
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        Capacity = c.Capacity,
+                        CurrentEnrollment = c.CurrentEnrollment,
+                        InstructorName = instructorName,
+                        CourseName = c.Course?.Name,
+                        DayOfWeek = c.DayOfWeek
+                    };
+
+                    classViewModels.Add(classViewModel);
+                }
+
+                response = ResponseHandler.Success(classViewModels, "Lấy danh sách lớp học thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<List<ClassViewModel>>(ex.Message);
+            }
+            return response;
+        }
+
 
 
 

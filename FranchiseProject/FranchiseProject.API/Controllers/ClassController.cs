@@ -91,9 +91,9 @@ namespace FranchiseProject.API.Controllers
         [SwaggerOperation(Summary = "lấy lịch học của lớp bằng ClassId {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpPost("class-schedules/{classId}")]
-        public async Task<ApiResponse<List<ClassScheduleViewModel>>> GetClassSchedulesByClassIdAsync(string classId)
+        public async Task<ApiResponse<List<ClassScheduleViewModel>>> GetClassSchedulesByClassIdAsync(string classId, DateTime startDate, DateTime endDate)
         {
-            return await _classService.GetClassSchedulesByClassIdAsync(classId);
+            return await _classService.GetClassSchedulesByClassIdAsync(classId,startDate,endDate);
         }
         [SwaggerOperation(Summary = "lấy danh sách giáo viên  {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
