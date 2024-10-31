@@ -43,12 +43,8 @@ using FranchiseProject.Application.ViewModels.QuestionViewModels;
 using FranchiseProject.API.Validator.QuestionValidator;
 using FranchiseProject.Application.ViewModels.ChapterMaterialViewModels;
 using FranchiseProject.API.Validator.ChapterMaterialValidator;
-using Microsoft.Extensions.DependencyInjection;
-using Google;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.API.Validator.ClassValidator;
-using FranchiseProject.Application.ViewModels.ChapterMaterialViewModels;
-using FranchiseProject.API.Validator.ChapterMaterialValidator;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
 using FranchiseProject.Application.ViewModels.AssignmentViewModels;
 
@@ -142,6 +138,8 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<UpdateCourseMaterialModel>, UpdateCourseMaterialValidator>();
             services.AddTransient<IValidator<CreateChapterModel>, CreateChapterValidator>();
             services.AddTransient<IValidator<UpdateChapterModel>, UpdateChapterValidator>();
+            services.AddTransient<IValidator<List<CreateChapterFileModel>>, CreateChapterArrangeFileValidator>();
+
             services.AddTransient<IValidator<CreateSessionModel>, CreateSessionValidator>();
             services.AddTransient<IValidator<UpdateSessionModel>, UpdateSessionValidator>();
             services.AddTransient<IValidator<CreateSyllabusModel>, CreateSyllabusValidator>();

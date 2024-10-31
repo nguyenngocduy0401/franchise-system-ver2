@@ -23,6 +23,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> UpdateCourseAsync(Guid courseId, UpdateCourseModel updateCourseModel);
         Task<ApiResponse<bool>> CreateCourseAsync(CreateCourseModel createCourseModel);
         Task<ApiResponse<bool>> CheckCourseAvailableAsync(Guid? courseId, CourseStatusEnum courseStatus);
-        Task<ApiResponse<bool>> CreateCourseByFileAsync(IFormFile file);
+        Task<ApiResponse<bool>> CreateCourseByFileAsync(CourseFilesModel courseFilesModel);
     }
 }
