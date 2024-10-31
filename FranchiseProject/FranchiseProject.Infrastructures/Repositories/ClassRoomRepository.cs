@@ -1,4 +1,5 @@
-﻿using FranchiseProject.Application.Interfaces;
+﻿using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
@@ -119,6 +120,38 @@ namespace FranchiseProject.Infrastructures.Repositories
                                  .Where(cr => cr.ClassId == classId)
                                  .Select(cr => cr.UserId)
                                  .ToListAsync();
+        }
+
+        public async Task<List<Guid>> GetClassIdsByCourseIdAsync(Guid courseId)
+        {
+            var classIds = await _dbContext.Classes
+                .Where(c => c.CourseId == courseId)
+                .Select(c => c.Id)
+                .ToListAsync();
+
+            return classIds;
+        }
+        public async Task<List<string>> GetInstructorUserIdsByClassIdAsync(Guid classId)
+        {
+            
+            var userIds = await _dbContext.ClassRooms
+                .Where(cr => cr.ClassId == classId)
+                .Select(cr => cr.UserId)
+                .ToListAsync();
+
+            var instructorIds = new List<string>();
+
+            foreach (var userId in userIds)
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+
+                if (user != null && await _userManager.IsInRoleAsync(user, AppRole.Instructor))
+                {
+                    instructorIds.Add(userId);
+                }
+            }
+
+            return instructorIds;
         }
     }
 }

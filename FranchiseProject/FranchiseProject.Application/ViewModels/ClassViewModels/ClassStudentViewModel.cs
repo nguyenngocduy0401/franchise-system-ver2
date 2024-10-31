@@ -15,8 +15,10 @@ namespace FranchiseProject.Application.ViewModels.ClassViewModel
         public int Capacity { get; set; }
         public int CurrentEnrollment { get; set; }
         public Guid? CourseId { get; set; }
+        public string? CourseCode {  get; set; }
         public string? CourseName { get; set; }
         public string? DayOfWeek { get; set; }
+        public string? InstructorId {  get; set; }
         public string? InstructorName { get; set; }
         public SlotViewModel? SlotViewModels { get; set; }
         public List<StudentClassViewModel>? StudentInfo { get; set; }
