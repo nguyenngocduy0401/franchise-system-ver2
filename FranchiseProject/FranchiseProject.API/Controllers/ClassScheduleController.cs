@@ -68,10 +68,10 @@ namespace FranchiseProject.API.Controllers
                 return await _classScheduleService.FilterClassScheduleAsync(filterClassScheduleViewModel);
             }
             [SwaggerOperation(Summary = "xóa tất cả lịch học của 1 lớp {Authorize = AgencyManager ,AgencyStaff}")]
-            [HttpDelete("{classId}")]
-            public async Task<ApiResponse<bool>> DeleteClassSheduleAllByClassIdAsync(string classId)
+            [HttpDelete("~/api/v1/classes/{id}/class-schedules")]
+            public async Task<ApiResponse<bool>> DeleteClassSheduleAllByClassIdAsync(string id)
             {
-                return await _classScheduleService.DeleteClassSheduleAllByClassIdAsync(classId);
+                return await _classScheduleService.DeleteClassSheduleAllByClassIdAsync(id);
             }
         }
     }
