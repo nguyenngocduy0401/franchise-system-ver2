@@ -66,7 +66,7 @@ namespace FranchiseProject.Application.Services
                 foreach (var student in students)
                 {
                    
-                    await _hubContext.Clients.User(student.Id.ToString())
+                    _hubContext.Clients.User(student.Id.ToString())
                         .SendAsync("ReceivedNotification", $"Bạn có bài Tập mới bắt đầu lúc {assignment.StartTime.ToString()}.");
                 }
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
@@ -136,7 +136,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var ass = await _unitOfWork.AssignmentRepository.GetExistByIdAsync(Guid.Parse(assId));
-                if (ass == null) return ResponseHandler.Failure<bool>("Slot học không khả dụng!");
+                if (ass == null) return ResponseHandler.Success(false, "Slot học không khả dụng!");
 
                 _unitOfWork.AssignmentRepository.SoftRemove(ass);
 
@@ -160,7 +160,7 @@ namespace FranchiseProject.Application.Services
                 var assignments = await _unitOfWork.AssignmentRepository.GetAllAsync1(a => a.ClassId == classID);
                 if (assignments == null || !assignments.Any())
                 {
-                    return ResponseHandler.Failure<Pagination<AssignmentViewModel>>("Không tìm thấy bài tập nào cho lớp này.");
+                    return ResponseHandler.Success<Pagination<AssignmentViewModel>>(null,"Không tìm thấy bài tập nào cho lớp này.");
                 }
 
                 var totalItemsCount = assignments.Count();
@@ -190,12 +190,12 @@ namespace FranchiseProject.Application.Services
                 var currentUserId = _claimsService.GetCurrentUserId.ToString();
                 if (currentUserId == null)
                 {
-                    return ResponseHandler.Failure<bool>("User chưa đăng nhập!");
+                    return ResponseHandler.Success(false, "User chưa đăng nhập!");
                 }
                 var assignment = await _unitOfWork.AssignmentRepository.GetFirstOrDefaultAsync(a => a.Id == assId);
                 if (assignment == null)
                 {
-                    return ResponseHandler.Failure<bool>("Bài tập không tồn tại!");
+                    return ResponseHandler.Success(false, "Bài tập không tồn tại!");
                 }
                 var existingSubmission = await _unitOfWork.AssignmentSubmitRepository.GetFirstOrDefaultAsync(rc => rc.UserId==currentUserId &&rc.AssignmentId==assId);
 

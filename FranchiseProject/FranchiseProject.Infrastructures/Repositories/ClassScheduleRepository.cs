@@ -1,4 +1,5 @@
-﻿using FranchiseProject.Application.Interfaces;
+﻿using FranchiseProject.Application;
+using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
 using Microsoft.EntityFrameworkCore;
@@ -55,6 +56,13 @@ namespace FranchiseProject.Infrastructures.Repositories
             }
 
             return await query.ToListAsync();
+        }
+        public async Task<ClassSchedule?> GetEarliestClassScheduleByClassIdAsync(Guid classId)
+        {
+            return await _dbContext.ClassSchedules
+                .Where(cs => cs.ClassId == classId && cs.Date != null)
+                .OrderBy(cs => cs.Date)
+                .FirstOrDefaultAsync();
         }
 
     }

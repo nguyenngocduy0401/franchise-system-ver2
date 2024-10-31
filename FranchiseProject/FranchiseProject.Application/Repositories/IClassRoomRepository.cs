@@ -20,6 +20,7 @@ namespace FranchiseProject.Application.Repositories
         Task<Dictionary<string, bool>> CheckEnrollStatusForStudentsAsync(List<string> studentIds, Guid courseId);
         Task<List<string>> GetUserIdsByClassIdAsync(Guid classId);
         Task<List<Guid>> GetClassIdsByCourseIdAsync(Guid courseId);
+        Task<ClassRoom> GetClassRoomsByClassIdAndInstructorRoleAsync(Guid classId);
 
     }
 }
