@@ -29,6 +29,7 @@ using FranchiseProject.Application.ViewModels.StudentViewModels;
 using FranchiseProject.Application.ViewModels.QuestionViewModels;
 using FranchiseProject.Application.ViewModels.QuestionOptionViewModels;
 using FranchiseProject.Application.ViewModels.PaymentViewModel;
+using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.ViewModels.AssignmentViewModels;
 
 
@@ -48,6 +49,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             #region Agency
             CreateMap<CreateAgencyViewModel, Agency>().ReverseMap();
             CreateMap<Agency, AgencyViewModel>();
+            CreateMap<Agency, AgencyAddressViewModel>()
+                .ForMember(dest => dest.FullAddress, opt => opt.MapFrom(src => $"{src.Address}, {src.Ward}, {src.District}, {src.City}"));
             #endregion
             #region Contract
             CreateMap<CreateContractViewModel, Contract>().ReverseMap();

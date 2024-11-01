@@ -9,6 +9,7 @@ using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.Application.ViewModels.ChapterMaterialViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
+using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
 using FranchiseProject.Application.ViewModels.QuestionOptionViewModels;
 using FranchiseProject.Application.ViewModels.QuestionViewModels;
@@ -18,16 +19,12 @@ using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace FranchiseProject.Application.Services
 {
-    public class CourseService : ICourseService
+	public class CourseService : ICourseService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -141,11 +138,7 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<ApiResponse<List<CourseViewModel>>> GetAllCourseAsync()
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public async Task<ApiResponse<CourseDetailViewModel>> GetCourseByIdAsync(Guid courseId)
         {
             var response = new ApiResponse<CourseDetailViewModel>();
@@ -719,5 +712,22 @@ namespace FranchiseProject.Application.Services
             course.CourseMaterials = courseMaterials;
             return course;
         }
-    }
+
+		public async Task<ApiResponse<IEnumerable<CourseViewModel>>> GetAllCoursesAvailableAsync()
+		{
+			var response = new ApiResponse<IEnumerable<CourseViewModel>>();
+			try
+			{
+				var courses = await _unitOfWork.CourseRepository.FindAsync(x => x.Status == CourseStatusEnum.AvailableForFranchise);
+				var courseViewModel = _mapper.Map<IEnumerable<CourseViewModel>>(courses);
+				if (courseViewModel.IsNullOrEmpty()) return ResponseHandler.Success(courseViewModel, "Không có khóa học nào khả dụng!");
+				response = ResponseHandler.Success(courseViewModel, "Lấy tất cả khóa học khả dụng thành công!");
+			}
+			catch (Exception ex)
+			{
+				response = ResponseHandler.Failure<IEnumerable<CourseViewModel>>(ex.Message);
+			}
+			return response;
+		}
+	}
 }
