@@ -56,7 +56,7 @@ namespace FranchiseProject.API.Controllers
             return await _assignmentService.GetAssignmentByClassIdAsync(id, pageIndex, pageSize);
         }
         [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager)]
-        [SwaggerOperation(Summary = "lấy danhh sách bài tập của một lớp  {Authorize = AgencyStaff, AgencyManager}")]
+        [SwaggerOperation(Summary = "lấy danhh sách bài tập đã nộp   {Authorize = AgencyStaff, AgencyManager}")]
         [HttpGet("classes/{id}/assignments")]
         public async Task<ApiResponse<Pagination<AssignmentSubmitViewModel>>> GetAssignmentSubmissionAsync(string assignmentId, int pageIndex, int pageSize)
         {
