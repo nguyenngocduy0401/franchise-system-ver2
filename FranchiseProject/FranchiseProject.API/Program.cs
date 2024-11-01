@@ -23,16 +23,7 @@ builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 builder.Services.AddSignalR();
 
 // Cấu hình CORS cho phép kết nối SignalR từ frontend
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowSpecificOrigin", builder =>
-    {
-        builder.WithOrigins("http://localhost:5173") // Thay bằng URL của frontend
-               .AllowAnyHeader()
-               .AllowAnyMethod()
-               .AllowCredentials();
-    });
-});
+
 
 builder.Services.AddSingleton(configuration);
 
@@ -47,7 +38,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseCors("AllowSpecificOrigin"); // Sử dụng CORS policy
+app.UseCors("CorsPolicy"); // Sử dụng CORS policy
 
 app.UseHttpsRedirection();
 app.UseMiddleware<PerformanceMiddleware>();
@@ -56,7 +47,7 @@ app.UseMiddleware<PerformanceMiddleware>();
 app.UseAuthorization();
 
 // Định tuyến cho SignalR Hub
-app.MapHub<NotificationHub>("/notificationHub").RequireCors("AllowSpecificOrigin"); // Định tuyến Hub
+app.MapHub<NotificationHub>("/notificationHub").RequireCors("CorsPolicy"); // Định tuyến Hub
 
 app.MapControllers();
 
