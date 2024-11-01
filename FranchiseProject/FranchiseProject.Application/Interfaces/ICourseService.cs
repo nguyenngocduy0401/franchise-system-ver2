@@ -16,7 +16,7 @@ namespace FranchiseProject.Application.Interfaces
     {
         Task<ApiResponse<bool>> UpdateCourseStatusAsync(Guid courseId, CourseStatusEnum courseStatusEnum);
         Task<ApiResponse<CourseDetailViewModel>> CreateCourseVersionAsync(Guid courseId);
-        Task<ApiResponse<List<CourseViewModel>>> GetAllCourseAsync();
+        Task<ApiResponse<IEnumerable<CourseViewModel>>> GetAllCoursesAvailableAsync();
         Task<ApiResponse<Pagination<CourseViewModel>>> FilterCourseAsync(FilterCourseModel filterCourseViewModel);
         Task<ApiResponse<bool>> DeleteCourseByIdAsync(Guid courseId);
         Task<ApiResponse<CourseDetailViewModel>> GetCourseByIdAsync(Guid courseId);

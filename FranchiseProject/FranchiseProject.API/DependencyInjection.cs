@@ -102,8 +102,17 @@ namespace FranchiseProject.API
                         .AllowAnyHeader();
                 });
             });
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin", builder =>
+                {
+                    builder.WithOrigins("http://localhost:5173") // Thay b?ng URL c?a frontend
+                           .AllowAnyHeader()
+                           .AllowAnyMethod()
+                           .AllowCredentials();
+                });
+            });
 
-            
             services.AddScoped<IClaimsService, ClaimsService>();
             services.AddScoped<IPdfService, PdfService>();
             services.AddSingleton<IFirebaseService, FirebaseService>();
