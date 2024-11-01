@@ -153,5 +153,20 @@ namespace FranchiseProject.Infrastructures.Repositories
 
             return instructorIds;
         }
+        public async Task<ClassRoom> GetClassRoomsByClassIdAndInstructorRoleAsync(Guid classId)
+        {
+            var instructorRoleId = await _dbContext.Roles
+                .Where(r => r.Name == AppRole.Instructor)
+                .Select(r => r.Id)
+                .FirstOrDefaultAsync();
+
+            return await _dbContext.ClassRooms
+                .Include(cr => cr.User)
+                .Where(cr => cr.ClassId == classId &&
+                             cr.User != null &&
+                             cr.User.UserRoles.Any(ur => ur.RoleId == instructorRoleId))
+                .FirstAsync();
+        }
+
     }
 }
