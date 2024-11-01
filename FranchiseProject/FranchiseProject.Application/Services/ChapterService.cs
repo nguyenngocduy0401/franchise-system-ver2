@@ -38,6 +38,28 @@ namespace FranchiseProject.Application.Services
             _createChapterValidator = createChapterValidator;
             _createChapterArrangeValidator = createChapterArrangeValidator;
         }
+        public async Task<ApiResponse<List<ChapterViewModel>>> GetChapterByCourseIdAsync(Guid courseId)
+        {
+            var response = new ApiResponse<List<ChapterViewModel>>();
+            try
+            {
+                var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(courseId);
+                if (course == null) throw new Exception("Course does not exist!");
+
+                var chapters = (await _unitOfWork.ChapterRepository
+                    .FindAsync(e => e.CourseId == courseId && e.IsDeleted != true))
+                    .OrderBy(e => e.Number)
+                    .ToList();
+
+                var chaptersModel = _mapper.Map<List<ChapterViewModel>>(chapters);
+                response = ResponseHandler.Success(chaptersModel);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<List<ChapterViewModel>>(ex.Message);
+            }
+            return response;
+        }
         public async Task<ApiResponse<bool>> CreateChapterAsync(CreateChapterModel createChapterModel)
         {
             var response = new ApiResponse<bool>();
@@ -87,19 +109,19 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<ChapterViewModel>> GetChapterByIdAsync(Guid chapterId)
+        public async Task<ApiResponse<ChapterDetailViewModel>> GetChapterByIdAsync(Guid chapterId)
         {
-            var response = new ApiResponse<ChapterViewModel>();
+            var response = new ApiResponse<ChapterDetailViewModel>();
             try
             {
                 var chapter = await _unitOfWork.ChapterRepository.GetByIdAsync(chapterId);
                 if (chapter == null) throw new Exception("Chapter does not exist!");
-                var chapterlModel = _mapper.Map<ChapterViewModel>(chapter);
+                var chapterlModel = _mapper.Map<ChapterDetailViewModel>(chapter);
                 response = ResponseHandler.Success(chapterlModel);
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<ChapterViewModel>(ex.Message);
+                response = ResponseHandler.Failure<ChapterDetailViewModel>(ex.Message);
             }
             return response;
         }

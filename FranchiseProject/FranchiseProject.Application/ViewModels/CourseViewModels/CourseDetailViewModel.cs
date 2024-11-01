@@ -31,7 +31,7 @@ namespace FranchiseProject.Application.ViewModels.CourseViewModels
         public Guid? CourseCategoryId { get; set; }
         public CourseCategoryViewModel? CourseCategory { get; set; }
         public virtual ICollection<SessionViewModel>? Sessions { get; set; }
-        public virtual ICollection<ChapterViewModel>? Chapters { get; set; }
+        public virtual ICollection<ChapterDetailViewModel>? Chapters { get; set; }
         public virtual ICollection<AssessmentViewModel>? Assessments { get; set; }
         public virtual ICollection<CourseMaterialViewModel>? CourseMaterials { get; set; }
     }
