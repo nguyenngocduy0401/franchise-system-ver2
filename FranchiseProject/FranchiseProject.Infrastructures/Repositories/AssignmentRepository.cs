@@ -35,5 +35,6 @@ namespace FranchiseProject.Infrastructures.Repositories
             return await _dbContext.Set<Assignment>().FirstOrDefaultAsync(predicate);
         }
        
+
     }
 }

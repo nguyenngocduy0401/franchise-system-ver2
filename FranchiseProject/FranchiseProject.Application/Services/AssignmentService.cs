@@ -29,6 +29,7 @@ namespace FranchiseProject.Application.Services
 {
     public class AssignmentService : IAssignmentService
     {
+        #region Constructor
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClaimsService _claimsService;
@@ -49,6 +50,7 @@ namespace FranchiseProject.Application.Services
             _emailService = emailService;
          
         }
+        #endregion
         public async Task<ApiResponse<bool>> CreateAssignmentAsync(CreateAssignmentViewModel assignment)
         {
             var response = new ApiResponse<bool>();
@@ -236,7 +238,7 @@ namespace FranchiseProject.Application.Services
             {
                 var assId = Guid.Parse(assignmentId);
                 var currentUserId = _claimsService.GetCurrentUserId.ToString();
-
+                var assSubmits =await _unitOfWork.AssignmentSubmitRepository.GetAllSubmissionsByAssignmentIdAsync(assId);
                 if (string.IsNullOrEmpty(currentUserId))
                 {
                     return ResponseHandler.Failure<Pagination<AssignmentSubmitViewModel>>("User chưa đăng nhập!");
@@ -249,21 +251,24 @@ namespace FranchiseProject.Application.Services
                 }
 
                 var assignmentSubmitViewModels = new List<AssignmentSubmitViewModel>();
-
-                foreach (var submission in submissions)
+                foreach (var assSubmit in assSubmits)
                 {
-                    var user = await _userManager.FindByIdAsync(submission.UserId);
-                    assignmentSubmitViewModels.Add(new AssignmentSubmitViewModel
+                    foreach (var submission in submissions)
                     {
-                        AssignmentId = submission.AssignmentId,
-                        AssignmentName = submission.Assignment?.Title,
-                        UserId = user?.Id, 
-                        UserName = user?.UserName, 
-                        FileSubmitURL = submission.FileSubmitURL,
-                        SubmitDate = submission.SubmitDate
-                    });
+                        var score = await _unitOfWork.ScoreRepository.GetSocreBByUserIdAssidAsync(assId, assSubmit.UserId.ToString());
+                        var user = await _userManager.FindByIdAsync(submission.UserId);
+                        assignmentSubmitViewModels.Add(new AssignmentSubmitViewModel
+                        {
+                            AssignmentId = submission.AssignmentId,
+                            AssignmentName = submission.Assignment?.Title,
+                            UserId = user?.Id,
+                            ScoreNumber=score.ScoreNumber,
+                            UserName = user?.UserName,
+                            FileSubmitURL = submission.FileSubmitURL,
+                            SubmitDate = submission.SubmitDate
+                        });
+                    }
                 }
-
                 var totalItemsCount = assignmentSubmitViewModels.Count();
                 var paginatedAssignments = assignmentSubmitViewModels.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
                 var assignmentPagination = new Pagination<AssignmentSubmitViewModel>
