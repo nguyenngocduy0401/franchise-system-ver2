@@ -49,6 +49,8 @@ using FranchiseProject.Application.ViewModels.ClassViewModels;
 using FranchiseProject.Application.ViewModels.AssignmentViewModels;
 using FranchiseProject.Application.ViewModels.FeedBackViewModels;
 using FranchiseProject.API.Validator.FeedBackValidator;
+using FranchiseProject.Application.ViewModels.QuizViewModels;
+using FranchiseProject.API.Validator.QuizValidator;
 
 
 namespace FranchiseProject.API
@@ -187,6 +189,8 @@ namespace FranchiseProject.API
 
             services.AddTransient<IValidator<CreateAssignmentViewModel>,CreateAssignmentValidator>();
             services.AddTransient<IValidator<CreateFeedBackViewModel>,CreateFeedBackValidator>();
+
+            services.AddTransient<IValidator<CreateQuizModel>, CreateQuizValidator>();
             #endregion
 
             return services;

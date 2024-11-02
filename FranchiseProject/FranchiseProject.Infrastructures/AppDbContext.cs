@@ -31,7 +31,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<QuestionOption> QuestionOptions { get; set; }
-        public DbSet<Quiz> Quizs { get; set; }
+        public DbSet<Quiz> Quizzes { get; set; }
         public DbSet<QuizDetail> QuizDetails { get; set; }
         public DbSet<Report> Reports { get; set; }
         public DbSet<Score> Scores { get; set; }

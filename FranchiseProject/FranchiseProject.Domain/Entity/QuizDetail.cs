@@ -13,7 +13,7 @@ namespace FranchiseProject.Domain.Entity
         [ForeignKey("QuizId")]
         public Quiz? Quiz { get; set; }
         public Guid? QuestionId { get; set; }
-        [ForeignKey("QuizTestId")]
+        [ForeignKey("QuestionId")]
         public Question? Question { get; set; }
     }
 }

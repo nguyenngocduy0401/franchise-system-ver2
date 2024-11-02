@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.ViewModels.QuizViewModels
 {
-    internal class QuizViewModel
+    public class QuizViewModel
     {
     }
 }

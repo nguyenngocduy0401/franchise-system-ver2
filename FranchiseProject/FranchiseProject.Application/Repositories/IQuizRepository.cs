@@ -9,5 +9,6 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IQuizRepository : IGenericRepository<Quiz>
     {
+        Task<Quiz> GetQuizForStudentById(Guid id);
     }
 }

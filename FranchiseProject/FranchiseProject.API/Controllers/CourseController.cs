@@ -106,17 +106,11 @@ namespace FranchiseProject.API.Controllers
         {
             return await _courseService.FilterCourseAsync(filterCourseModel);
         }
-        [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
+        //[Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo chương trình học bằng file {Authorize = SystemIntructor, Manager}")]
         [HttpPost("files")]
         public async Task<ApiResponse<bool>> CreateCourseByFileAsync(CourseFilesModel file)
             => await _courseService.CreateCourseByFileAsync(file);
-        //[Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
-        [SwaggerOperation(Summary = "tạo bộ câu hỏi cho khóa học bằng file {Authorize = SystemIntructor, Manager}")]
-        [HttpPost("api/v1/courses/{id}/questions/files")]
-        public async Task<ApiResponse<bool>> CreateQuestionByFileAsync(Guid id, IFormFile file)
-            => await _questionService.CreateQuestionByFileAsync(id, file);
-
 		[SwaggerOperation(Summary = "Lấy tất cả khóa học khả dụng")]
 		[HttpGet("available")]
 		public async Task<ApiResponse<IEnumerable<CourseViewModel>>> GetAllCoursesAvailableAsync()

@@ -31,6 +31,7 @@ using FranchiseProject.Application.ViewModels.QuestionOptionViewModels;
 using FranchiseProject.Application.ViewModels.PaymentViewModel;
 using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.ViewModels.AssignmentViewModels;
+using FranchiseProject.Application.ViewModels.QuizViewModels;
 
 
 
@@ -209,10 +210,16 @@ namespace FranchiseProject.Infrastructures.Mappers
                 .ForMember(dest => dest.QuestionOptions, opt => opt.MapFrom(src => src.QuestionOptions));
             CreateMap<UpdateQuestionModel, Question>()
                 .ForMember(dest => dest.QuestionOptions, opt => opt.Ignore());
+            CreateMap<Question, QuizDetail>()
+                .ForMember(dest => dest.QuestionId, opt => opt.MapFrom(src => src.Id));
             #endregion
             #region QuestionOption
             CreateMap<QuestionOption, QuestionOptionViewModel>();
             CreateMap<Question, QuestionViewModel>()
+                .ForMember(dest => dest.QuestionOptions, opt => opt.MapFrom(src => src.QuestionOptions));
+
+            CreateMap<QuestionOption, QuestionOptionStudentViewModel>();
+            CreateMap<Question, QuestionStudentViewModel>()
                 .ForMember(dest => dest.QuestionOptions, opt => opt.MapFrom(src => src.QuestionOptions));
             CreateMap<QuestionOptionViewModel, Question>();
             #endregion
@@ -227,7 +234,15 @@ namespace FranchiseProject.Infrastructures.Mappers
            .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
             #endregion
-           
+
+            #region Quiz
+            CreateMap<CreateQuizModel, Quiz>();
+            CreateMap<Quiz, QuizDetailStudentViewModel>()
+                .ForMember(dest => dest.Questions, opt => opt
+                .MapFrom(src => src.QuizDetails
+                .Select(qd => qd.Question)));
+            #endregion
+
             #region Payment
             CreateMap<CreateStudentPaymentViewModel, Payment>()
            .ForMember(dest => dest.Id, opt => opt.Ignore());

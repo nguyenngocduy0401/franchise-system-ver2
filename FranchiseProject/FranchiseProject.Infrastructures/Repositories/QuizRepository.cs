@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,16 @@ namespace FranchiseProject.Infrastructures.Repositories
             _dbContext = context;
             _timeService = timeService;
             _claimsService = claimsService;
+        }
+        public async Task<Quiz> GetQuizForStudentById(Guid id)
+        {
+            return await _dbSet
+                .Where(e => e.Id == id && e.IsDeleted != true)
+                          .Include(e => e.QuizDetails)
+                          .ThenInclude(e => e.Question)
+                          .ThenInclude(e => e.QuestionOptions)
+                          .FirstOrDefaultAsync();
+            ;
         }
     }
 }

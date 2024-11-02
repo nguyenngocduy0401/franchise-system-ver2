@@ -9,7 +9,8 @@ namespace FranchiseProject.Domain.Entity
 {
     public class Quiz : BaseEntity
     {
-        public double? Duration { get; set; }
+        public int Quantity { get; set; }
+        public int? Duration { get; set; }
         public string? Title { get; set; }
         public string? Description { get; set; }
         public DateTime? StartTime { get; set; }
