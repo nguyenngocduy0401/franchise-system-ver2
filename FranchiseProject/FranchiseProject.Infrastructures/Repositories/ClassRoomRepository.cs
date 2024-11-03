@@ -36,6 +36,15 @@ namespace FranchiseProject.Infrastructures.Repositories
             _userManager = userManager;
             _roleManager = roleManager;
         }
+        public async Task<IEnumerable<ClassRoom>> FindAsync(Expression<Func<ClassRoom, bool>> expression, string includeProperties = "")
+        {
+            IQueryable<ClassRoom> query = _dbContext.ClassRooms.Where(expression);
+            foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+            return await query.ToListAsync();
+        }
         public async Task<IEnumerable<ClassRoom>> GetFilterAsync(Expression<Func<ClassRoom, bool>> filter)
         {
             return await _dbContext.ClassRooms

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Repositories
 {
-    public interface IScoreRepository : IGenericRepository<Score>
+    public interface IScoreRepository
     {
     }
 }

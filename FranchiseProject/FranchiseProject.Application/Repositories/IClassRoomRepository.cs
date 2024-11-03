@@ -10,6 +10,7 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IClassRoomRepository
     {
+        Task<IEnumerable<ClassRoom>> FindAsync(Expression<Func<ClassRoom, bool>> expression, string includeProperties = "");
         Task AddAsync(ClassRoom classRoom);
         Task<List<User>> GetWaitlistedStudentsAsync(List<string> studentIds);
         Task<List<string>> GetInvalidStudentsAsync(List<string> studentIds);

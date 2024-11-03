@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Entity
 {
-    public class Score : BaseEntity
+    public class Score 
     {
         public double ScoreNumber { get; set; }
         public Guid? QuizId { get; set; }
@@ -16,8 +16,5 @@ namespace FranchiseProject.Domain.Entity
         public string? UserId { get; set; }
         [ForeignKey("UserId")]
         public User? User { get; set; }
-        public Guid? AssignmentId {  get; set; }
-        [ForeignKey("AssignmentId")]
-        public Assignment? Assignment { get; set; }
     }
 }

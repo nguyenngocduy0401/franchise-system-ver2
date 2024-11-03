@@ -11,9 +11,9 @@ namespace FranchiseProject.Application.Repositories
     public interface IClassScheduleRepository : IGenericRepository<ClassSchedule>
     {
         Task<ClassSchedule?> GetExistingScheduleAsync(DateTime date, string room, Guid slotId);
-        Task<List<ClassSchedule>> GetAllAsync1(Expression<Func<ClassSchedule, bool>> predicate);
+        Task<List<ClassSchedule>> GetAllClassScheduleAsync(Expression<Func<ClassSchedule, bool>> predicate);
 
-        Task<IEnumerable<ClassSchedule>> GetAllAsync1(Expression<Func<ClassSchedule, bool>> filter = null, string includeProperties = "");
+        Task<IEnumerable<ClassSchedule>> GetAllClassScheduleAsync(Expression<Func<ClassSchedule, bool>> filter = null, string includeProperties = "");
         Task<ClassSchedule?> GetEarliestClassScheduleByClassIdAsync(Guid classId);
     }
 }

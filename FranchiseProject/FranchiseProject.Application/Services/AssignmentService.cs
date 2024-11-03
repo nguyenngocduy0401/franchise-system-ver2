@@ -329,7 +329,6 @@ namespace FranchiseProject.Application.Services
                     response = ResponseHandler.Success(false, "điểm không hợp lệ");
                 }
                 var ass = _mapper.Map<Score>(model);
-                await _unitOfWork.ScoreRepository.AddAsync(ass);
                 var students = await _userManager.FindByIdAsync(model.UserId);
                var assignment = await _unitOfWork.AssignmentRepository.GetByIdAsync(Guid.Parse(model.AssignmentId));
                     await _hubContext.Clients.User(students.Id.ToString())

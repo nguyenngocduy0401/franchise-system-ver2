@@ -35,5 +35,12 @@ namespace FranchiseProject.Infrastructures.Repositories
                           .FirstOrDefaultAsync();
             ;
         }
+        public async Task<IEnumerable<Quiz>> GetQuizScoreStudentByClassIdAndStudentId(Guid classId, string studentId)
+        {
+            return await _dbSet
+                .Where(e => e.ClassId == classId  && e.IsDeleted != true)
+                          .Include(e => e.Scores.Where(e => e.UserId == studentId))
+                          .ToListAsync();
+        }
     }
 }

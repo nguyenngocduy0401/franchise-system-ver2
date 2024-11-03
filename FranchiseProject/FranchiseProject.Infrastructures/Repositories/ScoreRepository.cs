@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Infrastructures.Repositories
 {
-    public class ScoreRepository : GenericRepository<Score>, IScoreRepository
+    public class ScoreRepository : IScoreRepository
     {
         private readonly AppDbContext _dbContext;
         private readonly ICurrentTime _timeService;
@@ -18,7 +18,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             AppDbContext context,
             ICurrentTime timeService,
             IClaimsService claimsService
-        ) : base(context, timeService, claimsService)
+        )
         {
             _dbContext = context;
             _timeService = timeService;

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FranchiseProject.Application.ViewModels.ScoreViewModels;
+using FranchiseProject.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.ViewModels.QuizViewModels
 {
-    public class QuizViewModel
+    public class QuizStudentViewModel
     {
         public Guid? Id { get; set; }
         public int Quantity { get; set; }
@@ -15,5 +17,6 @@ namespace FranchiseProject.Application.ViewModels.QuizViewModels
         public string? Description { get; set; }
         public DateTime? StartTime { get; set; }
         public Guid? ClassId { get; set; }
+        public ScoreViewModel? Scores { get; set; }
     }
 }
