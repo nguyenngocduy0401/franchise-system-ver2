@@ -9,7 +9,8 @@ namespace FranchiseProject.Application.ViewModels.StudentViewModels
 {
     public class StudentRegisterViewModel
     {
-        public string? Id { get; set; }
+        public Guid?   Id { get; set; }
+        public string? UserId { get; set; }
         public Guid? CourseId { get; set; }
         public string? FullName { get; set; }
         public string? Email {  get; set; }
@@ -17,7 +18,9 @@ namespace FranchiseProject.Application.ViewModels.StudentViewModels
         public string? CourseCode { get; set; }
         public int? CoursePrice { get; set; }
         public string? RegisterDate { get; set; }
+        public DateTime? PaymentDeadline  { get; set; }
         public StudentCourseStatusEnum? StudentStatus { get; set; }
+        public StudentPaymentStatusEnum? PaymentStatus { get; set; }
         public string? DateTime { get; set; }
     }
 }

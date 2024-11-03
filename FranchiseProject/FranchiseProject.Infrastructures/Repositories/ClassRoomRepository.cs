@@ -174,7 +174,7 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Where(cr => cr.ClassId == classId &&
                              cr.User != null &&
                              cr.User.UserRoles.Any(ur => ur.RoleId == instructorRoleId))
-                .FirstAsync();
+                .FirstOrDefaultAsync();
         }
 
     }

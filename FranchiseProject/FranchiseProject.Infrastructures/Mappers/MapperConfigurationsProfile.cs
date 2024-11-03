@@ -234,6 +234,7 @@ namespace FranchiseProject.Infrastructures.Mappers
            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
            .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+            CreateMap<RegisterCourse, UpdateRegisterCourseViewModel>();
             #endregion
 
             #region Quiz

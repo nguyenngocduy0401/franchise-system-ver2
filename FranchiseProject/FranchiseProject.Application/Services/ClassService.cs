@@ -29,6 +29,7 @@ namespace FranchiseProject.Application.Services
 {
     public class ClassService : IClassService
     {
+        #region Constructor
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClaimsService _claimsService;
@@ -46,7 +47,7 @@ namespace FranchiseProject.Application.Services
             _userManager = userManager;
             _validatorUpdate = validatorUpdate;
         }
-
+        #endregion
         public async Task<ApiResponse<Guid?>> CreateClassAsync(CreateClassViewModel model)
         {
             var response = new ApiResponse<Guid?>();
@@ -85,34 +86,6 @@ namespace FranchiseProject.Application.Services
                 var invalidCourseRegistrations = await _unitOfWork.RegisterCourseRepository.GetAllAsync(rc =>
                     model.StudentId.Contains(rc.UserId) && rc.CourseId != Guid.Parse(model.CourseId) && rc.StudentCourseStatus != StudentCourseStatusEnum.Waitlisted);
 
-
-                // Kiểm tra trạng thái của từng học sinh
-                var students = await _unitOfWork.UserRepository.GetAllAsync(u => model.StudentId.Contains(u.Id));
-                var waitlistedStudents = await _unitOfWork.ClassRoomRepository.CheckWaitlistedStatusForStudentsAsync(model.StudentId,courseId);
-                if (waitlistedStudents.Count == 0)
-                {
-
-                    var invalidStudents = await _unitOfWork.ClassRoomRepository.GetInvalidStudentsAsync(model.StudentId);
-                    var invalidStudentNames = string.Join(", ", invalidStudents);
-                    return ResponseHandler.Success<Guid?>(null, $"Không có học sinh nào có trạng thái 'waitlisted'! Các học sinh không hợp lệ: {invalidStudentNames}");
-                }
-           
-                foreach (var studentId in waitlistedStudents.Keys)
-                {
-                    if (!waitlistedStudents[studentId]) 
-                    {                        var registerCourse = await _unitOfWork.RegisterCourseRepository.GetFirstOrDefaultAsync(rc =>
-                            rc.UserId == studentId && rc.CourseId == courseId);
-
-                        if (registerCourse != null)
-                        {
-                            registerCourse.StudentCourseStatus = StudentCourseStatusEnum.Enrolled;
-
-                       
-                         await   _unitOfWork.RegisterCourseRepository.UpdateAsync(registerCourse);
-                        }
-                    }
-                }
-
                 var newClass = new Class
                 {
                     Name = model.Name,
@@ -120,11 +93,28 @@ namespace FranchiseProject.Application.Services
                     CourseId = Guid.Parse(model.CourseId),
                     Status = ClassStatusEnum.Inactive,
                     AgencyId = userCurrent.AgencyId
-                    ,
+                  ,
                     CurrentEnrollment = model.StudentId.Count
                 };
                 await _unitOfWork.ClassRepository.AddAsync(newClass);
-               
+                // Kiểm tra trạng thái của từng học sinh
+                // var students = await _unitOfWork.UserRepository.GetAllAsync(u => model.StudentId.Contains(u.Id));
+                var waitlistedStudents = await _unitOfWork.ClassRoomRepository.CheckWaitlistedStatusForStudentsAsync(model.StudentId,courseId);
+                foreach (var student in model.StudentId)
+                {
+                    var check2 = await _unitOfWork.RegisterCourseRepository.FindRegisterCourseByUserId(student, Guid.Parse(model.CourseId));
+                    if (check2 == null) { return ResponseHandler.Success<Guid?>(null, "Danh sánh học sinh chưa hợp lệ !"); }
+                   check2.StudentCourseStatus = StudentCourseStatusEnum.Enrolled;
+                    await _unitOfWork.RegisterCourseRepository.UpdateAsync(check2);
+                    var newClassRoom = new ClassRoom
+                    {
+                        UserId = student,
+                        ClassId = newClass.Id,
+
+                    };
+
+                    await _unitOfWork.ClassRoomRepository.AddAsync(newClassRoom);
+                }  
                 if (!string.IsNullOrEmpty(model .InstructorId))
                 {
                     
@@ -135,20 +125,6 @@ namespace FranchiseProject.Application.Services
                     };
 
                     await _unitOfWork.ClassRoomRepository.AddAsync(classRoom1);
-                }
-                foreach (var studentId in waitlistedStudents.Keys)
-                {
-                    if (!waitlistedStudents[studentId]) 
-                    {
-                        var newClassRoom = new ClassRoom
-                        {
-                            UserId = studentId,
-                            ClassId = newClass.Id,
-                          
-                        };
-
-                        await _unitOfWork.ClassRoomRepository.AddAsync(newClassRoom);
-                    }
                 }
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
@@ -647,6 +623,7 @@ namespace FranchiseProject.Application.Services
                     {
                         Id = schedule.Id.ToString(),
                         Room = schedule.Room,
+                        ClassId=classE.Id,
                         ClassName = classE.Name,
                         SlotName = slot?.Name,
                         Date = schedule.Date.ToString(),

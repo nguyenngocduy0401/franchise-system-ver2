@@ -1,4 +1,5 @@
-﻿using FranchiseProject.Application.Repositories;
+﻿using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -11,16 +12,21 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Infrastructures.Repositories
 {
-    public class RegisterCourseRepository : IRegisterCourseRepository
+    public class RegisterCourseRepository :GenericRepository<RegisterCourse>, IRegisterCourseRepository
     {
         private readonly AppDbContext _dbContext;
-      
-        public RegisterCourseRepository(AppDbContext dbContext)
+        private readonly ICurrentTime _timeService;
+        private readonly IClaimsService _claimsService;
+        public RegisterCourseRepository(
+            AppDbContext context,
+            ICurrentTime timeService,
+            IClaimsService claimsService
+        ) : base(context, timeService, claimsService)
         {
-            _dbContext = dbContext;
-           
+            _dbContext = context;
+            _timeService = timeService;
+            _claimsService = claimsService;
         }
-
         public  Task<List<string>> GetCourseCodeByUserIdAsync(string userId)
         {
             return  _dbContext.RegisterCourses
@@ -37,10 +43,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             .Select(rc => rc.Course.Name)
             .ToListAsync();
         }
-        public async Task AddAsync(RegisterCourse registerCourse)
-        {
-            await _dbContext.Set<RegisterCourse>().AddAsync(registerCourse);
-        }
+      
         public async Task UpdateAsync(RegisterCourse registerCourse)
         {
 
@@ -102,6 +105,11 @@ namespace FranchiseProject.Infrastructures.Repositories
             }
 
             return await query.ToListAsync();
+        }
+        public async Task<RegisterCourse> FindRegisterCourseByUserId(string userId,Guid courseId)
+        {
+            return await _dbContext.RegisterCourses
+                    .Where(rc => rc.UserId==userId&&rc.CourseId==courseId&&rc.StudentCourseStatus==StudentCourseStatusEnum.Waitlisted).FirstOrDefaultAsync();
         }
     }
 }

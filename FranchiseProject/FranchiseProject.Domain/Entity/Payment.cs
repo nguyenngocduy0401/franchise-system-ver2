@@ -14,12 +14,15 @@ namespace FranchiseProject.Domain.Entity
         public string? Description { get; set; }
         public int? Amount { get; set; }
         public PaymentTypeEnum? Type { get; set; }
-        public PaymentStatusEnum? Status { get; set; }
         public Guid? ContractId { get; set; }
         [ForeignKey("ContractId")]
         public Contract? Contract { get; set; }
         public string ? UserId  { get; set; }
         [ForeignKey("UserId")]
         public User? User { get; set; }
+        public Guid? RegisterCourseId { get; set; }
+        [ForeignKey("RegisterCourseId")]
+        public RegisterCourse? RegisterCourse { get; set; }
+
     }
 }

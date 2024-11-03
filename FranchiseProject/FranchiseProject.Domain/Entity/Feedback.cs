@@ -11,9 +11,9 @@ namespace FranchiseProject.Domain.Entity
     {
         public string? Title { get; set; }
         public string? Description { get; set; }
-        public Guid? ClassId { get; set; }
-        [ForeignKey("ClassId")]
-        public Class? Class { get; set; }
+        public Guid? CourseId { get; set; }
+        [ForeignKey("CourseId")]
+        public Course? Course { get; set; }
         public string? UserId { get; set; }
         [ForeignKey("UserId")]
         public User? User { get; set; }
