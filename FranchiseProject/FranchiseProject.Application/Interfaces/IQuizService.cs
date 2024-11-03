@@ -12,6 +12,6 @@ namespace FranchiseProject.Application.Interfaces
     public interface IQuizService
     {
         Task<ApiResponse<bool>> CreateQuizForClass(CreateQuizModel createQuizModel);
-        Task<ApiResponse<QuizDetailStudentViewModel>> GetQuizForStudentByQuizId(Guid id);
+        Task<ApiResponse<QuizDetailStudentViewModel>> GetQuizDetailForStudentByQuizId(Guid id);
     }
 }

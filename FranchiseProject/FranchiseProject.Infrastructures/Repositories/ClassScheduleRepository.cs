@@ -27,6 +27,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
+        
         public async Task<ClassSchedule?> GetExistingScheduleAsync(DateTime date, string room, Guid slotId)
         {
             return  _dbContext.ClassSchedules
@@ -34,11 +35,11 @@ namespace FranchiseProject.Infrastructures.Repositories
                                            
                                             cs.SlotId == slotId);
         }
-        public async Task<List<ClassSchedule>> GetAllAsync1(Expression<Func<ClassSchedule, bool>> predicate)
+        public async Task<List<ClassSchedule>> GetAllClassScheduleAsync(Expression<Func<ClassSchedule, bool>> predicate)
         {
             return await _dbContext.Set<ClassSchedule>().Where(predicate).ToListAsync();
         }
-        public async Task<IEnumerable<ClassSchedule>> GetAllAsync1(Expression<Func<ClassSchedule, bool>> filter = null, string includeProperties = "")
+        public async Task<IEnumerable<ClassSchedule>> GetAllClassScheduleAsync(Expression<Func<ClassSchedule, bool>> filter = null, string includeProperties = "")
         {
             IQueryable<ClassSchedule> query = _dbContext.ClassSchedules;
 

@@ -599,11 +599,11 @@ namespace FranchiseProject.Application.Services
                 if (startDate == default(DateTime) && endDate == default(DateTime))
 
                 {
-                    classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs => cs.ClassId == classGuidId);
+                    classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllClassScheduleAsync(cs => cs.ClassId == classGuidId);
                 }
                 else
                 {
-                    classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs =>
+                    classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllClassScheduleAsync(cs =>
                         cs.ClassId == classGuidId && cs.Date.Value.Date >= startDate.Date && cs.Date.Value.Date <= endDate.Date);
                 }
 
@@ -691,7 +691,7 @@ namespace FranchiseProject.Application.Services
                 }
 
                 
-                var schedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs =>
+                var schedules = await _unitOfWork.ClassScheduleRepository.GetAllClassScheduleAsync(cs =>
                     activeClassIds.Contains(cs.ClassId.Value) &&
                     cs.Date.Value.Date >= startTime.Date.Date && cs.Date.Value.Date <= endTime.Date.Date);
 

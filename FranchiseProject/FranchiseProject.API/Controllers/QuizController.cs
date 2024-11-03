@@ -28,7 +28,7 @@ namespace FranchiseProject.API.Controllers
         [HttpGet("{id}")]
         public async Task<ApiResponse<QuizDetailStudentViewModel>> GetQuizForStudentByQuizId(Guid id)
         {
-            return await _quizService.GetQuizForStudentByQuizId(id);
+            return await _quizService.GetQuizDetailForStudentByQuizId(id);
         }
     }
 }

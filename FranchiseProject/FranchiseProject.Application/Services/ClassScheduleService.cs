@@ -363,7 +363,7 @@ namespace FranchiseProject.Application.Services
                 var currentDate=DateTime.Now;
                 
                
-                var classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllAsync1(cs => cs.ClassId == Guid.Parse(classId));
+                var classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllClassScheduleAsync(cs => cs.ClassId == Guid.Parse(classId));
                 var classRooms = await _unitOfWork.ClassRoomRepository.GetAllAsync(cr => cr.ClassId == Guid.Parse(classId));
                 var userIds = classRooms.Select(cr => cr.UserId).Distinct().ToList();
                 var classE = await _unitOfWork.ClassRepository.GetExistByIdAsync(Guid.Parse(classId));

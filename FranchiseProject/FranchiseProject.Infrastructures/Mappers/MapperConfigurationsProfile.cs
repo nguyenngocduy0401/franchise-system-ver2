@@ -32,6 +32,7 @@ using FranchiseProject.Application.ViewModels.PaymentViewModel;
 using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.ViewModels.AssignmentViewModels;
 using FranchiseProject.Application.ViewModels.QuizViewModels;
+using FranchiseProject.Application.ViewModels.ScoreViewModels;
 
 
 
@@ -242,8 +243,14 @@ namespace FranchiseProject.Infrastructures.Mappers
                 .ForMember(dest => dest.Questions, opt => opt
                 .MapFrom(src => src.QuizDetails
                 .Select(qd => qd.Question)));
+            CreateMap<Quiz, QuizStudentViewModel>()
+                .ForMember(dest => dest.Scores, opt => opt.MapFrom(src => src.Scores.FirstOrDefault()));
+
             #endregion
 
+            #region Score
+            CreateMap<Score, ScoreViewModel>();
+            #endregion
             #region Payment
             CreateMap<CreateStudentPaymentViewModel, Payment>()
            .ForMember(dest => dest.Id, opt => opt.Ignore());

@@ -8,7 +8,7 @@ namespace FranchiseProject.Domain.Enums
 {
     public enum ClassStatusEnum
     {
-        Active=1,
-      Inactive=2,
+        Active = 1,
+        Inactive = 2,
     }
 }

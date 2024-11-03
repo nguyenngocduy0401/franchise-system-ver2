@@ -10,5 +10,6 @@ namespace FranchiseProject.Application.Repositories
     public interface IQuizRepository : IGenericRepository<Quiz>
     {
         Task<Quiz> GetQuizForStudentById(Guid id);
+        Task<IEnumerable<Quiz>> GetQuizScoreStudentByClassIdAndStudentId(Guid classId, string studentId);
     }
 }
