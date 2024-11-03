@@ -175,6 +175,7 @@ namespace FranchiseProject.Application.Services
                     PageSize = pageSize
                 };
                 var assignmentViewModelPagination = _mapper.Map<Pagination<AssignmentViewModel>>(assignmentPagination);
+                response = ResponseHandler.Success<Pagination<AssignmentViewModel>>(assignmentViewModelPagination,"Lấy danh sách bài tập thành công!");
             }
             catch (Exception ex)
             {

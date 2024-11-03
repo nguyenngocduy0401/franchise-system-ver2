@@ -26,6 +26,7 @@ namespace FranchiseProject.Application.Services
 {
     public class PaymentService : IPaymentService
     {
+        #region Contructor
         private readonly IUnitOfWork _unitOfWork;
         private readonly  IMapper _mapper;
         private readonly  IValidator<CreateStudentPaymentViewModel> _validator;
@@ -33,7 +34,8 @@ namespace FranchiseProject.Application.Services
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly IClaimsService _claimsService;
         private readonly UserManager<User> _userManager;
-        public PaymentService(UserManager<User> userManager,IUnitOfWork unitOfWork,IMapper mapper,IValidator<CreateStudentPaymentViewModel>validator
+        private readonly IUserService _userService;
+        public PaymentService(IUserService userService,UserManager<User> userManager,IUnitOfWork unitOfWork,IMapper mapper,IValidator<CreateStudentPaymentViewModel>validator
             ,IEmailService emailService,IHubContext<NotificationHub>hubContext,IClaimsService claimsService)
         {
             _claimsService = claimsService;
@@ -43,83 +45,51 @@ namespace FranchiseProject.Application.Services
             _hubContext = hubContext;
             _emailService = emailService;
             _userManager = userManager;
+            _userService = userService;
         }
-
+        #endregion
         public async Task<ApiResponse<bool>> CreatePaymentStudent(CreateStudentPaymentViewModel create,  StudentPaymentStatusEnum status )
         {
             var response = new ApiResponse<bool>();
             try
             {
-                var userCurrentId = _claimsService.GetCurrentUserId;
-                var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
-                var student = await _userManager.FindByIdAsync(create.UserId);
-                var courseGuidId = Guid.Parse(create.CourseId);
-                if (student == null) throw new Exception("Student does not exist!");
-
-                //cần check Student thuộc agency 
-                var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(userCurrent.AgencyId.Value);
-                if (student.AgencyId != userCurrent.AgencyId)
-                {
-                    throw new Exception("Student does not belong to your agency!");
-                }
-
-                FluentValidation.Results.ValidationResult validationResult = await _validator.ValidateAsync(create);
-                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
-                var registerCourse = await _unitOfWork.RegisterCourseRepository
-                   .GetFirstOrDefaultAsync(rc => rc.UserId == create.UserId && rc.CourseId == courseGuidId);
-                if (status == StudentPaymentStatusEnum.Completed)
-                {
-                    if (registerCourse.StudentCourseStatus == StudentCourseStatusEnum.Pending)
-                    {
-                        registerCourse.StudentCourseStatus = StudentCourseStatusEnum.Waitlisted;
-                        await _unitOfWork.RegisterCourseRepository.UpdateAsync(registerCourse);
-                        var courseNames = await _unitOfWork.RegisterCourseRepository
-                      .GetCourseNamesByUserIdAsync(create.UserId);
-                        var random = new Random();
-                        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-                        var password = new string(Enumerable.Repeat(chars, 6)
-                            .Select(s => s[random.Next(s.Length)]).ToArray());
-                        var user1=  _userManager.AddPasswordAsync(student, password);
-                        var emailMessage = EmailTemplate.StudentPaymentSuccsess(student.Email, student.FullName, create.Amount, agency.Name,student.UserName, password);
-                        bool emailSent = await _emailService.SendEmailAsync(emailMessage);
-                        if (!emailSent)
-                        {
-                            response = ResponseHandler.Failure<bool>("Lỗi khi gửi mail"); return response;
+                var rc = await _unitOfWork.RegisterCourseRepository.GetExistByIdAsync(Guid.Parse(create.RegisterCourseId));
+                switch (status) {
+                    case StudentPaymentStatusEnum.Advance_Payment:
+                        if (rc.StudentCourseStatus == StudentCourseStatusEnum.Pending) {
+                            var payment = _mapper.Map<Payment>(create);
+                            rc.StudentPaymentStatus=StudentPaymentStatusEnum.Advance_Payment;
+                            rc.StudentCourseStatus = StudentCourseStatusEnum.Waitlisted;
+                            await _unitOfWork.RegisterCourseRepository.UpdateAsync(rc);
+                            await _unitOfWork.PaymentRepository.AddAsync(payment);
+                            var user = await _userManager.FindByIdAsync(rc.UserId);
+                            var generate = await _userService.GenerateUserCredentials(user.FullName);
+                            var email = EmailTemplate.StudentPaymentSuccsess(user.Email, user.FullName, create.Amount, generate.UserName, generate.Password);
+                          var mailSuccess=  _emailService.SendEmailAsync(email);
+                           
                         }
-                    }
-                    else
-                    {
-                        response = ResponseHandler.Failure<bool>("Không thể chuyển trạng thái học sinh"); return response;
-                    }
-                }
-                else if (status == StudentPaymentStatusEnum.Pending_Payment)
-                {
-                    if (student.StudentStatus == StudentStatusEnum.Pending)
-                    {
-                        //student.StudentStatus = StudentStatusEnum.Waitlisted;
-                        var courseNames = await _unitOfWork.RegisterCourseRepository
-                      .GetCourseNamesByUserIdAsync(create.UserId);
-                        var emailMessage = EmailTemplate.StudentPaymentSuccsessNotCompleted(student.Email, student.FullName, create.Amount, agency.Name);
-                        bool emailSent = await _emailService.SendEmailAsync(emailMessage);
-                        if (!emailSent)
+                        break;
+                    case StudentPaymentStatusEnum.Completed:
+                        if (rc.StudentCourseStatus == StudentCourseStatusEnum.Pending || rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted || rc.StudentCourseStatus == StudentCourseStatusEnum.Enrolled)
                         {
-                            response = ResponseHandler.Failure<bool>("Lỗi khi gửi mail");
-                            return response;
+                            var payment = _mapper.Map<Payment>(create);
+                            rc.StudentPaymentStatus = StudentPaymentStatusEnum. Completed;
+                            rc.StudentCourseStatus = StudentCourseStatusEnum.Waitlisted;
+                            await _unitOfWork.RegisterCourseRepository.UpdateAsync(rc);
+                            await _unitOfWork.PaymentRepository.AddAsync(payment);
+                            var user = await _userManager.FindByIdAsync(rc.UserId);
+                            var generate = await _userService.GenerateUserCredentials(user.FullName);
+                            var email = EmailTemplate.StudentPaymentSuccsess(user.Email, user.FullName, create.Amount, generate.UserName, generate.Password);
+                            var mailSuccess = _emailService.SendEmailAsync(email);
                         }
-                    }
-                    else
-                    {
-                        response = ResponseHandler.Failure<bool>("Không thể chuyển trạng thái học sinh");
-                        return response;
-                    }
-                }
-                var payment = _mapper.Map<Payment>(create);
-              //  student.StudentPaymentStatus = status;
-                await _unitOfWork.PaymentRepository.AddAsync(payment);
+                        break;
+
+
+                       
+                };
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Create failed!");
-
-                response = ResponseHandler.Success(true, "Tạo hóa đơn  thành công!");
+                if (!isSuccess) { throw new Exception("create fail!"); }
+                return ResponseHandler.Success<bool>(true, "Tạo thanh toán thành công !");
 
             }
             catch (Exception ex)

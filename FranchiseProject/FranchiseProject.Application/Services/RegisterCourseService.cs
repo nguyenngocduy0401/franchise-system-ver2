@@ -70,7 +70,7 @@ namespace FranchiseProject.Application.Services
 
                 if (string.IsNullOrEmpty(lastName))
                 {
-                    return ResponseHandler.Failure<bool>("Tên người dùng không hợp lệ!");
+                    return ResponseHandler.Success<bool>(false,"Tên người dùng không hợp lệ!");
                 }
            
                 string baseUserName = $"{lastName}lc";
@@ -84,10 +84,10 @@ namespace FranchiseProject.Application.Services
 
       
                 var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(Guid.Parse(model.CourseId));
-                if (course == null) return ResponseHandler.Failure<bool>("Khóa học không khả dụng!");
+                if (course == null) return ResponseHandler.Success<bool>(false, "Khóa học không khả dụng!");
 
                 var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(Guid.Parse(model.AgencyId));
-                if (agency == null) return ResponseHandler.Failure<bool>("Trung tâm không khả dụng!");
+                if (agency == null) return ResponseHandler.Success<bool>(false, "Trung tâm không khả dụng!");
 
                 var newUser = new User
                 {
@@ -163,6 +163,7 @@ namespace FranchiseProject.Application.Services
                     case StudentCourseStatusEnum.Pending:
                         if (registerCourse.StudentCourseStatus == StudentCourseStatusEnum.NotConsult)
                         {
+                            registerCourse.StudentPaymentStatus=StudentPaymentStatusEnum.Pending_Payment;
                             registerCourse.StudentCourseStatus = StudentCourseStatusEnum.Pending;
                         }
                         else
@@ -173,6 +174,7 @@ namespace FranchiseProject.Application.Services
 
                     case StudentCourseStatusEnum.Cancel:
                         registerCourse.StudentCourseStatus = StudentCourseStatusEnum.Cancel;
+                        registerCourse.StudentPaymentStatus = StudentPaymentStatusEnum.Late_Payment;
                         break;
                     case StudentCourseStatusEnum.Waitlisted:
                         registerCourse.StudentCourseStatus = StudentCourseStatusEnum.Waitlisted;
@@ -225,7 +227,8 @@ namespace FranchiseProject.Application.Services
 
                 var studentViewModel = new StudentRegisterViewModel
                 {
-                    Id = student.Id,
+                    Id = rc.Id,
+                    UserId=student.Id,
                     FullName = student.FullName,
                     Email = student.Email,
                     PhoneNumber = student.PhoneNumber,
@@ -234,7 +237,8 @@ namespace FranchiseProject.Application.Services
                     CourseId = registerCourse.CourseId,
                     DateTime = await GetDateTimeFromRegisterCourseAsync(id, registerCourse.CourseId.Value),
                     CoursePrice = registerCourse.Course?.Price,
-                    RegisterDate = registerCourse.CreatDate?.ToString()
+                    RegisterDate = registerCourse.CreatDate?.ToString(),
+                    PaymentStatus=registerCourse.StudentPaymentStatus,
                 };
 
                 response = ResponseHandler.Success(studentViewModel, "Lấy thông tin thành công!");
@@ -253,71 +257,60 @@ namespace FranchiseProject.Application.Services
             {
                 var userCurrentId = _claimsService.GetCurrentUserId;
                 var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
-                var studentRole = await _roleManager.FindByNameAsync(AppRole.Student);
 
-                if (studentRole == null)
+                if (userCurrent == null || !userCurrent.AgencyId.HasValue)
                 {
-                    return ResponseHandler.Failure<Pagination<StudentRegisterViewModel>>("Không tìm thấy vai trò sinh viên.");
+                    return ResponseHandler.Success<Pagination<StudentRegisterViewModel>>(null,"User hoặc Agency không khả dụng!");
                 }
-
-                var studentRoleId = studentRole.Id;
-                var currentAgencyId = userCurrent.AgencyId;
-
-                Expression<Func<User, bool>> filter = u =>
-                    (u.AgencyId == currentAgencyId) &&
-                    (u.UserRoles.Any(r => r.RoleId == studentRoleId)) &&
-                    (u.StudentStatus != StudentStatusEnum.Enrolled) &&
-                    (string.IsNullOrEmpty(filterStudentModel.CourseId) ||
-                     u.RegisterCourses.Any(rc => rc.CourseId.ToString() == filterStudentModel.CourseId)) &&
-                    (!filterStudentModel.Status.HasValue ||
-                     u.RegisterCourses.Any(rc => rc.StudentCourseStatus == filterStudentModel.Status));
-
-                var students = await _unitOfWork.UserRepository.GetFilterAsync(
+                var allowedStatuses = new List<StudentCourseStatusEnum>
+                {
+                    StudentCourseStatusEnum.Pending,
+                    StudentCourseStatusEnum.Waitlisted,
+                    StudentCourseStatusEnum.Cancel,
+                    StudentCourseStatusEnum.NotConsult,
+                    StudentCourseStatusEnum.Enrolled
+                };
+                Expression<Func<RegisterCourse, bool>> filter = rc =>
+                    allowedStatuses.Contains(rc.StudentCourseStatus.Value) &&
+                    (filterStudentModel.Status == null || rc.StudentCourseStatus == filterStudentModel.Status) &&
+                    (filterStudentModel.PaymentStatus == null || rc.StudentPaymentStatus == filterStudentModel.PaymentStatus) &&
+                    (string.IsNullOrEmpty(filterStudentModel.CourseId) || rc.CourseId.ToString() == filterStudentModel.CourseId) &&
+                    rc.User.AgencyId == userCurrent.AgencyId;
+                var registerCourses = await _unitOfWork.RegisterCourseRepository.GetFilterAsync(
                     filter: filter,
+                    includeProperties:"User,Course",
                     pageIndex: filterStudentModel.PageIndex,
-                    pageSize: filterStudentModel.PageSize,
-                    includeProperties: "RegisterCourses.Course"
+                    pageSize: filterStudentModel.PageSize
                 );
-
-                var studentViewModels = students.Items
-                    .Select(s => {
-                        var firstValidRegisterCourse = s.RegisterCourses
-                            .Where(rc => rc.StudentCourseStatus == StudentCourseStatusEnum.Pending ||
-                                         rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted ||
-                                         rc.StudentCourseStatus == StudentCourseStatusEnum.Cancel ||
-                                         rc.StudentCourseStatus == StudentCourseStatusEnum.NotConsult||
-                                          rc.StudentCourseStatus != StudentCourseStatusEnum.Enrolled)
-                            .OrderByDescending(rc => rc.CreatDate)
-                            .FirstOrDefault();
-
-                        return new StudentRegisterViewModel
-                        {
-                            Id = s.Id,
-                            FullName = s.FullName,
-                            StudentStatus = firstValidRegisterCourse?.StudentCourseStatus,
-                            PhoneNumber = s.PhoneNumber,
-                            Email = s.Email,
-                            CourseId = firstValidRegisterCourse?.CourseId,
-                            DateTime = firstValidRegisterCourse?.DateTime,
-                            CourseCode = firstValidRegisterCourse?.Course?.Code,
-                            CoursePrice = firstValidRegisterCourse?.Course?.Price,
-                            RegisterDate = firstValidRegisterCourse?.CreatDate.ToString()
-                        };
-                    })
-                    .ToList();
-
-                var totalItemsCount = students.TotalItemsCount;
-
+                var studentRegisterViewModels = registerCourses.Items.Select(rc => new StudentRegisterViewModel
+                {
+                    Id = rc.Id,
+                    UserId=rc.UserId,
+                    CourseId = rc.CourseId,
+                    FullName = rc.User?.FullName,
+                    Email = rc.User?.Email,
+                    PhoneNumber = rc.User?.PhoneNumber,
+                    CourseCode = rc.Course?.Code,
+                    CoursePrice = rc.Course?.Price,
+                    RegisterDate = rc.CreatDate?.ToString("dd/MM/yyyy"),
+                    StudentStatus = rc.StudentCourseStatus,
+                    PaymentStatus = rc.StudentPaymentStatus,
+                    DateTime = rc.DateTime,
+                    PaymentDeadline=rc.PaymentDeadline,
+                    
+                }).ToList();
                 var paginatedResult = new Pagination<StudentRegisterViewModel>
                 {
-                    Items = studentViewModels,
-                    TotalItemsCount = totalItemsCount,
-                    PageIndex = filterStudentModel.PageIndex,
-                    PageSize = filterStudentModel.PageSize
+                    Items = studentRegisterViewModels,
+                    PageIndex = registerCourses.PageIndex,
+                    PageSize = registerCourses.PageSize,
+                    TotalItemsCount = registerCourses.TotalPagesCount
                 };
 
-                if (!studentViewModels.Any())
-                    return ResponseHandler.Success(paginatedResult, "Không tìm thấy sinh viên phù hợp!");
+                if (studentRegisterViewModels.Count==0)
+                {
+                    return ResponseHandler.Success(paginatedResult, "Không tìm thấy học viên phù hợp!");
+                }
 
                 response = ResponseHandler.Success(paginatedResult, "Successful!");
             }
@@ -329,100 +322,24 @@ namespace FranchiseProject.Application.Services
         }
 
 
-        public async Task<ApiResponse<bool>> UpdateRegisterCourseDateTimeAsync(string userId, string courseId, UpdateRegisterCourseViewModel update)
+        public async Task<ApiResponse<bool>> UpdateRegisterCourseDateTimeAsync(string id, UpdateRegisterCourseViewModel update)
         {
             var response = new ApiResponse<bool>();
             try
             {
-                var registerCourse = await _unitOfWork.RegisterCourseRepository.GetFirstOrDefaultAsync(
-                    rc => rc.UserId == userId && rc.CourseId ==  Guid.Parse(courseId)&& rc.StudentCourseStatus==StudentCourseStatusEnum.Pending);
-                if (registerCourse == null)
-                {
-                    return ResponseHandler.Failure<bool>("Không tìm thấy khóa học đăng ký phù hợp.");
-                }
-                
-                if (update.CourseId != null) 
-                {
-                    var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(Guid.Parse(update.CourseId));
-                    if (course == null) { return ResponseHandler.Failure<bool>("Không tìm thấy khóa học phù hợp."); }
-                    _unitOfWork.RegisterCourseRepository.Delete(registerCourse);
-                }
-                
-                if (update.DateTime !="")
-                {
-                    var dateTimePattern = @"^(Thứ [2-7]|Chủ Nhật)(,\s*(Thứ [2-7]|Chủ Nhật))*;\s*[0-2][0-9]:[0-5][0-9]$";
-                    if (!Regex.IsMatch(update.DateTime, dateTimePattern, RegexOptions.IgnoreCase))
-                    {
-                        return ResponseHandler.Failure<bool>("Định dạng không hợp lệ! Định dạng đúng: Thứ X, Thứ Y;HH:mm.");
-                    }
-
-                    var dateTimeParts = update.DateTime.Split(';');
-                    var daysOfWeek = dateTimeParts[0].Trim().Split(',');
-                    var time = TimeSpan.Parse(dateTimeParts[1].Trim());
-
-
-                    var validDaysOfWeek = new HashSet<string>
-        {
-            "thứ 2", "thứ 3", "thứ 4", "thứ 5", "thứ 6", "thứ 7", "chủ nhật"
-        };
-
-
-                    foreach (var day in daysOfWeek)
-                    {
-                        var trimmedDay = day.Trim().ToLower(); 
-                        if (!validDaysOfWeek.Contains(trimmedDay))
-                        {
-                            return ResponseHandler.Failure<bool>("Ngày trong tuần không hợp lệ. Chỉ chấp nhận Thứ 2 đến Thứ 7 hoặc Chủ Nhật.");
-                        }
-                    }
-                    var slot = await _unitOfWork.SlotRepository.GetFirstOrDefaultAsync(s => s.StartTime == time);
-                    if (slot == null)
-                    {
-                        return ResponseHandler.Failure<bool>("Không có Slot nào khớp với thời gian đã nhập!");
-                    }
-                }
-                if (update.CourseId != null)
-                {
-                    var newRegisterCourse = new RegisterCourse
-                    {
-                        UserId = userId,
-                        CourseId = Guid.Parse(update.CourseId),
-                        DateTime = update.DateTime,
-                        StudentCourseStatus = StudentCourseStatusEnum.Pending
-                    };
-                    await _unitOfWork.RegisterCourseRepository.AddAsync(newRegisterCourse);
-                }
-                else
-                {
-                    var registerCourseExist = await _unitOfWork.RegisterCourseRepository.GetFirstOrDefaultAsync(
-                   rc => rc.UserId == userId && rc.CourseId == Guid.Parse(courseId) && rc.StudentCourseStatus == StudentCourseStatusEnum.Pending);
-                    registerCourseExist.DateTime = update.DateTime;
-                    await _unitOfWork.RegisterCourseRepository.UpdateAsync(registerCourseExist);
-                }
-                if (update.StudentName != null)
-                {
-                    var user = await _userManager.FindByIdAsync(userId);
-                    var nameParts = update.StudentName.Split(' ');
-                    var lastName = nameParts.LastOrDefault()?.ToLower();
-                    lastName = RemoveDiacritics(lastName);
-
-                    if (string.IsNullOrEmpty(lastName))
-                    {
-                        return ResponseHandler.Failure<bool>("Tên người dùng không hợp lệ!");
-                    }
-
-                    string baseUserName = $"{lastName}lc";
-                    string finalUserName = baseUserName;
-                    int counter = 1;
-                    user.UserName=finalUserName;
-                    user.FullName = update.StudentName;
-                }
-              
-
+                var rc = await _unitOfWork.RegisterCourseRepository.GetExistByIdAsync(Guid.Parse(id));
+                var userId = rc.UserId;
+                var user =await  _userManager.FindByIdAsync(userId);
+                user.FullName=update.StudentName;
+                rc.DateTime=update.DateTime;
+                rc.CourseId=Guid.Parse(update.CourseId);
+                rc.PaymentDeadline = update.PaymentDeadline;
+                await _userManager.UpdateAsync(user);
+                await _unitOfWork.RegisterCourseRepository.UpdateAsync(rc);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess)
+                if (isSuccess)
                 {
-                    return ResponseHandler.Failure<bool>("Cập nhật thất bại!");
+                    return ResponseHandler.Failure<bool>("Update Fail!");
                 }
 
 

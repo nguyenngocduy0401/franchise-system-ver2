@@ -16,7 +16,7 @@ namespace FranchiseProject.Application.Interfaces
     Task<ApiResponse<bool>> UpdateStatusStudentAsync(string studentId, string courseId, StudentCourseStatusEnum status);
     Task<ApiResponse<StudentRegisterViewModel>> GetStudentRegisterByIdAsync (string id,string courseId);
     Task<ApiResponse<Pagination<StudentRegisterViewModel>>> FilterStudentAsync(FilterRegisterCourseViewModel filterStudentModel);
-        Task<ApiResponse<bool>> UpdateRegisterCourseDateTimeAsync(string userId, string courseId, UpdateRegisterCourseViewModel update);
+        Task<ApiResponse<bool>> UpdateRegisterCourseDateTimeAsync(string id, UpdateRegisterCourseViewModel update);
         Task<ApiResponse<bool>> StudentExistRegisterCourse(string courseId);
     }
 }

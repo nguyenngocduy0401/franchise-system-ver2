@@ -58,9 +58,9 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager)]
         [SwaggerOperation(Summary = "lấy danhh sách bài tập đã nộp   {Authorize = AgencyStaff, AgencyManager}")]
         [HttpGet("classes/{id}/assignments")]
-        public async Task<ApiResponse<Pagination<AssignmentSubmitViewModel>>> GetAssignmentSubmissionAsync(string assignmentId, int pageIndex, int pageSize)
+        public async Task<ApiResponse<Pagination<AssignmentSubmitViewModel>>> GetAssignmentSubmissionAsync(string id, int pageIndex, int pageSize)
         {
-            return await _assignmentService.GetAssignmentSubmissionAsync(assignmentId, pageIndex, pageSize);
+            return await _assignmentService.GetAssignmentSubmissionAsync(id, pageIndex, pageSize);
         }
     }
 }
