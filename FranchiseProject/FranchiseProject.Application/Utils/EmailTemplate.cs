@@ -53,7 +53,7 @@ namespace FranchiseProject.Application.Utils
                        $"<p>Đội ngũ FutureTech</p>"
             };
         }
-        public static MessageModel StudentPaymentSuccsess(string to, string name, int amount, string agencyName, string UserName, string password)
+        public static MessageModel StudentPaymentSuccsess(string to, string name, int amount, string UserName, string password)
         {
             return new MessageModel
             {

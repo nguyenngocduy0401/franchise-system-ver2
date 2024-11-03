@@ -12,7 +12,7 @@ namespace FranchiseProject.Application.ViewModels.FeedBackViewModels
     {
         public string? Title { get; set; }
         public string? Description { get; set; }
-        public string? ClassId { get; set; }
+        public string? CourseId { get; set; }
        
     }
 }

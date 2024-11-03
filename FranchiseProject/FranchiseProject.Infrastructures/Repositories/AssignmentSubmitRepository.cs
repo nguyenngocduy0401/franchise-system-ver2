@@ -64,5 +64,11 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.Set<AssignmentSubmit>().Where(predicate).ToListAsync();
         }
+        public async Task<List<AssignmentSubmit>> GetAllSubmissionsByAssignmentIdAsync(Guid assignmentId)
+        {
+            return await _dbContext.AssignmentSubmits
+                .Where(rc => rc.AssignmentId == assignmentId)
+                .ToListAsync();
+        }
     }
 }

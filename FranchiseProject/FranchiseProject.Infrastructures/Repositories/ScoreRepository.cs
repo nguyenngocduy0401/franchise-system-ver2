@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,13 @@ namespace FranchiseProject.Infrastructures.Repositories
             _dbContext = context;
             _timeService = timeService;
             _claimsService = claimsService;
+        }
+        public async Task<Score> GetSocreBByUserIdAssidAsync(Guid assignmentId,string UserId)
+        {
+            return await _dbContext.Scores
+                .Where(rc => rc.AssignmentId == assignmentId && rc.UserId==UserId)
+                .FirstOrDefaultAsync();
+                
         }
     }
 }

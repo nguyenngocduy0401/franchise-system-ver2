@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Entity
 {
-    public class RegisterCourse
+    public class RegisterCourse:BaseEntity
     {
         public string? UserId { get; set; }
         [ForeignKey("UserId")]
@@ -17,8 +17,10 @@ namespace FranchiseProject.Domain.Entity
         [ForeignKey("CourseId")]
         public Course? Course { get; set; }
         public string? DateTime {  get; set; }
+        public string? Email { get; set; }
+        public DateTime? PaymentDeadline { get; set; }
         public StudentCourseStatusEnum? StudentCourseStatus { get; set; }
-
+        public StudentPaymentStatusEnum? StudentPaymentStatus { get; set; }
         public DateTime? CreatDate { get; set; }
     }
 }

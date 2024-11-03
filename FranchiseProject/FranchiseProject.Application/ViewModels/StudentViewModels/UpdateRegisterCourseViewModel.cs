@@ -8,8 +8,9 @@ namespace FranchiseProject.Application.ViewModels.StudentViewModels
 {
     public  class UpdateRegisterCourseViewModel
     {
-        public string StudentName {  get; set; }
-        public string DateTime {  get; set; }
+        public string? StudentName {  get; set; }
+        public string? DateTime {  get; set; }
         public string? CourseId { get; set; }
+        public DateTime? PaymentDeadline { get; set; }
     }
 }

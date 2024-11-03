@@ -9,5 +9,6 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IScoreRepository : IGenericRepository<Score>
     {
+        Task<Score> GetSocreBByUserIdAssidAsync(Guid assignmentId, string UserId);
     }
 }
