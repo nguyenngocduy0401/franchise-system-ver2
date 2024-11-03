@@ -256,14 +256,13 @@ namespace FranchiseProject.Application.Services
                 {
                     foreach (var submission in submissions)
                     {
-                        var score = await _unitOfWork.ScoreRepository.GetSocreBByUserIdAssidAsync(assId, assSubmit.UserId.ToString());
+                        
                         var user = await _userManager.FindByIdAsync(submission.UserId);
                         assignmentSubmitViewModels.Add(new AssignmentSubmitViewModel
                         {
                             AssignmentId = submission.AssignmentId,
                             AssignmentName = submission.Assignment?.Title,
                             UserId = user?.Id,
-                            ScoreNumber=score.ScoreNumber,
                             UserName = user?.UserName,
                             FileSubmitURL = submission.FileSubmitURL,
                             SubmitDate = submission.SubmitDate

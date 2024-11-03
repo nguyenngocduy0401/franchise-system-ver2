@@ -36,6 +36,28 @@ namespace FranchiseProject.Application.Services
             _createQuizValidator = createQuizValidator;
             _currentTime = currentTime;
         }
+        public async Task<ApiResponse<IEnumerable<QuizViewModel>>> GetAllQuizByClassId(Guid id)
+        {
+            var response = new ApiResponse<IEnumerable<QuizViewModel>>();
+            try
+            {
+                var classs = await _unitOfWork.ClassRepository.GetExistByIdAsync(id);
+                if (classs == null || classs.Status != ClassStatusEnum.Active)
+                    return ResponseHandler.Success(response.Data , "Lớp học không khả dụng!");
+
+                var quizzes = await _unitOfWork.QuizRepository
+                    .FindAsync(e => e.ClassId == classs.Id);
+
+
+                var quizModel = _mapper.Map<IEnumerable<QuizViewModel>>(quizzes);
+                response = ResponseHandler.Success(quizModel);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<IEnumerable<QuizViewModel>>(ex.Message);
+            }
+            return response;
+        }
         public async Task<ApiResponse<IEnumerable<QuizStudentViewModel>>> GetAllQuizForStudentByClassId(Guid id)
         {
             var response = new ApiResponse<IEnumerable<QuizStudentViewModel>>();

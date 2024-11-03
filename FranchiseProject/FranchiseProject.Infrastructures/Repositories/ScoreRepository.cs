@@ -25,12 +25,6 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
-        public async Task<Score> GetSocreBByUserIdAssidAsync(Guid assignmentId,string UserId)
-        {
-            return await _dbContext.Scores
-                .Where(rc => rc.AssignmentId == assignmentId && rc.UserId==UserId)
-                .FirstOrDefaultAsync();
-                
-        }
+        
     }
 }
