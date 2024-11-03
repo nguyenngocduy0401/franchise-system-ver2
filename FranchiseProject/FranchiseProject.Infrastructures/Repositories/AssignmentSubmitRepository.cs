@@ -70,5 +70,15 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Where(rc => rc.AssignmentId == assignmentId)
                 .ToListAsync();
         }
+        public async Task<bool> UpdatesAsync(AssignmentSubmit assignmentSubmit)
+        {
+            if (assignmentSubmit == null)
+            {
+                throw new ArgumentNullException(nameof(assignmentSubmit));
+            }
+            _dbContext.AssignmentSubmits.Update(assignmentSubmit);
+            var result = await _dbContext.SaveChangesAsync();
+            return result > 0;
+        }
     }
 }

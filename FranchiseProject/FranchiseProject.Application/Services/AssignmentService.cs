@@ -231,20 +231,22 @@ namespace FranchiseProject.Application.Services
 
             return response;
         }
-        public async Task<ApiResponse<Pagination<AssignmentSubmitViewModel>>> GetAssignmentSubmissionAsync(string assignmentId, int pageIndex, int pageSize)
+        public async Task<ApiResponse<Pagination<AssignmentSubmitViewModel>>> GetAssignmentSubmissionAsync(string classId, int pageIndex, int pageSize)
         {
             var response = new ApiResponse<Pagination<AssignmentSubmitViewModel>>();
 
             try
             {
-                var assId = Guid.Parse(assignmentId);
+                var classid = Guid.Parse(classId);
                 var currentUserId = _claimsService.GetCurrentUserId.ToString();
-                var assSubmits =await _unitOfWork.AssignmentSubmitRepository.GetAllSubmissionsByAssignmentIdAsync(assId);
+              
+                var assigment= await _unitOfWork.AssignmentRepository.GetAllAsync1(cl=>cl.ClassId==classid);
+                var assSubmits =await _unitOfWork.AssignmentSubmitRepository.GetAllSubmissionsByAssignmentIdAsync(assigment.FirstOrDefault().Id);
                 if (string.IsNullOrEmpty(currentUserId))
                 {
                     return ResponseHandler.Failure<Pagination<AssignmentSubmitViewModel>>("User chưa đăng nhập!");
                 }
-                var submissions = await _unitOfWork.AssignmentSubmitRepository.GetAllAsync1(rs => rs.AssignmentId == assId);
+                var submissions = await _unitOfWork.AssignmentSubmitRepository.GetAllAsync1(rs => rs.AssignmentId == assSubmits.FirstOrDefault().AssignmentId);
 
                 if (submissions == null)
                 {
@@ -256,14 +258,14 @@ namespace FranchiseProject.Application.Services
                 {
                     foreach (var submission in submissions)
                     {
-                        var score = await _unitOfWork.ScoreRepository.GetSocreBByUserIdAssidAsync(assId, assSubmit.UserId.ToString());
+                        var score = await _unitOfWork.AssignmentSubmitRepository.GetFirstOrDefaultAsync(rc=>rc.AssignmentId==submission.AssignmentId&& rc.UserId==currentUserId);
                         var user = await _userManager.FindByIdAsync(submission.UserId);
                         assignmentSubmitViewModels.Add(new AssignmentSubmitViewModel
                         {
                             AssignmentId = submission.AssignmentId,
                             AssignmentName = submission.Assignment?.Title,
                             UserId = user?.Id,
-                            ScoreNumber=score.ScoreNumber,
+                            ScoreNumber=score.ScoreNumber.Value,
                             UserName = user?.UserName,
                             FileSubmitURL = submission.FileSubmitURL,
                             SubmitDate = submission.SubmitDate
@@ -334,13 +336,14 @@ namespace FranchiseProject.Application.Services
                 {
                     response = ResponseHandler.Success(false, "điểm không hợp lệ");
                 }
-                var ass = _mapper.Map<Score>(model);
-                await _unitOfWork.ScoreRepository.AddAsync(ass);
+               
                 var students = await _userManager.FindByIdAsync(model.UserId);
-               var assignment = await _unitOfWork.AssignmentRepository.GetByIdAsync(Guid.Parse(model.AssignmentId));
+                var assignmentsubmit = await _unitOfWork.AssignmentSubmitRepository.GetFirstOrDefaultAsync(rc=>rc.AssignmentId==model.AssignmentId&&rc.UserId==model.UserId);
+                var assignment = await _unitOfWork.AssignmentRepository.GetExistByIdAsync(assignmentsubmit.AssignmentId.Value);
                     await _hubContext.Clients.User(students.Id.ToString())
                         .SendAsync("ReceivedNotification", $" bài Tập {assignment.Title.ToString()} đã được chấm điểm.");
-                
+                assignmentsubmit.ScoreNumber = model.ScoreNumber;
+                await _unitOfWork.AssignmentSubmitRepository.UpdatesAsync(assignmentsubmit);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
 

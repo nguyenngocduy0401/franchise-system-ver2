@@ -12,8 +12,8 @@ namespace FranchiseProject.Application.ViewModels.FeedBackViewModels
     {
         public string? Title { get; set; }
         public string? Description { get; set; }
-        public Guid? ClassId { get; set; }
-        public string? ClassName { get; set; }
+        public Guid? CourseId { get; set; }
+        public string? CourseName { get; set; }
         public string? UserId { get; set; }
         public string?  UserName { get; set; }
     }

@@ -17,6 +17,8 @@ namespace FranchiseProject.Application.Repositories
         Task<List<AssignmentSubmit>> GetAllAsync1(Expression<Func<AssignmentSubmit, bool>> predicate);
 
         Task<List<AssignmentSubmit>> GetAllSubmissionsByAssignmentIdAsync(Guid assignmentId);
-        
+        Task<bool> UpdatesAsync(AssignmentSubmit assignmentSubmit);
+
+
         }
 }
