@@ -391,5 +391,22 @@ namespace FranchiseProject.Application.Services
 			}
 			return response;
 		}
-	}
+        public async Task<ApiResponse<IEnumerable<AgencyAddressViewModel>>> GetActiveAgencyAdressesByProvince(string city)
+        {
+            var response = new ApiResponse<IEnumerable<AgencyAddressViewModel>>();
+            try
+            {
+                var agencies = await _unitOfWork.AgencyRepository.FindAsync(x => x.Status == AgencyStatusEnum.Active && x.City == city);
+                var agencyAddressViewModels = _mapper.Map<IEnumerable<AgencyAddressViewModel>>(agencies);
+                if (agencyAddressViewModels.IsNullOrEmpty())
+                    return ResponseHandler.Success(agencyAddressViewModels, "Không có chi nhánh nào đang hoạt động trong tỉnh này!");
+                response = ResponseHandler.Success(agencyAddressViewModels, "Lấy địa chỉ các chi nhánh đang hoạt động thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<IEnumerable<AgencyAddressViewModel>>(ex.Message);
+            }
+            return response;
+        }
+    }
 }
