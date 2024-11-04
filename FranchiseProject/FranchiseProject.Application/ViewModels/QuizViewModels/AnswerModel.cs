@@ -9,7 +9,6 @@ namespace FranchiseProject.Application.ViewModels.QuizViewModels
     public class AnswerModel
     {
         public ICollection<Guid>? QuestionOptionsId { get; set; }
-        public ICollection<Guid>? UserId { get; set; }
 
     }
 }

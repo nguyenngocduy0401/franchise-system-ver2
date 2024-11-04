@@ -97,9 +97,9 @@ namespace FranchiseProject.Application.Services
                 var checkQuiz = await CheckQuizAvailable(quiz, studentId);
 
                 if (checkQuiz.Data == false) return response;
-                if(quiz.QuizDetails == null ) throw new Exception("QuizDetail does not exist!");
+                if(quiz.QuizDetails == null || !quiz.QuizDetails.Any()) throw new Exception("QuizDetail does not exist!");
 
-                double pointPerQuestion = 10 / quiz.QuizDetails.Count();
+                double pointPerQuestion = 10.0 / quiz.QuizDetails.Count();
                 double totalScore = 0.0;
 
                 foreach (var quizDetail in quiz.QuizDetails)
@@ -111,7 +111,8 @@ namespace FranchiseProject.Application.Services
                     var studentOptionIds = answerModel.QuestionOptionsId
                                             .Where(id => quizDetail.Question.QuestionOptions.Any(opt => opt.Id == id))
                                             .ToList();
-                    if (correctOptionIds.SequenceEqual(studentOptionIds))
+                    if (correctOptionIds.Count == studentOptionIds.Count &&
+                        !correctOptionIds.Except(studentOptionIds).Any())
                     {
                         totalScore += pointPerQuestion;
                     }
