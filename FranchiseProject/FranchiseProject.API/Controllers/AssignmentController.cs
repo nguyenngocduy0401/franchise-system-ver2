@@ -18,16 +18,16 @@ namespace FranchiseProject.API.Controllers
             _assignmentService = assignmentService;
         }
 
-        [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager)]
-        [SwaggerOperation(Summary = "tạo mới bài tập {Authorize = AgencyStaff, AgencyManager}")]
+        [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager + "," + AppRole.Instructor)]
+        [SwaggerOperation(Summary = "tạo mới bài tập {Authorize = AgencyStaff, AgencyManager, Instructor}")]
         [HttpPost]
         public async Task<ApiResponse<bool>> CreateAssignmentAsync(CreateAssignmentViewModel assignment)
         {
             return await _assignmentService.CreateAssignmentAsync(assignment);
         }
 
-        [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager)]
-        [SwaggerOperation(Summary = "cập nhật bài tập {Authorize = AgencyStaff, AgencyManager}")]
+        [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager + "," + AppRole.Instructor)]
+        [SwaggerOperation(Summary = "cập nhật bài tập {Authorize = AgencyStaff, AgencyManager,Instructor}")]
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> UpdateAssignmentAsync(string id, [FromBody] CreateAssignmentViewModel update)
         {
@@ -41,23 +41,23 @@ namespace FranchiseProject.API.Controllers
             return await _assignmentService.GetAssignmentByIdAsync(id);
         }
 
-        [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager)]
-        [SwaggerOperation(Summary = "xóa bài tập bằng ID {Authorize = AgencyStaff, AgencyManager}")]
+        [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager + "," + AppRole.Instructor)]
+        [SwaggerOperation(Summary = "xóa bài tập bằng ID {Authorize = AgencyStaff, AgencyManager,Instructor}")]
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteAssignmentAsync(string id)
         {
             return await _assignmentService.DeleteSlotByIdAsync(id);
         }
-        [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager)]
-        [SwaggerOperation(Summary = "lấy danhh sách bài tập của một lớp  {Authorize = AgencyStaff, AgencyManager}")]
+        [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager+"," + AppRole.Instructor)]
+        [SwaggerOperation(Summary = "lấy danhh sách bài tập của một lớp  {Authorize = AgencyStaff, AgencyManager ,Instructor}")]
         [HttpGet("assignments/{id}/submissions")]
        public async Task<ApiResponse<Pagination<AssignmentViewModel>>> GetAssignmentByClassIdAsync(string id, int pageIndex, int pageSize)
         {
             return await _assignmentService.GetAssignmentByClassIdAsync(id, pageIndex, pageSize);
         }
-        [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager)]
-        [SwaggerOperation(Summary = "lấy danhh sách bài tập đã nộp   {Authorize = AgencyStaff, AgencyManager}")]
-        [HttpGet("classes/{id}/assignments")]
+        [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager+","+AppRole.Instructor)]
+        [SwaggerOperation(Summary = "lấy danhh sách bài tập đã nộp   {Authorize = AgencyStaff, AgencyManager,Instructor}")]
+        [HttpGet("classes/assignments/{id}")]
         public async Task<ApiResponse<Pagination<AssignmentSubmitViewModel>>> GetAssignmentSubmissionAsync(string id, int pageIndex, int pageSize)
         {
             return await _assignmentService.GetAssignmentSubmissionAsync(id, pageIndex, pageSize);

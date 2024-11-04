@@ -11,9 +11,11 @@ using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -81,7 +83,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<FeedBackViewModel>> GetSlotByIdAsync(Guid feedbackId)
+        public async Task<ApiResponse<FeedBackViewModel>> GetFeedBaByIdAsync(Guid feedbackId)
         {
 
             var response = new ApiResponse<FeedBackViewModel>();
@@ -105,20 +107,20 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> DeleteSlotByIdAsync(Guid slotId)
+        public async Task<ApiResponse<bool>> DeleteFeedBackByIdAsync(Guid slotId)
         {
             var response = new ApiResponse<bool>();
             try
             {
-                var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync(slotId);
-                if (slot == null) return ResponseHandler.Failure<bool>("Slot học không khả dụng!");
+                var feedBack = await _unitOfWork.FeedbackRepository.GetExistByIdAsync(slotId);
+                if (feedBack == null) return ResponseHandler.Success<bool>(false,"Feedback học không khả dụng!");
 
-                _unitOfWork.SlotRepository.SoftRemove(slot);
+                _unitOfWork.FeedbackRepository.HardRemove(feedBack);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete failed!");
 
-                response = ResponseHandler.Success(true, "Xoá slot học thành công!");
+                response = ResponseHandler.Success(true, "Xoá Feedback học thành công!");
             }
             catch (Exception ex)
             {
@@ -126,5 +128,38 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+       /* public async Task<ApiResponse<Pagination<FeedBackViewModel>>> FilterFeedBackAsync(FilterSlotModel filterSlotModel)
+        {
+            var response = new ApiResponse<Pagination<FeedBackViewModel>>();
+            try
+            {
+                var userCurrentId = _claimsService.GetCurrentUserId;
+                var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
+
+                if (userCurrent == null || !userCurrent.AgencyId.HasValue)
+                {
+                    return ResponseHandler.Failure<Pagination<FeedBackViewModel>>("User hoặc Agency không khả dụng!");
+                }
+                Expression<Func<Slot, bool>> filter = s =>
+                (!filterSlotModel.StartTime.HasValue || filterSlotModel.StartTime <= s.StartTime) &&
+                (!filterSlotModel.StartTime.HasValue || filterSlotModel.EndTime >= s.EndTime) &&
+                 (s.AgencyId == userCurrent.AgencyId);
+                var slots = await _unitOfWork.SlotRepository.GetFilterAsync(
+                    filter: filter,
+                    pageIndex: filterSlotModel.PageIndex,
+                    pageSize: filterSlotModel.PageSize
+                    );
+                var slotViewModels = _mapper.Map<Pagination<SlotViewModel>>(slots);
+                if (slotViewModels.Items.IsNullOrEmpty()) return ResponseHandler.Success(slotViewModels, "Không tìm thấy slot phù hợp!");
+
+                response = ResponseHandler.Success(slotViewModels, "Successful!");
+
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<Pagination<SlotViewModel>>(ex.Message);
+            }
+            return response;
+        }*/
     }
 }

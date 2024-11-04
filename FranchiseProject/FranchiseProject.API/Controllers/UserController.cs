@@ -2,6 +2,7 @@
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AssignmentViewModels;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
+using FranchiseProject.Application.ViewModels.ClassViewModels;
 using FranchiseProject.Application.ViewModels.StudentViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -84,10 +85,16 @@ namespace FranchiseProject.API.Controllers
          [HttpGet("mine/class-schedules")]
          public async Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync(DateTime startTime, DateTime endTime) => await _classService.GetStudentSchedulesAsync(startTime,endTime);
         [SwaggerOperation(Summary = "giáo viên chấm điểm bài tập (assignement){Authorize = Instructor}")]
+        [Authorize(Roles = AppRole.Instructor)]
         [HttpPost("mine/scores")]
         public async Task<ApiResponse<bool>> GradeStudentAssAsync(StudentAssScorseNumberViewModel model) => await _assignmentService.GradeStudentAssAsync(model);
         [SwaggerOperation(Summary = "học sinh nộp bài tập (assignement){Authorize = Student}")]
+        [Authorize(Roles = AppRole.Student)]
         [HttpPost("mine/assignments")]
         public async Task<ApiResponse<bool>> SubmitAssignmentAsync(string assignmentId, string fileSubmitUrl)=> await _assignmentService.SubmitAssignmentAsync(assignmentId, fileSubmitUrl);
+        [SwaggerOperation(Summary = "Lấy danh sách lớp học bằng login  (class){Authorize = Student}")]
+        [Authorize(Roles = AppRole.Student)]
+        [HttpPost("mine/classes")]
+        public async Task<ApiResponse<List<ClassByLoginViewModel>>> GetAllClassByLogin()=> await _classService.GetAllClassByLogin();
     }
 }
