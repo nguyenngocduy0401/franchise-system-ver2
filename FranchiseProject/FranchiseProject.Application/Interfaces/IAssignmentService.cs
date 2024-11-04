@@ -13,7 +13,7 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> CreateAssignmentAsync(CreateAssignmentViewModel assignment);
         Task<ApiResponse<bool>> UpdateAssignmentAsync(CreateAssignmentViewModel update, string assignmentId);
         Task<ApiResponse<AssignmentViewModel>> GetAssignmentByIdAsync(string slotId);
-        Task<ApiResponse<bool>> DeleteSlotByIdAsync(string assId);
+        Task<ApiResponse<bool>> DeleteAssignmentByIdAsync(string assId);
         Task<ApiResponse<Pagination<AssignmentViewModel>>> GetAssignmentByClassIdAsync(string classId, int pageIndex, int pageSize);
         Task<ApiResponse<bool>> GradeStudentAssAsync(StudentAssScorseNumberViewModel model);
         Task<ApiResponse<bool>> SubmitAssignmentAsync(string assignmentId, string fileSubmitUrl);
