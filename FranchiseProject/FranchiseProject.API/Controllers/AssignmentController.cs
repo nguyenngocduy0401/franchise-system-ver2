@@ -46,7 +46,7 @@ namespace FranchiseProject.API.Controllers
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteAssignmentAsync(string id)
         {
-            return await _assignmentService.DeleteSlotByIdAsync(id);
+            return await _assignmentService.DeleteAssignmentByIdAsync(id);
         }
         [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager+"," + AppRole.Instructor)]
         [SwaggerOperation(Summary = "lấy danhh sách bài tập của một lớp  {Authorize = AgencyStaff, AgencyManager ,Instructor}")]

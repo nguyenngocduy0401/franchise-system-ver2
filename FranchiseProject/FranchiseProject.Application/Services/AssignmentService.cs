@@ -132,13 +132,13 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> DeleteSlotByIdAsync(string  assId)
+        public async Task<ApiResponse<bool>> DeleteAssignmentByIdAsync(string  assId)
         {
             var response = new ApiResponse<bool>();
             try
             {
                 var ass = await _unitOfWork.AssignmentRepository.GetExistByIdAsync(Guid.Parse(assId));
-                if (ass == null) return ResponseHandler.Success(false, "Slot học không khả dụng!");
+                if (ass == null) return ResponseHandler.Success(false, "Bài tập  không khả dụng!");
 
                 _unitOfWork.AssignmentRepository.SoftRemove(ass);
 
@@ -316,14 +316,19 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-               if(model.ScoreNumber<0 || model.ScoreNumber > 10)
+            /*    var currentUserIid = _claimsService.GetCurrentUserId.ToString();
+                var currentUser = _userManager.FindByIdAsync(currentUserIid);*/
+
+                var assignmentsubmit = await _unitOfWork.AssignmentSubmitRepository.GetFirstOrDefaultAsync(rc => rc.AssignmentId == model.AssignmentId && rc.UserId == model.UserId);
+                var assignment = await _unitOfWork.AssignmentRepository.GetExistByIdAsync(assignmentsubmit.AssignmentId.Value);
+                if (model.ScoreNumber<0 || model.ScoreNumber > 10)
                 {
                     response = ResponseHandler.Success(false, "điểm không hợp lệ");
                 }
                
                 var students = await _userManager.FindByIdAsync(model.UserId);
-                var assignmentsubmit = await _unitOfWork.AssignmentSubmitRepository.GetFirstOrDefaultAsync(rc=>rc.AssignmentId==model.AssignmentId&&rc.UserId==model.UserId);
-                var assignment = await _unitOfWork.AssignmentRepository.GetExistByIdAsync(assignmentsubmit.AssignmentId.Value);
+               
+
                     await _hubContext.Clients.User(students.Id.ToString())
                         .SendAsync("ReceivedNotification", $" bài Tập {assignment.Title.ToString()} đã được chấm điểm.");
                 assignmentsubmit.ScoreNumber = model.ScoreNumber;
