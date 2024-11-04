@@ -9,6 +9,6 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IScoreRepository
     {
-        Task<Score> GetSocreBByUserIdAssidAsync(Guid assignmentId, string UserId);
+       
     }
 }

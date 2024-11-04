@@ -231,59 +231,43 @@ namespace FranchiseProject.Application.Services
 
             return response;
         }
-        public async Task<ApiResponse<Pagination<AssignmentSubmitViewModel>>> GetAssignmentSubmissionAsync(string classId, int pageIndex, int pageSize)
+        public async Task<ApiResponse<Pagination<AssignmentSubmitViewModel>>> GetAssignmentSubmissionAsync(string assignmentId, int pageIndex, int pageSize)
         {
             var response = new ApiResponse<Pagination<AssignmentSubmitViewModel>>();
 
             try
             {
-                var classid = Guid.Parse(classId);
+                var assid = Guid.Parse(assignmentId);
                 var currentUserId = _claimsService.GetCurrentUserId.ToString();
               
-                var assigment= await _unitOfWork.AssignmentRepository.GetAllAsync1(cl=>cl.ClassId==classid);
-                var assSubmits =await _unitOfWork.AssignmentSubmitRepository.GetAllSubmissionsByAssignmentIdAsync(assigment.FirstOrDefault().Id);
-                if (string.IsNullOrEmpty(currentUserId))
-                {
-                    return ResponseHandler.Failure<Pagination<AssignmentSubmitViewModel>>("User chưa đăng nhập!");
-                }
-                var submissions = await _unitOfWork.AssignmentSubmitRepository.GetAllAsync1(rs => rs.AssignmentId == assSubmits.FirstOrDefault().AssignmentId);
+               
+                var assSubmits =await _unitOfWork.AssignmentSubmitRepository.GetAllSubmitAsync(assid);
 
-                if (submissions == null)
-                {
-                    return ResponseHandler.Failure<Pagination<AssignmentSubmitViewModel>>("Bài nộp không tồn tại!");
-                }
-
-                var assignmentSubmitViewModels = new List<AssignmentSubmitViewModel>();
-                foreach (var assSubmit in assSubmits)
-                {
-                    foreach (var submission in submissions)
+                var totalCount =  assSubmits.Count();
+                var submissions =  assSubmits
+                    .Skip((pageIndex - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(a => new AssignmentSubmitViewModel
                     {
-                        var score = await _unitOfWork.AssignmentSubmitRepository.GetFirstOrDefaultAsync(rc=>rc.AssignmentId==submission.AssignmentId&& rc.UserId==currentUserId);
-                        var user = await _userManager.FindByIdAsync(submission.UserId);
-                        assignmentSubmitViewModels.Add(new AssignmentSubmitViewModel
-                        {
-                            AssignmentId = submission.AssignmentId,
-                            AssignmentName = submission.Assignment?.Title,
-                            UserId = user?.Id,
-                            ScoreNumber=score.ScoreNumber.Value,
-                            UserName = user?.UserName,
-                            FileSubmitURL = submission.FileSubmitURL,
-                            SubmitDate = submission.SubmitDate
-                        });
-                    }
-                }
-                var totalItemsCount = assignmentSubmitViewModels.Count();
-                var paginatedAssignments = assignmentSubmitViewModels.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+                        AssignmentId = a.AssignmentId,
+                        AssignmentName = a.Assignment?.Title,
+                        UserId = a.UserId,
+                        UserName = a.User?.UserName,
+                        FileSubmitURL = a.FileSubmitURL,
+                        SubmitDate = a.SubmitDate,
+                        ScoreNumber = a.ScoreNumber ?? 0
+                    })
+                    .ToList();
                 var assignmentPagination = new Pagination<AssignmentSubmitViewModel>
                 {
-                    Items = paginatedAssignments,
-                    TotalItemsCount = totalItemsCount,
+                    Items =submissions,
+                    TotalItemsCount = totalCount,
                     PageIndex = pageIndex,
                     PageSize = pageSize
                 };
-                var assignmentViewModelPagination = _mapper.Map<Pagination<AssignmentViewModel>>(assignmentPagination);
+                var assignmentViewModelPagination =  _mapper.Map<Pagination<AssignmentSubmitViewModel>>(assignmentPagination);
 
-                response = ResponseHandler.Success(assignmentPagination, "Lấy thông tin bài nộp thành công!");
+                response = ResponseHandler.Success<Pagination<AssignmentSubmitViewModel>>(assignmentViewModelPagination, "Lấy thông tin bài nộp thành công!");
             }
             catch (Exception ex)
             {
@@ -345,7 +329,7 @@ namespace FranchiseProject.Application.Services
                 assignmentsubmit.ScoreNumber = model.ScoreNumber;
                 await _unitOfWork.AssignmentSubmitRepository.UpdatesAsync(assignmentsubmit);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Create failed!");
+               
 
                 response = ResponseHandler.Success(true, "Chấm điểm thành công!");
             }

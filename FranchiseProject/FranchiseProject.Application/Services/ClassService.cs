@@ -5,6 +5,7 @@ using FluentValidation;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.Repositories;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
@@ -446,7 +447,7 @@ namespace FranchiseProject.Application.Services
                 var courseId =classE.CourseId.Value;
                 var students = await _unitOfWork.UserRepository.GetAllAsync(u => model.StudentId.Contains(u.Id));
                 var waitlistedStudents = await _unitOfWork.ClassRoomRepository.CheckWaitlistedStatusForStudentsAsync(model.StudentId, courseId);
-
+                if (classE.Capacity==classE.CurrentEnrollment) { return ResponseHandler.Success(false, "Lớp đã đã đủ học sinh!"); }
                 if (!waitlistedStudents.Any())
                 {
                     return ResponseHandler.Success(false,"Không có sinh viên nào có trạng thái chờ lớp  để thêm vào lớp học.");
@@ -783,6 +784,27 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
+        public async Task<ApiResponse<List<ClassByLoginViewModel>>> GetAllClassByLogin()
+        {
+           
+            try
+            {
+                var currentUserId = _claimsService.GetCurrentUserId.ToString();
+                var classes = await _unitOfWork.ClassRepository.GetClassesByUserIdAsync(currentUserId);
+
+                var classViewModels = classes.Select(c => new ClassByLoginViewModel
+                {
+                   ClassId = c.Id,
+                   ClassName=c.Name
+                }).ToList();
+
+                return ResponseHandler.Success<List<ClassByLoginViewModel>>(classViewModels, "Successfully retrieved classes");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<List<ClassByLoginViewModel>>( ex.Message);
+            }
+        }
 
 
 

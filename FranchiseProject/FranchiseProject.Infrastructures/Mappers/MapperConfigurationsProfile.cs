@@ -263,6 +263,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             #region Assignment
             CreateMap<CreateAssignmentViewModel, Assignment>();
             CreateMap<Assignment, AssignmentViewModel>();
+            CreateMap<List<AssignmentSubmitViewModel>, Pagination<AssignmentSubmitViewModel>>();
+        
             #endregion
         }
     }

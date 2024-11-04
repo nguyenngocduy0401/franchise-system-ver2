@@ -29,6 +29,7 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<List<ClassScheduleViewModel>>> GetClassSchedulesByClassIdAsync(string classId, DateTime startDate, DateTime endDate);
         Task<ApiResponse<List<InstructorViewModel>>> GetInstructorsByAgencyAsync();
         Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync(DateTime startTime, DateTime endTime);
+        Task<ApiResponse<List<ClassByLoginViewModel>>> GetAllClassByLogin();
 
     }
 }

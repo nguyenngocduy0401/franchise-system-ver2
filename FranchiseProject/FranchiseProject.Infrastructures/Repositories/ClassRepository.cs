@@ -62,6 +62,14 @@ namespace FranchiseProject.Infrastructures.Repositories
                                               && u.ClassRooms.Any(cr => cr.ClassId == classId))
                                  .ToListAsync();
         }
-
+        public async Task<List<Class>> GetClassesByUserIdAsync(string userId)
+        {
+            return await _dbContext.ClassRooms
+                .Where(cr => cr.UserId == userId && cr.Status == ClassRoomStatusEnum.Active)
+                .Include(cr => cr.Class)
+                .Select(cr => cr.Class)
+                .Where(c => c != null)
+                .ToListAsync();
+        }
     }
 }

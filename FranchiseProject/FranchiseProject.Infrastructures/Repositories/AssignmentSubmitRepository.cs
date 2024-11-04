@@ -64,12 +64,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.Set<AssignmentSubmit>().Where(predicate).ToListAsync();
         }
-        public async Task<List<AssignmentSubmit>> GetAllSubmissionsByAssignmentIdAsync(Guid assignmentId)
-        {
-            return await _dbContext.AssignmentSubmits
-                .Where(rc => rc.AssignmentId == assignmentId)
-                .ToListAsync();
-        }
+      
         public async Task<bool> UpdatesAsync(AssignmentSubmit assignmentSubmit)
         {
             if (assignmentSubmit == null)
@@ -79,6 +74,14 @@ namespace FranchiseProject.Infrastructures.Repositories
             _dbContext.AssignmentSubmits.Update(assignmentSubmit);
             var result = await _dbContext.SaveChangesAsync();
             return result > 0;
+        }
+
+        public  async Task<List<AssignmentSubmit>> GetAllSubmitAsync(Guid asmId)
+        {
+            return await _dbContext.AssignmentSubmits
+           .Where(a => a.AssignmentId == asmId)
+           .Include(a => a.User)
+           .Include(a => a.Assignment).ToListAsync();
         }
     }
 }
