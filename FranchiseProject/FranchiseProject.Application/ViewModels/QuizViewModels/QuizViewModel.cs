@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FranchiseProject.Application.ViewModels.ScoreViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,5 +16,6 @@ namespace FranchiseProject.Application.ViewModels.QuizViewModels
         public string? Description { get; set; }
         public DateTime? StartTime { get; set; }
         public Guid? ClassId { get; set; }
+        public ICollection<UserScoreViewModel>? UserScores { get; set; }
     }
 }

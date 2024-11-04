@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
@@ -6,6 +8,7 @@ using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.QuestionViewModels;
 using FranchiseProject.Application.ViewModels.QuizViewModels;
+using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using MimeKit.Cryptography;
@@ -24,17 +27,112 @@ namespace FranchiseProject.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IClaimsService _claimsService;
-        private readonly IValidator<CreateQuizModel> _createQuizValidator;
         private readonly ICurrentTime _currentTime;
+        private readonly IValidator<CreateQuizModel> _createQuizValidator;
+        private readonly IValidator<UpdateQuizModel> _updateQuizValidator;
 
         public QuizService(IUnitOfWork unitOfWork, IMapper mapper, IClaimsService claimsService,
-            IValidator<CreateQuizModel> createQuizValidator, ICurrentTime currentTime)
+            IValidator<CreateQuizModel> createQuizValidator, ICurrentTime currentTime, 
+            IValidator<UpdateQuizModel> updateQuizValidator)
         {
             _claimsService = claimsService;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _createQuizValidator = createQuizValidator;
             _currentTime = currentTime;
+            _updateQuizValidator = updateQuizValidator;
+        }
+        public async Task<ApiResponse<bool>> UpdateQuizByIdAsync(Guid quizId, UpdateQuizModel updateQuizModel) 
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                ValidationResult validationResult = await _updateQuizValidator.ValidateAsync(updateQuizModel);
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult); 
+                var quiz = await _unitOfWork.QuizRepository.GetExistByIdAsync(quizId);
+                if (quiz == null) throw new Exception("Quiz does not exist!");
+
+                quiz = _mapper.Map(updateQuizModel,quiz);
+                
+                _unitOfWork.QuizRepository.Update(quiz);
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Submit failed!");
+                response = ResponseHandler.Success(true, "Bài kiểm tra được cập nhật thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
+        public async Task<ApiResponse<bool>> DeleteQuizByIdAsync(Guid quizId) 
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var quiz = await _unitOfWork.QuizRepository.GetExistByIdAsync(quizId);
+                if (quiz == null) throw new Exception("Quiz does not exist!");
+
+                _unitOfWork.QuizRepository.SoftRemove(quiz);
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Delete failed!");
+
+                response = ResponseHandler.Success(true, "Bài kiểm tra được xóa thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
+        public async Task<ApiResponse<bool>> SubmitQuiz(Guid quizId, AnswerModel answerModel)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var studentId = _claimsService.GetCurrentUserId.ToString();
+
+                var quiz = await _unitOfWork.QuizRepository.GetQuizForStudentById(quizId);
+                var checkQuiz = await CheckQuizAvailable(quiz, studentId);
+
+                if (checkQuiz.Data == false) return response;
+                if(quiz.QuizDetails == null ) throw new Exception("QuizDetail does not exist!");
+
+                double pointPerQuestion = 10 / quiz.QuizDetails.Count();
+                double totalScore = 0.0;
+
+                foreach (var quizDetail in quiz.QuizDetails)
+                {
+                    var correctOptionIds = quizDetail.Question.QuestionOptions
+                                            .Where(opt => opt.Status == true)
+                                            .Select(opt => opt.Id)
+                                            .ToList();
+                    var studentOptionIds = answerModel.QuestionOptionsId
+                                            .Where(id => quizDetail.Question.QuestionOptions.Any(opt => opt.Id == id))
+                                            .ToList();
+                    if (correctOptionIds.SequenceEqual(studentOptionIds))
+                    {
+                        totalScore += pointPerQuestion;
+                    }
+                }
+                var score = new Score
+                {
+                    QuizId = quizId,
+                    UserId = studentId,
+                    ScoreNumber = totalScore
+                };
+                await _unitOfWork.ScoreRepository.AddAsync(score);
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Submit failed!");
+
+                response = ResponseHandler.Success(true);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
         }
         public async Task<ApiResponse<IEnumerable<QuizViewModel>>> GetAllQuizByClassId(Guid id)
         {
@@ -45,10 +143,7 @@ namespace FranchiseProject.Application.Services
                 if (classs == null || classs.Status != ClassStatusEnum.Active)
                     return ResponseHandler.Success(response.Data , "Lớp học không khả dụng!");
 
-                var quizzes = await _unitOfWork.QuizRepository
-                    .FindAsync(e => e.ClassId == classs.Id);
-
-
+                var quizzes = await _unitOfWork.QuizRepository.GetQuizByClassId(id);
                 var quizModel = _mapper.Map<IEnumerable<QuizViewModel>>(quizzes);
                 response = ResponseHandler.Success(quizModel);
             }

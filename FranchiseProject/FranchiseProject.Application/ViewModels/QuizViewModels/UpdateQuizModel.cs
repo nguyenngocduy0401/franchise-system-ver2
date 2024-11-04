@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.ViewModels.QuizViewModels
 {
-    internal class UpdateQuizModel
+    public class UpdateQuizModel
     {
+        public int? Duration { get; set; }
+        public string? Title { get; set; }
+        public string? Description { get; set; }
+        public DateTime? StartTime { get; set; }
     }
 }

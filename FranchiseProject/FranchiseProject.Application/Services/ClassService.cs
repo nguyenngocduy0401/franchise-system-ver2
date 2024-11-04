@@ -356,7 +356,7 @@ namespace FranchiseProject.Application.Services
                     });
                 }*/
                 var classSchedules = await _unitOfWork.SlotRepository
-                     .GetAllAsync1(cs => cs.ClassId == classEntity.Id);
+                     .GetAllSlotAsync(cs => cs.ClassId == classEntity.Id);
 
                 var slotViewModels = new List<SlotViewModel>();
                 string instructorName = string.Empty;

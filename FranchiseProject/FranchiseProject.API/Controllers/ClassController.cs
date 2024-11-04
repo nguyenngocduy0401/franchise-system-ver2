@@ -3,6 +3,7 @@ using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
+using FranchiseProject.Application.ViewModels.QuizViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -20,10 +21,11 @@ namespace FranchiseProject.API.Controllers
     public class ClassController : ControllerBase
     {
         private readonly IClassService _classService;
-
-        public ClassController(IClassService classService)
+        private readonly IQuizService _quizService;
+        public ClassController(IClassService classService, IQuizService quizService)
         {
             _classService = classService;
+            _quizService = quizService;
         }
         [SwaggerOperation(Summary = "Tạo mới lớp học {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
@@ -101,6 +103,18 @@ namespace FranchiseProject.API.Controllers
         public async Task<ApiResponse<List<InstructorViewModel>>> GetInstructorsByAgencyAsync()
         {
             return await _classService.GetInstructorsByAgencyAsync();
+        }
+        [Authorize(Roles = AppRole.Student)]
+        [HttpGet("~/student/api/v1/classes/{id}/quizzes")]
+        public async Task<ApiResponse<IEnumerable<QuizStudentViewModel>>> GetAllQuizForStudentByClassId(Guid id)
+        {
+            return await _quizService.GetAllQuizForStudentByClassId(id);
+        }
+        [Authorize(Roles = AppRole.Student)]
+        [HttpGet("~/instructor/api/v1/classes/{id}/quizzes")]
+        public async Task<ApiResponse<IEnumerable<QuizViewModel>>> GetAllQuizByClassId(Guid id)
+        {
+            return await _quizService.GetAllQuizByClassId(id);
         }
     }
 }

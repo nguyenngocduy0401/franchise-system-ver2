@@ -245,11 +245,24 @@ namespace FranchiseProject.Infrastructures.Mappers
                 .Select(qd => qd.Question)));
             CreateMap<Quiz, QuizStudentViewModel>()
                 .ForMember(dest => dest.Scores, opt => opt.MapFrom(src => src.Scores.FirstOrDefault()));
+            CreateMap<Quiz, QuizViewModel>()
+                .ForMember(dest => dest.UserScores.Select(e => e.Score), opt => opt.MapFrom(src => src.Scores));
 
+            CreateMap<Quiz, QuizViewModel>()
+            .ForMember(dest => dest.UserScores, opt => opt.MapFrom(src => src.Scores));
+            CreateMap<Score, UserScoreViewModel>()
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.FullName))
+            .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.User.UserName))
+            .ForMember(dest => dest.Score, opt => opt.MapFrom(src => src.ScoreNumber));
+
+            CreateMap<UpdateQuizModel, Quiz>();
             #endregion
 
             #region Score
             CreateMap<Score, ScoreViewModel>();
+
+            
             #endregion
             #region Payment
             CreateMap<CreateStudentPaymentViewModel, Payment>()

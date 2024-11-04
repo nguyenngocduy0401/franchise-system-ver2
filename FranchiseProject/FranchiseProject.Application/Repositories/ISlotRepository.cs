@@ -11,6 +11,6 @@ namespace FranchiseProject.Application.Repositories
     public interface ISlotRepository : IGenericRepository<Slot>
     {
         Task<Slot?> GetFirstOrDefaultAsync(Expression<Func<Slot, bool>> filter);
-        Task<IEnumerable<ClassSchedule>> GetAllAsync1(Expression<Func<ClassSchedule, bool>> predicate);
+        Task<IEnumerable<ClassSchedule>> GetAllSlotAsync(Expression<Func<ClassSchedule, bool>> predicate);
     }
 }

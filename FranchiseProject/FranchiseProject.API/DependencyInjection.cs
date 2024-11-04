@@ -191,6 +191,7 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<CreateFeedBackViewModel>,CreateFeedBackValidator>();
 
             services.AddTransient<IValidator<CreateQuizModel>, CreateQuizValidator>();
+            services.AddTransient<IValidator<UpdateQuizModel>, UpdateQuizValidator>();
             #endregion
 
             return services;

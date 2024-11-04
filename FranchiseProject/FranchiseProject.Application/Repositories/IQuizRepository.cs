@@ -11,5 +11,6 @@ namespace FranchiseProject.Application.Repositories
     {
         Task<Quiz> GetQuizForStudentById(Guid id);
         Task<IEnumerable<Quiz>> GetQuizScoreStudentByClassIdAndStudentId(Guid classId, string studentId);
+        Task<IEnumerable<Quiz>> GetQuizByClassId(Guid classId);
     }
 }

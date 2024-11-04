@@ -25,6 +25,10 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
-        
+        public async Task AddAsync(Score score)
+        {
+            await _dbContext.Scores.AddAsync(score);
+        }
+
     }
 }
