@@ -12,7 +12,7 @@ namespace FranchiseProject.Application.ViewModels.AssignmentViewModels
     {
         public double ScoreNumber { get; set; }
         public string? UserId { get; set; }
-        public string? AssignmentId { get; set; }
+        public Guid? AssignmentId { get; set; }
 
     }
 }

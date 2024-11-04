@@ -29,6 +29,5 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             await _dbContext.Scores.AddAsync(score);
         }
-
     }
 }

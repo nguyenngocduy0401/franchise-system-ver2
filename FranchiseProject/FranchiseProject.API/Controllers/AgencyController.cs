@@ -43,5 +43,6 @@ namespace FranchiseProject.API.Controllers
 		[SwaggerOperation(Summary = "Lấy tất cả địa chỉ các chi nhánh đang hoạt động")]
 		[HttpGet("active/addresses")]
 		public async Task<ApiResponse<IEnumerable<AgencyAddressViewModel>>> GetActiveAgencyAdresses() => await _agencyService.GetActiveAgencyAdresses();
-	}
+       
+    }
 }

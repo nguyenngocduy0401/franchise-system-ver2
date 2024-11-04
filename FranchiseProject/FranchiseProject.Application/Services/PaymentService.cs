@@ -54,7 +54,10 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var rc = await _unitOfWork.RegisterCourseRepository.GetExistByIdAsync(Guid.Parse(create.RegisterCourseId));
-                switch (status) {
+                var userCurrentId =  _claimsService.GetCurrentUserId.ToString();
+                var userCurrent =await _userManager.FindByIdAsync(userCurrentId);
+                switch (status)
+                {
                     case StudentPaymentStatusEnum.Advance_Payment:
                         if (rc.StudentCourseStatus == StudentCourseStatusEnum.Pending) {
                             var payment = _mapper.Map<Payment>(create);
@@ -64,6 +67,18 @@ namespace FranchiseProject.Application.Services
                             await _unitOfWork.PaymentRepository.AddAsync(payment);
                             var user = await _userManager.FindByIdAsync(rc.UserId);
                             var generate = await _userService.GenerateUserCredentials(user.FullName);
+                            user.UserName = generate.UserName;
+                            user.Status = UserStatusEnum.active;
+                            user.AgencyId = userCurrent.AgencyId;
+                            await _userManager.AddToRoleAsync(user, AppRole.Student);
+
+                            await _userManager.AddPasswordAsync(user, generate.Password);
+                            var result = await _userManager.UpdateAsync(user);
+
+                            if (!result.Succeeded)
+                            {
+                                throw new Exception("Update User Account fail!");
+                            }
                             var email = EmailTemplate.StudentPaymentSuccsess(user.Email, user.FullName, create.Amount, generate.UserName, generate.Password);
                           var mailSuccess=  _emailService.SendEmailAsync(email);
                            
@@ -79,6 +94,18 @@ namespace FranchiseProject.Application.Services
                             await _unitOfWork.PaymentRepository.AddAsync(payment);
                             var user = await _userManager.FindByIdAsync(rc.UserId);
                             var generate = await _userService.GenerateUserCredentials(user.FullName);
+                            user.UserName = generate.UserName;
+                            user.Status = UserStatusEnum.active;
+                            user.AgencyId = userCurrent.AgencyId;
+                            await _userManager.AddToRoleAsync(user, AppRole.Student);
+
+                            await _userManager.AddPasswordAsync(user, generate.Password);
+                            var result = await _userManager.UpdateAsync(user);
+
+                            if (!result.Succeeded)
+                            {
+                                throw new Exception("Update User Account fail!");
+                            }
                             var email = EmailTemplate.StudentPaymentSuccsess(user.Email, user.FullName, create.Amount, generate.UserName, generate.Password);
                             var mailSuccess = _emailService.SendEmailAsync(email);
                         }
@@ -88,7 +115,7 @@ namespace FranchiseProject.Application.Services
                        
                 };
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) { throw new Exception("create fail!"); }
+             
                 return ResponseHandler.Success<bool>(true, "Tạo thanh toán thành công !");
 
             }
