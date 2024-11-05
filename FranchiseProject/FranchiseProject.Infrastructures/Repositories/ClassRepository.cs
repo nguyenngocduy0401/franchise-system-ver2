@@ -65,7 +65,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         public async Task<List<Class>> GetClassesByUserIdAsync(string userId)
         {
             return await _dbContext.ClassRooms
-                .Where(cr => cr.UserId == userId && cr.Status == ClassRoomStatusEnum.Active)
+                .Where(cr => cr.UserId == userId && cr.Class.Status == ClassStatusEnum.Active)
                 .Include(cr => cr.Class)
                 .Select(cr => cr.Class)
                 .Where(c => c != null)
