@@ -12,7 +12,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IQuizService
     {
-
+        Task<ApiResponse<QuizStudentViewModel>> GetAllQuizForStudentByQuizId(Guid id);
         Task<ApiResponse<bool>> UpdateQuizByIdAsync(Guid quizId, UpdateQuizModel updateQuizModel);
         Task<ApiResponse<bool>> DeleteQuizByIdAsync(Guid quizId);
         Task<ApiResponse<bool>> SubmitQuiz(Guid quizId, AnswerModel answerModel);
