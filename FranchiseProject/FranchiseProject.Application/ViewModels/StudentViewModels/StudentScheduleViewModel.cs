@@ -19,6 +19,7 @@ namespace FranchiseProject.Application.ViewModels.StudentViewModels
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
         public AttendanceStatusEnum? AttendanceStatus { get; set; }
+        public bool? Status { get; set; }
      
     }
 }

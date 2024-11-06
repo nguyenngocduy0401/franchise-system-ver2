@@ -18,6 +18,6 @@ namespace FranchiseProject.Domain.Entity
         public Slot? Slot { get; set; }
         public string? Room { get; set; }
         public virtual ICollection<Attendance>? Attendances { get; set; }
-        public bool? Status { get; set; }//1 là true 0, là false
+        public bool? Status { get; set; }//1 là La da diem danh 0, là chuaw
       }
 }
