@@ -691,10 +691,18 @@ namespace FranchiseProject.Application.Services
                     }
                 }
 
-                
-                var schedules = await _unitOfWork.ClassScheduleRepository.GetAllClassScheduleAsync(cs =>
-                    activeClassIds.Contains(cs.ClassId.Value) &&
-                    cs.Date.Value.Date >= startTime.Date.Date && cs.Date.Value.Date <= endTime.Date.Date);
+
+                var schedules = startTime != DateTime.MinValue && endTime != DateTime.MinValue
+                         ? await _unitOfWork.ClassScheduleRepository.GetClassSchedulesByClassIdsAsync(
+                             activeClassIds,
+                             cs => cs.Date.HasValue &&
+                                   cs.Date.Value.Date >= startTime.Date &&
+                                   cs.Date.Value.Date <= endTime.Date
+                           )
+                         : await _unitOfWork.ClassScheduleRepository.GetClassSchedulesByClassIdsAsync(
+                             activeClassIds,
+                             cs => cs.Date.HasValue
+                           );
 
                 var scheduleViewModels = new List<StudentScheduleViewModel>();
 
@@ -703,7 +711,8 @@ namespace FranchiseProject.Application.Services
                     var slot = schedule.SlotId.HasValue
                         ? await _unitOfWork.SlotRepository.GetByIdAsync(schedule.SlotId.Value)
                         : null;
-
+                    var attendance = await _unitOfWork.AttendanceRepository.GetFirstOrDefaultAsync(a =>
+                                  a.ClassScheduleId == schedule.Id && a.UserId == studentId);
                     scheduleViewModels.Add(new StudentScheduleViewModel
                     {
                         ScheduleId = schedule.Id,
@@ -714,7 +723,8 @@ namespace FranchiseProject.Application.Services
                         SlotName = slot?.Name,
                         Date = schedule.Date,
                         StartTime = slot?.StartTime ?? TimeSpan.Zero,
-                        EndTime = slot?.EndTime ?? TimeSpan.Zero
+                        EndTime = slot?.EndTime ?? TimeSpan.Zero,
+                         AttendanceStatus = attendance?.Status
                     });
                 }
 

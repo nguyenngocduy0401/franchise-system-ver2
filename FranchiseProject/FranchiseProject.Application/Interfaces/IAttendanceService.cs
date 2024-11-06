@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FranchiseProject.Application.Commons;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,6 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IAttendanceService
     {
+        Task<ApiResponse<bool>> MarkAttendanceByClassScheduleAsync(Guid classScheduleId, List<string> studentIds);
     }
 }

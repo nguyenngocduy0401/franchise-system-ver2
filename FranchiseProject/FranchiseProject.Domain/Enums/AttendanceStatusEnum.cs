@@ -8,5 +8,8 @@ namespace FranchiseProject.Domain.Enums
 {
     public enum AttendanceStatusEnum
     {
+        Absent=0,
+        Present=1,
+        NotStarted=3
     }
 }

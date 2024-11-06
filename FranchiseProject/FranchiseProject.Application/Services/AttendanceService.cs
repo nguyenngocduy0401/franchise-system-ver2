@@ -7,6 +7,7 @@ using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using System;
@@ -35,19 +36,49 @@ namespace FranchiseProject.Application.Services
             _emailService = emailService;
             _hubContext = hubContext;
         }
-        public async Task<ApiResponse<bool>>CreateAttendace(Guid classScheduleId,List<string> studentIds)
+        public async Task<ApiResponse<bool>> MarkAttendanceByClassScheduleAsync(Guid classScheduleId, List<string> studentIds)
         {
             var response = new ApiResponse<bool>();
             try
             {
+                
+
+                var attendances = await _unitOfWork.AttendanceRepository.GetAllAsync(a => a.ClassScheduleId == classScheduleId);
+                var classSchedule = await _unitOfWork.ClassScheduleRepository.GetByIdAsync(classScheduleId);
+                if (classSchedule.Date.Value.Date != DateTime.Today)
+                {
+                    return ResponseHandler.Success<bool>(false,"Lịch học không phải ngày hôm nay, không thể điểm danh.");
+                }
+
+                var currentStudentIds = attendances.Select(a => a.UserId).ToList();
+
+                foreach (var studentId in studentIds)
+                {
+                    var attendance = attendances.FirstOrDefault(a => a.UserId == studentId);
+
+                    
+                        attendance.Status = AttendanceStatusEnum.Present;
+                       await _unitOfWork.AttendanceRepository.UpdateAsync(attendance);
+                    
+                }
+                var absentStudents = attendances.Where(a => !studentIds.Contains(a.UserId)).ToList();
+                foreach (var absentAttendance in absentStudents)
+                {
+                    absentAttendance.Status = AttendanceStatusEnum.Absent;
+                    await _unitOfWork.AttendanceRepository.UpdateAsync(absentAttendance);
+                }
 
 
+
+                response = ResponseHandler.Success(true, "Điểm danh thành công!");
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<bool>(ex.Message);
+                response = ResponseHandler.Failure<bool>($"Lỗi khi điểm danh: {ex.Message}");
             }
+
             return response;
         }
+
     }
 }

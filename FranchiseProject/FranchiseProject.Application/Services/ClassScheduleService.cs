@@ -80,7 +80,13 @@ namespace FranchiseProject.Application.Services
                     {
                         var emailMessage = EmailTemplate.ClassScheduleCreated(user.Email, user.UserName,classE.Name);
                         bool emailSent = await _emailService.SendEmailAsync(emailMessage);
-
+                        var attendance = new Attendance
+                        {
+                        Status=AttendanceStatusEnum.NotStarted,
+                            ClassScheduleId = classSchedule.Id,
+                            UserId = userId
+                        };
+                        await _unitOfWork.AttendanceRepository.AddAsync(attendance);
                         if (!emailSent)
                         {
                             response.Message += $" Lỗi khi gửi email đến {user.Email}.";
@@ -152,6 +158,7 @@ namespace FranchiseProject.Application.Services
 
                 var startDate = DateTime.Now;
                 var createdSchedules = new List<DateTime>();
+                var classSchedules = new List<ClassSchedule>();
                 int createdLessons = 0;
 
                 while (createdLessons < numberOfLessons)
@@ -178,6 +185,7 @@ namespace FranchiseProject.Application.Services
                         };
 
                         await _unitOfWork.ClassScheduleRepository.AddAsync(classSchedule);
+                        classSchedules.Add(classSchedule);
                         createdSchedules.Add(startDate);
                         createdLessons++;
                     }
@@ -190,6 +198,21 @@ namespace FranchiseProject.Application.Services
                 var classE = await _unitOfWork.ClassRepository.GetByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.ClassId));
                 classE.DayOfWeek = dateClass;
                 _unitOfWork.ClassRepository.Update(classE);
+                var students = await _unitOfWork.ClassRepository.GetStudentsByClassIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.ClassId));
+                foreach (var schedule in classSchedules)
+                {
+                    foreach (var student in students)
+                    {
+                        var attendance = new Attendance
+                        {
+                            Status =AttendanceStatusEnum.NotStarted,
+                            ClassScheduleId = schedule.Id,
+                            UserId = student.Id
+                        };
+
+                        await _unitOfWork.AttendanceRepository.AddAsync(attendance);
+                    }
+                }
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Tạo lịch học thất bại!");
 
@@ -375,6 +398,14 @@ namespace FranchiseProject.Application.Services
                     if (!classSchedules.Any())
                 {
                     return ResponseHandler.Success(false, "Không có lịch học nào để xóa.");
+                }
+                foreach (var classSchedule in classSchedules)
+                {
+                    var attendanceRecords = await _unitOfWork.AttendanceRepository.GetAllAsync(a => a.ClassScheduleId == classSchedule.Id);
+                    if (attendanceRecords.Any())
+                    {
+                        _unitOfWork.AttendanceRepository.DeleteRange(attendanceRecords);
+                    }
                 }
                 _unitOfWork.ClassScheduleRepository.HardRemoveRange( classSchedules);
                 await _unitOfWork.SaveChangeAsync();

@@ -65,6 +65,17 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .OrderBy(cs => cs.Date)
                 .FirstOrDefaultAsync();
         }
+        public async Task<List<ClassSchedule>> GetClassSchedulesByClassIdsAsync(List<Guid> classIds, Expression<Func<ClassSchedule, bool>> predicate = null)
+        {
+            if (classIds == null || !classIds.Any())
+                return new List<ClassSchedule>();
 
+            var query = _dbContext.Set<ClassSchedule>().    Where(cs => cs.ClassId.HasValue && classIds.Contains(cs.ClassId.Value   ));
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+            return await query.ToListAsync();
+        }
     }
 }
