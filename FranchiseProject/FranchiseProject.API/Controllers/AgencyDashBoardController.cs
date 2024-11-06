@@ -27,7 +27,7 @@ namespace FranchiseProject.API.Controllers
             return await _agencyDashboardService.GetCourseRevenueAsync();
         }
         [Authorize(Roles = AppRole.AgencyManager)]
-        [SwaggerOperation(Summary = "báo cáo theo khóa học   {Authorize = AgencyManager}")]
+        [SwaggerOperation(Summary = "báo cáo doanh thu  theo ngày   {Authorize = AgencyManager}")]
         [HttpGet("")]
         public async Task<ApiResponse<int>> GetTotalRevenueFromRegisterCourseAsync(DateTime startDate, DateTime endDate)
         {
