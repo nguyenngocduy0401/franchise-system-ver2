@@ -42,6 +42,7 @@ namespace FranchiseProject.Application
      //   public IMaterialRepository MaterialRepository { get; }
         public ICourseMaterialRepository CourseMaterialRepository { get; }
         public IChapterMaterialRepository ChapterMaterialRepository { get; }
+        public IAgencyDashboardRepository AgencyDashboardRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

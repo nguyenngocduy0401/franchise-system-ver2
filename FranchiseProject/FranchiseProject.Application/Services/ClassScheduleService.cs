@@ -6,7 +6,9 @@ using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Hubs;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Utils;
+using FranchiseProject.Application.ViewModels.AttendanceViewModels;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
+using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
@@ -434,6 +436,47 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<ClassScheduleDetailViewModel>>GetClassScheduleDetailAsync(Guid id)
+        {
+           
+                var response = new ApiResponse<ClassScheduleDetailViewModel>();
+                try
+                {
+                    var classSchedule = await _unitOfWork.ClassScheduleRepository.GetClassScheduleWithDetailsAsync(id);
 
+                    if (classSchedule == null)
+                    {
+                        return ResponseHandler.Failure<ClassScheduleDetailViewModel>("Không tìm thấy lịch học.");
+                    }
+                    var numberOfStudents = classSchedule.Attendances?.Count ?? 0;
+                    var studentInfos = classSchedule.Attendances?
+                        .Select(a => new StudentClassScheduleViewModel
+                        {
+                            UserName = a.User.UserName,
+                            UserId = a.User.Id,
+                            StudentName = a.User.FullName,
+                            DateOfBirth = a.User.DateOfBirth,
+                            URLImage = a.User.URLImage,
+                            AttendanceStatus=a.Status
+
+                        }).ToList();
+                    var classScheduleDetail = new ClassScheduleDetailViewModel
+                    {
+                        Date = classSchedule.Date?.ToString("yyyy-MM-dd"),
+                        StartTime = classSchedule.Slot?.StartTime,
+                        EndTime = classSchedule.Slot?.EndTime,
+                        NumberOfStudent = numberOfStudents,
+                        
+                        StudentInfo = studentInfos
+                    };
+
+                    response = ResponseHandler.Success(classScheduleDetail, "Lấy chi tiết lịch học thành công!");
+                }
+                catch (Exception ex)
+                {
+                    response = ResponseHandler.Failure<ClassScheduleDetailViewModel>($"Lỗi khi lấy chi tiết lịch học: {ex.Message}");
+                }
+                return response;
+            }
     }
 }

@@ -77,5 +77,13 @@ namespace FranchiseProject.Infrastructures.Repositories
             }
             return await query.ToListAsync();
         }
+        public async Task<ClassSchedule?> GetClassScheduleWithDetailsAsync(Guid id)
+        {
+            return await _dbContext.ClassSchedules
+                .Include(cs => cs.Slot)
+                .Include(cs => cs.Attendances)
+                .ThenInclude(a => a.User)
+                .FirstOrDefaultAsync(cs => cs.Id == id);
+        }
     }
 }

@@ -45,6 +45,7 @@ namespace FranchiseProject.Infrastructures
         private readonly ICourseMaterialRepository _courseMaterialRepository;
         private readonly IRegisterCourseRepository _registerCourseRepository;
         private readonly IChapterMaterialRepository _chapterMaterialRepository;
+        private readonly IAgencyDashboardRepository _agencyDashboardRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -56,7 +57,7 @@ namespace FranchiseProject.Infrastructures
             IRegisterFormRepository franchiseRegistrationRequestRepository, IAssessmentRepository assessmentRepository,INotificationRepository notificationRepository,
             IPaymentRepository paymentRepository,IStudentRepository studentRepository,
             ICourseMaterialRepository courseMaterialRepository,IRegisterCourseRepository registerCourseRepository,
-            IChapterMaterialRepository chapterMaterialRepository)
+            IChapterMaterialRepository chapterMaterialRepository,IAgencyDashboardRepository agencyDashboardRepository)
 
            
         {
@@ -94,6 +95,7 @@ namespace FranchiseProject.Infrastructures
             _registerCourseRepository= registerCourseRepository;
             _chapterMaterialRepository= chapterMaterialRepository;
             _courseMaterialRepository = courseMaterialRepository;
+            _agencyDashboardRepository = agencyDashboardRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -159,6 +161,7 @@ namespace FranchiseProject.Infrastructures
         public IRegisterCourseRepository RegisterCourseRepository => _registerCourseRepository;
         public IChapterMaterialRepository ChapterMaterialRepository => _chapterMaterialRepository;
 
+        public IAgencyDashboardRepository AgencyDashboardRepository => _agencyDashboardRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

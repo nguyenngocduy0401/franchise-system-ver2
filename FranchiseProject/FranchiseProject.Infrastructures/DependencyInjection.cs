@@ -56,7 +56,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IChapterMaterialService, ChapterMaterialService>();
             services.AddScoped<ICourseMaterialService, CourseMaterialService>();
             services.AddScoped<IAssessmentService, AssessmentService>();
-
+            services.AddScoped<IAgencyDashboardService, AgencyDashboardService>();
            
 
             #endregion
@@ -94,6 +94,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<ICourseMaterialRepository, CourseMaterialRepository>();
             services.AddScoped<IChapterMaterialRepository, ChapterMaterialRepository>();
+            services.AddScoped<IAgencyDashboardRepository, AgencyDashboardRepository>();
             #endregion
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>

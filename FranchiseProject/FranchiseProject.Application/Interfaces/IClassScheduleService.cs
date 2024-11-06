@@ -1,4 +1,5 @@
 ﻿using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.ViewModels.AttendanceViewModels;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using System;
 using System.Collections.Generic;
@@ -17,5 +18,7 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<ClassScheduleViewModel>> GetClassScheduleByIdAsync(string id);
         Task<ApiResponse<bool>> UpdateClassScheduleAsync(CreateClassScheduleViewModel updateClassScheduleViewModel, string id);
         Task<ApiResponse<bool>> DeleteClassSheduleAllByClassIdAsync(string classId);
+        Task<ApiResponse<ClassScheduleDetailViewModel>> GetClassScheduleDetailAsync(Guid id);
+        
     }
 }
