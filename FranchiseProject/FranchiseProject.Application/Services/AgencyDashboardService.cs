@@ -79,32 +79,38 @@ namespace FranchiseProject.Application.Services
 
             return response;
         }
-        public async Task<ApiResponse<decimal>> GetTotalRevenueFromRegisterCourseAsync(DateTime startDate, DateTime endDate)
+        public async Task<ApiResponse<int>> GetTotalRevenueFromRegisterCourseAsync(DateTime startDate, DateTime endDate)
         {
-            var response = new ApiResponse<decimal>();
+            var response = new ApiResponse<int>();
 
             try
             {
-                var registerCourses = await _unitOfWork.RegisterCourseRepository.GetAllAsync(
-                    filter: rc =>
-                        rc.CreatDate >= startDate && rc.CreatDate <= endDate &&
-                        rc.StudentPaymentStatus.HasValue && (
-                            rc.StudentPaymentStatus == StudentPaymentStatusEnum.Pending_Payment ||
-                            rc.StudentPaymentStatus == StudentPaymentStatusEnum.Advance_Payment ||
-                            rc.StudentPaymentStatus == StudentPaymentStatusEnum.Completed) &&
-                        rc.StudentCourseStatus.HasValue && (
-                            rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted ||
-                            rc.StudentCourseStatus == StudentCourseStatusEnum.Studied ||
-                            rc.StudentCourseStatus == StudentCourseStatusEnum.Enrolled));
-
-                decimal totalRevenue = registerCourses
-                    .Where(rc => rc.Course != null)
-                    .Sum(rc => rc.Course.Price ?? 0);  
-                response = ResponseHandler.Success(totalRevenue, "Tính tổng doanh thu từ RegisterCourse thành công!");
+                
+                var userCurrentId = _claimsService.GetCurrentUserId;
+                var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
+                var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(userCurrent.AgencyId.Value);
+                var totalMoney = 0;
+                if (userCurrent == null || !userCurrent.AgencyId.HasValue)
+                {
+                    return ResponseHandler.Success<int>(0,"User hoặc Agency không khả dụng!");
+                }
+                foreach (var registration in registerCourses)
+                {
+                    
+                    var payments = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByRegisterCourseIdAsync(registration.Id);
+                    foreach (var payment in payments)
+                    {
+                        if (payment.CreationDate.Date >= startDate.Date && payment.CreationDate.Date <= endDate.Date)
+                        {
+                            totalMoney += payment.Amount ?? 0;  
+                        }
+                    }
+                }
+                response = ResponseHandler.Success(totalMoney, "Tính tổng doanh thu từ Payment thành công!");
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<decimal>($"Lỗi khi tính tổng doanh thu: {ex.Message}");
+                response = ResponseHandler.Failure<int>($"Lỗi khi tính tổng doanh thu: {ex.Message}");
             }
 
             return response;

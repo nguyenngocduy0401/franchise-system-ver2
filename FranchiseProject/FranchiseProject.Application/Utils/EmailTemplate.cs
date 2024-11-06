@@ -61,7 +61,7 @@ namespace FranchiseProject.Application.Utils
                 Subject = "Xác Nhận Thanh Toán Thành Công [futuretech-noreply]",
                 Body = $"<p>Chào bạn {name},</p>" +
                        $"<p>Bạn đã thanh toán khóa học thành công </p>" +
-                       $"<p>Số tiền đã thanh toán:{amount} </p>" +
+                       $"<p>Số tiền đã thanh toán:{amount} VNĐ </p>" +
                        $"<li><strong>Username:</strong> {UserName}</li>" +
                        $"<li><strong>Password:</strong> {password}</li>" +
                        $"</ul>" +
@@ -79,7 +79,7 @@ namespace FranchiseProject.Application.Utils
                 Subject = "Xác Nhận Thanh Toán Thành Công [futuretech-noreply]",
                 Body = $"<p>Chào bạn {name},</p>" +
                        $"<p>Bạn đã đăng Thanh khóa học  thành công </p>" +
-                       $"<p>Số tiền đã thanh toán:{amount} </p>" +
+                       $"<p>Số tiền đã thanh toán:{amount} VNĐ </p>" +
                        $"<p>Chúng tôi sẽ liên hệ và gửi thông báo về thông tin lớp học trong thời gian sớm nhất </p>" +
                        $"<p>Trân trọng,</p>" +
                        $"<p>Đội ngũ FutureTech</p>"
