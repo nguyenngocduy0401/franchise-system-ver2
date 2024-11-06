@@ -79,7 +79,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var courseCategory = await _unitOfWork.CourseCategoryRepository.GetExistByIdAsync(courseCategoryId);
-                if (courseCategory == null) return ResponseHandler.Failure<bool>("Loại của khóa học không khả dụng!");
+                if (courseCategory == null) return ResponseHandler.Success<bool>(false, "Loại của khóa học không khả dụng!");
                 _unitOfWork.CourseCategoryRepository.SoftRemove(courseCategory);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete failed!");
@@ -141,7 +141,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var courseCategory = await _unitOfWork.CourseCategoryRepository.GetExistByIdAsync(courseCategoryId);
-                if (courseCategory == null) return ResponseHandler.Failure<bool>("Loại của khóa học không khả dụng!");
+                if (courseCategory == null) return ResponseHandler.Success<bool>(false, "Loại của khóa học không khả dụng!");
 
                 ValidationResult validationResult = await _updateCourseCategoryValidator.ValidateAsync(updateCourseCategoryModel);
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);

@@ -55,7 +55,7 @@ namespace FranchiseProject.Application.Services
                 if (!validationResult.IsValid)
                 {
                     response.Data = false;
-                    response.isSuccess = false;
+                    response.isSuccess = true;
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
@@ -129,14 +129,14 @@ namespace FranchiseProject.Application.Services
                 var classEntity = await _unitOfWork.ClassRepository.GetExistByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.ClassId));
                 if (classEntity == null)
                 {
-                    return ResponseHandler.Failure<bool>("Lớp học không tồn tại!");
+                    return ResponseHandler.Success<bool>(false,"Lớp học không tồn tại!");
                 }
 
 
                 var courseEntity = await _unitOfWork.CourseRepository.GetByIdAsync(classEntity.CourseId.Value);
                 if (courseEntity == null)
                 {
-                    return ResponseHandler.Failure<bool>("Khóa học không tồn tại!");
+                    return ResponseHandler.Success<bool>(false, "Khóa học không tồn tại!");
                 }
                 int numberOfLessons = courseEntity.NumberOfLession.Value;
                 var selectedDaysOfWeek = new List<DayOfWeekEnum>();
@@ -446,7 +446,7 @@ namespace FranchiseProject.Application.Services
 
                     if (classSchedule == null)
                     {
-                        return ResponseHandler.Failure<ClassScheduleDetailViewModel>("Không tìm thấy lịch học.");
+                        return ResponseHandler.Success<ClassScheduleDetailViewModel>(null,"Không tìm thấy lịch học.");
                     }
                     var numberOfStudents = classSchedule.Attendances?.Count ?? 0;
                     var studentInfos = classSchedule.Attendances?

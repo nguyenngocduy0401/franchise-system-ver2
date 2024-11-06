@@ -46,7 +46,7 @@ namespace FranchiseProject.Application.Services
                 ValidationResult validationResult = await _createChapterMaterialValidator.ValidateAsync(createChapterMaterialModel);
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
                 var chapter = await _unitOfWork.ChapterRepository.GetExistByIdAsync((Guid)createChapterMaterialModel.ChapterId);
-                if (chapter == null) return ResponseHandler.Failure<bool>("Chương học không khả dụng!");
+                if (chapter == null) return ResponseHandler.Success<bool>(false, "Chương học không khả dụng!");
 
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(chapter.CourseId, CourseStatusEnum.Draft);
                 if (!checkCourse.Data) return checkCourse;
@@ -76,7 +76,7 @@ namespace FranchiseProject.Application.Services
                 if (chapterMaterial == null) throw new Exception("ChapterMaterial does not exist!");
 
                 var chapter = await _unitOfWork.ChapterRepository.GetExistByIdAsync((Guid)chapterMaterial.ChapterId);
-                if (chapter == null) return ResponseHandler.Failure<bool>("Chương học không khả dụng!");
+                if (chapter == null) return ResponseHandler.Success<bool>(false, "Chương học không khả dụng!");
 
 
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(chapter.CourseId, CourseStatusEnum.Draft);
@@ -106,7 +106,7 @@ namespace FranchiseProject.Application.Services
                 if (chapterMaterial == null) throw new Exception("ChapterMaterial does not exist!");
 
                 var chapter = await _unitOfWork.ChapterRepository.GetExistByIdAsync((Guid)chapterMaterial.ChapterId);
-                if (chapter == null) return ResponseHandler.Failure<bool>("Chương học không khả dụng!");
+                if (chapter == null) return ResponseHandler.Success<bool>(false, "Chương học không khả dụng!");
 
 
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(chapter.CourseId, CourseStatusEnum.Draft);

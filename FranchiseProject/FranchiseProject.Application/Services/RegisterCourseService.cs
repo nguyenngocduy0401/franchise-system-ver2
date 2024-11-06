@@ -104,13 +104,13 @@ namespace FranchiseProject.Application.Services
                 var result = await _userManager.CreateAsync(newUser);
                 if (!result.Succeeded)
                 {
-                    return ResponseHandler.Failure<bool>("Không thể tạo tài khoản người dùng!");
+                    return ResponseHandler.Success<bool>(false,"Không thể tạo tài khoản người dùng!");
                 }
 
                 var roleResult = await _userManager.AddToRoleAsync(newUser, AppRole.Student);
                 if (!roleResult.Succeeded)
                 {
-                    return ResponseHandler.Failure<bool>("Không thể gán quyền cho người dùng!");
+                    return ResponseHandler.Success<bool>(false, "Không thể gán quyền cho người dùng!");
                 }
 
                 var newRegisterCourse = new RegisterCourse
@@ -125,7 +125,7 @@ namespace FranchiseProject.Application.Services
                 bool emailSent = await _emailService.SendEmailAsync(emailMessage);
                 if (!emailSent)
                 {
-                    return ResponseHandler.Failure<bool>("Lỗi khi gửi mail");
+                    return ResponseHandler.Success<bool>(false, "Lỗi khi gửi mail");
                 }
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
@@ -148,7 +148,7 @@ namespace FranchiseProject.Application.Services
                 var student = await _userManager.FindByIdAsync(studentId);
                 if (student == null)
                 {
-                    return ResponseHandler.Failure<bool>("Học sinh không khả dụng!");
+                    return ResponseHandler.Success<bool>(false, "Học sinh không khả dụng!");
                 }
                 var courseGuidId = Guid.Parse(courseId);
                 var registerCourse = await _unitOfWork.RegisterCourseRepository
@@ -156,7 +156,7 @@ namespace FranchiseProject.Application.Services
 
                 if (registerCourse == null)
                 {
-                    return ResponseHandler.Failure<bool>("Không tìm thấy bản ghi khóa học của học sinh!");
+                    return ResponseHandler.Success<bool>(false, "Không tìm thấy bản ghi khóa học của học sinh!");
                 }
                 switch (status)
                 {
@@ -168,7 +168,7 @@ namespace FranchiseProject.Application.Services
                         }
                         else
                         {
-                            return ResponseHandler.Failure<bool>("Học sinh không thể chuyển thành trạng thái Chờ!");
+                            return ResponseHandler.Success<bool>(false, "Học sinh không thể chuyển thành trạng thái Chờ!");
                         }
                         break;
 
@@ -207,12 +207,12 @@ namespace FranchiseProject.Application.Services
                 var student = await _userManager.FindByIdAsync(id);
                 if (student == null)
                 {
-                    return ResponseHandler.Failure<StudentRegisterViewModel>("Học sinh không tồn tại!");
+                    return ResponseHandler.Success<StudentRegisterViewModel>(null,"Học sinh không tồn tại!");
                 }
 
                 if (student.AgencyId != userCurrent.AgencyId)
                 {
-                    return ResponseHandler.Failure<StudentRegisterViewModel>("Học sinh không thuộc về agency của bạn!");
+                    return ResponseHandler.Success<StudentRegisterViewModel>(null, "Học sinh không thuộc về agency của bạn!");
                 }
                 var registerCourse = await _unitOfWork.RegisterCourseRepository.GetFirstOrDefaultAsync(rc =>
                     rc.UserId == id &&
@@ -220,7 +220,7 @@ namespace FranchiseProject.Application.Services
                     );
                 if (registerCourse == null)
                 {
-                    return ResponseHandler.Failure<StudentRegisterViewModel>("Học sinh chưa đăng ký khóa học này!");
+                    return ResponseHandler.Success<StudentRegisterViewModel>(null,"Học sinh chưa đăng ký khóa học này!");
                 }
                 var rc = await _unitOfWork.RegisterCourseRepository.GetFirstOrDefaultAsync(rc=> rc.UserId==id&&rc.CourseId==Guid.Parse(courseId));
                 var courseCodes = await _unitOfWork.RegisterCourseRepository.GetCourseCodeByUserIdAsync(id);
@@ -347,7 +347,7 @@ namespace FranchiseProject.Application.Services
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (isSuccess)
                 {
-                    return ResponseHandler.Failure<bool>("Update Fail!");
+                    return ResponseHandler.Success<bool>(false, "Update Fail!");
                 }
 
 

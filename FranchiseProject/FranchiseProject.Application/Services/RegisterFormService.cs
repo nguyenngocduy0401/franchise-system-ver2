@@ -102,8 +102,8 @@ namespace FranchiseProject.Application.Services
                 var currentUser = await _userManager.FindByIdAsync(userId);
                 if (currentUser == null)
                 {
-
-                    response.isSuccess = false;
+                    response.Data=false;
+                    response.isSuccess = true;
                     response.Message = "Current user not found.";
                     
                 }

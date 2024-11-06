@@ -40,7 +40,7 @@ namespace FranchiseProject.Application.Services
                 if (sendNotificationViewModel.userIds == null || sendNotificationViewModel.userIds.Count == 0 || string.IsNullOrEmpty(sendNotificationViewModel.message))
                 {
                     response.Data = true;
-                    response.isSuccess = false;
+                    response.isSuccess = true;
                     response.Message = "Danh sách user hoặc message không hợp lệ.";
                     return response;
                 }

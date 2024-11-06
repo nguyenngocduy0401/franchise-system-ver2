@@ -69,7 +69,9 @@ namespace FranchiseProject.Application.Services
                 }
 
 
-
+                classSchedule.Status = true;
+                 _unitOfWork.ClassScheduleRepository.Update(classSchedule);
+                await _unitOfWork.SaveChangeAsync();
                 response = ResponseHandler.Success(true, "Điểm danh thành công!");
             }
             catch (Exception ex)

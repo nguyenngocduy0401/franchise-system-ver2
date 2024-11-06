@@ -74,7 +74,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync(slotId);
-                if (slot == null) return ResponseHandler.Failure<bool>("Slot học không khả dụng!");
+                if (slot == null) return ResponseHandler.Success<bool>(false,"Slot học không khả dụng!");
 
                 _unitOfWork.SlotRepository.SoftRemove(slot);
                   
@@ -100,7 +100,7 @@ namespace FranchiseProject.Application.Services
 
                     if (userCurrent == null || !userCurrent.AgencyId.HasValue)
                     {
-                        return ResponseHandler.Failure<SlotViewModel>("User hoặc Agency không khả dụng!");
+                        return ResponseHandler.Success<SlotViewModel>(null,"User hoặc Agency không khả dụng!");
                     }
                     var slot = await _unitOfWork.SlotRepository.GetByIdAsync(slotId);
                     if (slot == null) throw new Exception("Slot không tồn tại!");
@@ -129,7 +129,7 @@ namespace FranchiseProject.Application.Services
 
                 if (userCurrent == null || !userCurrent.AgencyId.HasValue)
                 {
-                    return ResponseHandler.Failure<bool>("User hoặc Agency không khả dụng!");
+                    return ResponseHandler.Success<bool>(false, "User hoặc Agency không khả dụng!");
                 }
                 ValidationResult validationResult = await _slotValidator.ValidateAsync(updateSlotModel);
                 if (!validationResult.IsValid)
@@ -137,10 +137,10 @@ namespace FranchiseProject.Application.Services
                     return ValidatorHandler.HandleValidation<bool>(validationResult);
                 }
                 var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync(slotId);
-                if (slot == null) return ResponseHandler.Failure<bool>("Slot không tồn tại!");
+                if (slot == null) return ResponseHandler.Success<bool>(false, "Slot không tồn tại!");
                 if (slot.AgencyId != userCurrent.AgencyId)
                 {
-                    return ResponseHandler.Failure<bool>("Bạn không có quyền cập nhật slot này vì nó không thuộc Agency của bạn!");
+                    return ResponseHandler.Success<bool>(false, "Bạn không có quyền cập nhật slot này vì nó không thuộc Agency của bạn!");
                 }
                 slot = _mapper.Map(updateSlotModel, slot);
                 _unitOfWork.SlotRepository.Update(slot);
@@ -164,7 +164,7 @@ namespace FranchiseProject.Application.Services
                 var userCurrent =await _userManager.FindByIdAsync(userCurrentId);
                 if (userCurrent == null || !userCurrent.AgencyId.HasValue)
                 {
-                    return ResponseHandler.Failure<bool>("User hoặc Agency không khả dụng!");
+                    return ResponseHandler.Success<bool>(false, "User hoặc Agency không khả dụng!");
                 }
                 ValidationResult validationResult = await _slotValidator.ValidateAsync(createSlotModel);
                 if (!validationResult.IsValid) if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);

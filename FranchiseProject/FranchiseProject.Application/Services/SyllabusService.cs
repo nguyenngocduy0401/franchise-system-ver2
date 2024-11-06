@@ -115,7 +115,7 @@ namespace FranchiseProject.Application.Services
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 var syllabus = await _unitOfWork.SyllabusRepository.GetExistByIdAsync(syllabusId);
-                if (syllabus == null) return ResponseHandler.Failure<bool>("Giáo trình của khóa học không khả dụng!");
+                if (syllabus == null) return ResponseHandler.Success<bool>(false, "Giáo trình của khóa học không khả dụng!");
 
                 var course = (await _unitOfWork.CourseRepository.FindAsync(e => e.SyllabusId == syllabusId && e.IsDeleted != true)).FirstOrDefault();
                 var checkCourse = CheckCourseAvailableAsync(course);
