@@ -462,13 +462,15 @@ namespace FranchiseProject.Application.Services
                         }).ToList();
                     var classScheduleDetail = new ClassScheduleDetailViewModel
                     {
-                        Date = classSchedule.Date?.ToString("yyyy-MM-dd"),
+                        Id = classSchedule.Id.ToString(),
+						Date = classSchedule.Date?.ToString("yyyy-MM-dd"),
                         StartTime = classSchedule.Slot?.StartTime,
                         EndTime = classSchedule.Slot?.EndTime,
                         NumberOfStudent = numberOfStudents,
-                        
-                        StudentInfo = studentInfos
-                    };
+                        StudentInfo = studentInfos,
+                        CourseCode = classSchedule.Class.Course.Code,
+						ClassName= classSchedule.Class.Name
+					};
 
                     response = ResponseHandler.Success(classScheduleDetail, "Lấy chi tiết lịch học thành công!");
                 }
