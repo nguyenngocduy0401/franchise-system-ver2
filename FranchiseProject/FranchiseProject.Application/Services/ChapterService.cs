@@ -92,7 +92,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var chapter = await _unitOfWork.ChapterRepository.GetExistByIdAsync(chapterId);
-                if (chapter == null) throw new Exception("Chapter does not exist!");
+                if (chapter == null) return ResponseHandler.Success<bool>(false, "Chương học không khả dụng!");
 
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(chapter.CourseId, CourseStatusEnum.Draft);
                 if (!checkCourse.Data) return checkCourse; 
@@ -134,7 +134,7 @@ namespace FranchiseProject.Application.Services
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 var chapter = await _unitOfWork.ChapterRepository.GetExistByIdAsync(chapterId);
-                if (chapter == null) return ResponseHandler.Failure<bool>("Chương học không khả dụng!");
+                if (chapter == null) return ResponseHandler.Success<bool>(false, "Chương học không khả dụng!");
                 
 
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(chapter.CourseId, CourseStatusEnum.Draft);

@@ -94,7 +94,7 @@ namespace FranchiseProject.Application.Services
 
                 }
                 var assignement = await _unitOfWork.AssignmentRepository.GetExistByIdAsync(Guid.Parse(assignmentId));
-                if (assignement == null) return ResponseHandler.Failure<bool>("Bài tập không tồn tại!");
+                if (assignement == null) return ResponseHandler.Success<bool>(false, "Bài tập không tồn tại!");
                 assignement = _mapper.Map(update,assignement);
                 _unitOfWork.AssignmentRepository.Update(assignement);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
@@ -119,7 +119,7 @@ namespace FranchiseProject.Application.Services
 
                 if (userCurrent == null || !userCurrent.AgencyId.HasValue)
                 {
-                    return ResponseHandler.Failure<AssignmentViewModel>("User hoặc Agency không khả dụng!");
+                    return ResponseHandler.Success<AssignmentViewModel>(null,"User hoặc Agency không khả dụng!");
                 }
                 var ass = await _unitOfWork.AssignmentRepository.GetByIdAsync(Guid.Parse(slotId));
                 if (ass == null) throw new Exception("Bài tập  không tồn tại!");

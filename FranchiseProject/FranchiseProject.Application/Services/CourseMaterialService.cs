@@ -70,7 +70,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var material = await _unitOfWork.CourseMaterialRepository.GetExistByIdAsync(materialId);
-                if (material == null) return ResponseHandler.Failure<bool>("Tài nguyên của khóa học không khả dụng!");
+                if (material == null) return ResponseHandler.Success<bool>(false, "Tài nguyên của khóa học không khả dụng!");
 
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(material.CourseId, CourseStatusEnum.Draft);
                 if (!checkCourse.Data) return checkCourse;
@@ -114,7 +114,7 @@ namespace FranchiseProject.Application.Services
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 var material = await _unitOfWork.CourseMaterialRepository.GetExistByIdAsync(materialId);
-                if (material == null) return ResponseHandler.Failure<bool>("Tài nguyên của khóa học không khả dụng!");
+                if (material == null) return ResponseHandler.Success<bool>(false, "Tài nguyên của khóa học không khả dụng!");
 
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(material.CourseId, CourseStatusEnum.Draft);
                 if (!checkCourse.Data) return checkCourse;

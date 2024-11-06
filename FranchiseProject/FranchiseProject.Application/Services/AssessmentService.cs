@@ -69,7 +69,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var assessment = await _unitOfWork.AssessmentRepository.GetExistByIdAsync(assessmentId);
-                if (assessment == null) return ResponseHandler.Failure<bool>("Đánh giá của khóa học không khả dụng!");
+                if (assessment == null) return ResponseHandler.Success<bool>(false,"Đánh giá của khóa học không khả dụng!");
                 
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(assessment.CourseId, CourseStatusEnum.Draft);
                 if (!checkCourse.Data) return checkCourse;

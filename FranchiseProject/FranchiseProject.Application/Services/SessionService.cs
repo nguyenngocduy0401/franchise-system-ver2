@@ -67,7 +67,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var session = await _unitOfWork.SessionRepository.GetExistByIdAsync(sessionId);
-                if (session == null) return ResponseHandler.Failure<bool>("Phiên học của khóa học không khả dụng!");
+                if (session == null) return ResponseHandler.Success<bool>(false, "Phiên học của khóa học không khả dụng!");
 
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(session.CourseId, CourseStatusEnum.Draft);
                 if (!checkCourse.Data) return checkCourse;
@@ -111,7 +111,7 @@ namespace FranchiseProject.Application.Services
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 var session = await _unitOfWork.SessionRepository.GetExistByIdAsync(sessionId);
-                if (session == null) return ResponseHandler.Failure<bool>("Phiên học của khóa học không khả dụng!");
+                if (session == null) return ResponseHandler.Success<bool>(false, "Phiên học của khóa học không khả dụng!");
 
                 var checkCourse = await _courseService.CheckCourseAvailableAsync(session.CourseId, CourseStatusEnum.Draft);
                 if (!checkCourse.Data) return checkCourse;

@@ -4,21 +4,13 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Hubs;
 using FranchiseProject.Application.Interfaces;
-using FranchiseProject.Application.ViewModels.AssignmentViewModels;
 using FranchiseProject.Application.ViewModels.FeedBackViewModels;
-using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Services
 {
@@ -140,7 +132,7 @@ namespace FranchiseProject.Application.Services
 
                 if (userCurrent == null || !userCurrent.AgencyId.HasValue)
                 {
-                    return ResponseHandler.Failure<Pagination<FeedBackViewModel>>("User hoặc Agency không khả dụng!");
+                    return ResponseHandler.Success<Pagination<FeedBackViewModel>>(null,"User hoặc Agency không khả dụng!");
                 }
                 Expression<Func<Feedback, bool>> filter = f =>
                 (string.IsNullOrEmpty(filterModel.CourseId) || f.CourseId.ToString() == filterModel.CourseId) &&
