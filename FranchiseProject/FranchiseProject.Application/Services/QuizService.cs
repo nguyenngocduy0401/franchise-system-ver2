@@ -42,6 +42,30 @@ namespace FranchiseProject.Application.Services
             _currentTime = currentTime;
             _updateQuizValidator = updateQuizValidator;
         }
+        public async Task<ApiResponse<QuizStudentViewModel>> GetAllQuizForStudentByQuizId(Guid id)
+        {
+            var response = new ApiResponse<QuizStudentViewModel>();
+            try
+            {
+                var userId = _claimsService.GetCurrentUserId.ToString();
+
+                var quizzes = await _unitOfWork.QuizRepository
+                    .GetQuizScoreStudentByQuizIdAndStudentId(id, userId);
+                if (quizzes == null) return ResponseHandler.Success(new QuizStudentViewModel(), "Bài kiểm tra không khả dụng!");
+
+                var classs = await _unitOfWork.ClassRepository.GetExistByIdAsync((Guid)quizzes.ClassId);
+                if (classs == null || classs.Status != ClassStatusEnum.Active)
+                    return ResponseHandler.Success(response.Data, "Lớp học không khả dụng!");
+
+                var quizModel = _mapper.Map<QuizStudentViewModel>(quizzes);
+                response = ResponseHandler.Success(quizModel);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<QuizStudentViewModel>(ex.Message);
+            }
+            return response;
+        }
         public async Task<ApiResponse<bool>> UpdateQuizByIdAsync(Guid quizId, UpdateQuizModel updateQuizModel) 
         {
             var response = new ApiResponse<bool>();

@@ -13,7 +13,7 @@ namespace FranchiseProject.Application.Services
         private readonly IDistributedCache _cache;
 
         public RedisService(IDistributedCache cache)
-         {
+        {
             _cache = cache;
         }
 
@@ -55,6 +55,5 @@ namespace FranchiseProject.Application.Services
                 await _cache.RemoveAsync($"jwt:{jwtToken}");
             }
         }
-
     }
 }

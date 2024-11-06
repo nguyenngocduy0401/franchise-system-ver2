@@ -19,14 +19,16 @@ namespace FranchiseProject.API.Controllers
         {
             _quizService = quizService;
         }
-        [SwaggerOperation(Summary = "tạo bài kiểm tra {Authorize = Instructor, Manager}")]
+        [Authorize(Roles = AppRole.Instructor)]
+        [SwaggerOperation(Summary = "tạo bài kiểm tra {Authorize = Instructor}")]
         [HttpPost("")]
         public async Task<ApiResponse<bool>> CreateQuestionByIdAsync(CreateQuizModel createQuizModel)
         {
             return await _quizService.CreateQuizForClass(createQuizModel);
         }
-        [SwaggerOperation(Summary = "học sinh lấy bài kiểm tra {Authorize = Instructor, Manager}")]
-        [HttpGet("{id}")]
+        [Authorize(Roles = AppRole.Student)]
+        [SwaggerOperation(Summary = "học sinh lấy bài kiểm tra {Authorize = Student}")]
+        [HttpGet("{id}/details")]
         public async Task<ApiResponse<QuizDetailStudentViewModel>> GetQuizForStudentByQuizId(Guid id)
         {
             return await _quizService.GetQuizDetailForStudentByQuizId(id);
@@ -51,6 +53,12 @@ namespace FranchiseProject.API.Controllers
         public async Task<ApiResponse<bool>> DeleteQuizByIdAsync(Guid quizId)
         {
             return await _quizService.DeleteQuizByIdAsync(quizId);
+        }
+        [SwaggerOperation(Summary = "học sinh lấy thông tin bài kiểm tra {Authorize = Student}")]
+        [HttpGet("{id}")]
+        public async Task<ApiResponse<QuizStudentViewModel>> GetQuizById(Guid id)
+        {
+            return await _quizService.GetAllQuizForStudentByQuizId(id);
         }
     }
 }

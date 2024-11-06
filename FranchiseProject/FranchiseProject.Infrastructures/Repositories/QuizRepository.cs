@@ -42,6 +42,13 @@ namespace FranchiseProject.Infrastructures.Repositories
                           .Include(e => e.Scores.Where(e => e.UserId == studentId))
                           .ToListAsync();
         }
+        public async Task<Quiz> GetQuizScoreStudentByQuizIdAndStudentId(Guid id, string studentId)
+        {
+            return await _dbSet
+                .Where(e => e.Id == id && e.IsDeleted != true)
+                          .Include(e => e.Scores.Where(e => e.UserId == studentId))
+                          .FirstOrDefaultAsync();
+        }
 
         public async Task<IEnumerable<Quiz>> GetQuizByClassId(Guid classId)
         {
