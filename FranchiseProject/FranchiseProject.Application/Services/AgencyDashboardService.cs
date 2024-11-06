@@ -7,6 +7,7 @@ using FranchiseProject.Application.ViewModels.AgencyDashboardViewModels;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -37,14 +38,16 @@ namespace FranchiseProject.Application.Services
             _validatorUpdate = validatorUpdate;
         }
         #endregion
-        public async Task<ApiResponse<List<CourseRevenueViewModel>>> GetCourseRevenueAsync(Guid agencyId)
+        public async Task<ApiResponse<List<CourseRevenueViewModel>>> GetCourseRevenueAsync()
         {
             var response = new ApiResponse<List<CourseRevenueViewModel>>();
             try
             {
-
+                var userCurrentId = _claimsService.GetCurrentUserId.ToString();
+                var userCurrent =await _userManager.FindByIdAsync(userCurrentId);
+                var agencyId = userCurrent.AgencyId;
                 var courseRevenueList = new List<CourseRevenueViewModel>();
-                var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(agencyId);
+                var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(agencyId.Value);
                 var courseList = await _unitOfWork.CourseRepository.GetAllAsync();
                 foreach (var course in courseList)
                 {
@@ -76,6 +79,43 @@ namespace FranchiseProject.Application.Services
 
             return response;
         }
+        public async Task<ApiResponse<int>> GetTotalRevenueFromRegisterCourseAsync(DateTime startDate, DateTime endDate)
+        {
+            var response = new ApiResponse<int>();
+
+            try
+            {
+                
+                var userCurrentId = _claimsService.GetCurrentUserId;
+                var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
+                var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(userCurrent.AgencyId.Value);
+                var totalMoney = 0;
+                if (userCurrent == null || !userCurrent.AgencyId.HasValue)
+                {
+                    return ResponseHandler.Success<int>(0,"User hoặc Agency không khả dụng!");
+                }
+                foreach (var registration in registerCourses)
+                {
+                    
+                    var payments = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByRegisterCourseIdAsync(registration.Id);
+                    foreach (var payment in payments)
+                    {
+                        if (payment.CreationDate.Date >= startDate.Date && payment.CreationDate.Date <= endDate.Date)
+                        {
+                            totalMoney += payment.Amount ?? 0;  
+                        }
+                    }
+                }
+                response = ResponseHandler.Success(totalMoney, "Tính tổng doanh thu từ Payment thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<int>($"Lỗi khi tính tổng doanh thu: {ex.Message}");
+            }
+
+            return response;
+        }
+
 
     }
 }
