@@ -26,6 +26,7 @@ namespace FranchiseProject.Application.Services
 {
 	public class CourseService : ICourseService
     {
+        #region Constructor
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IClaimsService _claimsService;
@@ -60,6 +61,7 @@ namespace FranchiseProject.Application.Services
             _createCourseMaterialArrangeValidator = createCourseMaterialArrangeModel;
             _createChapterFileValidator = createChapterFileValidator;
         }
+        #endregion
         public async Task<ApiResponse<CourseDetailViewModel>> CreateCourseVersionAsync(Guid courseId)
         {
             var response = new ApiResponse<CourseDetailViewModel>();
@@ -120,7 +122,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(courseId);
-                if (course == null) return ResponseHandler.Failure<bool>("Khóa học không khả dụng!");
+                if (course == null) return ResponseHandler.Success<bool>(false, "Khóa học không khả dụng!");
 
                 var checkCourse = await CheckCourseAvailableAsync(courseId, CourseStatusEnum.Draft);
                 if (!checkCourse.Data) return checkCourse;
@@ -165,7 +167,7 @@ namespace FranchiseProject.Application.Services
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(courseId);
-                if (course == null) return ResponseHandler.Failure<bool>("Khóa học không khả dụng!");
+                if (course == null) return ResponseHandler.Success<bool>(false, "Khóa học không khả dụng!");
 
                 var checkCourse = await CheckCourseAvailableAsync(courseId, CourseStatusEnum.Draft);
                 if (!checkCourse.Data) return checkCourse;
@@ -278,7 +280,7 @@ namespace FranchiseProject.Application.Services
                 var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
                 if (role == null) throw new Exception("User role not found!");
                 var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(courseId);
-                if (course == null) return ResponseHandler.Failure<bool>("Khóa học không khả dụng!");
+                if (course == null) return ResponseHandler.Success<bool>(false, "Khóa học không khả dụng!");
                 switch (course.Status)
                 {
                     case CourseStatusEnum.Draft:
