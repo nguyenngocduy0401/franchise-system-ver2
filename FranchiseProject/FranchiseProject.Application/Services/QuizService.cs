@@ -211,7 +211,7 @@ namespace FranchiseProject.Application.Services
 
                 var quiz = await _unitOfWork.QuizRepository.GetQuizForStudentById(id);
                 var checkQuiz = await CheckQuizAvailable(quiz, userId);
-                if (checkQuiz.Data == false)
+                if (checkQuiz.Data == false && checkQuiz.isSuccess == true)
                     return ResponseHandler.Success(new QuizDetailStudentViewModel(), checkQuiz.Message);
                 if (checkQuiz.isSuccess == false)
                     throw new Exception(checkQuiz.Message);
@@ -240,9 +240,8 @@ namespace FranchiseProject.Application.Services
                     .FirstOrDefault();
                 if (classs == null) return ResponseHandler.Success(false, "Bạn không tồn tại trong danh sách lớp!");
                 DateTime? checkEndTime = quiz.StartTime?.AddMinutes(quiz.Duration + 5 ?? 0);
-                if (checkEndTime == null &&
-                    (quiz.StartTime > _currentTime.GetCurrentTime() ||
-                    _currentTime.GetCurrentTime() > checkEndTime))
+                if (checkEndTime == null || quiz.StartTime > _currentTime.GetCurrentTime() ||
+                    _currentTime.GetCurrentTime() > checkEndTime)
                     return ResponseHandler.Success(false, "Không nằm trong phạm vi thời gian cho phép!");
                 response = ResponseHandler.Success(true);
             }
