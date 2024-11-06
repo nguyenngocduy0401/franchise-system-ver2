@@ -80,7 +80,7 @@ namespace FranchiseProject.Application.Services
                 
                 _unitOfWork.QuizRepository.Update(quiz);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Submit failed!");
+                if (!isSuccess) throw new Exception("Update failed!");
                 response = ResponseHandler.Success(true, "Bài kiểm tra được cập nhật thành công!");
             }
             catch (Exception ex)
@@ -126,7 +126,7 @@ namespace FranchiseProject.Application.Services
                 double pointPerQuestion = 10.0 / quiz.QuizDetails.Count();
                 double totalScore = 0.0;
 
-                foreach (var quizDetail in quiz.QuizDetails)
+                /*foreach (var quizDetail in quiz.QuizDetails)
                 {
                     var correctOptionIds = quizDetail.Question.QuestionOptions
                                             .Where(opt => opt.Status == true)
@@ -135,8 +135,23 @@ namespace FranchiseProject.Application.Services
                     var studentOptionIds = answerModel.QuestionOptionsId
                                             .Where(id => quizDetail.Question.QuestionOptions.Any(opt => opt.Id == id))
                                             .ToList();
+
                     if (correctOptionIds.Count == studentOptionIds.Count &&
                         !correctOptionIds.Except(studentOptionIds).Any())
+                    {
+                        totalScore += pointPerQuestion;
+                    }
+                }*/
+                foreach (var quizDetail in quiz.QuizDetails)
+                {
+                    var correctOptionIds = quizDetail.Question.QuestionOptions
+                                            .Where(opt => opt.Status == true)
+                                            .Select(opt => opt.Id)
+                                            .ToHashSet();
+                    var studentOptionIds = answerModel.QuestionOptionsId
+                                            .Where(id => quizDetail.Question.QuestionOptions.Any(opt => opt.Id == id))
+                                            .ToHashSet();
+                    if (correctOptionIds.SetEquals(studentOptionIds))
                     {
                         totalScore += pointPerQuestion;
                     }

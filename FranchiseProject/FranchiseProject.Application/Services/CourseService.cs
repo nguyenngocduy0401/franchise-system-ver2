@@ -137,8 +137,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
-        
         public async Task<ApiResponse<CourseDetailViewModel>> GetCourseByIdAsync(Guid courseId)
         {
             var response = new ApiResponse<CourseDetailViewModel>();
@@ -712,7 +710,6 @@ namespace FranchiseProject.Application.Services
             course.CourseMaterials = courseMaterials;
             return course;
         }
-
 		public async Task<ApiResponse<IEnumerable<CourseViewModel>>> GetAllCoursesAvailableAsync()
 		{
 			var response = new ApiResponse<IEnumerable<CourseViewModel>>();

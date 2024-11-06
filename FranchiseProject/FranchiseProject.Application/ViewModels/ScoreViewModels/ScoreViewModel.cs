@@ -8,6 +8,6 @@ namespace FranchiseProject.Application.ViewModels.ScoreViewModels
 {
     public class ScoreViewModel
     {
-        public double Score { get; set; }   
+        public double ScoreNumber { get; set; }   
     }
 }
