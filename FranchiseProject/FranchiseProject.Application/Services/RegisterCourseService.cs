@@ -282,6 +282,13 @@ namespace FranchiseProject.Application.Services
                     pageIndex: filterStudentModel.PageIndex,
                     pageSize: filterStudentModel.PageSize
                 );
+              var registerCourseIds = registerCourses.Items.Select(rc => rc.Id).ToList();
+                var payments = await _unitOfWork.PaymentRepository.GetAllAsync(
+                    p => registerCourseIds.Contains((Guid)p.RegisterCourseId)
+                );
+                var paymentTotalByCourse = payments
+                    .GroupBy(p => p.RegisterCourseId)
+                    .ToDictionary(g => g.Key, g => g.Sum(p => p.Amount));
                 var studentRegisterViewModels = registerCourses.Items.Select(rc => new StudentRegisterViewModel
                 {
                     Id = rc.Id,
@@ -296,7 +303,8 @@ namespace FranchiseProject.Application.Services
                     StudentStatus = rc.StudentCourseStatus,
                     PaymentStatus = rc.StudentPaymentStatus,
                     DateTime = rc.DateTime,
-                    PaymentDeadline=rc.PaymentDeadline,
+                    StudentAmountPaid = paymentTotalByCourse.ContainsKey(rc.Id) ? paymentTotalByCourse[rc.Id] : 0,
+                    PaymentDeadline =rc.PaymentDeadline,
                     
                 }).ToList();
                 var paginatedResult = new Pagination<StudentRegisterViewModel>

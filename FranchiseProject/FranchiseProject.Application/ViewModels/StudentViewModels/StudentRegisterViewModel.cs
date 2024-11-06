@@ -21,6 +21,7 @@ namespace FranchiseProject.Application.ViewModels.StudentViewModels
         public DateTime? PaymentDeadline  { get; set; }
         public StudentCourseStatusEnum? StudentStatus { get; set; }
         public StudentPaymentStatusEnum? PaymentStatus { get; set; }
+        public double? StudentAmountPaid { get; set; } 
         public string? DateTime { get; set; }
     }
 }

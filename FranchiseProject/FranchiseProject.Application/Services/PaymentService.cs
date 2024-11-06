@@ -63,6 +63,7 @@ namespace FranchiseProject.Application.Services
                             var payment = _mapper.Map<Payment>(create);
                             rc.StudentPaymentStatus=StudentPaymentStatusEnum.Advance_Payment;
                             rc.StudentCourseStatus = StudentCourseStatusEnum.Waitlisted;
+                            payment.UserId = rc.UserId;
                             await _unitOfWork.RegisterCourseRepository.UpdateAsync(rc);
                             await _unitOfWork.PaymentRepository.AddAsync(payment);
                             var user = await _userManager.FindByIdAsync(rc.UserId);
@@ -90,6 +91,7 @@ namespace FranchiseProject.Application.Services
                             var payment = _mapper.Map<Payment>(create);
                             rc.StudentPaymentStatus = StudentPaymentStatusEnum. Completed;
                             rc.StudentCourseStatus = StudentCourseStatusEnum.Waitlisted;
+                            payment.UserId = rc.UserId;
                             await _unitOfWork.RegisterCourseRepository.UpdateAsync(rc);
                             await _unitOfWork.PaymentRepository.AddAsync(payment);
                             var user = await _userManager.FindByIdAsync(rc.UserId);
@@ -217,6 +219,37 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
+        public async Task<ApiResponse<bool>> UpdateStudentPaymentStatusAsync(Guid registerCourseId, StudentPaymentStatusEnum newStatus)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var registerCourse = await _unitOfWork.RegisterCourseRepository.GetByIdAsync(registerCourseId);
+                if (registerCourse == null)
+                {
+                    return ResponseHandler.Success<bool>(false,"Không tìm thấy thông tin khóa học.");
+                }
+                var currentDate = DateTime.UtcNow;
+                if (registerCourse.PaymentDeadline.HasValue && currentDate <= registerCourse.PaymentDeadline)
+                {
+                    return ResponseHandler.Success<bool>(false, "Chưa đến hạn thanh toán!");
+                }
+                if (registerCourse.StudentPaymentStatus==StudentPaymentStatusEnum.Completed)
+                {
+                    return ResponseHandler.Success<bool>(false, "Học sinh đã hoàn thành thanh toán!");
+                }
+                registerCourse.StudentPaymentStatus = newStatus;
+                await _unitOfWork.RegisterCourseRepository.UpdateAsync(registerCourse);
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+             //   if (!isSuccess) throw new Exception("Cập nhật thất bại!");
+                response = ResponseHandler.Success(true, "Cập nhật trạng thái thanh toán thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>($"Lỗi khi cập nhật trạng thái thanh toán: {ex.Message}");
+            }
+            return response;
+        }
 
 
     }

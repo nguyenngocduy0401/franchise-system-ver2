@@ -17,5 +17,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<Pagination<PaymentStudentViewModel>>> FilterPaymentAsync(FilterStudentPaymentViewModel filterModel);
         Task<ApiResponse<PaymentStudentViewModel>> GetPaymentByIdAsync(string paymentId);
         Task<ApiResponse<Pagination<PaymentStudentViewModel>>> GetPaymentByLoginAsync(int pageIndex = 1, int pageSize = 10);
+        Task<ApiResponse<bool>> UpdateStudentPaymentStatusAsync(Guid registerCourseId, StudentPaymentStatusEnum newStatus);
     }
 }

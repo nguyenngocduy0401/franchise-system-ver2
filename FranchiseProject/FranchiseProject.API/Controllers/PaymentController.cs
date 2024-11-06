@@ -30,5 +30,9 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.Student )]
         [HttpGet("mine")]
         public async Task<ApiResponse<Pagination<PaymentStudentViewModel>>> GetPaymentByLoginAsync(int pageIndex = 1, int pageSize = 10)=>await _paymentService.GetPaymentByLoginAsync(pageIndex, pageSize);
+        [SwaggerOperation(Summary = "cập nhật trạng thái thanh toán (dùng cho Agency)   ")]
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
+        [HttpPut("{id}")]
+        public async Task<ApiResponse<bool>> UpdateStudentPaymentStatusAsync(Guid id, StudentPaymentStatusEnum newStatus)=> await _paymentService.UpdateStudentPaymentStatusAsync(id, newStatus);  
     }
 }
