@@ -724,7 +724,8 @@ namespace FranchiseProject.Application.Services
                         Date = schedule.Date,
                         StartTime = slot?.StartTime ?? TimeSpan.Zero,
                         EndTime = slot?.EndTime ?? TimeSpan.Zero,
-                         AttendanceStatus = attendance?.Status
+                         AttendanceStatus = attendance?.Status,
+                         Status=schedule.Status,
                     });
                 }
 
