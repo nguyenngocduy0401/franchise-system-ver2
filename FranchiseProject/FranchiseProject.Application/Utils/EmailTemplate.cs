@@ -48,7 +48,7 @@ namespace FranchiseProject.Application.Utils
                 Subject = "Đăng kí khóa học thành công  [futuretech-noreply]",
                 Body = $"<p>Chào bạn {name},</p>" +
                        $"<p>Cảm ơn bạn đã đăng kí khóa học {courseName} </p>" +
-                       $"<p>Chúng tôi sẻ liên hệ với bạn trong thời gian sớm nhất !</p>" +
+                       $"<p>Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất !</p>" +
                        $"<p>Trân trọng,</p>" +
                        $"<p>Đội ngũ FutureTech</p>"
             };
@@ -60,13 +60,13 @@ namespace FranchiseProject.Application.Utils
                 To = to,
                 Subject = "Xác Nhận Thanh Toán Thành Công [futuretech-noreply]",
                 Body = $"<p>Chào bạn {name},</p>" +
-                       $"<p>Bạn đã Thanh khóa học  thành công </p>" +
+                       $"<p>Bạn đã thanh toán khóa học thành công </p>" +
                        $"<p>Số tiền đã thanh toán:{amount} </p>" +
                        $"<li><strong>Username:</strong> {UserName}</li>" +
                        $"<li><strong>Password:</strong> {password}</li>" +
                        $"</ul>" +
                        $"<p>Vui lòng bảo mật thông tin đăng nhập này.</p>" +
-                       $"<p>Chúng tôi sẻ liên hệ và gửi thông báo về thông tin lớp học trong thời gian sớm nhất </p>" +
+                       $"<p>Chúng tôi sẽ liên hệ và gửi thông báo về thông tin lớp học trong thời gian sớm nhất </p>" +
                        $"<p>Trân trọng,</p>" +
                        $"<p>Đội ngũ FutureTech</p>"
             };
@@ -80,7 +80,7 @@ namespace FranchiseProject.Application.Utils
                 Body = $"<p>Chào bạn {name},</p>" +
                        $"<p>Bạn đã đăng Thanh khóa học  thành công </p>" +
                        $"<p>Số tiền đã thanh toán:{amount} </p>" +
-                       $"<p>Chúng tôi sẻ liên hệ và gửi thông báo về thông tin lớp học trong thời gian sớm nhất </p>" +
+                       $"<p>Chúng tôi sẽ liên hệ và gửi thông báo về thông tin lớp học trong thời gian sớm nhất </p>" +
                        $"<p>Trân trọng,</p>" +
                        $"<p>Đội ngũ FutureTech</p>"
             };
@@ -95,7 +95,7 @@ namespace FranchiseProject.Application.Utils
                 Subject = "Lịch Học Thay Đổi [futuretech-noreply]",
                 Body = $"<p>Chào bạn {name},</p>" +
                        $"<p>Lịch học của lớp {ClassName} đã thay đổi  </p>" +
-                       $"<p>chúng tôi sẻ thông tin đến bạn lịch học của Lớp {ClassName}  trong thời gian sớm nhất  </p>" +
+                       $"<p>chúng tôi sẽ thông tin đến bạn lịch học của Lớp {ClassName}  trong thời gian sớm nhất  </p>" +
                        $"<p>Trân trọng,</p>" +
                        $"<p>Đội ngũ FutureTech</p>"
             };

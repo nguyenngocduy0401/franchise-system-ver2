@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.ViewModels.AgencyDashboardViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +10,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IAgencyDashboardService
     {
+        Task<ApiResponse<decimal>> GetTotalRevenueFromRegisterCourseAsync(DateTime startDate, DateTime endDate);
+        Task<ApiResponse<List<CourseRevenueViewModel>>> GetCourseRevenueAsync();
     }
 }

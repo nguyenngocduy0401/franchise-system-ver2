@@ -7,6 +7,7 @@ using FranchiseProject.Application.ViewModels.AgencyDashboardViewModels;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -37,14 +38,16 @@ namespace FranchiseProject.Application.Services
             _validatorUpdate = validatorUpdate;
         }
         #endregion
-        public async Task<ApiResponse<List<CourseRevenueViewModel>>> GetCourseRevenueAsync(Guid agencyId)
+        public async Task<ApiResponse<List<CourseRevenueViewModel>>> GetCourseRevenueAsync()
         {
             var response = new ApiResponse<List<CourseRevenueViewModel>>();
             try
             {
-
+                var userCurrentId = _claimsService.GetCurrentUserId.ToString();
+                var userCurrent =await _userManager.FindByIdAsync(userCurrentId);
+                var agencyId = userCurrent.AgencyId;
                 var courseRevenueList = new List<CourseRevenueViewModel>();
-                var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(agencyId);
+                var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(agencyId.Value);
                 var courseList = await _unitOfWork.CourseRepository.GetAllAsync();
                 foreach (var course in courseList)
                 {
@@ -76,6 +79,37 @@ namespace FranchiseProject.Application.Services
 
             return response;
         }
+        public async Task<ApiResponse<decimal>> GetTotalRevenueFromRegisterCourseAsync(DateTime startDate, DateTime endDate)
+        {
+            var response = new ApiResponse<decimal>();
+
+            try
+            {
+                var registerCourses = await _unitOfWork.RegisterCourseRepository.GetAllAsync(
+                    filter: rc =>
+                        rc.CreatDate >= startDate && rc.CreatDate <= endDate &&
+                        rc.StudentPaymentStatus.HasValue && (
+                            rc.StudentPaymentStatus == StudentPaymentStatusEnum.Pending_Payment ||
+                            rc.StudentPaymentStatus == StudentPaymentStatusEnum.Advance_Payment ||
+                            rc.StudentPaymentStatus == StudentPaymentStatusEnum.Completed) &&
+                        rc.StudentCourseStatus.HasValue && (
+                            rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted ||
+                            rc.StudentCourseStatus == StudentCourseStatusEnum.Studied ||
+                            rc.StudentCourseStatus == StudentCourseStatusEnum.Enrolled));
+
+                decimal totalRevenue = registerCourses
+                    .Where(rc => rc.Course != null)
+                    .Sum(rc => rc.Course.Price ?? 0);  
+                response = ResponseHandler.Success(totalRevenue, "Tính tổng doanh thu từ RegisterCourse thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<decimal>($"Lỗi khi tính tổng doanh thu: {ex.Message}");
+            }
+
+            return response;
+        }
+
 
     }
 }
