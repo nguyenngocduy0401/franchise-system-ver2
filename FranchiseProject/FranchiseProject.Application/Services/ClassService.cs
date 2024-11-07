@@ -742,6 +742,10 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<List<ClassViewModel>>();
             try
             {
+
+                var userCurrentId = _claimsService.GetCurrentUserId.ToString();
+                var userCurrent = await _userManager.FindByIdAsync(userCurrentId);
+                var agencyId = userCurrent?.AgencyId;
                 if (!Guid.TryParse(courseId, out Guid parsedCourseId))
                 {
                     return ResponseHandler.Success<List<ClassViewModel>>(null,"CourseId không hợp lệ.");
@@ -752,11 +756,12 @@ namespace FranchiseProject.Application.Services
                 }
                 Expression<Func<Class, bool>> filter = c =>
                     c.CourseId == parsedCourseId &&
-                    c.Status == ClassStatusEnum.Active; 
+                    c.Status == ClassStatusEnum.Active &&
+                      c.AgencyId == agencyId.Value; 
 
                 var classes = await _unitOfWork.ClassRepository.GetFilterAsync(
                     filter: filter,
-                    includeProperties: "Course,User,RegisterCourse"
+                    includeProperties: "Course"
                 );
 
 

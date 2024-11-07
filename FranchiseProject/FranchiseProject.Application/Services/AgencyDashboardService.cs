@@ -38,7 +38,7 @@ namespace FranchiseProject.Application.Services
             _validatorUpdate = validatorUpdate;
         }
         #endregion
-        public async Task<ApiResponse<List<CourseRevenueViewModel>>> GetCourseRevenueAsync()
+        public async Task<ApiResponse<List<CourseRevenueViewModel>>> GetCourseRevenueAsync(DateTime startDate, DateTime endDate)
         {
             var response = new ApiResponse<List<CourseRevenueViewModel>>();
             try
@@ -53,20 +53,28 @@ namespace FranchiseProject.Application.Services
                 {
                     var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id);
                     var TotalMoney = 0;
-                    var studentCount = 0;
-                    foreach (var registration in filteredRegisterCourses)
+                    var studentCount = 0; 
+                    var validRegistrations = filteredRegisterCourses
+                .Where(r => r.CreatDate.HasValue && r.CreatDate.Value.Date >= startDate.Date && r.CreatDate.Value.Date <= endDate.Date)
+                .ToList();
+                    foreach (var registration in validRegistrations)
                     {
                         studentCount++;
                           var payments=await _unitOfWork.AgencyDashboardRepository.GetPaymentsByRegisterCourseIdAsync(registration.Id);
                        foreach (var payment in payments)
                         {
-                            TotalMoney=TotalMoney+payment.Amount.Value;
-                         }
+                            if (payment.CreationDate.Date >= startDate.Date && payment.CreationDate.Date <= endDate.Date)
+                            {
+                                TotalMoney += payment.Amount ?? 0;
+                            }
+                        }
                     }
                     courseRevenueList.Add(new CourseRevenueViewModel
                     {
                         CourseId= course.Id,
                         StudentCount= studentCount,
+                        CourseCode=course.Code,
+                        CourseName=course.Name,
                         TotalRevenue=TotalMoney,
                     });
                 }
