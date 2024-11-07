@@ -92,8 +92,8 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.Student)]
         [HttpPost("mine/assignments")]
         public async Task<ApiResponse<bool>> SubmitAssignmentAsync(string assignmentId, string fileSubmitUrl)=> await _assignmentService.SubmitAssignmentAsync(assignmentId, fileSubmitUrl);
-        [SwaggerOperation(Summary = "Lấy danh sách lớp học bằng login  (class){Authorize = Student}")]
-        [Authorize(Roles = AppRole.Student)]
+        [SwaggerOperation(Summary = "Lấy danh sách lớp học bằng login  (class){Authorize = Student,Instructor}")]
+        [Authorize(Roles = AppRole.Student+","+AppRole.Instructor)]
         [HttpGet("mine/classes")]
         public async Task<ApiResponse<List<ClassByLoginViewModel>>> GetAllClassByLogin()=> await _classService.GetAllClassByLogin();
     }
