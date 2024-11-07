@@ -116,5 +116,12 @@ namespace FranchiseProject.API.Controllers
         {
             return await _quizService.GetAllQuizByClassId(id);
         }
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff+","+AppRole.Instructor +","+AppRole.Student )]
+        [SwaggerOperation(Summary = "lấy danh sách lớp bằng course Id{Authorize = AgencyManager ,AgencyStaff , Instructor,Student}")]
+        [HttpGet("courses/{id}")]
+        public async Task<ApiResponse<List<ClassViewModel>>> GetAllClassByCourseId(string id)
+        {
+            return await _classService.GetAllClassByCourseId(id);
+        }
     }
 }
