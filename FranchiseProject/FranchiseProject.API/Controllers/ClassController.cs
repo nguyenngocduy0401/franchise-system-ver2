@@ -1,5 +1,6 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
@@ -22,10 +23,12 @@ namespace FranchiseProject.API.Controllers
     {
         private readonly IClassService _classService;
         private readonly IQuizService _quizService;
-        public ClassController(IClassService classService, IQuizService quizService)
+        private readonly IChapterService _chapterService;
+        public ClassController(IClassService classService, IQuizService quizService, IChapterService chapterService)
         {
             _classService = classService;
             _quizService = quizService;
+            _chapterService = chapterService;
         }
         [SwaggerOperation(Summary = "Tạo mới lớp học {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
@@ -54,13 +57,13 @@ namespace FranchiseProject.API.Controllers
         [SwaggerOperation(Summary = "Cập nhật trạng thái lớp học {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpPatch("{id}/status")]
-        public async Task<ApiResponse<bool>> UpdateClassStatusAsync( ClassStatusEnum status, string id)
+        public async Task<ApiResponse<bool>> UpdateClassStatusAsync(ClassStatusEnum status, string id)
         {
             return await _classService.UpdateClassStatusAsync(status, id);
         }
 
         [SwaggerOperation(Summary = "Lấy thông tin chi tiết lớp học {Authorize = AgencyManager ,AgencyStaff,Instructor}")]
-        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff+"," + AppRole.Instructor)]
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff + "," + AppRole.Instructor)]
         [HttpGet("{id}")]
         public async Task<ApiResponse<ClassStudentViewModel>> GetClassDetailAsync(string id)
         {
@@ -86,7 +89,7 @@ namespace FranchiseProject.API.Controllers
         [SwaggerOperation(Summary = "Thêm học sinh vào lớp {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpPost("{classId}/users")]
-        public async Task<ApiResponse<bool>> AddStudentAsync(string classId,[FromBody] AddStudentViewModel model)
+        public async Task<ApiResponse<bool>> AddStudentAsync(string classId, [FromBody] AddStudentViewModel model)
         {
             return await _classService.AddStudentAsync(classId, model);
         }
@@ -95,7 +98,7 @@ namespace FranchiseProject.API.Controllers
         [HttpPost("class-schedules/{classId}")]
         public async Task<ApiResponse<List<ClassScheduleViewModel>>> GetClassSchedulesByClassIdAsync(string classId, DateTime startDate, DateTime endDate)
         {
-            return await _classService.GetClassSchedulesByClassIdAsync(classId,startDate,endDate);
+            return await _classService.GetClassSchedulesByClassIdAsync(classId, startDate, endDate);
         }
         [SwaggerOperation(Summary = "lấy danh sách giáo viên  {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
@@ -110,11 +113,17 @@ namespace FranchiseProject.API.Controllers
         {
             return await _quizService.GetAllQuizForStudentByClassId(id);
         }
-        [Authorize(Roles = AppRole.Student)]
+        [Authorize(Roles = AppRole.Instructor)]
         [HttpGet("~/instructor/api/v1/classes/{id}/quizzes")]
         public async Task<ApiResponse<IEnumerable<QuizViewModel>>> GetAllQuizByClassId(Guid id)
         {
             return await _quizService.GetAllQuizByClassId(id);
+        }
+        [Authorize(Roles = AppRole.Instructor)]
+        [HttpGet("{id}/chapters")]
+        public async Task<ApiResponse<List<ChapterViewModel>>> GetChapterByClassIdAsync(Guid id)
+        {
+            return await _chapterService.GetChapterByClassIdAsync(id);
         }
     }
 }

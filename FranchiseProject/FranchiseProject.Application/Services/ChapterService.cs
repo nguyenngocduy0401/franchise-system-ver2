@@ -38,6 +38,35 @@ namespace FranchiseProject.Application.Services
             _createChapterValidator = createChapterValidator;
             _createChapterArrangeValidator = createChapterArrangeValidator;
         }
+        public async Task<ApiResponse<List<ChapterViewModel>>> GetChapterByClassIdAsync(Guid classId)
+        {
+            var response = new ApiResponse<List<ChapterViewModel>>();
+            try
+            {
+                var classs = (await _unitOfWork.ClassRepository
+                    .FindAsync(e => e.Id == classId && 
+                                    e.IsDeleted != true && 
+                                    e.Status == ClassStatusEnum.Active))
+                    .FirstOrDefault();
+                if (classs == null) throw new Exception("Class does not exist!");
+
+                var course = await _unitOfWork.CourseRepository.GetExistByIdAsync((Guid)classs.CourseId);
+                if (course == null) throw new Exception("Course does not exist!");
+
+                var chapters = (await _unitOfWork.ChapterRepository
+                    .FindAsync(e => e.CourseId == course.Id && e.IsDeleted != true))
+                    .OrderBy(e => e.Number)
+                    .ToList();
+
+                var chaptersModel = _mapper.Map<List<ChapterViewModel>>(chapters);
+                response = ResponseHandler.Success(chaptersModel);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<List<ChapterViewModel>>(ex.Message);
+            }
+            return response;
+        }
         public async Task<ApiResponse<List<ChapterViewModel>>> GetChapterByCourseIdAsync(Guid courseId)
         {
             var response = new ApiResponse<List<ChapterViewModel>>();

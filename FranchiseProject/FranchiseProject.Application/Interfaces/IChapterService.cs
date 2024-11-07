@@ -11,6 +11,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IChapterService
     {
+        Task<ApiResponse<List<ChapterViewModel>>> GetChapterByClassIdAsync(Guid classId);
         Task<ApiResponse<List<ChapterViewModel>>> GetChapterByCourseIdAsync(Guid courseId);
         Task<ApiResponse<bool>> DeleteChapterByIdAsync(Guid chapterId);
         Task<ApiResponse<ChapterDetailViewModel>> GetChapterByIdAsync(Guid chapterId);
