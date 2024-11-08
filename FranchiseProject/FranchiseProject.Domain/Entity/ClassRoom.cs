@@ -20,6 +20,5 @@ namespace FranchiseProject.Domain.Entity
         public string? DayofWeek {  get; set; }    
         public DateOnly? FromDate { get; set; }
         public DateOnly? ToDate { get;set; }
-        public ClassRoomStatusEnum? Status { get; set; }
     }
 }

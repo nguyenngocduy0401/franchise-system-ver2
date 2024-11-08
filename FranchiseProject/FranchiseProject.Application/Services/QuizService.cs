@@ -250,7 +250,6 @@ namespace FranchiseProject.Application.Services
                     return ResponseHandler.Success(false, "Bài kiểm tra không tồn tại!");
                 var classs = (await _unitOfWork.ClassRoomRepository
                     .FindAsync(e => e.UserId == userId
-                                 && e.Status == ClassRoomStatusEnum.Active
                                  && e.ClassId == quiz.ClassId))
                     .FirstOrDefault();
                 if (classs == null) return ResponseHandler.Success(false, "Bạn không tồn tại trong danh sách lớp!");
@@ -274,7 +273,7 @@ namespace FranchiseProject.Application.Services
                 ValidationResult validationResult = await _createQuizValidator.ValidateAsync(createQuizModel);
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
                 var classRoom = (await _unitOfWork.ClassRepository
-                    .FindAsync(e => e.Id == createQuizModel.ClassId && e.Status == ClassStatusEnum.Active))
+                    .FindAsync(e => e.Id == createQuizModel.ClassId))
                     .FirstOrDefault();
                 if (classRoom == null) throw new Exception("Class does not exist!");
                 if (createQuizModel.ChapterId == null) throw new Exception("ChapterId is null!");
@@ -289,7 +288,7 @@ namespace FranchiseProject.Application.Services
                         ("Số lượng trong ngân hàng câu hỏi không đủ! "
                         + "Số lượng câu hỏi trong ngân hàng: " + randomQuestions.Count());
 
-                var quizdetails = _mapper.Map<List<QuizDetail>>(questions);
+                var quizdetails = _mapper.Map<List<QuizDetail>>(randomQuestions);
 
                 var quiz = _mapper.Map<Quiz>(createQuizModel);
                 quiz.QuizDetails = quizdetails;
