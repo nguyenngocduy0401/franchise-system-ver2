@@ -72,6 +72,7 @@ namespace FranchiseProject.Application.Services
                 if (course == null) throw new Exception("Course does not exist!");
                 var newCourse = _mapper.Map<Course>(course);
                 newCourse.Status = CourseStatusEnum.Draft;
+                newCourse.Version = 0;
                 await _unitOfWork.CourseRepository.AddAsync(newCourse);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Duplicate failed!");
@@ -93,14 +94,9 @@ namespace FranchiseProject.Application.Services
                 ValidationResult validationResult = await _createCourseValidator.ValidateAsync(createCourseModel);
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
-                var checkCourseExist = await _unitOfWork.CourseRepository.FindAsync
-                    (e => e.Code == createCourseModel.Code && e.IsDeleted != true
-                    && e.Status != CourseStatusEnum.Closed);
-                if (!checkCourseExist.IsNullOrEmpty())
-                    return ResponseHandler.Success
-                        (false, "Khóa học đã tồn tại không thể tạo mới. Chỉ có thể cập nhật lên phiên bản mới!");
-
                 var course = _mapper.Map<Course>(createCourseModel);
+                course.Version = 0;
+                course.Status = CourseStatusEnum.Draft;
                 await _unitOfWork.CourseRepository.AddAsync(course);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
@@ -316,7 +312,7 @@ namespace FranchiseProject.Application.Services
                         (e => e.Code == course.Code && e.Status != CourseStatusEnum.Draft
                         && e.Status != CourseStatusEnum.PendingApproval))
                         .OrderByDescending(e => e.Version).FirstOrDefault();
-                    if (oldCourse != null && oldCourse.Id != courseId)
+                    if (oldCourse != null && oldCourse.Id == courseId)
                     {
                         oldCourse.Status = CourseStatusEnum.Closed;
                         course.Version = oldCourse.Version + 1;
