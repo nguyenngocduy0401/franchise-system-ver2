@@ -49,10 +49,10 @@ namespace FranchiseProject.Infrastructures.Repositories
                 }
                 var registerCourses = await _dbContext.RegisterCourses
                                                        .Where(rc => userIds.Contains(rc.UserId)&& 
-                                                       (rc.StudentCourseStatus==StudentCourseStatusEnum.Studied||
+                                                       (
                                                        rc.StudentCourseStatus==StudentCourseStatusEnum.Waitlisted||
-                                                       rc.StudentCourseStatus==StudentCourseStatusEnum.Enrolled||
-                                                       rc.StudentCourseStatus==StudentCourseStatusEnum.DroppedOut))
+                                                       rc.StudentCourseStatus==StudentCourseStatusEnum.Enrolled
+                                                    ))
                                                        .ToListAsync();
 
                 return registerCourses;

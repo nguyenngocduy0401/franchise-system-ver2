@@ -215,6 +215,7 @@ namespace FranchiseProject.Application.Services
                         await _unitOfWork.AttendanceRepository.AddAsync(attendance);
                     }
                 }
+                var classRoom= await _unitOfWork.ClassRoomRepository.GetAllAsync(rc=>rc.ClassId==Guid.Parse(createClassScheduleDateRangeViewModel.ClassId));
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Tạo lịch học thất bại!");
 

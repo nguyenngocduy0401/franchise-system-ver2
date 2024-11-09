@@ -374,7 +374,7 @@ namespace FranchiseProject.Application.Services
                                            && rc.UserId == studentId
                                            && (rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
                                                || rc.StudentCourseStatus == StudentCourseStatusEnum.Pending
-                                               ||rc.StudentCourseStatus == StudentCourseStatusEnum.Studied));
+                                              ));
 
                 if (existingRegistration != null) 
                 {

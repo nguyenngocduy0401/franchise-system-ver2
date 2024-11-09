@@ -14,6 +14,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using FranchiseProject.Domain.Enums;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using DocumentFormat.OpenXml;
+using FranchiseProject.Application.ViewModels.ClassViewModel;
 
 namespace FranchiseProject.API.Controllers
 {
@@ -27,6 +28,7 @@ namespace FranchiseProject.API.Controllers
         private readonly ISessionService _sessionService;
         private readonly IChapterService _chapterService;
         private readonly IQuestionService _questionService;
+        private readonly IClassService _classService;
         public CourseController(ICourseService courseService, ICourseMaterialService materialService,
             IAssessmentService assessmentService, ISessionService sessionService,
             IChapterService chapterService, IQuestionService questionService)
@@ -123,6 +125,13 @@ namespace FranchiseProject.API.Controllers
         public async Task<ApiResponse<List<ChapterViewModel>>> GetChapterByCourseIdAsync(Guid id)
         {
             return await _chapterService.GetChapterByCourseIdAsync(id);
+        }
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff + "," + AppRole.Instructor + "," + AppRole.Student)]
+        [SwaggerOperation(Summary = "lấy danh sách lớp bằng course Id{Authorize = AgencyManager ,AgencyStaff , Instructor,Student}")]
+        [HttpGet("courses/{id}/classes")]
+        public async Task<ApiResponse<List<ClassViewModel>>> GetAllClassByCourseId(string id)
+        {
+            return await _classService.GetAllClassByCourseId(id);
         }
     }
 }

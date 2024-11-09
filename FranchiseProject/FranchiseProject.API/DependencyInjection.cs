@@ -51,6 +51,7 @@ using FranchiseProject.Application.ViewModels.FeedBackViewModels;
 using FranchiseProject.API.Validator.FeedBackValidator;
 using FranchiseProject.Application.ViewModels.QuizViewModels;
 using FranchiseProject.API.Validator.QuizValidator;
+using Microsoft.Extensions.Hosting;
 
 
 namespace FranchiseProject.API
@@ -193,7 +194,9 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<CreateQuizModel>, CreateQuizValidator>();
             services.AddTransient<IValidator<UpdateQuizModel>, UpdateQuizValidator>();
             #endregion
-
+            #region BackgroundService
+            services.AddHostedService< ClassRoomBackgroundService>();
+            #endregion
             return services;
         }
         public static IServiceCollection AddAuthenticationServices(this IServiceCollection services, AppConfiguration configuration)

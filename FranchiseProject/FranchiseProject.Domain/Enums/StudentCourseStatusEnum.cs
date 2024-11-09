@@ -9,11 +9,9 @@ namespace FranchiseProject.Domain.Enums
     public enum StudentCourseStatusEnum
     {
         Waitlisted = 0,                // Chưa Học
-        Studied=1,                   // Đã Học
-        Enrolled = 2 ,                // Đang Học
-        DroppedOut=3 ,               //Thôi học
-        Pending=4,                  //Đã Tư vấn 
-        NotConsult =5,               //Chưa Tư Vấn 
-        Cancel =6 ,                   //Cancel Khóa học    
+        Enrolled = 1 ,                // Đang Học
+        Pending=2,                  //Đã Tư vấn 
+        NotConsult =3,               //Chưa Tư Vấn 
+        Cancel =4 ,                   //Cancel Khóa học    
     }
 }

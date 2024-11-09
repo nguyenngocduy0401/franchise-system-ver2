@@ -56,11 +56,19 @@ namespace FranchiseProject.Application.Services
                     return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 }
-                var rc = _unitOfWork.RegisterCourseRepository.GetFirstOrDefaultAsync(rc => rc.UserId == userCurrentId && rc.CourseId == Guid.Parse(model.CourseId) && rc.StudentCourseStatus == StudentCourseStatusEnum.Studied);
+                var rc = _unitOfWork.RegisterCourseRepository.GetFirstOrDefaultAsync(rc => rc.UserId == userCurrentId && rc.CourseId == Guid.Parse(model.CourseId) );
                 if (rc == null)
                 {
                     return ResponseHandler.Success<bool>(false,"Học sinh chưa hoàn thành khóa học !");
 
+                }
+                var classRoomEntry = await _unitOfWork.ClassRoomRepository.GetFirstOrDefaultAsync(
+                        cr => cr.UserId == userCurrentId &&cr.Class.CourseId==Guid.Parse(model.CourseId) && cr.Status == ClassRoomEnumStatus.CanFeedback
+                     );
+
+                if (classRoomEntry == null)
+                {
+                    return ResponseHandler.Success(false, "Học sinh chưa được phép gửi đánh giá!");
                 }
                 var feedback = _mapper.Map<Feedback>(model);
                 await _unitOfWork.FeedbackRepository.AddAsync(feedback);
