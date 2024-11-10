@@ -34,7 +34,13 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.Set<Assignment>().FirstOrDefaultAsync(predicate);
         }
-       
 
+        public async Task<IEnumerable<Assignment>> GetAsmsByClassId(Guid classId)
+        {
+            return await _dbSet
+                .Where(e => e.ClassId == classId && e.IsDeleted != true)
+                          .Include(e => e.AssignmentSubmits).ThenInclude(s => s.User)
+                          .ToListAsync();
+        }
     }
 }
