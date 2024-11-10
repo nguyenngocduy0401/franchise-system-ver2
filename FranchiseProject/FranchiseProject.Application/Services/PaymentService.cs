@@ -81,7 +81,7 @@ namespace FranchiseProject.Application.Services
                                 throw new Exception("Update User Account fail!");
                             }
                             var email = EmailTemplate.StudentPaymentSuccsess(user.Email, user.FullName, create.Amount, generate.UserName, generate.Password);
-                          var mailSuccess=  _emailService.SendEmailAsync(email);
+                          var mailSuccess= await _emailService.SendEmailAsync(email);
                            
                         }
                         break;
@@ -109,7 +109,7 @@ namespace FranchiseProject.Application.Services
                                 throw new Exception("Update User Account fail!");
                             }
                             var email = EmailTemplate.StudentPaymentSuccsess(user.Email, user.FullName, create.Amount, generate.UserName, generate.Password);
-                            var mailSuccess = _emailService.SendEmailAsync(email);
+                            var mailSuccess = await _emailService.SendEmailAsync(email);
                         }
                         break;
 

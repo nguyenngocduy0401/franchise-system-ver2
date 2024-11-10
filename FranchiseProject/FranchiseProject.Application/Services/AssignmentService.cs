@@ -71,8 +71,8 @@ namespace FranchiseProject.Application.Services
                 foreach (var student in students)
                 {
 
-                    _hubContext.Clients.User(student.Id.ToString())
-                        .SendAsync("ReceivedNotification", $"Bạn có bài Tập mới bắt đầu lúc {assignment.StartTime.ToString()}.");
+                await    _hubContext.Clients.User(student.Id.ToString())
+                        .SendAsync("ReceivedNotification", $"Bạn có bài tập mới bắt đầu lúc {assignment.StartTime.ToString()}.");
                 }
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
@@ -333,7 +333,7 @@ namespace FranchiseProject.Application.Services
 
 
                 await _hubContext.Clients.User(students.Id.ToString())
-                    .SendAsync("ReceivedNotification", $" bài Tập {assignment.Title.ToString()} đã được chấm điểm.");
+                    .SendAsync("ReceivedNotification", $" bài tập {assignment.Title.ToString()} đã được chấm điểm.");
                 assignmentsubmit.ScoreNumber = model.ScoreNumber;
                 await _unitOfWork.AssignmentSubmitRepository.UpdatesAsync(assignmentsubmit);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
