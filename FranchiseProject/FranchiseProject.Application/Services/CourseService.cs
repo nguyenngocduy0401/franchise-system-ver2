@@ -317,9 +317,17 @@ namespace FranchiseProject.Application.Services
                         oldCourse.Status = CourseStatusEnum.Closed;
                         course.Version = oldCourse.Version + 1;
                         _unitOfWork.CourseRepository.Update(oldCourse);
-
-
-                        // Sửa danh sách học sinh đang ở code cũ (Phần này Tính thêm vào)
+                        // Sửa danh sách học sinh đang ở course cũ 
+                            
+                        var registerCourses = (await _unitOfWork.RegisterCourseRepository
+                            .FindAsync(e => e.CourseId == oldCourse.Id && 
+                                            e.StudentCourseStatus != StudentCourseStatusEnum.Enrolled &&
+                                            e.StudentCourseStatus != StudentCourseStatusEnum.Cancel)).ToList();
+                        foreach (var registerCourse in registerCourses)
+                        {
+                            registerCourse.CourseId = course.Id;
+                        }
+                        _unitOfWork.RegisterCourseRepository.UpdateRange(registerCourses);
                     }
                     else course.Version = 1;
                 }

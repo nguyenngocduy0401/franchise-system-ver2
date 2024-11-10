@@ -67,7 +67,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.RegisterCourses.FirstOrDefaultAsync(filter);
         }
-        public async Task<bool> Update1Async(RegisterCourse registerCourse)
+        public async Task<bool> UpdateVersion2Async(RegisterCourse registerCourse)
         {
             if (registerCourse == null)
             {

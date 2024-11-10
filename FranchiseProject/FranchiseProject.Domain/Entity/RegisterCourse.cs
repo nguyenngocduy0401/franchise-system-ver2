@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Entity
 {
-    public class RegisterCourse:BaseEntity
+    public class RegisterCourse : BaseEntity
     {
         public string? UserId { get; set; }
         [ForeignKey("UserId")]

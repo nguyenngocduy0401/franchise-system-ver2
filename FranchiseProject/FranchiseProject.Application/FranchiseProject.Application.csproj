@@ -21,10 +21,17 @@
     <PackageReference Include="Google.Apis.Auth" Version="1.68.0" />
     <PackageReference Include="itext7" Version="8.0.5" />
     <PackageReference Include="MimeKit" Version="4.7.1" />
+    <PackageReference Include="Quartz" Version="3.13.1" />
+    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.13.1" />
+    <PackageReference Include="Quartzmin" Version="1.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FranchiseProject.Domain\FranchiseProject.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Jobs\" />
   </ItemGroup>
 
 </Project>

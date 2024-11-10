@@ -284,8 +284,8 @@ namespace FranchiseProject.Application.Services
                 .Take(createQuizModel.Quantity);
 
                 if (randomQuestions.Count() < createQuizModel.Quantity)
-                    return ResponseHandler.Failure<bool>
-                        ("Số lượng trong ngân hàng câu hỏi không đủ! "
+                    return ResponseHandler.Success(false,
+                        "Số lượng trong ngân hàng câu hỏi không đủ! "
                         + "Số lượng câu hỏi trong ngân hàng: " + randomQuestions.Count());
 
                 var quizdetails = _mapper.Map<List<QuizDetail>>(randomQuestions);
