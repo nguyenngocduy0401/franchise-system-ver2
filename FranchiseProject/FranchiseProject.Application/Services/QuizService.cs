@@ -1,16 +1,19 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Math;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
+using FranchiseProject.Application.Hubs;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.QuestionViewModels;
 using FranchiseProject.Application.ViewModels.QuizViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using Microsoft.AspNetCore.SignalR;
 using MimeKit.Cryptography;
 using System;
 using System.Collections.Generic;
@@ -30,10 +33,11 @@ namespace FranchiseProject.Application.Services
         private readonly ICurrentTime _currentTime;
         private readonly IValidator<CreateQuizModel> _createQuizValidator;
         private readonly IValidator<UpdateQuizModel> _updateQuizValidator;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
         public QuizService(IUnitOfWork unitOfWork, IMapper mapper, IClaimsService claimsService,
             IValidator<CreateQuizModel> createQuizValidator, ICurrentTime currentTime, 
-            IValidator<UpdateQuizModel> updateQuizValidator)
+            IValidator<UpdateQuizModel> updateQuizValidator, IHubContext<NotificationHub> hubContext)
         {
             _claimsService = claimsService;
             _unitOfWork = unitOfWork;
@@ -41,6 +45,7 @@ namespace FranchiseProject.Application.Services
             _createQuizValidator = createQuizValidator;
             _currentTime = currentTime;
             _updateQuizValidator = updateQuizValidator;
+            _hubContext = hubContext;
         }
         public async Task<ApiResponse<QuizStudentViewModel>> GetAllQuizForStudentByQuizId(Guid id)
         {
@@ -253,11 +258,19 @@ namespace FranchiseProject.Application.Services
                                  && e.ClassId == quiz.ClassId))
                     .FirstOrDefault();
                 if (classs == null) return ResponseHandler.Success(false, "Bạn không tồn tại trong danh sách lớp!");
+
+                var score = (await _unitOfWork.ScoreRepository
+                    .FindAsync(e => e.UserId == userId &&
+                                    e.QuizId == quiz.Id)).FirstOrDefault();
+                if(score != null) return ResponseHandler.Success(false, "Bạn đã hoàn thành bài kiểm tra này trước đó!");
+
                 DateTime? checkEndTime = quiz.StartTime?.AddMinutes(quiz.Duration + 5 ?? 0);
                 if (checkEndTime == null || quiz.StartTime > _currentTime.GetCurrentTime() ||
                     _currentTime.GetCurrentTime() > checkEndTime)
                     return ResponseHandler.Success(false, "Không nằm trong phạm vi thời gian cho phép!");
                 response = ResponseHandler.Success(true);
+
+
             }
             catch (Exception ex)
             {
@@ -292,10 +305,17 @@ namespace FranchiseProject.Application.Services
 
                 var quiz = _mapper.Map<Quiz>(createQuizModel);
                 quiz.QuizDetails = quizdetails;
+                await _unitOfWork.QuizRepository.AddAsync(quiz); 
 
-                await _unitOfWork.QuizRepository.AddAsync(quiz);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
+
+                var students = await _unitOfWork.ClassRepository.GetStudentsByClassIdAsync((Guid)createQuizModel.ClassId);
+                foreach (var student in students)
+                {
+                    await _hubContext.Clients.User(student.Id.ToString())
+                        .SendAsync("ReceivedNotification", $"Bạn có bài kiểm tra mới bắt đầu lúc {createQuizModel.StartTime.ToString()}.");
+                }
                 response = ResponseHandler.Success(true);
             }
             catch (Exception ex)
