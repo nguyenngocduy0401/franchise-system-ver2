@@ -111,7 +111,7 @@ namespace FranchiseProject.Application.Services
                     {
                         UserId = student,
                         ClassId = newClass.Id,
-
+                        
                     };
 
                     await _unitOfWork.ClassRoomRepository.AddAsync(newClassRoom);

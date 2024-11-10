@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace FranchiseProject.Domain.Entity
 {
     public class AssignmentSubmit
-    {
+    {   public string? FileSbumitName {  get; set; }
         public string? FileSubmitURL { get; set; }
         public string? UserId { get; set; }
         [ForeignKey("UserId")]

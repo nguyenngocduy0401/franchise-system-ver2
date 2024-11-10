@@ -36,7 +36,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             _userManager = userManager;
             _roleManager = roleManager;
         }
-        public async Task<IEnumerable<ClassRoom>> FindAsync(Expression<Func<ClassRoom, bool>> expression, string includeProperties = "")
+        public async Task<List<ClassRoom>> FindAsync(Expression<Func<ClassRoom, bool>> expression, string includeProperties = "")
         {
             IQueryable<ClassRoom> query = _dbContext.ClassRooms.Where(expression);
             foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
@@ -45,7 +45,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             }
             return await query.ToListAsync();
         }
-        public async Task<IEnumerable<ClassRoom>> GetFilterAsync(Expression<Func<ClassRoom, bool>> filter)
+        public async Task<List<ClassRoom>> GetFilterAsync(Expression<Func<ClassRoom, bool>> filter)
         {
             return await _dbContext.ClassRooms
                 .Include(sc => sc.User)  
@@ -177,5 +177,22 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<bool> UpdatesAsync(ClassRoom room)
+        {
+            if (room == null)
+            {
+                throw new ArgumentNullException(nameof(room));
+            }
+            _dbContext.ClassRooms.Update(room);
+            var result = await _dbContext.SaveChangesAsync();
+            return result > 0;
+        }
+
+        public async Task<List<ClassRoom>> GetClassRoomsWithNullStatusAndToDateAsync()
+        {
+            return await _dbContext.ClassRooms
+                .Where(cr => cr.ToDate !=null && cr.Status == null)
+                      .ToListAsync();
+        }
     }
 }

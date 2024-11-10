@@ -273,8 +273,19 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<CreateAssignmentViewModel, Assignment>();
             CreateMap<Assignment, AssignmentViewModel>();
             CreateMap<List<AssignmentSubmitViewModel>, Pagination<AssignmentSubmitViewModel>>();
-        
-            #endregion
+            CreateMap<Assignment, AsmSubmitDetailViewModel>()
+           
+            .ForMember(dest => dest.UserScores, opt => opt.MapFrom(src => src.AssignmentSubmits.Select(us => new UserSubmitScoreViewModel
+            {
+                UserId = us.UserId,
+                Name = us.User.FullName,
+                Username = us.User.UserName,
+                Score = us.ScoreNumber,
+                SubmitFileName = us.FileSbumitName,
+                SubmitUrl = us.FileSubmitURL
+            }).ToList())); // Chuyển đổi danh sách thành List
         }
+        #endregion
     }
-}
+    }
+

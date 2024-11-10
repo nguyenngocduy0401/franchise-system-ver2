@@ -12,7 +12,8 @@ namespace FranchiseProject.Application.Repositories
     {
         Task<List<Assignment>> GetAllAsync1(Expression<Func<Assignment, bool>> predicate);
             Task<Assignment> GetFirstOrDefaultAsync(Expression<Func<Assignment, bool>> predicate);
+        Task<IEnumerable<Assignment>> GetAsmsByClassId(Guid classId);
 
-       
+
     }
 }

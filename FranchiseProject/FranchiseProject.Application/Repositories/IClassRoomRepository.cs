@@ -10,7 +10,7 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IClassRoomRepository
     {
-        Task<IEnumerable<ClassRoom>> FindAsync(Expression<Func<ClassRoom, bool>> expression, string includeProperties = "");
+        Task<List<ClassRoom>> FindAsync(Expression<Func<ClassRoom, bool>> expression, string includeProperties = "");
         Task AddAsync(ClassRoom classRoom);
         Task<List<User>> GetWaitlistedStudentsAsync(List<string> studentIds);
         Task<List<string>> GetInvalidStudentsAsync(List<string> studentIds);
@@ -22,6 +22,7 @@ namespace FranchiseProject.Application.Repositories
         Task<List<string>> GetUserIdsByClassIdAsync(Guid classId);
         Task<List<Guid>> GetClassIdsByCourseIdAsync(Guid courseId);
         Task<ClassRoom> GetClassRoomsByClassIdAndInstructorRoleAsync(Guid classId);
-
+        Task<bool> UpdatesAsync(ClassRoom room);
+        Task<List<ClassRoom>> GetClassRoomsWithNullStatusAndToDateAsync();
     }
 }
