@@ -12,5 +12,8 @@ namespace FranchiseProject.Application.ViewModels.ScoreViewModels
         public string? Name { get; set; }
         public string? Username { get; set; }
         public double? Score { get; set; }
+        public string? SubmitFileName { get; set; }
+        public string? SubmitUrl { get; set; }
+
     }
 }

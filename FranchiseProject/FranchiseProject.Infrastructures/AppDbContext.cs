@@ -39,7 +39,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<Slot> Slots { get; set; }
         public DbSet<StudentAnswer> StudentAnswers { get; set; }
         public DbSet<ClassRoom> ClassRooms { get; set; }
-        public DbSet<RegisterForm> RegisterForms{ get; set; }
+        public DbSet<RegisterForm> RegisterForms { get; set; }
         public DbSet<Syllabus> Syllabuses { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
@@ -61,7 +61,7 @@ namespace FranchiseProject.Infrastructures
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(QuizDetailConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentAnswerConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentClassConfiguration).Assembly);
-           // modelBuilder.ApplyConfigurationsFromAssembly(typeof(RegisterCourseConfiguration).Assembly);
+            // modelBuilder.ApplyConfigurationsFromAssembly(typeof(RegisterCourseConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AssignmentSubmitConfiguration).Assembly);
             modelBuilder.Entity<Contract>().HasData(
                      new Contract
@@ -336,8 +336,76 @@ namespace FranchiseProject.Infrastructures
             }
         );
             #endregion
-            
-            
+
+            modelBuilder.HasAnnotation("TriggerSetup", true);
         }
+        public override int SaveChanges()
+        {
+            CreateAgencyStatusTrigger();
+            CreateClassRoomDatesTrigger();
+            return base.SaveChanges();
+        }
+        private void CreateAgencyStatusTrigger()
+        {
+            Database.ExecuteSqlRaw(@"
+            CREATE TRIGGER trg_UpdateUserStatusWhenAgencyStatusChange
+            ON Agencies
+            AFTER UPDATE
+            AS
+            BEGIN
+                IF EXISTS (
+                    SELECT 1
+                    FROM inserted i
+                    JOIN deleted d ON i.Id = d.Id
+                    WHERE i.Status IN (6) AND i.Status <> d.Status
+                )
+                BEGIN
+                    UPDATE AspNetUsers
+                    SET Status = 1
+                    WHERE AgencyId IN (
+                        SELECT Id
+                        FROM inserted
+                        WHERE Status IN (5, 6)
+                    );
+                END
+            END;");
+        }
+
+        private void CreateClassRoomDatesTrigger()
+        {
+            Database.ExecuteSqlRaw(@"
+            CREATE TRIGGER trg_UpdateClassRoomDates
+            ON ClassSchedules
+            AFTER INSERT, UPDATE, DELETE
+            AS
+            BEGIN
+                DECLARE @ClassId UNIQUEIDENTIFIER;
+                IF EXISTS (SELECT * FROM inserted)
+                BEGIN
+                    SET @ClassId = (SELECT TOP 1 ClassId FROM inserted);
+                END
+                ELSE IF EXISTS (SELECT * FROM deleted)
+                BEGIN
+                    SET @ClassId = (SELECT TOP 1 ClassId FROM deleted);
+                END
+                IF @ClassId IS NOT NULL
+                BEGIN
+                    DECLARE @MinDate DATE;
+                    DECLARE @MaxDate DATE;
+                    SELECT 
+                        @MinDate = MIN(Date),
+                        @MaxDate = MAX(Date)
+                    FROM ClassSchedules
+                    WHERE ClassId = @ClassId;
+
+                    UPDATE ClassRooms
+                    SET FromDate = @MinDate,
+                        ToDate = @MaxDate,
+                        Status = 0
+                    WHERE ClassId = @ClassId;
+                END
+            END;");
+        }
+
     }
 }
