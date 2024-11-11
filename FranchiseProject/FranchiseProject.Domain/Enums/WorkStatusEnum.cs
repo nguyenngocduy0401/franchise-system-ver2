@@ -8,7 +8,8 @@ namespace FranchiseProject.Domain.Enums
 {
     public enum WorkStatusEnum
     {
-        Canceled,   //Huy
-        Completed   //Xac nhan
+        None,
+        Approved,   //Xác nhận 
+        Rejected   //Hủy 
     }
 }
