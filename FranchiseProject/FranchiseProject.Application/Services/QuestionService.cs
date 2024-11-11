@@ -201,9 +201,6 @@ namespace FranchiseProject.Application.Services
 
                 question.ChapterId = chapterId;
 
-                var deleteQuestions = (await _unitOfWork.QuestionRepository.FindAsync(e => e.ChapterId == chapterId && e.IsDeleted != true)).ToList();
-                if (!deleteQuestions.IsNullOrEmpty()) _unitOfWork.QuestionRepository.SoftRemoveRange(deleteQuestions);
-
                 await _unitOfWork.QuestionRepository.AddAsync(question);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
