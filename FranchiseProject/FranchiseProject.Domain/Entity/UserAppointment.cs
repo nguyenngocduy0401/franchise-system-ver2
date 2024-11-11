@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Entity
 {
-    public class WorkDetail
+    public class UserAppointment
     {
-        public Guid? WorkId { get; set; }
-        [ForeignKey("WorkId")]
-        public Work? Work { get; set; }
-        public string? UserId { get; set; }
+        public Guid? AppointmentId { get; set; }
+        [ForeignKey("AppointmentId")]
+        public Appointment? Appointment { get; set; }
+        public string? UserId {  get; set; }
         [ForeignKey("UserId")]
         public User? User { get; set; }
-
     }
 }

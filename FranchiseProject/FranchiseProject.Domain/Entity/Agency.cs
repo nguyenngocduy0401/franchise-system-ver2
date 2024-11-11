@@ -20,6 +20,7 @@ namespace FranchiseProject.Domain.Entity
         public string? Email { get; set; }
         public AgencyStatusEnum Status { get; set; }
         public AgencyActivitiesStatusEnum ActivityStatus { get; set; }
+        public virtual ICollection<Appointment>? Appointments { get; set; }
         public virtual ICollection<Contract>? Contracts { get; set; }
         public virtual ICollection<Slot>? Slots { get; set; }
     }

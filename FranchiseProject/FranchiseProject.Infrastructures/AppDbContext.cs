@@ -45,9 +45,8 @@ namespace FranchiseProject.Infrastructures
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Assessment> Assessments { get; set; }
         public DbSet<Work> Works { get; set; }
-        public DbSet<WorkDetail> WorkDetails { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
-        public DbSet<AppointmentDetail> AppointmentDetails { get; set; }
+        public DbSet<UserAppointment> UserAppointments { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<RegisterCourse> RegisterCourses { get; set; }

@@ -8,5 +8,7 @@ namespace FranchiseProject.Domain.Enums
 {
     public enum WorkStatusEnum
     {
+        Canceled,   //Huy
+        Completed   //Xac nhan
     }
 }
