@@ -86,7 +86,7 @@ namespace FranchiseProject.API.Controllers
          public async Task<ApiResponse<List<StudentScheduleViewModel>>> GetStudentSchedulesAsync(DateTime startTime, DateTime endTime) => await _classService.GetStudentSchedulesAsync(startTime,endTime);
         [SwaggerOperation(Summary = "giáo viên chấm điểm bài tập (assignement){Authorize = Instructor}")]
         [Authorize(Roles = AppRole.Instructor)]
-        [HttpPost("mine/scores")]
+        [HttpPost("~/instructor/api/v1/scores")]
         public async Task<ApiResponse<bool>> GradeStudentAssAsync(StudentAssScorseNumberViewModel model) => await _assignmentService.GradeStudentAssAsync(model);
         [SwaggerOperation(Summary = "học sinh nộp bài tập (assignement){Authorize = Student}")]
         [Authorize(Roles = AppRole.Student)]
