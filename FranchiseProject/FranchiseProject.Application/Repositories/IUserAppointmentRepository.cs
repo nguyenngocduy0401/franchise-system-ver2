@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Domain.Enums
+namespace FranchiseProject.Application.Repositories
 {
-    public enum WorkStatusEnum
+    public interface IUserAppointmentRepository 
     {
-        Canceled,   //Huy
-        Completed   //Xac nhan
     }
 }

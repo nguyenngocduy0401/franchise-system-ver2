@@ -196,6 +196,12 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Chapter, Chapter>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CourseId, opt => opt.Ignore());
+            CreateMap<Question, Question>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.ChapterId, opt => opt.Ignore());
+            CreateMap<QuestionOption, QuestionOption>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.QuestionId, opt => opt.Ignore());
             #endregion
             #region Syllabus
             CreateMap<CreateSyllabusModel, Syllabus>();
