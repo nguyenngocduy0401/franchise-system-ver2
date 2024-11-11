@@ -39,10 +39,12 @@ namespace FranchiseProject.Application
         public INotificationRepository NotificationRepository { get; }
         public IPaymentRepository PaymentRepository { get; }
         public IStudentRepository StudentRepository { get; }
-     //   public IMaterialRepository MaterialRepository { get; }
         public ICourseMaterialRepository CourseMaterialRepository { get; }
         public IChapterMaterialRepository ChapterMaterialRepository { get; }
         public IAgencyDashboardRepository AgencyDashboardRepository { get; }
+        public IUserAppointmentRepository UserAppointmentRepository { get; }
+        public IWorkRepository WorkRepository { get; }  
+        public IAppointmentRepository AppointmentRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

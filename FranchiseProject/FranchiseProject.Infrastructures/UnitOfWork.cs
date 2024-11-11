@@ -46,6 +46,9 @@ namespace FranchiseProject.Infrastructures
         private readonly IRegisterCourseRepository _registerCourseRepository;
         private readonly IChapterMaterialRepository _chapterMaterialRepository;
         private readonly IAgencyDashboardRepository _agencyDashboardRepository;
+        private readonly IWorkRepository _workRepository;
+        private readonly IUserAppointmentRepository _userAppointmentRepository; 
+        private readonly IAppointmentRepository _appointmentRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -57,7 +60,9 @@ namespace FranchiseProject.Infrastructures
             IRegisterFormRepository franchiseRegistrationRequestRepository, IAssessmentRepository assessmentRepository,INotificationRepository notificationRepository,
             IPaymentRepository paymentRepository,IStudentRepository studentRepository,
             ICourseMaterialRepository courseMaterialRepository,IRegisterCourseRepository registerCourseRepository,
-            IChapterMaterialRepository chapterMaterialRepository,IAgencyDashboardRepository agencyDashboardRepository)
+            IChapterMaterialRepository chapterMaterialRepository,IAgencyDashboardRepository agencyDashboardRepository,
+            IAppointmentRepository appointmentRepository, IWorkRepository workRepository,
+            IUserAppointmentRepository userAppointmentRepository)
 
            
         {
@@ -96,6 +101,9 @@ namespace FranchiseProject.Infrastructures
             _chapterMaterialRepository= chapterMaterialRepository;
             _courseMaterialRepository = courseMaterialRepository;
             _agencyDashboardRepository = agencyDashboardRepository;
+            _appointmentRepository = appointmentRepository;
+            _userAppointmentRepository = userAppointmentRepository;
+            _workRepository = workRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -152,16 +160,24 @@ namespace FranchiseProject.Infrastructures
         public INotificationRepository NotificationRepository => _notificationRepository;
         
         public IAssessmentRepository AssessmentRepository => _assessmentRepository;
-        public IStudentRepository StudentRepository => _studentRepository;
-        public IPaymentRepository PaymentRepository=>_paymentRepository;
 
+        public IStudentRepository StudentRepository => _studentRepository;
+
+        public IPaymentRepository PaymentRepository=>_paymentRepository;
 
         public ICourseMaterialRepository CourseMaterialRepository => _courseMaterialRepository;
 
         public IRegisterCourseRepository RegisterCourseRepository => _registerCourseRepository;
+
         public IChapterMaterialRepository ChapterMaterialRepository => _chapterMaterialRepository;
 
         public IAgencyDashboardRepository AgencyDashboardRepository => _agencyDashboardRepository;
+
+        public IUserAppointmentRepository UserAppointmentRepository => _userAppointmentRepository;
+
+        public IWorkRepository WorkRepository => _workRepository;   
+        public IAppointmentRepository AppointmentRepository => _appointmentRepository;
+
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();
