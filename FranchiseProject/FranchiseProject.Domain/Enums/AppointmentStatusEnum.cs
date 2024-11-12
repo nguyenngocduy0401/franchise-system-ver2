@@ -8,5 +8,8 @@ namespace FranchiseProject.Domain.Enums
 {
     public enum AppointmentStatusEnum
     {
+        None,
+        Cancelled,
+        Completed
     }
 }

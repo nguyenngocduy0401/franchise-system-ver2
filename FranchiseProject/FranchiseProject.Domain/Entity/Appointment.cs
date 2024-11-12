@@ -15,7 +15,6 @@ namespace FranchiseProject.Domain.Entity
         public string? Description { get; set; }
         public string? Report { get; set; }
         public string? ReportImageURL { get; set; }
-        public AppointmentTypeEnum? Type { get; set; }
         public AppointmentStatusEnum? Status { get; set; }
         public Guid? WorkId { get; set; }
         [ForeignKey("WorkId")]
