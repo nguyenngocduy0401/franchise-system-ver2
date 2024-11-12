@@ -20,7 +20,7 @@ namespace FranchiseProject.API.Controllers
             _chapterService = chapterService;
             _questionService = questionService;
         }
-        [Authorize(Roles = AppRole.Instructor + "," + AppRole.Manager)]
+        [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo câu hỏi của chương học {Authorize = Instructor, Manager}")]
         [HttpPost("{id}/questions")]
         public async Task<ApiResponse<bool>> CreateQuestionByChapterIdAsync(Guid id, CreateQuestionArrangeModel createQuestionArrangeModel)
@@ -33,21 +33,21 @@ namespace FranchiseProject.API.Controllers
         {
             return await _questionService.GetAllQuestionByChapterId(id);
         }
-        [Authorize(Roles = AppRole.Instructor + "," + AppRole.Manager)]
+        [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "xóa chương của khóa học bằng id {Authorize = Instructor, Manager}")]
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteChapterByIdAsync(Guid id)
         {
             return await _chapterService.DeleteChapterByIdAsync(id);
         }
-        [Authorize(Roles = AppRole.Instructor + "," + AppRole.Manager)]
+        [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo chương của khóa học {Authorize = Instructor, Manager}")]
         [HttpPost()]
         public async Task<ApiResponse<bool>> CreateChapterAsync(CreateChapterModel createChapterModel)
         {
             return await _chapterService.CreateChapterAsync(createChapterModel);
         }
-        [Authorize(Roles = AppRole.Instructor + "," + AppRole.Manager)]
+        [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "cập nhật chương của khóa học {Authorize = Instructor, Manager}")]
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> UpdateChapterAsync(Guid id, UpdateChapterModel updateChapterModel)
