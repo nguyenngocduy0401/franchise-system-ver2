@@ -298,8 +298,10 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<CreateWorkModel, Work>();
             CreateMap<UpdateWorkModel, Work>();
             CreateMap<Work, WorkViewModel>();
+            CreateMap<Work, WorkDetailViewModel>();
             #endregion
             #region Appointment
+            CreateMap<Appointment, AppointmentViewModel>();
             CreateMap<CreateAppointmentModel, Appointment>()
                 .ForMember(dest => dest.UserAppointments, opt => opt.MapFrom(src =>
                     src.UserId));
@@ -312,6 +314,12 @@ namespace FranchiseProject.Infrastructures.Mappers
             #endregion
             CreateMap<string, UserAppointment>()
                     .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src));
+            CreateMap<UpdateAppointmentModel, Appointment>();
+            CreateMap<User, AppointmentUserViewModel>();
+            CreateMap<Appointment, AppointmentDetailViewModel>()
+                    .ForMember(dest => dest.User, opt => opt
+                    .MapFrom(src => src.UserAppointments
+                    .Select(up => up.User)));
             #endregion
         }
     }

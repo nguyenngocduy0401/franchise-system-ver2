@@ -30,6 +30,27 @@ namespace FranchiseProject.Application.Services
             _createAppointmentValidator = createAppointmentValidator;
             _updateAppointmentValidator = updateAppointmentValidator;
         }
+        public async Task<ApiResponse<AppointmentDetailViewModel>> GetAppointmentDetailByIdAsync(Guid id)
+        {
+            var response = new ApiResponse<AppointmentDetailViewModel>();
+            try
+            {
+                var appointment = await _unitOfWork.AppointmentRepository
+                    .GetAppointmentAsyncById(id);
+                if (appointment == null) return ResponseHandler
+                        .Success(new AppointmentDetailViewModel(), "Cuộc hẹn không khả dụng!");
+
+                var appointmentModel = _mapper.Map<AppointmentDetailViewModel>(appointment);
+
+                response = ResponseHandler.Success(appointmentModel);
+
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<AppointmentDetailViewModel>(ex.Message);
+            }
+            return response;
+        }
         public async Task<ApiResponse<bool>> CreateAppointmentAsync(CreateAppointmentModel createAppointmentModel)
         {
             var response = new ApiResponse<bool>();
@@ -41,8 +62,7 @@ namespace FranchiseProject.Application.Services
                 var work = await _unitOfWork.WorkRepository.GetExistByIdAsync((Guid)createAppointmentModel.WorkId);
                 if (work == null) return ResponseHandler.Success(false, "Cơ sở nhượng quyền không khả dụng!");
 
-                if (work.StartDate <= createAppointmentModel.StartTime 
-                    && createAppointmentModel.EndTime <= work.EndDate) 
+                if (createAppointmentModel.StartTime < work.StartDate || createAppointmentModel.EndTime > work.EndDate)
                     return ResponseHandler.Success(false, "Ngày trong cuộc hẹn phải nằm trong thời gian của nhiệm vụ!");
 
                 var appointment = _mapper.Map<Appointment>(createAppointmentModel);
@@ -76,6 +96,34 @@ namespace FranchiseProject.Application.Services
                 if (!isSuccess) throw new Exception("Create failed!");
 
                 response = ResponseHandler.Success(true, "Tạo cuộc hẹn thành công!");
+
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
+        public async Task<ApiResponse<bool>> UpdateAppointmentAsync(Guid id, UpdateAppointmentModel updateAppointmentModel)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var appointment = await _unitOfWork.AppointmentRepository.GetExistByIdAsync(id);
+                var checkAppointmentAvailable = CheckAppointmentAvailable(appointment);
+                if (checkAppointmentAvailable.Data == false) return checkAppointmentAvailable;
+
+                var work = await _unitOfWork.WorkRepository.GetExistByIdAsync((Guid)appointment.WorkId);
+                if (updateAppointmentModel.StartTime < work.StartDate || updateAppointmentModel.EndTime > work.EndDate)
+                    return ResponseHandler.Success(false, "Ngày trong cuộc hẹn phải nằm trong thời gian của nhiệm vụ!");
+
+                appointment = _mapper.Map(updateAppointmentModel, appointment);
+                _unitOfWork.AppointmentRepository.Update(appointment);
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Update failed!");
+
+                response = ResponseHandler.Success(true, "Cập nhật cuộc hẹn thành công!");
 
             }
             catch (Exception ex)

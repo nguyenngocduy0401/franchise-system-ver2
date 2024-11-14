@@ -48,8 +48,7 @@ namespace FranchiseProject.Application.Services
                             UserId = userId,
                         });
                 }
-
-
+                await _unitOfWork.UserAppointmentRepository.AddRangeAsync(listUserAppointment);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
 

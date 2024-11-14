@@ -9,9 +9,11 @@ namespace FranchiseProject.Application.ViewModels.WorkViewModels
 {
     public class WorkViewModel
     {
+        public Guid? Id { get; set; }
         public string? Title { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public WorkTypeEnum? Type { get; set; }
+        public WorkStatusEnum? Status { get; set; }
     }
 }

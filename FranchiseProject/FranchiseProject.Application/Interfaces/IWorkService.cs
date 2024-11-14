@@ -14,5 +14,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> DeleteWorkByIdAsync(Guid workId);
         Task<ApiResponse<IEnumerable<WorkViewModel>>> GetAllWorkByAgencyId(Guid agencyId);
         Task<ApiResponse<bool>> UpdateWorkAsync(Guid workId, UpdateWorkModel updateWorkModel);
+        Task<ApiResponse<WorkDetailViewModel>> GetWorkDetailByIdAsync(Guid id);
     }
 }

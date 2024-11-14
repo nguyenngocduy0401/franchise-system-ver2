@@ -10,14 +10,19 @@ namespace FranchiseProject.API.Controllers
 {
     [Route("api/v1/works")]
     [ApiController]
-    public class WorkController : ControllerBase 
+    public class WorkController : ControllerBase
     {
         private readonly IWorkService _workService;
         public WorkController(IWorkService workService)
         {
             _workService = workService;
         }
-
+        [SwaggerOperation(Summary = "lấy chi tiết công việc bằng id")]
+        [HttpGet("{id}")]
+        public async Task<ApiResponse<WorkDetailViewModel>> GetWorkDetailByIdAsync(Guid id)
+        {
+            return await _workService.GetWorkDetailByIdAsync(id);
+        }
         [Authorize(Roles = AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo công việc{Authorize = Manager}")]
         [HttpPost()]

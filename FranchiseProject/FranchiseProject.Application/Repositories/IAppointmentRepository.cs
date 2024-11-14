@@ -9,5 +9,6 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IAppointmentRepository : IGenericRepository<Appointment>
     {
+        Task<Appointment> GetAppointmentAsyncById(Guid id);
     }
 }

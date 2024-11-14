@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,13 @@ namespace FranchiseProject.Infrastructures.Repositories
             _dbContext = context;
             _timeService = timeService;
             _claimsService = claimsService;
+        }
+
+        public async Task<Appointment> GetAppointmentAsyncById(Guid id) 
+        {
+            return await _dbContext.Appointments.Where(e => e.Id == id && e.IsDeleted != true)
+                                          .Include(a => a.UserAppointments)
+                                          .ThenInclude(u => u.User).FirstOrDefaultAsync();
         }
     }
 }

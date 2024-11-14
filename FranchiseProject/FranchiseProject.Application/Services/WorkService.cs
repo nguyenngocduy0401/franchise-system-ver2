@@ -36,13 +36,32 @@ namespace FranchiseProject.Application.Services
             _createWordValidator = createWorkValidator;
             _updateWordValidator = updateWordValidator;
         }
+        public async Task<ApiResponse<WorkDetailViewModel>> GetWorkDetailByIdAsync(Guid id)
+        {
+            var response = new ApiResponse<WorkDetailViewModel>();
+            try
+            {
+                var work = (await _unitOfWork.WorkRepository
+                    .FindAsync(e => e.Id == id && e.IsDeleted != true, "Appointments")).FirstOrDefault();
+                if (work == null) return ResponseHandler.Success(new WorkDetailViewModel(), "Nhiệm vụ không khả dụng!");
+
+                var workModel = _mapper.Map<WorkDetailViewModel>(work);
+
+                response = ResponseHandler.Success(workModel);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<WorkDetailViewModel>(ex.Message);
+            }
+            return response;
+        }
         public async Task<ApiResponse<bool>> DeleteWorkByIdAsync(Guid workId)
         {
             var response = new ApiResponse<bool>();
             try
             {
                 var work = await _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
-                if (work == null) return ResponseHandler.Success(false, "Slot học không khả dụng!");
+                if (work == null) return ResponseHandler.Success(false, "Nhiệm vụ không khả dụng!");
 
                 _unitOfWork.WorkRepository.SoftRemove(work);
 
@@ -111,7 +130,7 @@ namespace FranchiseProject.Application.Services
                 if(agency == null) return ResponseHandler.Success(false, "Cơ sở nhượng quyền không khả dụng!");
 
                 var work = _mapper.Map<Work>(createWorkModel);
-
+                work.Status = WorkStatusEnum.None;
                 await _unitOfWork.WorkRepository.AddAsync(work);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
