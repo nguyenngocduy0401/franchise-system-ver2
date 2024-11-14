@@ -52,6 +52,10 @@ using FranchiseProject.API.Validator.FeedBackValidator;
 using FranchiseProject.Application.ViewModels.QuizViewModels;
 using FranchiseProject.API.Validator.QuizValidator;
 using Microsoft.Extensions.Hosting;
+using FranchiseProject.Application.ViewModels.WorkViewModels;
+using FranchiseProject.API.Validator.WorkValidator;
+using FranchiseProject.Application.ViewModels.AppointmentViewModels;
+using FranchiseProject.API.Validator.AppointmentValidator;
 
 
 namespace FranchiseProject.API
@@ -193,6 +197,12 @@ namespace FranchiseProject.API
 
             services.AddTransient<IValidator<CreateQuizModel>, CreateQuizValidator>();
             services.AddTransient<IValidator<UpdateQuizModel>, UpdateQuizValidator>();
+
+            services.AddTransient<IValidator<UpdateWorkModel>, UpdateWorkValidator>();
+            services.AddTransient<IValidator<CreateWorkModel>, CreateWorkValidator>();
+
+            services.AddTransient<IValidator<UpdateAppointmentModel>, UpdateAppointmentValidator>();
+            services.AddTransient<IValidator<CreateAppointmentModel>, CreateAppointmentValidator>();
             #endregion
             return services;
         }

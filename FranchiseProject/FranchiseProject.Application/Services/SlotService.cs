@@ -145,7 +145,7 @@ namespace FranchiseProject.Application.Services
                 slot = _mapper.Map(updateSlotModel, slot);
                 _unitOfWork.SlotRepository.Update(slot);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Cập nhật thất bại!");
+                if (!isSuccess) throw new Exception("Update failed!");
 
                 response = ResponseHandler.Success(true, "Cập nhật slot thành công!");
             }

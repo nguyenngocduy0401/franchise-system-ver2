@@ -1,5 +1,7 @@
-﻿using FranchiseProject.Application.Interfaces;
+﻿using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
+using FranchiseProject.Application.ViewModels.WorkViewModels;
 using FranchiseProject.Domain.Entity;
 using System;
 using System.Collections.Generic;
@@ -23,6 +25,11 @@ namespace FranchiseProject.Infrastructures.Repositories
             _dbContext = context;
             _timeService = timeService;
             _claimsService = claimsService;
+        }
+        public IEnumerable<Work> GetAllWorkByAgencyId(Guid agencyId) 
+        {
+            return _dbContext.Works
+                .Where(e => e.AgencyId == agencyId);
         }
     }
 }

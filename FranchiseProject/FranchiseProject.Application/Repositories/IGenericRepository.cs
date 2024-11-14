@@ -20,7 +20,7 @@ namespace FranchiseProject.Application.Repositories
            int? pageSize = null,
            string? foreignKey = null,
            object? foreignKeyId = null);
-
+        IQueryable<TEntity> GetTableAsTracking();
         Task<List<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null);
         Task<TEntity> GetByIdAsync(Guid id);
         Task AddAsync(TEntity entity);

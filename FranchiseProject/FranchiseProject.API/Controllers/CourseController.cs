@@ -31,7 +31,8 @@ namespace FranchiseProject.API.Controllers
         private readonly IClassService _classService;
         public CourseController(ICourseService courseService, ICourseMaterialService materialService,
             IAssessmentService assessmentService, ISessionService sessionService,
-            IChapterService chapterService, IQuestionService questionService)
+            IChapterService chapterService, IQuestionService questionService,
+            IClassService classService)
         {
             _courseService = courseService;
             _materialService = materialService;
@@ -39,6 +40,7 @@ namespace FranchiseProject.API.Controllers
             _sessionService = sessionService;
             _chapterService = chapterService;
             _questionService = questionService;
+            _classService = classService;
         }
         [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "cập nhật trạng thái của học bằng id {Authorize = SystemInstructor, Manager}")]

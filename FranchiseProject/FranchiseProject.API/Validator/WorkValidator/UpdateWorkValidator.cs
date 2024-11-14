@@ -1,12 +1,11 @@
 ﻿using FluentValidation;
-using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
 
 namespace FranchiseProject.API.Validator.WorkValidator
 {
-    public class CreateWorkValidator : AbstractValidator<CreateWorkModel>
+    public class UpdateWorkValidator : AbstractValidator<UpdateWorkModel>
     {
-        public CreateWorkValidator()
+        public UpdateWorkValidator()
         {
             RuleFor(x => x.Title)
                 .NotEmpty()
@@ -16,14 +15,12 @@ namespace FranchiseProject.API.Validator.WorkValidator
             RuleFor(x => x.StartDate)
                 .NotEmpty()
                 .LessThanOrEqualTo(x => x.EndDate)
-                .GreaterThanOrEqualTo(new DateTime(2020,1,1))
+                .GreaterThanOrEqualTo(new DateTime(2020, 1, 1))
                 .WithMessage("Start date must be in the future.");
             RuleFor(x => x.EndDate)
                 .NotEmpty()
                 .LessThanOrEqualTo(DateTime.Now.AddYears(1))
                 .WithMessage("Start date must be within one year from today.");
-            RuleFor(x => x.Type)
-                .NotEmpty();
         }
     }
 }

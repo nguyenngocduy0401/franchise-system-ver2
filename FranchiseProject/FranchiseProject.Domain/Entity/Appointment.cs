@@ -11,17 +11,16 @@ namespace FranchiseProject.Domain.Entity
     public class Appointment : BaseEntity
     {
         public string? Title { get; set; }
-        public DateTime? Date { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime? EndTime { get; set; }
         public string? Description { get; set; }
         public string? Report { get; set; }
         public string? ReportImageURL { get; set; }
         public AppointmentStatusEnum? Status { get; set; }
+        public AppointmentTypeEnum? Type { get; set; }
         public Guid? WorkId { get; set; }
         [ForeignKey("WorkId")]
         public Work? Work { get; set; }
-        public Guid? AgencyId { get; set; }
-        [ForeignKey("AgencyId")]
-        public Agency? Agency { get; set; }
         public virtual ICollection<UserAppointment>? UserAppointments { get; set; }
     }
 }

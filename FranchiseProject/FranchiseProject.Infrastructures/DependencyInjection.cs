@@ -59,6 +59,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IAgencyDashboardService, AgencyDashboardService>();
             services.AddScoped<IWorkService, WorkService>();
             services.AddScoped<IAppointmentService, AppointmentService>();
+            services.AddScoped<IUserAppointmentService, UserAppointmentService>();
 
             #endregion
             #region Repository DI

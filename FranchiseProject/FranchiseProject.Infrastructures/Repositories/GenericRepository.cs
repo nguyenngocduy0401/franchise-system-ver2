@@ -24,6 +24,11 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
+        public IQueryable<TEntity> GetTableAsTracking()
+        {
+            return _dbSet.AsQueryable();
+
+        }
         public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, string includeProperties = "")
         {
             IQueryable<TEntity> query = _dbSet.Where(expression);

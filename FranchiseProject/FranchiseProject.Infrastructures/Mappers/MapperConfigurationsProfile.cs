@@ -33,6 +33,8 @@ using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.ViewModels.AssignmentViewModels;
 using FranchiseProject.Application.ViewModels.QuizViewModels;
 using FranchiseProject.Application.ViewModels.ScoreViewModels;
+using FranchiseProject.Application.ViewModels.WorkViewModels;
+using FranchiseProject.Application.ViewModels.AppointmentViewModels;
 
 
 
@@ -290,8 +292,28 @@ namespace FranchiseProject.Infrastructures.Mappers
                 SubmitFileName = us.FileSbumitName,
                 SubmitUrl = us.FileSubmitURL
             }).ToList())); // Chuyển đổi danh sách thành List
+            #endregion
+
+            #region Work
+            CreateMap<CreateWorkModel, Work>();
+            CreateMap<UpdateWorkModel, Work>();
+            CreateMap<Work, WorkViewModel>();
+            #endregion
+            #region Appointment
+            CreateMap<CreateAppointmentModel, Appointment>()
+                .ForMember(dest => dest.UserAppointments, opt => opt.MapFrom(src =>
+                    src.UserId));
+            #region replace
+            /*.ForMember(dest => dest.UserAppointments, opt => opt.MapFrom(src =>
+                src.UserId != null
+                ? src.UserId.Select(userId => new UserAppointment { UserId = userId }).ToList()
+                : new List<UserAppointment>()*/
+            //
+            #endregion
+            CreateMap<string, UserAppointment>()
+                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src));
+            #endregion
         }
-        #endregion
     }
-    }
+}
 
