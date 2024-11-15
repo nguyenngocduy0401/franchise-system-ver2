@@ -3,6 +3,7 @@ using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,10 +27,15 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
-        public IEnumerable<Work> GetAllWorkByAgencyId(Guid agencyId) 
+        public IEnumerable<Work> GetAllPreWorkByAgencyId(Guid agencyId) 
         {
             return _dbContext.Works
-                .Where(e => e.AgencyId == agencyId);
+                .Where(e => e.AgencyId == agencyId && e.IsDeleted != true &&
+                (e.Type == WorkTypeEnum.Interview || e.Type == WorkTypeEnum.AgreementSigned ||
+                 e.Type == WorkTypeEnum.BusinessRegistered || e.Type == WorkTypeEnum.SiteSurvey ||
+                 e.Type == WorkTypeEnum.Design || e.Type == WorkTypeEnum.Quotation ||
+                 e.Type == WorkTypeEnum.SignedContract || e.Type == WorkTypeEnum.ConstructionAndTrainning || 
+                 e.Type == WorkTypeEnum.Handover || e.Type == WorkTypeEnum.EducationalSupervision));
         }
     }
 }
