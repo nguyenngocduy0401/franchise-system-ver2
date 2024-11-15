@@ -62,7 +62,7 @@ namespace FranchiseProject.Application.Services
         }
 
 
-        public async Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAgency(FilterUserByAgencyModel filterUserByAgencyModel)
+        public async Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAgencyManagerAsync(FilterUserByAgencyModel filterUserByAgencyModel)
         {
             var response = new ApiResponse<Pagination<UserViewModel>>();
             try
