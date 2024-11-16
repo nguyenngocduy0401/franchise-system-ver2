@@ -81,7 +81,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<IEnumerable<WorkViewModel>>();
             try
             {
-                var work = _unitOfWork.WorkRepository.GetAllWorkByAgencyId(agencyId);
+                var work = _unitOfWork.WorkRepository.GetAllPreWorkByAgencyId (agencyId);
                 var workModel = _mapper.Map<IEnumerable<WorkViewModel>>(work);
 
                 response = ResponseHandler.Success(workModel, "Successful!");
