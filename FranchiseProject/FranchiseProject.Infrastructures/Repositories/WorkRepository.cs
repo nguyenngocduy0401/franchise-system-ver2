@@ -37,6 +37,11 @@ namespace FranchiseProject.Infrastructures.Repositories
                  e.Type == WorkTypeEnum.SignedContract || e.Type == WorkTypeEnum.ConstructionAndTrainning || 
                  e.Type == WorkTypeEnum.Handover || e.Type == WorkTypeEnum.EducationalSupervision));
         }
+
+        public IEnumerable<Work> GetAllWorkByAgencyId(Guid agencyId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 
