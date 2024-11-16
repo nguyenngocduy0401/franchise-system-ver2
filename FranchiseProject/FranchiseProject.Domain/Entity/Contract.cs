@@ -17,7 +17,7 @@ namespace FranchiseProject.Domain.Entity
         public int Duration { get; set; }
         public string? ContractDocumentImageURL { get; set; }
         public string? Description { get; set; }
-        public string? TermsAndCondition { get; set; }
+      //  public string? TermsAndCondition { get; set; }
         public double? RevenueSharePercentage { get; set; }
         public Guid? AgencyId { get; set; }
         [ForeignKey("AgencyId")]

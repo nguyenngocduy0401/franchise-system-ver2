@@ -13,6 +13,7 @@ using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
 using Microsoft.IdentityModel.Tokens;
+using FranchiseProject.Application.Utils;
 
 namespace FranchiseProject.Application.Services
 {
@@ -21,6 +22,7 @@ namespace FranchiseProject.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClaimsService _claimsService;
         private readonly IValidator<CreateAgencyViewModel> _validator;
+        private readonly IValidator<UpdateAgencyViewModel> _validatorUpdate;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
         private readonly IHubContext<NotificationHub> _hubContext;
@@ -62,16 +64,7 @@ namespace FranchiseProject.Application.Services
                     response.Data=true;
                     response.isSuccess = true;
                     response.Message = "Tạo Thành Công !";
-                    var emailMessage = new MessageModel
-                    {
-                        To = create.Email, 
-                        Subject = "Đăng ký thành công  [futuretech-noreply]",
-                        Body = $"<p>Chào {create.Name},</p>" +
-                      $"<p>Cảm ơn bạn đã đăng ký trở thành đối tác của chúng tôi.</p>" +
-                      $"<p>Thông tin của bạn đã được ghi nhận thành công.</p>" +
-                      $"<p>Trân trọng,</p>" +
-                      $"<p>Đội ngũ Futuretech</p>"
-                    };
+                    var emailMessage = EmailTemplate.AgencyRegistrationSuccess(agency.Name, agency.Email);
                     bool emailSent = await _emailService.SendEmailAsync(emailMessage);
                     if (!emailSent)
                     {
@@ -105,7 +98,17 @@ namespace FranchiseProject.Application.Services
             {
                 var paginationResult = await _unitOfWork.AgencyRepository.GetFilterAsync(
                       filter: s =>
-                    (!filter.Status.HasValue || s.Status == filter.Status) ,
+                    (!filter.Status.HasValue || s.Status == filter.Status) &&
+                    (!filter.Activity.HasValue|| s.ActivityStatus==filter.Activity)&&
+                    (string.IsNullOrEmpty(filter.FreeText) || (
+                    s.Name != null && s.Name.Contains(filter.FreeText) ||
+                    s.Address != null && s.Address.Contains(filter.FreeText) ||
+                    s.City != null && s.City.Contains(filter.FreeText) ||
+                    s.District != null && s.District.Contains(filter.FreeText) ||
+                    s.Ward != null && s.Ward.Contains(filter.FreeText) ||
+                    s.PhoneNumber != null && s.PhoneNumber.Contains(filter.FreeText) ||
+                    s.Email != null && s.Email.Contains(filter.FreeText)
+                )),
                     pageIndex: filter.PageIndex,
                     pageSize: filter.PageSize
                 );
@@ -130,13 +133,13 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<ApiResponse<bool>> UpdateAgencyAsync(CreateAgencyViewModel update, string id)
+        public async Task<ApiResponse<bool>> UpdateAgencyAsync(UpdateAgencyViewModel  update, string id)
         {
             var response = new ApiResponse<bool>();
             try
             {
                 var agenyId = Guid.Parse(id);
-                FluentValidation.Results.ValidationResult validationResult = await _validator.ValidateAsync(update);
+                FluentValidation.Results.ValidationResult validationResult = await _validatorUpdate.ValidateAsync(update);
                 if (!validationResult.IsValid)
                 {
                     response.isSuccess = false;

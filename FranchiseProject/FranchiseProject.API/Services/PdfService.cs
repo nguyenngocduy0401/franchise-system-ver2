@@ -25,10 +25,10 @@ namespace FranchiseProject.API.Services
                    var form = stamper.AcroFields;
                     form.SetField("StartTime", StartTime.ToString("dd/MM/yyyy"));
                     form.SetField("EndTime", EndTime.ToString("dd/MM/yyyy"));
-                    form.SetField("Amount", contract.Amount.ToString());
+                  
                     form.SetField("Duration", contract.Duration.ToString());
                     form.SetField("Description", contract.Description ?? "");
-                    form.SetField("TermsAndCondition", contract.TermsAndCondition ?? "");
+                 
                     stamper.FormFlattening = true;
                 }
             }

@@ -9,9 +9,7 @@ namespace FranchiseProject.API.Validator.ContractValidator
         public CreateContractValidator()
         {
 
-            RuleFor(x => x.Amount)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("Amount must be greater than or equal to 0.");
+          
 
             RuleFor(x => x.Duration)
                 .Must(d => new[] { 1, 2, 3, 5, 10 }.Contains(d)) // Year options
@@ -21,9 +19,7 @@ namespace FranchiseProject.API.Validator.ContractValidator
                 .NotNull()
                 .WithMessage("Description cannot be null.");
 
-            RuleFor(x => x.TermsAndCondition)
-                .NotNull()
-                .WithMessage("Terms and Conditions cannot be null.");
+         
             RuleFor(x => x.AgencyId)
                 .NotNull()
                 .WithMessage("Agency ID cannot be null.");
