@@ -100,14 +100,14 @@ namespace FranchiseProject.Application.Services
                       filter: s =>
                     (!filter.Status.HasValue || s.Status == filter.Status) &&
                     (!filter.Activity.HasValue|| s.ActivityStatus==filter.Activity)&&
-                    (string.IsNullOrEmpty(filter.FreeText) || (
-                    s.Name != null && s.Name.Contains(filter.FreeText) ||
-                    s.Address != null && s.Address.Contains(filter.FreeText) ||
-                    s.City != null && s.City.Contains(filter.FreeText) ||
-                    s.District != null && s.District.Contains(filter.FreeText) ||
-                    s.Ward != null && s.Ward.Contains(filter.FreeText) ||
-                    s.PhoneNumber != null && s.PhoneNumber.Contains(filter.FreeText) ||
-                    s.Email != null && s.Email.Contains(filter.FreeText)
+                    (string.IsNullOrEmpty(filter.SearchInput) || (
+                    s.Name != null && s.Name.Contains(filter.SearchInput) ||
+                    s.Address != null && s.Address.Contains(filter.SearchInput) ||
+                    s.City != null && s.City.Contains(filter.SearchInput) ||
+                    s.District != null && s.District.Contains(filter.SearchInput) ||
+                    s.Ward != null && s.Ward.Contains(filter.SearchInput) ||
+                    s.PhoneNumber != null && s.PhoneNumber.Contains(filter.SearchInput) ||
+                    s.Email != null && s.Email.Contains(filter.SearchInput)
                 )),
                     pageIndex: filter.PageIndex,
                     pageSize: filter.PageSize
