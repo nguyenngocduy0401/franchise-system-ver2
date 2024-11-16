@@ -2,6 +2,7 @@
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Services;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
+using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -43,6 +44,13 @@ namespace FranchiseProject.API.Controllers
         public async Task<ApiResponse<bool>> DeleteWorkAsync(Guid id)
         {
             return await _workService.DeleteWorkByIdAsync(id);
+        }
+        [Authorize(Roles = AppRole.Manager)]
+        [SwaggerOperation(Summary = "cập nhật trạng thái  công việc{Authorize = Manager}")]
+        [HttpPut("~/manager/api/v1/works/{id}")]
+        public async Task<ApiResponse<bool>> UpdateStatusWorkByIdAsync(Guid id, WorkStatusEnum status)
+        {
+            return await _workService.UpdateStatusWorkByIdAsync(id,status);
         }
     }
 }

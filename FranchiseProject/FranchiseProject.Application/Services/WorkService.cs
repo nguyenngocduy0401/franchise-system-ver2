@@ -145,5 +145,26 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<bool>> UpdateStatusWorkByIdAsync(Guid workId,WorkStatusEnum status)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var work = await _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
+                if (work == null) return ResponseHandler.Success(false, "Nhiệm vụ không khả dụng!");
+                work.Status=status;
+                _unitOfWork.WorkRepository.Update(work);
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Update status failed!");
+
+                response = ResponseHandler.Success(true, "Cập nhật nhiệm vụ thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
     }
 }
