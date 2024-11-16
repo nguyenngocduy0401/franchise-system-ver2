@@ -314,7 +314,7 @@ namespace FranchiseProject.Application.Services
 
                     break;
 
-                    case AgencyStatusEnum.Terminated:
+                    case AgencyStatusEnum.Suspended:
                         var user = await _unitOfWork.UserRepository.GetByAgencyIdAsync(agencyId);
                         if (user != null)
                         {
