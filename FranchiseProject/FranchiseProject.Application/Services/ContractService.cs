@@ -144,6 +144,7 @@ namespace FranchiseProject.Application.Services
                 existingContract.Amount = update.Amount;
                 existingContract.Duration= update.Duration;
                 existingContract.Description=update.Description;
+              //  existingContract.TermsAndCondition=update.TermsAndCondition;
                 existingContract.StartTime = DateTime.Now;
                 existingContract.EndTime = existingContract.StartTime.AddYears(update.Duration);
                 //xu li pdf
