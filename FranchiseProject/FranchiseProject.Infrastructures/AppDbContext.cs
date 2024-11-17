@@ -343,13 +343,13 @@ namespace FranchiseProject.Infrastructures
             modelBuilder.Entity<EquipmentTypePrice>().HasData(
                      new EquipmentTypePrice
                      {
-                         Id = Guid.NewGuid(),
+                         Id = Guid.Parse("7CC69321-2180-44ED-84A6-A4AFDD775092"),
                        Type=EquipmentTypeEnum.Table,
                        Price=800000
                      },
                       new EquipmentTypePrice
                       {
-                          Id = Guid.NewGuid(),
+                          Id = Guid.Parse("A2863B86-1CD8-4921-BC64-C01706CAFFE2"),
                           Type = EquipmentTypeEnum.Chair,
                           Price = 300000
                       }
