@@ -10,7 +10,7 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModels
     {
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
-        public Guid? AgencyId { get; set; }
+        public string? SearchInput { get; set; }
         public int PageIndex { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }

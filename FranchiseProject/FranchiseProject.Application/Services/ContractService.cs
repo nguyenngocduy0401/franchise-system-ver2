@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
@@ -209,21 +210,19 @@ namespace FranchiseProject.Application.Services
                 Expression<Func<Contract, bool>> filter = c =>
                     (!filterContractModel.StartTime.HasValue || filterContractModel.StartTime <= c.StartTime) &&
                     (!filterContractModel.EndTime.HasValue || filterContractModel.EndTime >= c.EndTime) &&
-                    (!filterContractModel.AgencyId.HasValue || c.AgencyId == filterContractModel.AgencyId);
+                    (string.IsNullOrEmpty(filterContractModel.SearchInput) ||
+                        (c.Title.Contains(filterContractModel.SearchInput) ||
+                        (c.Agency != null && c.Agency.Name.Contains(filterContractModel.SearchInput)))
+                    );
 
                 var contracts = await _unitOfWork.ContractRepository.GetFilterAsync(
                     filter: filter,
+                    orderBy: q => q.OrderByDescending(c => c.CreationDate),
                     pageIndex: filterContractModel.PageIndex,
                     pageSize: filterContractModel.PageSize,
                     includeProperties: "Agency"
                 );
 
-                if (!contracts.Items.Any())
-                {
-                    return ResponseHandler.Success(new Pagination<ContractViewModel>(), "Không tìm thấy hợp đồng phù hợp!");
-                }
-
-                // Ánh xạ trực tiếp
                 var contractViewModels = new Pagination<ContractViewModel>
                 {
                     Items = contracts.Items.Select(c => new ContractViewModel
@@ -237,10 +236,14 @@ namespace FranchiseProject.Application.Services
                         AgencyName = c.Agency != null ? c.Agency.Name : string.Empty
                     }).ToList(),
                     TotalItemsCount = contracts.TotalItemsCount,
-                    
                     PageIndex = contracts.PageIndex,
                     PageSize = contracts.PageSize
                 };
+
+                if (!contractViewModels.Items.Any())
+                {
+                    return ResponseHandler.Success(contractViewModels, "Không tìm thấy hợp đồng phù hợp!");
+                }
 
                 response = ResponseHandler.Success(contractViewModels, "Successful!");
             }
@@ -252,6 +255,7 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
+      
 
         private List<ContractViewModel> MapContractsToViewModels(List<Contract> contracts)
         {
