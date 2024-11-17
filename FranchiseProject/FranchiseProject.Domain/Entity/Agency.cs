@@ -18,6 +18,7 @@ namespace FranchiseProject.Domain.Entity
         public string? PositionImageURL { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Email { get; set; }
+        public string? DesignFee { get; set; }
         public AgencyStatusEnum Status { get; set; }
         public AgencyActivitiesStatusEnum ActivityStatus { get; set; }
         public virtual ICollection<Appointment>? Appointments { get; set; }

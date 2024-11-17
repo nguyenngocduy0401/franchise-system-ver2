@@ -52,6 +52,8 @@ using FranchiseProject.API.Validator.FeedBackValidator;
 using FranchiseProject.Application.ViewModels.QuizViewModels;
 using FranchiseProject.API.Validator.QuizValidator;
 using Microsoft.Extensions.Hosting;
+using FranchiseProject.Application.ViewModels.DocumentViewModels;
+using FranchiseProject.API.Validator.DocumentValidator;
 
 
 namespace FranchiseProject.API
@@ -193,6 +195,8 @@ namespace FranchiseProject.API
 
             services.AddTransient<IValidator<CreateQuizModel>, CreateQuizValidator>();
             services.AddTransient<IValidator<UpdateQuizModel>, UpdateQuizValidator>();
+
+            services.AddTransient<IValidator<UploadDocumentViewModel>, UploadDocumentValidator>();
             #endregion
             return services;
         }

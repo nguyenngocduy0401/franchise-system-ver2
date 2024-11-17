@@ -100,14 +100,14 @@ namespace FranchiseProject.Application.Services
                       filter: s =>
                     (!filter.Status.HasValue || s.Status == filter.Status) &&
                     (!filter.Activity.HasValue|| s.ActivityStatus==filter.Activity)&&
-                    (string.IsNullOrEmpty(filter.FreeText) || (
-                    s.Name != null && s.Name.Contains(filter.FreeText) ||
-                    s.Address != null && s.Address.Contains(filter.FreeText) ||
-                    s.City != null && s.City.Contains(filter.FreeText) ||
-                    s.District != null && s.District.Contains(filter.FreeText) ||
-                    s.Ward != null && s.Ward.Contains(filter.FreeText) ||
-                    s.PhoneNumber != null && s.PhoneNumber.Contains(filter.FreeText) ||
-                    s.Email != null && s.Email.Contains(filter.FreeText)
+                    (string.IsNullOrEmpty(filter.SearchInput) || (
+                    s.Name != null && s.Name.Contains(filter.SearchInput) ||
+                    s.Address != null && s.Address.Contains(filter.SearchInput) ||
+                    s.City != null && s.City.Contains(filter.SearchInput) ||
+                    s.District != null && s.District.Contains(filter.SearchInput) ||
+                    s.Ward != null && s.Ward.Contains(filter.SearchInput) ||
+                    s.PhoneNumber != null && s.PhoneNumber.Contains(filter.SearchInput) ||
+                    s.Email != null && s.Email.Contains(filter.SearchInput)
                 )),
                     pageIndex: filter.PageIndex,
                     pageSize: filter.PageSize
@@ -292,7 +292,7 @@ namespace FranchiseProject.Application.Services
                             existingUser.Status = UserStatusEnum.active; 
                         }
                      break;
-                    case AgencyStatusEnum.Processing:
+                    case AgencyStatusEnum.Active:
                         var agencyregister = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
                         if(agencyregister != null)
                         {
@@ -314,7 +314,7 @@ namespace FranchiseProject.Application.Services
 
                     break;
 
-                    case AgencyStatusEnum.Terminated:
+                    case AgencyStatusEnum.Suspended:
                         var user = await _unitOfWork.UserRepository.GetByAgencyIdAsync(agencyId);
                         if (user != null)
                         {
@@ -325,7 +325,7 @@ namespace FranchiseProject.Application.Services
                                 IsRead = false,
                                 SenderId = agencyId.ToString(),
                                 ReceiverId = user.Id,
-                                Message = "Chấm dứt hợp đồng"
+                                Message = "Tạm ngưng hoạt động!"
                             };
                             user.Status = UserStatusEnum.blocked;
                             await _hubContext.Clients.User(agencyId.ToString()).SendAsync("ReceivedNotification",notification.Message);
@@ -335,8 +335,8 @@ namespace FranchiseProject.Application.Services
                                 To = agency.Email,
                                 Subject = "[futuretech-noreply]Hợp đồng hết hạn",
                                 Body = $"<p>Chào {agency.Name},</p>" +
-                                 $"<p>Chúng tôi  thông báo tới bạn đã hết hạn hợp đồng!</p>" +
-                                
+                                 $"<p>Chúng tôi  thông báo tới bạn !</p>" +
+                                $"<p>Cơ sở của bạn đã tạm ngưng hoạt động</p>" +
                                  $"<P>Hãy liên hệ với đội ngũ nhân viên để được hỗ trợ </p>"+
                                  $"<p>Trân trọng,</p>" +
                                  $"<p>Đội ngũ Futuretech</p>"

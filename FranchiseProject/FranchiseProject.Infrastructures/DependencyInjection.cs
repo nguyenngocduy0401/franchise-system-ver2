@@ -59,6 +59,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IAgencyDashboardService, AgencyDashboardService>();
             services.AddScoped<IWorkService, WorkService>();
             services.AddScoped<IAppointmentService, AppointmentService>();
+            services.AddScoped<IDocumentService, DocumentService>();
 
             #endregion
             #region Repository DI
@@ -99,6 +100,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IUserAppointmentRepository, UserAppointmentRepository>();
             services.AddScoped<IWorkRepository, WorkRepository>();
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+            services.AddScoped<IDocumentRepository, DocumentRepository>();  
             #endregion
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>

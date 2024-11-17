@@ -12,7 +12,6 @@ namespace FranchiseProject.Domain.Enums
         Approved,                    // Đã duyệt
         Active,                      // Đang hoạt động
         Suspended,                   // Tạm ngưng hoạt động
-        Terminated,                  // Chấm dứt hợp tác
         Inactive                     // Không hoạt động
     }
 
