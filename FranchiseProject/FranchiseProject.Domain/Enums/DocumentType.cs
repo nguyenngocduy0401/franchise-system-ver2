@@ -8,8 +8,8 @@ namespace FranchiseProject.Domain.Enums
 {
     public enum DocumentType
     {
-        Agreement_Contract,
-        Business_License,
-        Educational_Operation_License
+        AgreementContract,
+        BusinessLicense,
+        EducationalOperationLicense
     }
 }

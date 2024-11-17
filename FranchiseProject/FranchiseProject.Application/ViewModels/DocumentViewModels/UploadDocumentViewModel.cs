@@ -14,6 +14,7 @@ namespace FranchiseProject.Application.ViewModels.DocumentViewModels
         public string? Title { get; set; }
         public string? URLFile { get; set; }
         public DateOnly? ExpirationDate { get; set; }
+        public DocumentType DocumentType { get; set; }
         public Guid? AgencyId { get; set; }
 
     }

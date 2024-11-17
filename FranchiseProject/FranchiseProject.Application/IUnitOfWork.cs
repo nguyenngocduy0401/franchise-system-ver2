@@ -45,7 +45,7 @@ namespace FranchiseProject.Application
         public IUserAppointmentRepository UserAppointmentRepository { get; }
         public IWorkRepository WorkRepository { get; }  
         public IAppointmentRepository AppointmentRepository { get; }
-       // public IDocumentRepository DocumentRepository { get; }
+        public IDocumentRepository DocumentRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

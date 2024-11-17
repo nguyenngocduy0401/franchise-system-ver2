@@ -11,8 +11,12 @@ namespace FranchiseProject.Application.ViewModels.DocumentViewModel
 {
     public class DocumentViewModel
     {
+        public Guid? Id { get; set; }
         public string? Title { get; set; }
         public string? URLFile { get; set; }
+        public DateOnly? ExpirationDate { get; set; }
+        public DocumentType? Type { get; set; }
+        public DocumentStatus Status { get; set; }
         public Guid? AgencyId { get; set; }
         
     }
