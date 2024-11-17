@@ -12,7 +12,7 @@ namespace FranchiseProject.Application.Interfaces
     public interface IContractService
     {
         Task<ApiResponse<bool>> CreateContractAsync(CreateContractViewModel create);
-        Task<ApiResponse<bool>> UpdateContractAsync(CreateContractViewModel update, string id);
+        Task<ApiResponse<bool>> UpdateContractAsync(UpdateContractViewModel update, string id);
         Task<ApiResponse<Pagination<ContractViewModel>>> FilterContractViewModelAsync(FilterContractViewModel filter);
         Task<ApiResponse<ContractViewModel>> GetContractByIdAsync(string id);
         Task<ApiResponse<AgencyInfoViewModel>> GetAgencyInfoAsync(Guid agencyId);

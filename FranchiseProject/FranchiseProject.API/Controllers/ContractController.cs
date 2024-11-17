@@ -31,7 +31,7 @@ namespace FranchiseProject.API.Controllers
         [HttpPut("{id}")]
 
         [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
-        public async Task<ApiResponse<bool>> UpdateContractAsync([FromBody] CreateContractViewModel update, string id)
+        public async Task<ApiResponse<bool>> UpdateContractAsync([FromBody] UpdateContractViewModel update, string id)
         {
             return await _contractService.UpdateContractAsync(update, id);
         }

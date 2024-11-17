@@ -58,7 +58,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             #endregion
             #region Contract
             CreateMap<CreateContractViewModel, Contract>().ReverseMap();
-            CreateMap<Contract, ContractViewModel>().ForMember(dest => dest.AgencyName,otp => otp.MapFrom(src=>src.Agency.Name));
+            CreateMap<Contract, ContractViewModel>().ReverseMap();
+  
 
             #endregion
             #region User

@@ -40,14 +40,14 @@ namespace FranchiseProject.API.Services
             finalOutputStream.Position = 0;
             return finalOutputStream;
         }
-
+/*
         public async Task<Stream> FillUpdatePdfTemplate(UpdateContractViewModel contract)
         {
 
             string firebaseUrl = "https://firebasestorage.googleapis.com/v0/b/franchise-project-1ea45.firebasestorage.app/o/Contract%2Fhop-dong-nhuong-quyen-thuong-mai_1010092534%20(3).pdf?alt=media&token=38cd36c7-a187-4716-891b-52a30132dc16";
             Stream pdfTemplateStream = await DownloadFileFromFirebaseAsync(firebaseUrl);
 
-            var StartTime = DateTime.Now;
+           *//* var StartTime = DateTime.Now;
             var EndTime = StartTime.AddYears(contract.Duration);
             var outputStream = new MemoryStream();
             using (var reader = new PdfReader(pdfTemplateStream))
@@ -63,11 +63,11 @@ namespace FranchiseProject.API.Services
                     form.SetField("TermsAndCondition", contract.TermsAndCondition ?? "");
                     stamper.FormFlattening = true;
                 }
-            }
+            }*//*
             var finalOutputStream = new MemoryStream(outputStream.ToArray());
             finalOutputStream.Position = 0;
             return finalOutputStream;
-        }
+        }*/
         private async Task<Stream> DownloadFileFromFirebaseAsync(string url)
         {
             var response = await _httpClient.GetAsync(url);
