@@ -31,7 +31,7 @@ namespace FranchiseProject.API.Controllers
         [HttpPut("{id}")]
 
         [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
-        public async Task<ApiResponse<bool>> UpdateContractAsync([FromBody] UpdateContractViewModel update, string id)
+        public async Task<ApiResponse<bool>> UpdateContractAsync([FromBody] CreateContractViewModel update, string id)
         {
             return await _contractService.UpdateContractAsync(update, id);
         }
@@ -50,6 +50,13 @@ namespace FranchiseProject.API.Controllers
         public Task<ApiResponse<Pagination<ContractViewModel>>> FilterContractAsync([FromQuery] FilterContractViewModel filter)
         {
             return _contractService.FilterContractViewModelAsync(filter);
+        }
+        [SwaggerOperation(Summary = "Truy xuất thông tin đối tác cho hợp đồng  {Authorize = Manager,Admin}")]
+        [HttpGet("agency/{id}")]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        public Task<ApiResponse<AgencyInfoViewModel>> GetAgencyInfoAsync(Guid id)
+        {
+            return _contractService.GetAgencyInfoAsync(id);
         }
     }
 }

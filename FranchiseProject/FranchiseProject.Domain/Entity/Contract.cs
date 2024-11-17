@@ -12,12 +12,9 @@ namespace FranchiseProject.Domain.Entity
         public string? Title { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public int Amount { get; set; }
         public int Total { get; set; }
-        public int Duration { get; set; }
         public string? ContractDocumentImageURL { get; set; }
         public string? Description { get; set; }
-      //  public string? TermsAndCondition { get; set; }
         public double? RevenueSharePercentage { get; set; }
         public Guid? AgencyId { get; set; }
         [ForeignKey("AgencyId")]

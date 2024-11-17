@@ -52,6 +52,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<RegisterCourse> RegisterCourses { get; set; }
         public DbSet<CourseMaterial> CourseMaterials { get; set; }
         public DbSet<ChapterMaterial> ChapterMaterials { get; set; }
+        public DbSet<Document> Documents { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
