@@ -20,7 +20,7 @@ namespace FranchiseProject.API.Services
            
 
             var StartTime = DateTime.Now;
-            var EndTime = StartTime.AddYears(contract.Duration);
+         //   var EndTime = StartTime.AddYears(contract.Duration);
             var outputStream = new MemoryStream();
             using (var reader = new PdfReader(pdfTemplateStream))
             {
@@ -28,10 +28,10 @@ namespace FranchiseProject.API.Services
                 {
                    var form = stamper.AcroFields;
                     form.SetField("StartTime", StartTime.ToString("dd/MM/yyyy"));
-                    form.SetField("EndTime", EndTime.ToString("dd/MM/yyyy"));
+                 //   form.SetField("EndTime", EndTime.ToString("dd/MM/yyyy"));
                   
-                    form.SetField("Duration", contract.Duration.ToString());
-                    form.SetField("Description", contract.Description ?? "");
+                    //form.SetField("Duration", contract.Duration.ToString());
+                    //form.SetField("Description", contract.Description ?? "");
                  
                     stamper.FormFlattening = true;
                 }
