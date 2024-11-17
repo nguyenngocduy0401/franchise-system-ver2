@@ -53,6 +53,8 @@ namespace FranchiseProject.Infrastructures
         public DbSet<CourseMaterial> CourseMaterials { get; set; }
         public DbSet<ChapterMaterial> ChapterMaterials { get; set; }
         public DbSet<Document> Documents { get; set; }
+        public DbSet<Equipment> Equipments { get; set; }
+        public DbSet<EquipmentTypePrice> EquipmentTypePrices { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -335,6 +337,23 @@ namespace FranchiseProject.Infrastructures
                 CourseId = Guid.Parse("1b182028-e25d-43b0-ba63-08dcf207c014")
             }
         );
+            #endregion
+
+            #region EquipmentPrice
+            modelBuilder.Entity<EquipmentTypePrice>().HasData(
+                     new EquipmentTypePrice
+                     {
+                         Id = Guid.NewGuid(),
+                       Type=EquipmentTypeEnum.Table,
+                       Price=800000
+                     },
+                      new EquipmentTypePrice
+                      {
+                          Id = Guid.NewGuid(),
+                          Type = EquipmentTypeEnum.Chair,
+                          Price = 300000
+                      }
+                     );
             #endregion
 
             modelBuilder.HasAnnotation("TriggerSetup", true);
