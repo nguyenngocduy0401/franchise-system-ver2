@@ -50,6 +50,8 @@ namespace FranchiseProject.Infrastructures
         private readonly IUserAppointmentRepository _userAppointmentRepository; 
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IDocumentRepository _documentRepository;
+        private readonly IEquipmentRepository _equipmentRepository;
+        private readonly IEquipmentTypePriceRepository _equipmentTypePriceRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -64,7 +66,8 @@ namespace FranchiseProject.Infrastructures
             IChapterMaterialRepository chapterMaterialRepository,IAgencyDashboardRepository agencyDashboardRepository,
             IAppointmentRepository appointmentRepository, IWorkRepository workRepository,
             IUserAppointmentRepository userAppointmentRepository
-            ,IDocumentRepository documentRepository)
+            ,IDocumentRepository documentRepository
+            ,IEquipmentRepository equipmentRepository,IEquipmentTypePriceRepository equipmentTypePriceRepository)
 
            
         {
@@ -107,6 +110,8 @@ namespace FranchiseProject.Infrastructures
             _userAppointmentRepository = userAppointmentRepository;
             _workRepository = workRepository;
             _documentRepository = documentRepository;
+            _equipmentRepository = equipmentRepository;
+            _equipmentTypePriceRepository =equipmentTypePriceRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -183,6 +188,8 @@ namespace FranchiseProject.Infrastructures
 
         public IDocumentRepository DocumentRepository => _documentRepository;
 
+        public IEquipmentRepository EquipmentRepository => _equipmentRepository;
+        public IEquipmentTypePriceRepository EquipmentTypePriceRepository => _equipmentTypePriceRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

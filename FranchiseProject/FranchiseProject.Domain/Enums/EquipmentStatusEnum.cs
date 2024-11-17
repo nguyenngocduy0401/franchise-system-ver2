@@ -8,5 +8,9 @@ namespace FranchiseProject.Domain.Enums
 {
     public  enum EquipmentStatusEnum
     {
+        none,
+        Available,
+        Repair,
+      
     }
 }
