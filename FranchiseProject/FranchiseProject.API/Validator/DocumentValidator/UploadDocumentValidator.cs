@@ -15,10 +15,6 @@ namespace FranchiseProject.API.Validator.DocumentValidator
             RuleFor(x=> x.AgencyId).NotEmpty().WithMessage("AgencyId cannot be null");
             RuleFor(x=>x.ExpirationDate)
                     .Must(BeAFutureDate).WithMessage("Date must be in the future");
-
-
-
-
         }
         private bool BeAFutureDate(DateOnly? date)
         {

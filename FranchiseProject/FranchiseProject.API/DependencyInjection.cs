@@ -58,6 +58,8 @@ using FranchiseProject.Application.ViewModels.AppointmentViewModels;
 using FranchiseProject.API.Validator.AppointmentValidator;
 using FranchiseProject.Application.ViewModels.DocumentViewModels;
 using FranchiseProject.API.Validator.DocumentValidator;
+using FranchiseProject.Application.ViewModels.AgenciesViewModels;
+using FranchiseProject.API.Validator.AgencyValidator;
 
 
 namespace FranchiseProject.API
@@ -139,6 +141,8 @@ namespace FranchiseProject.API
             #region Validator
             services.AddTransient<IValidator<RegisterConsultationViewModel>, RegisterFranchiseViewModelValidator>();
             services.AddTransient<IValidator<CreateAgencyViewModel>,CreateAgencyValidator>();
+            services.AddTransient<IValidator<UpdateAgencyViewModel>, UpdateAgencyValidator>();
+
             services.AddTransient<IValidator<CreateContractViewModel>, CreateContractValidator>();
             services.AddTransient<IValidator<UpdateContractViewModel>, UpdateContracValidator>();
             services.AddTransient<IValidator<UserResetPasswordModel>, UserResetPasswordValidator>();
