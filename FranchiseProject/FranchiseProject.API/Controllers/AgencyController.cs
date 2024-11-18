@@ -39,7 +39,7 @@ namespace FranchiseProject.API.Controllers
         [HttpPut("{id}")]
         [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
 
-        public async Task<ApiResponse<bool>> UpdateAgencyAsync(CreateAgencyViewModel update, string id) => await _agencyService.UpdateAgencyAsync(update, id);
+        public async Task<ApiResponse<bool>> UpdateAgencyAsync(UpdateAgencyViewModel update, string id) => await _agencyService.UpdateAgencyAsync(update, id);
         [SwaggerOperation(Summary = "truy xuất thông tin đối tác  bằng Id {Authorize = Manager,Admin} ")]
         [HttpGet("{id}")]
         [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]

@@ -10,8 +10,7 @@ namespace FranchiseProject.API.Validator.WorkValidator
         {
             RuleFor(x => x.Title)
                 .NotEmpty()
-                .MaximumLength(150);
-            RuleFor(x => x.Description)
+                .MaximumLength(150)
                 .MaximumLength(1000);
             RuleFor(x => x.StartDate)
                 .NotEmpty()

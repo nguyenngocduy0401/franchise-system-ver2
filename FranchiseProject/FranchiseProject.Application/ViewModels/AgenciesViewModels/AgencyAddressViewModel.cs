@@ -9,6 +9,7 @@ namespace FranchiseProject.Application.ViewModels.AgenciesViewModels
 	public class AgencyAddressViewModel
 	{
 		public Guid? Id { get; set; }
+        public string? AgencyName { get; set; }
 		public string? FullAddress { get; set; }
         public string? City { get; set; }
         public string? District { get; set; }

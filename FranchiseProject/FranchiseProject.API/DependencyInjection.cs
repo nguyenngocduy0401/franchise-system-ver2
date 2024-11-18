@@ -56,6 +56,8 @@ using FranchiseProject.Application.ViewModels.WorkViewModels;
 using FranchiseProject.API.Validator.WorkValidator;
 using FranchiseProject.Application.ViewModels.AppointmentViewModels;
 using FranchiseProject.API.Validator.AppointmentValidator;
+using FranchiseProject.Application.ViewModels.DocumentViewModels;
+using FranchiseProject.API.Validator.DocumentValidator;
 
 
 namespace FranchiseProject.API
@@ -203,6 +205,7 @@ namespace FranchiseProject.API
 
             services.AddTransient<IValidator<UpdateAppointmentModel>, UpdateAppointmentValidator>();
             services.AddTransient<IValidator<CreateAppointmentModel>, CreateAppointmentValidator>();
+            services.AddTransient<IValidator<UploadDocumentViewModel>, UploadDocumentValidator>();
             #endregion
             return services;
         }

@@ -13,6 +13,7 @@ using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
 using Microsoft.IdentityModel.Tokens;
+using FranchiseProject.Application.Utils;
 
 namespace FranchiseProject.Application.Services
 {
@@ -21,6 +22,7 @@ namespace FranchiseProject.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClaimsService _claimsService;
         private readonly IValidator<CreateAgencyViewModel> _validator;
+        private readonly IValidator<UpdateAgencyViewModel> _validatorUpdate;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
         private readonly IHubContext<NotificationHub> _hubContext;
@@ -29,7 +31,7 @@ namespace FranchiseProject.Application.Services
         public AgencyService(IMapper mapper,IUnitOfWork unitOfWork,
             IClaimsService claimsService,IValidator<CreateAgencyViewModel>  validator,
             IUserService userService,IHubContext<NotificationHub>hubContext,
-            IEmailService emailService)
+            IEmailService emailService, IValidator<UpdateAgencyViewModel> validatorUpdate)
         {
             _unitOfWork= unitOfWork;
             _validator= validator;
@@ -38,7 +40,7 @@ namespace FranchiseProject.Application.Services
             _userService= userService;
             _hubContext= hubContext;
             _emailService= emailService;
-
+            _validatorUpdate = validatorUpdate;
         }
 
         public async  Task<ApiResponse<bool>> CreateAgencyAsync(CreateAgencyViewModel create)
@@ -62,16 +64,7 @@ namespace FranchiseProject.Application.Services
                     response.Data=true;
                     response.isSuccess = true;
                     response.Message = "Tạo Thành Công !";
-                    var emailMessage = new MessageModel
-                    {
-                        To = create.Email, 
-                        Subject = "Đăng ký thành công  [futuretech-noreply]",
-                        Body = $"<p>Chào {create.Name},</p>" +
-                      $"<p>Cảm ơn bạn đã đăng ký trở thành đối tác của chúng tôi.</p>" +
-                      $"<p>Thông tin của bạn đã được ghi nhận thành công.</p>" +
-                      $"<p>Trân trọng,</p>" +
-                      $"<p>Đội ngũ Futuretech</p>"
-                    };
+                    var emailMessage = EmailTemplate.AgencyRegistrationSuccess(agency.Name, agency.Email);
                     bool emailSent = await _emailService.SendEmailAsync(emailMessage);
                     if (!emailSent)
                     {
@@ -105,7 +98,17 @@ namespace FranchiseProject.Application.Services
             {
                 var paginationResult = await _unitOfWork.AgencyRepository.GetFilterAsync(
                       filter: s =>
-                    (!filter.Status.HasValue || s.Status == filter.Status) ,
+                    (!filter.Status.HasValue || s.Status == filter.Status) &&
+                    (!filter.Activity.HasValue|| s.ActivityStatus==filter.Activity)&&
+                    (string.IsNullOrEmpty(filter.SearchInput) || (
+                    s.Name != null && s.Name.Contains(filter.SearchInput) ||
+                    s.Address != null && s.Address.Contains(filter.SearchInput) ||
+                    s.City != null && s.City.Contains(filter.SearchInput) ||
+                    s.District != null && s.District.Contains(filter.SearchInput) ||
+                    s.Ward != null && s.Ward.Contains(filter.SearchInput) ||
+                    s.PhoneNumber != null && s.PhoneNumber.Contains(filter.SearchInput) ||
+                    s.Email != null && s.Email.Contains(filter.SearchInput)
+                )),
                     pageIndex: filter.PageIndex,
                     pageSize: filter.PageSize
                 );
@@ -130,13 +133,13 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<ApiResponse<bool>> UpdateAgencyAsync(CreateAgencyViewModel update, string id)
+        public async Task<ApiResponse<bool>> UpdateAgencyAsync(UpdateAgencyViewModel  update, string id)
         {
             var response = new ApiResponse<bool>();
             try
             {
                 var agenyId = Guid.Parse(id);
-                FluentValidation.Results.ValidationResult validationResult = await _validator.ValidateAsync(update);
+                FluentValidation.Results.ValidationResult validationResult = await _validatorUpdate.ValidateAsync(update);
                 if (!validationResult.IsValid)
                 {
                     response.isSuccess = false;
@@ -289,7 +292,7 @@ namespace FranchiseProject.Application.Services
                             existingUser.Status = UserStatusEnum.active; 
                         }
                      break;
-                    case AgencyStatusEnum.Processing:
+                    case AgencyStatusEnum.Active:
                         var agencyregister = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
                         if(agencyregister != null)
                         {
@@ -310,6 +313,41 @@ namespace FranchiseProject.Application.Services
                         }
 
                     break;
+
+                    case AgencyStatusEnum.Suspended:
+                        var user = await _unitOfWork.UserRepository.GetByAgencyIdAsync(agencyId);
+                        if (user != null)
+                        {
+                            var notification = new Notification
+                            {
+                               
+                                CreationDate = DateTime.Now,
+                                IsRead = false,
+                                SenderId = agencyId.ToString(),
+                                ReceiverId = user.Id,
+                                Message = "Tạm ngưng hoạt động!"
+                            };
+                            user.Status = UserStatusEnum.blocked;
+                            await _hubContext.Clients.User(agencyId.ToString()).SendAsync("ReceivedNotification",notification.Message);
+
+                            var emailMessage = new MessageModel
+                            {
+                                To = agency.Email,
+                                Subject = "[futuretech-noreply]Hợp đồng hết hạn",
+                                Body = $"<p>Chào {agency.Name},</p>" +
+                                 $"<p>Chúng tôi  thông báo tới bạn !</p>" +
+                                $"<p>Cơ sở của bạn đã tạm ngưng hoạt động</p>" +
+                                 $"<P>Hãy liên hệ với đội ngũ nhân viên để được hỗ trợ </p>"+
+                                 $"<p>Trân trọng,</p>" +
+                                 $"<p>Đội ngũ Futuretech</p>"
+                            };
+                            bool emailSent = await _emailService.SendEmailAsync(emailMessage);
+                            if (!emailSent)
+                            {
+                                response.Message += " (Lỗi khi gửi email)";
+                            }
+                        }
+                        break;
                   
                 }
                 agency.Status = newStatus;

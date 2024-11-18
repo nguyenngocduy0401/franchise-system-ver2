@@ -49,6 +49,9 @@ namespace FranchiseProject.Infrastructures
         private readonly IWorkRepository _workRepository;
         private readonly IUserAppointmentRepository _userAppointmentRepository; 
         private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IDocumentRepository _documentRepository;
+        private readonly IEquipmentRepository _equipmentRepository;
+        private readonly IEquipmentTypePriceRepository _equipmentTypePriceRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -62,7 +65,9 @@ namespace FranchiseProject.Infrastructures
             ICourseMaterialRepository courseMaterialRepository,IRegisterCourseRepository registerCourseRepository,
             IChapterMaterialRepository chapterMaterialRepository,IAgencyDashboardRepository agencyDashboardRepository,
             IAppointmentRepository appointmentRepository, IWorkRepository workRepository,
-            IUserAppointmentRepository userAppointmentRepository)
+            IUserAppointmentRepository userAppointmentRepository
+            ,IDocumentRepository documentRepository
+            ,IEquipmentRepository equipmentRepository,IEquipmentTypePriceRepository equipmentTypePriceRepository)
 
            
         {
@@ -104,6 +109,9 @@ namespace FranchiseProject.Infrastructures
             _appointmentRepository = appointmentRepository;
             _userAppointmentRepository = userAppointmentRepository;
             _workRepository = workRepository;
+            _documentRepository = documentRepository;
+            _equipmentRepository = equipmentRepository;
+            _equipmentTypePriceRepository =equipmentTypePriceRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -178,6 +186,10 @@ namespace FranchiseProject.Infrastructures
         public IWorkRepository WorkRepository => _workRepository;   
         public IAppointmentRepository AppointmentRepository => _appointmentRepository;
 
+        public IDocumentRepository DocumentRepository => _documentRepository;
+
+        public IEquipmentRepository EquipmentRepository => _equipmentRepository;
+        public IEquipmentTypePriceRepository EquipmentTypePriceRepository => _equipmentTypePriceRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

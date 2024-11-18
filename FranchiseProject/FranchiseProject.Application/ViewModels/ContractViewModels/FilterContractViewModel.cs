@@ -8,8 +8,9 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModels
 {
     public class FilterContractViewModel
     {
-        public string? StartTime { get; set; }
-        public string? EndTime { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime? EndTime { get; set; }
+        public string? SearchInput { get; set; }
         public int PageIndex { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }

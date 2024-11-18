@@ -51,5 +51,12 @@ namespace FranchiseProject.API.Controllers
         {
             return _contractService.FilterContractViewModelAsync(filter);
         }
+        [SwaggerOperation(Summary = "Truy xuất thông tin đối tác cho hợp đồng  {Authorize = Manager,Admin}")]
+        [HttpGet("agency/{id}")]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        public Task<ApiResponse<AgencyInfoViewModel>> GetAgencyInfoAsync(Guid id)
+        {
+            return _contractService.GetAgencyInfoAsync(id);
+        }
     }
 }

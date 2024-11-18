@@ -3,26 +3,26 @@ using FranchiseProject.Application.ViewModels.ContractViewModels;
 
 namespace FranchiseProject.API.Validator.ContractValidator
 {
-    public class UpdateContracValidator: AbstractValidator<UpdateContractViewModel>
+    public class UpdateContracValidator : AbstractValidator<UpdateContractViewModel>
     {
         public UpdateContracValidator()
         {
 
-            RuleFor(x => x.Amount)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("Amount must be greater than or equal to 0.");
 
-            RuleFor(x => x.Duration)
-                .Must(d => new[] { 1, 2, 3, 5, 10 }.Contains(d)) // Year options
-                .WithMessage("Duration must be one of the following: 1, 2, 3, 5, or 10 years.");
-
-            RuleFor(x => x.Description)
+            RuleFor(x => x.Title)
+                .MaximumLength(50)
+                .WithMessage("Title must be less than 100.")
                 .NotNull()
-                .WithMessage("Description cannot be null.");
+                .WithMessage("Title cannot be null.");
+            RuleFor(x => x.StartTime)
+                    .NotEmpty().WithMessage("Start Time must not be empty");
+            RuleFor(x => x.EndTime)
+                .NotEmpty().WithMessage("End Time must not be empty");
 
-            RuleFor(x => x.TermsAndCondition)
-                .NotNull()
-                .WithMessage("Terms and Conditions cannot be null.");
-                }
+            RuleFor(x => x.RevenueSharePercentage)
+                .NotEmpty().WithMessage("Revenue Share Percentage must not be empty")
+                .GreaterThan(0).WithMessage("Revenue Share Percentage must be greater than 0.")
+                .LessThan(100).WithMessage("Revenue Share Percentage must be less than 0");
+        }
     }
 }

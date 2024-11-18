@@ -21,5 +21,9 @@ namespace FranchiseProject.Domain.Enums
         Handover,                    // Bàn Giao                    -Manager & Techinican
         EducationLicenseRegistered,  // Đăng ký giấy phép giáo dục   -Manager
         Finish,                      // hoàn thành
+        //-----After-Frachise-------
+        TrainningInternal,           //Đào tạo định kì
+        RepairingEquipment,          //Sửa chữa thiết bị
+        EducationalSupervision       //Giám sát hoạt động
     }
 }

@@ -35,6 +35,8 @@ using FranchiseProject.Application.ViewModels.QuizViewModels;
 using FranchiseProject.Application.ViewModels.ScoreViewModels;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
 using FranchiseProject.Application.ViewModels.AppointmentViewModels;
+using FranchiseProject.Application.ViewModels.DocumentViewModels;
+using FranchiseProject.Application.ViewModels.DocumentViewModel;
 
 
 
@@ -58,7 +60,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             #endregion
             #region Contract
             CreateMap<CreateContractViewModel, Contract>().ReverseMap();
-            CreateMap<Contract, ContractViewModel>().ForMember(dest => dest.AgencyName,otp => otp.MapFrom(src=>src.Agency.Name));
+            CreateMap<Contract, ContractViewModel>().ReverseMap();
+  
 
             #endregion
             #region User
@@ -320,6 +323,13 @@ namespace FranchiseProject.Infrastructures.Mappers
                     .ForMember(dest => dest.User, opt => opt
                     .MapFrom(src => src.UserAppointments
                     .Select(up => up.User)));
+            #endregion
+
+            #region Document
+            CreateMap<Document, DocumentViewModel>();
+            CreateMap<UploadDocumentViewModel, Document>();
+            CreateMap<Pagination<Document>, Pagination<DocumentViewModel>>()
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
             #endregion
         }
     }
