@@ -10,6 +10,7 @@ namespace FranchiseProject.Application.ViewModels.WorkViewModels
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public WorkTypeEnum? Type { get; set; }
+        public WorkStatusEnum? Status { get; set; }
         public List<AppointmentViewModel>? Appointments { get; set; }
         public Guid? AgencyId { get; set; }
     }
