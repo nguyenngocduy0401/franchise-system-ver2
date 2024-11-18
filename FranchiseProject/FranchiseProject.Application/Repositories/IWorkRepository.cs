@@ -11,6 +11,7 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IWorkRepository : IGenericRepository<Work>
     {
-        IEnumerable<Work> GetAllWorkByAgencyId(Guid agencyId);
+        IEnumerable<Work> GetAllPreWorkByAgencyId(Guid agencyId);
+        IEnumerable<Work> GetWorksByUserId(string userId);
     }
 }

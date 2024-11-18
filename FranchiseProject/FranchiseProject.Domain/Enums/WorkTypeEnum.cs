@@ -24,5 +24,7 @@ namespace FranchiseProject.Domain.Enums
         TrainningInternal,    // Đào tạo tạo định kì
         RepairingEquipment,                    // Sửa chữa thiết bị
         EducationalSupervision,  // Giám sát hoạt động giáo dục
+        RenewContract, // Gia hạn hợp đồng 
+        Other, 
     }
 }

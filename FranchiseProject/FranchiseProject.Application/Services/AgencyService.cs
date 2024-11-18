@@ -310,42 +310,6 @@ namespace FranchiseProject.Application.Services
                         }
 
                     break;
-
-                    case AgencyStatusEnum.Terminated:
-                        var user = await _unitOfWork.UserRepository.GetByAgencyIdAsync(agencyId);
-                        if (user != null)
-                        {
-                            var notification = new Notification
-                            {
-                               
-                                CreationDate = DateTime.Now,
-                                IsRead = false,
-                                SenderId = agencyId.ToString(),
-                                ReceiverId = user.Id,
-                                Message = "Chấm dứt hợp đồng"
-                            };
-                            user.Status = UserStatusEnum.blocked;
-                            await _hubContext.Clients.User(agencyId.ToString()).SendAsync("ReceivedNotification",notification.Message);
-
-                            var emailMessage = new MessageModel
-                            {
-                                To = agency.Email,
-                                Subject = "[futuretech-noreply]Hợp đồng hết hạn",
-                                Body = $"<p>Chào {agency.Name},</p>" +
-                                 $"<p>Chúng tôi  thông báo tới bạn đã hết hạn hợp đồng!</p>" +
-                                
-                                 $"<P>Hãy liên hệ với đội ngũ nhân viên để được hỗ trợ </p>"+
-                                 $"<p>Trân trọng,</p>" +
-                                 $"<p>Đội ngũ Futuretech</p>"
-                            };
-                            bool emailSent = await _emailService.SendEmailAsync(emailMessage);
-                            if (!emailSent)
-                            {
-                                response.Message += " (Lỗi khi gửi email)";
-                            }
-                        }
-                        break;
-
                   
                 }
                 agency.Status = newStatus;

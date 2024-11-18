@@ -17,6 +17,7 @@ namespace FranchiseProject.API.Controllers
         {
             _workService = workService;
         }
+        
         [SwaggerOperation(Summary = "lấy chi tiết công việc bằng id")]
         [HttpGet("{id}")]
         public async Task<ApiResponse<WorkDetailViewModel>> GetWorkDetailByIdAsync(Guid id)

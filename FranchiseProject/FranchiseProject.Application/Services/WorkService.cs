@@ -24,17 +24,37 @@ namespace FranchiseProject.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
+        private readonly IClaimsService _claimsService;
         private readonly IValidator<CreateWorkModel> _createWordValidator;
         private readonly IValidator<UpdateWorkModel> _updateWordValidator;
         public WorkService(IUnitOfWork unitOfWork, UserManager<User> userManager,
             IValidator<CreateWorkModel> createWorkValidator, IMapper mapper,
-            IValidator<UpdateWorkModel> updateWordValidator)
+            IValidator<UpdateWorkModel> updateWordValidator, IClaimsService claimsService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _mapper = mapper;
             _createWordValidator = createWorkValidator;
             _updateWordValidator = updateWordValidator;
+            _claimsService = claimsService;
+        }
+        public async Task<ApiResponse<IEnumerable<WorkViewModel>>> GetAllWorkByLogin()
+        {
+            var response = new ApiResponse<IEnumerable<WorkViewModel>>();
+            try
+            {
+                var userId = _claimsService.GetCurrentUserId.ToString();
+                var work = _unitOfWork.WorkRepository.GetWorksByUserId(userId);
+                var workModel = _mapper.Map<IEnumerable<WorkViewModel>>(work);
+
+                response = ResponseHandler.Success(workModel, "Successful!");
+
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<IEnumerable<WorkViewModel>>(ex.Message);
+            }
+            return response;
         }
         public async Task<ApiResponse<WorkDetailViewModel>> GetWorkDetailByIdAsync(Guid id)
         {
@@ -81,7 +101,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<IEnumerable<WorkViewModel>>();
             try
             {
-                var work = _unitOfWork.WorkRepository.GetAllWorkByAgencyId(agencyId);
+                var work = _unitOfWork.WorkRepository.GetAllPreWorkByAgencyId(agencyId);
                 var workModel = _mapper.Map<IEnumerable<WorkViewModel>>(work);
 
                 response = ResponseHandler.Success(workModel, "Successful!");

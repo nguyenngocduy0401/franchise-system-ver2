@@ -5,6 +5,7 @@ using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
 using FranchiseProject.Application.ViewModels.StudentViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
+using FranchiseProject.Application.ViewModels.WorkViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,17 +19,29 @@ namespace FranchiseProject.API.Controllers
 	{
 		private readonly IUserService _userService;
 		private readonly IClassService _classService;
+		private readonly IWorkService _workService;
 		private readonly IRegisterCourseService _registerCourseService;
 		private readonly IAssignmentService _assignmentService;
-		public UserController(IUserService userService, IClassService classService, IRegisterCourseService registerCourseService, IAssignmentService assignmentService)
+		public UserController(IUserService userService, IClassService classService,
+			IRegisterCourseService registerCourseService, IAssignmentService assignmentService,
+			IWorkService workService)
 		{
 			_userService = userService;
 			_classService = classService;
 			_registerCourseService = registerCourseService;
 			_assignmentService = assignmentService;
+				_workService = workService;
 		}
-
-		[SwaggerOperation(Summary = "lấy thông tin User bằng đăng nhập")]
+		[Authorize(Roles = AppRole.Manager + "," + AppRole.AgencyManager + "," + 
+			AppRole.SystemConsultant + AppRole.SystemTechnician + "," 
+			+ AppRole.SystemInstructor)]
+        [SwaggerOperation(Summary = "lấy công việc bằng login")]
+        [HttpGet("mine/works")]
+        public async Task<ApiResponse<IEnumerable<WorkViewModel>>> GetWorksByLoginAsync()
+        {
+            return await _workService.GetAllWorkByLogin();
+        }
+        [SwaggerOperation(Summary = "lấy thông tin User bằng đăng nhập")]
 		[HttpGet("mine")]
 		public async Task<ApiResponse<UserViewModel>> GetInfoByLoginAsync() => await _userService.GetInfoByLoginAsync();
 
