@@ -1,4 +1,5 @@
-﻿using FranchiseProject.Application.Commons;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
@@ -127,7 +128,31 @@ namespace FranchiseProject.Infrastructures.Repositories
 
             return result;
         }
-
+        public async Task<IEnumerable<User>> GetUserWorkAsync(
+         Expression<Func<User, bool>>? filter = null,
+         Func<IQueryable<User>, IOrderedQueryable<User>>? orderBy = null,
+         string? role = null)
+        {
+            IQueryable<User> query = _dbContext.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role);
+           
+           query = query.Where(u =>
+                        (u.LockoutEnd <= DateTimeOffset.UtcNow || u.LockoutEnd == null)
+                        );
+            
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+            if (!string.IsNullOrEmpty(role))
+            {
+                var usersInRole = await _userManager.GetUsersInRoleAsync(role);
+                var userIdsInRole = usersInRole.Select(u => u.Id);
+                query = query.Where(u => userIdsInRole.Contains(u.Id));
+            }
+            return query;
+        }
         public async Task<User> GetUserByUserName(string username)
         {
             var user = await _dbContext.Users

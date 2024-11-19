@@ -106,6 +106,34 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<IEnumerable<UserWorkViewModel>>> FilterUserWorkAsync(FilterUserWorkModel filterUserWorkModel)
+        {
+            var response = new ApiResponse<IEnumerable<UserWorkViewModel>>();
+            try
+            {
+                var filter = (Expression<Func<User, bool>>)(e =>
+                    (string.IsNullOrEmpty(filterUserWorkModel.Search) || e.UserName.Contains(filterUserWorkModel.Search)
+                    || e.Email.Contains(filterUserWorkModel.Search) || e.PhoneNumber.Contains(filterUserWorkModel.Search))
+                );
+                var rolee = filterUserWorkModel.Role.ToString();
+                var users = await _unitOfWork.UserRepository.GetUserWorkAsync(
+                    filter: filter,
+                    role: rolee
+                );
+                var userViewModels = _mapper.Map<IEnumerable<UserWorkViewModel>>(users);
+
+                if (userViewModels.IsNullOrEmpty()) return ResponseHandler.Success(userViewModels, "Không tìm thấy người dùng phù hợp!");
+                response = ResponseHandler.Success(userViewModels);
+
+            }
+            catch (Exception ex)
+            {
+                response.Data = null;
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
         public async Task<ApiResponse<List<CreateUserByAgencyModel>>> CreateListUserByAgencyAsync(IFormFile file)
         {
             var response = new ApiResponse<List<CreateUserByAgencyModel>>();

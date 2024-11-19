@@ -22,6 +22,10 @@ namespace FranchiseProject.Application.Repositories
            IsActiveEnum? isActive = null,
            string? foreignKey = null,
            object? foreignKeyId = null);
+        Task<IEnumerable<User>> GetUserWorkAsync(
+         Expression<Func<User, bool>>? filter = null,
+         Func<IQueryable<User>, IOrderedQueryable<User>>? orderBy = null,
+         string? role = null);
         Task<User> GetUserByUserName(string username);
         Task<User> GetUserByLogin(string username, string password);
         Task CreateUserAndAssignRoleAsync(User user, string role);
