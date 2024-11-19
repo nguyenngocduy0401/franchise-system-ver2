@@ -15,6 +15,7 @@ namespace FranchiseProject.Domain.Entity
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public WorkStatusEnum? Status { get; set; }
+        public WorkLevelEnum? Level { get; set; }
         public string? Report { get; set; }
         public string? ReportImageURL { get; set; }
         public WorkTypeEnum? Type { get; set; }

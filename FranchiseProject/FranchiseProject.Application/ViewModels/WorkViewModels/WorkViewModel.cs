@@ -15,5 +15,6 @@ namespace FranchiseProject.Application.ViewModels.WorkViewModels
         public DateTime? EndDate { get; set; }
         public WorkTypeEnum? Type { get; set; }
         public WorkStatusEnum? Status { get; set; }
+        public WorkLevelEnum? Level { get; set; }
     }
 }

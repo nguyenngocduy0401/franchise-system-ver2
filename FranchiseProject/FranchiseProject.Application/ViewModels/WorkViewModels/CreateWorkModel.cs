@@ -14,6 +14,7 @@ namespace FranchiseProject.Application.ViewModels.WorkViewModels
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public WorkTypeEnum? Type { get; set; }
+        public WorkLevelEnum? Level { get; set; }
         public Guid? AgencyId { get; set; }
     }
 }
