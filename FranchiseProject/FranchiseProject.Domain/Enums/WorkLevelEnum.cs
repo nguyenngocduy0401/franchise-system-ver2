@@ -8,7 +8,7 @@ namespace FranchiseProject.Domain.Enums
 {
     public enum WorkLevelEnum
     {
-        optional,
-        compulsory
+        Optional,
+        Compulsory
     }
 }

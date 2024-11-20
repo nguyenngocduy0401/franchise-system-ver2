@@ -214,9 +214,16 @@ namespace FranchiseProject.Application.Services
                         break;
                     case WorkStatusEnum.Rejected:
                         work.Status = status;
-                        var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(work.Id);
-                        agency.Status = AgencyStatusEnum.Inactive;
-                        _unitOfWork.AgencyRepository.Update(agency);
+                        if (work.Level == WorkLevelEnum.Compulsory)
+                        {
+                            var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync((Guid)work.AgencyId);
+                            if (agency == null)
+                            {
+                                return ResponseHandler.Success(false, "Cơ sở nhượng quyền không khả dụng!");
+                            }
+                            agency.Status = AgencyStatusEnum.Inactive;
+                            _unitOfWork.AgencyRepository.Update(agency);
+                        }
                         break;
                 }
                 work.ApproveBy = userId;
