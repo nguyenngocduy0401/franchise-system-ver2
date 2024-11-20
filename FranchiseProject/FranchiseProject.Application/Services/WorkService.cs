@@ -28,18 +28,21 @@ namespace FranchiseProject.Application.Services
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
         private readonly IClaimsService _claimsService;
-        private readonly IValidator<CreateWorkModel> _createWordValidator;
-        private readonly IValidator<UpdateWorkModel> _updateWordValidator;
+        private readonly IValidator<CreateWorkModel> _createWorkValidator;
+        private readonly IValidator<UpdateWorkModel> _updateWorkValidator;
+        private readonly IValidator<UpdateWorkByStaffModel> _updateWorkByStaffValidator;
         public WorkService(IUnitOfWork unitOfWork, UserManager<User> userManager,
             IValidator<CreateWorkModel> createWorkValidator, IMapper mapper,
-            IValidator<UpdateWorkModel> updateWordValidator, IClaimsService claimsService)
+            IValidator<UpdateWorkModel> updateWorkValidator, IClaimsService claimsService,
+            IValidator<UpdateWorkByStaffModel> updateWorkByStaffValidator)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _mapper = mapper;
-            _createWordValidator = createWorkValidator;
-            _updateWordValidator = updateWordValidator;
+            _createWorkValidator = createWorkValidator;
+            _updateWorkValidator = updateWorkValidator;
             _claimsService = claimsService;
+            _updateWorkByStaffValidator = updateWorkByStaffValidator;
         }
         public async Task<ApiResponse<Pagination<WorkViewModel>>> FilterWorksByLogin(FilterWorkByLoginModel filterWorkByLoginModel)
         {
@@ -135,12 +138,37 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<bool>> UpdateWorkByStaffAsync(Guid workId, UpdateWorkByStaffModel updateWorkByStaffModel)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                ValidationResult validationResult = await _updateWorkByStaffValidator.ValidateAsync(updateWorkByStaffModel                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 );
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+
+                var work = await _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
+                if (work == null) return ResponseHandler.Success(false, "Nhiệm vụ không tồn tại!");
+
+                /*work = _mapper.Map(updateWorkModel, work);*/
+                _unitOfWork.WorkRepository.Update(work);
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Update failed!");
+
+                response = ResponseHandler.Success(true, "Cập nhật nhiệm vụ thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
         public async Task<ApiResponse<bool>> UpdateWorkAsync(Guid workId, UpdateWorkModel updateWorkModel)
         {
             var response = new ApiResponse<bool>();
             try
             {
-                ValidationResult validationResult = await _updateWordValidator.ValidateAsync(updateWorkModel);
+                ValidationResult validationResult = await _updateWorkValidator.ValidateAsync(updateWorkModel);
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 var work = await _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
@@ -165,7 +193,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-                ValidationResult validationResult = await _createWordValidator.ValidateAsync(createWorkModel);
+                ValidationResult validationResult = await _createWorkValidator.ValidateAsync(createWorkModel);
                 if (!validationResult.IsValid) if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync((Guid)createWorkModel.AgencyId);
@@ -197,14 +225,14 @@ namespace FranchiseProject.Application.Services
                 var work = await _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
                 if (work == null) return ResponseHandler.Success(false, "Nhiệm vụ không khả dụng!");
                 if (work.Status != WorkStatusEnum.None) return ResponseHandler.Success(false, "Nhiệm vụ đã được duyệt trước đó!");
-                var checkWorkBefore = await _unitOfWork.WorkRepository
+                var checkWorkBefore = (await _unitOfWork.WorkRepository
                     .FindAsync(e => e.IsDeleted != true &&
                                e.Type < work.Type && 
                                e.Status != WorkStatusEnum.Approved &&
                                e.Level == WorkLevelEnum.Compulsory
-                               );
+                               )).FirstOrDefault();
 
-                if(checkWorkBefore != null && checkWorkBefore.Any()) return ResponseHandler.Success(false, "Phải hoàn thành nhiệm vụ ưu tiên trước!");
+                if(checkWorkBefore != null) return ResponseHandler.Success(false, "Phải hoàn thành nhiệm vụ ưu tiên trước!");
 
                 switch (status) 
                 {

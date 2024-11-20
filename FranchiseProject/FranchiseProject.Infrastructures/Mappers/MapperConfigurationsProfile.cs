@@ -303,6 +303,7 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<UpdateWorkModel, Work>();
             CreateMap<Work, WorkViewModel>();
             CreateMap<Work, WorkDetailViewModel>();
+            CreateMap<UpdateWorkByStaffModel, Work>();
             #endregion
             #region Appointment
             CreateMap<Appointment, AppointmentViewModel>();
