@@ -196,6 +196,7 @@ namespace FranchiseProject.Application.Services
                 var userId = _claimsService.GetCurrentUserId;
                 var work = await _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
                 if (work == null) return ResponseHandler.Success(false, "Nhiệm vụ không khả dụng!");
+                if (work.Status != WorkStatusEnum.None) return ResponseHandler.Success(false, "Nhiệm vụ đã được duyệt trước đó!");
                 var checkWorkBefore = await _unitOfWork.WorkRepository
                     .FindAsync(e => e.IsDeleted != true &&
                                e.Type < work.Type && 
