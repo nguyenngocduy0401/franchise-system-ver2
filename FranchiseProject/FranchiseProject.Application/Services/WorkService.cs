@@ -5,6 +5,7 @@ using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.ViewModels.AppointmentViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
@@ -77,9 +78,17 @@ namespace FranchiseProject.Application.Services
                 var work = (await _unitOfWork.WorkRepository
                     .FindAsync(e => e.Id == id && e.IsDeleted != true, "Appointments")).FirstOrDefault();
                 if (work == null) return ResponseHandler.Success(new WorkDetailViewModel(), "Nhiệm vụ không khả dụng!");
-
+                var approvedBy = await _userManager.FindByIdAsync((work.ApproveBy).ToString());
                 var workModel = _mapper.Map<WorkDetailViewModel>(work);
-
+                if (approvedBy != null) 
+                {
+                    workModel.ApprovedBy = new AppointmentUserViewModel 
+                    {
+                        FullName = approvedBy.FullName,
+                        Id = approvedBy.Id,
+                        Username = approvedBy.UserName,
+                    };
+                }
                 response = ResponseHandler.Success(workModel);
             }
             catch (Exception ex)
@@ -184,15 +193,17 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
+                var userId = _claimsService.GetCurrentUserId;
                 var work = await _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
                 if (work == null) return ResponseHandler.Success(false, "Nhiệm vụ không khả dụng!");
                 var checkWorkBefore = await _unitOfWork.WorkRepository
                     .FindAsync(e => e.IsDeleted != true &&
                                e.Type < work.Type && 
-                               e.Status != WorkStatusEnum.Approved
+                               e.Status != WorkStatusEnum.Approved &&
+                               e.Level == WorkLevelEnum.Compulsory
                                );
 
-                if(checkWorkBefore != null) return ResponseHandler.Success(false, "Phải hoàn thành nhiệm vụ ưu tiên trước!");
+                if(checkWorkBefore != null && checkWorkBefore.Any()) return ResponseHandler.Success(false, "Phải hoàn thành nhiệm vụ ưu tiên trước!");
 
                 switch (status) 
                 {
@@ -208,7 +219,7 @@ namespace FranchiseProject.Application.Services
                         _unitOfWork.AgencyRepository.Update(agency);
                         break;
                 }
-                
+                work.ApproveBy = userId;
                 _unitOfWork.WorkRepository.Update(work);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
