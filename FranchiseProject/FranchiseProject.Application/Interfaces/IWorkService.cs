@@ -13,7 +13,7 @@ namespace FranchiseProject.Application.Interfaces
     {
         Task<ApiResponse<bool>> CreateWorkAsync(CreateWorkModel createWorkModel);
         Task<ApiResponse<bool>> DeleteWorkByIdAsync(Guid workId);
-        Task<ApiResponse<IEnumerable<WorkViewModel>>> GetAllWorkByAgencyId(Guid agencyId);
+        Task<ApiResponse<WorkAgencyViewModel>> GetAllWorkByAgencyId(Guid agencyId);
         Task<ApiResponse<bool>> UpdateWorkAsync(Guid workId, UpdateWorkModel updateWorkModel);
         Task<ApiResponse<WorkDetailViewModel>> GetWorkDetailByIdAsync(Guid id);
         Task<ApiResponse<Pagination<WorkViewModel>>> FilterWorksByLogin(FilterWorkByLoginModel filterWorkByLoginModel);

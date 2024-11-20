@@ -27,7 +27,7 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.Manager)]
         [SwaggerOperation(Summary = "Lấy công việc bằng agencyId{Authorize = Manager}")]
         [HttpGet("{id}/works")]
-        public async Task<ApiResponse<IEnumerable<WorkViewModel>>> GetAllWorkByAgencyId(Guid id)
+        public async Task<ApiResponse<WorkAgencyViewModel>> GetAllWorkByAgencyId(Guid id)
         {
             return await _workService.GetAllWorkByAgencyId(id);
         }

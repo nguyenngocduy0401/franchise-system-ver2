@@ -120,20 +120,25 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<IEnumerable<WorkViewModel>>> GetAllWorkByAgencyId(Guid agencyId)
+        public async Task<ApiResponse<WorkAgencyViewModel>> GetAllWorkByAgencyId(Guid agencyId)
         {
-            var response = new ApiResponse<IEnumerable<WorkViewModel>>();
+            var response = new ApiResponse<WorkAgencyViewModel>();
             try
             {
+                var agency =await _unitOfWork.AgencyRepository.GetExistByIdAsync(agencyId);
                 var work = _unitOfWork.WorkRepository.GetAllPreWorkByAgencyId(agencyId);
                 var workModel = _mapper.Map<IEnumerable<WorkViewModel>>(work);
-
-                response = ResponseHandler.Success(workModel, "Successful!");
+                var workAgencyModel = new WorkAgencyViewModel 
+                {
+                    Work = workModel,
+                    AgencyStatus = agency.Status
+                };
+                response = ResponseHandler.Success(workAgencyModel, "Successful!");
 
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<IEnumerable<WorkViewModel>>(ex.Message);
+                response = ResponseHandler.Failure<WorkAgencyViewModel>(ex.Message);
             }
             return response;
         }
