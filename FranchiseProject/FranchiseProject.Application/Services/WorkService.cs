@@ -6,6 +6,7 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
+using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
@@ -14,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -38,21 +40,32 @@ namespace FranchiseProject.Application.Services
             _updateWordValidator = updateWordValidator;
             _claimsService = claimsService;
         }
-        public async Task<ApiResponse<IEnumerable<WorkViewModel>>> GetAllWorkByLogin()
+        public async Task<ApiResponse<Pagination<WorkViewModel>>> FilterWorksByLogin(FilterWorkByLoginModel filterWorkByLoginModel)
         {
-            var response = new ApiResponse<IEnumerable<WorkViewModel>>();
+            var response = new ApiResponse<Pagination<WorkViewModel>>();
             try
             {
                 var userId = _claimsService.GetCurrentUserId.ToString();
-                var work = _unitOfWork.WorkRepository.GetWorksByUserId(userId);
-                var workModel = _mapper.Map<IEnumerable<WorkViewModel>>(work);
+                var filter = (Expression<Func<Work, bool>>)(e =>
+                    (string.IsNullOrEmpty(filterWorkByLoginModel.Search) || e.Title.Contains(filterWorkByLoginModel.Search)
+                    || e.Description.Contains(filterWorkByLoginModel.Search)) &&
+                    (filterWorkByLoginModel.Status.HasValue || e.Status == filterWorkByLoginModel.Status) &&
+                    (filterWorkByLoginModel.Level.HasValue || e.Level == filterWorkByLoginModel.Level)
+                );
+                var worksPagination = await _unitOfWork.WorkRepository.FilterWorksByUserId(
+                userId: userId,
+                filter: filter,
+                pageIndex: filterWorkByLoginModel.PageIndex,
+                pageSize: filterWorkByLoginModel.PageSize
+                );
+                var workModel = _mapper.Map<Pagination<WorkViewModel>>(worksPagination);
 
                 response = ResponseHandler.Success(workModel, "Successful!");
 
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<IEnumerable<WorkViewModel>>(ex.Message);
+                response = ResponseHandler.Failure<Pagination<WorkViewModel>>(ex.Message);
             }
             return response;
         }
@@ -151,6 +164,7 @@ namespace FranchiseProject.Application.Services
 
                 var work = _mapper.Map<Work>(createWorkModel);
                 work.Status = WorkStatusEnum.None;
+                work.Submit = WorkStatusSubmitEnum.None;
                 await _unitOfWork.WorkRepository.AddAsync(work);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
@@ -165,18 +179,40 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> UpdateStatusWorkByIdAsync(Guid workId,WorkStatusEnum status)
+        public async Task<ApiResponse<bool>> UpdateStatusWorkByIdAsync(Guid workId, WorkStatusEnum status)
         {
             var response = new ApiResponse<bool>();
             try
             {
                 var work = await _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
                 if (work == null) return ResponseHandler.Success(false, "Nhiệm vụ không khả dụng!");
-                work.Status=status;
+                var checkWorkBefore = await _unitOfWork.WorkRepository
+                    .FindAsync(e => e.IsDeleted != true &&
+                               e.Type < work.Type && 
+                               e.Status != WorkStatusEnum.Approved
+                               );
+
+                if(checkWorkBefore != null) return ResponseHandler.Success(false, "Phải hoàn thành nhiệm vụ ưu tiên trước!");
+
+                switch (status) 
+                {
+                    case WorkStatusEnum.None:
+                        throw new Exception("Cannot update this status!");
+                    case WorkStatusEnum.Approved:
+                        work.Status = status;
+                        break;
+                    case WorkStatusEnum.Rejected:
+                        work.Status = status;
+                        var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(work.Id);
+                        agency.Status = AgencyStatusEnum.Inactive;
+                        _unitOfWork.AgencyRepository.Update(agency);
+                        break;
+                }
+                
                 _unitOfWork.WorkRepository.Update(work);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Update status failed!");
+                if (!isSuccess) throw new Exception("Update failed!");
 
                 response = ResponseHandler.Success(true, "Cập nhật nhiệm vụ thành công!");
             }

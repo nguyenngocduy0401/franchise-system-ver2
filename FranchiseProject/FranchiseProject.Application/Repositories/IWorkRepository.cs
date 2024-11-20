@@ -1,9 +1,11 @@
-﻿using FranchiseProject.Application.Commons;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
 using FranchiseProject.Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,6 +14,11 @@ namespace FranchiseProject.Application.Repositories
     public interface IWorkRepository : IGenericRepository<Work>
     {
         IEnumerable<Work> GetAllPreWorkByAgencyId(Guid agencyId);
-        IEnumerable<Work> GetWorksByUserId(string userId);
+        Task<Pagination<Work>> FilterWorksByUserId(
+            string userId,
+            Expression<Func<Work, bool>>? filter = null,
+            Func<IQueryable<Work>, IOrderedQueryable<Work>>? orderBy = null,
+            int? pageIndex = null,
+            int? pageSize = null);
     }
 }

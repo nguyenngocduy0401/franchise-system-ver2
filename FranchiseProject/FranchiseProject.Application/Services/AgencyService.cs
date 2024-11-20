@@ -393,6 +393,5 @@ namespace FranchiseProject.Application.Services
 			}
 			return response;
 		}
-        
     }
 }

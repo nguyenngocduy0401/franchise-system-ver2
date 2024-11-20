@@ -18,6 +18,7 @@ namespace FranchiseProject.Domain.Entity
         public WorkLevelEnum? Level { get; set; }
         public string? Report { get; set; }
         public string? ReportImageURL { get; set; }
+        public WorkStatusSubmitEnum? Submit { get; set; }
         public WorkTypeEnum? Type { get; set; }
         public Guid? AgencyId { get; set; }
         [ForeignKey("AgencyId")]

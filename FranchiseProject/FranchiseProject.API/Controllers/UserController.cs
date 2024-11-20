@@ -43,9 +43,9 @@ namespace FranchiseProject.API.Controllers
 			+ AppRole.SystemInstructor)]
         [SwaggerOperation(Summary = "lấy công việc bằng login")]
         [HttpGet("mine/works")]
-        public async Task<ApiResponse<IEnumerable<WorkViewModel>>> GetWorksByLoginAsync()
+        public async Task<ApiResponse<Pagination<WorkViewModel>>> FilterWorksByLoginAsync(FilterWorkByLoginModel filterWorkByLoginModel)
         {
-            return await _workService.GetAllWorkByLogin();
+            return await _workService.FilterWorksByLogin(filterWorkByLoginModel);
         }
         [SwaggerOperation(Summary = "lấy thông tin User bằng đăng nhập")]
 		[HttpGet("mine")]
