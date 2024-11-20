@@ -13,6 +13,7 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IWorkRepository : IGenericRepository<Work>
     {
+        Task<Work> GetWorkDetailById(Guid id);
         IEnumerable<Work> GetAllPreWorkByAgencyId(Guid agencyId);
         Task<Pagination<Work>> FilterWorksByUserId(
             string userId,

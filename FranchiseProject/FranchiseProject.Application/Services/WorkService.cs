@@ -78,8 +78,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<WorkDetailViewModel>();
             try
             {
-                var work = (await _unitOfWork.WorkRepository
-                    .FindAsync(e => e.Id == id && e.IsDeleted != true, "Appointments")).FirstOrDefault();
+                var work = await _unitOfWork.WorkRepository.GetWorkDetailById(id);
                 if (work == null) return ResponseHandler.Success(new WorkDetailViewModel(), "Nhiệm vụ không khả dụng!");
                 var approvedBy = await _userManager.FindByIdAsync((work.ApproveBy).ToString());
                 var workModel = _mapper.Map<WorkDetailViewModel>(work);

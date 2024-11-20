@@ -30,6 +30,14 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
+        public async Task<Work> GetWorkDetailById(Guid id) 
+        {
+            var work = await _dbContext.Works.Where(e => e.Id == id &&
+                                                   e.IsDeleted != true)
+                                       .Include(e => e.Appointments.OrderByDescending(e => e.StartTime))
+                                       .FirstOrDefaultAsync();
+            return work;
+        }
         public IEnumerable<Work> GetAllPreWorkByAgencyId(Guid agencyId) 
         {
             return _dbContext.Works
@@ -38,7 +46,8 @@ namespace FranchiseProject.Infrastructures.Repositories
                  e.Type == WorkTypeEnum.BusinessRegistered || e.Type == WorkTypeEnum.SiteSurvey ||
                  e.Type == WorkTypeEnum.Design || e.Type == WorkTypeEnum.Quotation ||
                  e.Type == WorkTypeEnum.SignedContract || e.Type == WorkTypeEnum.ConstructionAndTrainning || 
-                 e.Type == WorkTypeEnum.Handover || e.Type == WorkTypeEnum.EducationalSupervision));
+                 e.Type == WorkTypeEnum.Handover || e.Type == WorkTypeEnum.EducationalSupervision))
+                .OrderByDescending(e => e.StartDate);
         }
 
         public async Task<Pagination<Work>> FilterWorksByUserId(string userId,
