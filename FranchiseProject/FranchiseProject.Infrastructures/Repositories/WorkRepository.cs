@@ -45,7 +45,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             var work = await _dbContext.Works.Where(e => e.Id == id &&
                                                    e.IsDeleted != true)
-                                       .Include(e => e.Appointments.OrderByDescending(e => e.StartTime))
+                                       .Include(e => e.Appointments.Where(e => e.IsDeleted != true).OrderByDescending(e => e.StartTime))
                                        .FirstOrDefaultAsync();
             return work;
         }

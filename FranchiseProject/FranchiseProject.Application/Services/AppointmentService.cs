@@ -95,11 +95,11 @@ namespace FranchiseProject.Application.Services
                 if (checkAppointmentAvailable.Data == false) return checkAppointmentAvailable;
 
 
-                _unitOfWork.AppointmentRepository.SoftRemove(appointment);
+                _unitOfWork.AppointmentRepository.HardRemove(appointment);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
 
-                response = ResponseHandler.Success(true, "Tạo cuộc hẹn thành công!");
+                response = ResponseHandler.Success(true, "Xóa cuộc hẹn thành công!");
 
             }
             catch (Exception ex)
@@ -161,7 +161,8 @@ namespace FranchiseProject.Application.Services
 
                 var filter = (Expression<Func<Appointment, bool>>)(e => 
                 (search.StartTime.HasValue || search.StartTime <= e.StartTime) && 
-                (search.EndTime.HasValue || search.EndTime >= e.StartTime));
+                (search.EndTime.HasValue || search.EndTime >= e.StartTime) &&
+                e.IsDeleted != true);
 
                 var appointment = await _unitOfWork.AppointmentRepository.GetAppointmentByLoginAsync(userId, filter);
 
