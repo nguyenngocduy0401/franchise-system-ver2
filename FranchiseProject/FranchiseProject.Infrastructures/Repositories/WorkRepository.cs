@@ -30,6 +30,17 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
+        public async Task<bool> CheckUserWorkExist(Guid workId, string userId)
+        {
+            var userWork = await _dbContext.UserAppointments
+                .Where(e => e.UserId == userId)
+                .Select(ua => ua.Appointment)
+                .Where(a => a.IsDeleted != true)
+                .Select(a => a.Work)
+                .Where(a => a.IsDeleted != true && a.Id == workId)
+                .Distinct().FirstOrDefaultAsync();
+            return (userWork == null) ? false : true;
+        }
         public async Task<Work> GetWorkDetailById(Guid id) 
         {
             var work = await _dbContext.Works.Where(e => e.Id == id &&

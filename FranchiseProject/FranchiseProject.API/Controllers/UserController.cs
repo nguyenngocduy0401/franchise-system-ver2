@@ -41,9 +41,9 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.Manager + "," + AppRole.AgencyManager + "," + 
 			AppRole.SystemConsultant + AppRole.SystemTechnician + "," 
 			+ AppRole.SystemInstructor)]
-        [SwaggerOperation(Summary = "lấy công việc bằng login")]
+        [SwaggerOperation(Summary = "lấy công việc bằng login {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor, AgencyManager}")]
         [HttpGet("mine/works")]
-        public async Task<ApiResponse<Pagination<WorkViewModel>>> FilterWorksByLoginAsync(FilterWorkByLoginModel filterWorkByLoginModel)
+        public async Task<ApiResponse<Pagination<WorkViewModel>>> FilterWorksByLoginAsync([FromQuery] FilterWorkByLoginModel filterWorkByLoginModel)
         {
             return await _workService.FilterWorksByLogin(filterWorkByLoginModel);
         }
@@ -106,7 +106,7 @@ namespace FranchiseProject.API.Controllers
 		[SwaggerOperation(Summary = "giáo viên chấm điểm bài tập (assignement){Authorize = Instructor}")]
 		[Authorize(Roles = AppRole.Instructor)]
 		[HttpPost("~/instructor/api/v1/scores")]
-		public async Task<ApiResponse<bool>> GradeStudentAssAsync(StudentAssScorseNumberViewModel model) => await _assignmentService.GradeStudentAssAsync(model);
+		public async Task<ApiResponse<bool>> GradeStudentAssignmentAsync(StudentAssScorseNumberViewModel model) => await _assignmentService.GradeStudentAssignmentAsync(model);
 		[SwaggerOperation(Summary = "học sinh nộp bài tập (assignement){Authorize = Student}")]
 		[Authorize(Roles = AppRole.Student)]
 		[HttpPost("mine/assignments")]

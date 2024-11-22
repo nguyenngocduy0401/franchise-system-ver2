@@ -15,7 +15,7 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<AssignmentViewModel>> GetAssignmentByIdAsync(string slotId);
         Task<ApiResponse<bool>> DeleteAssignmentByIdAsync(string assId);
         Task<ApiResponse<Pagination<AssignmentViewModel>>> GetAssignmentByClassIdAsync(string classId, int pageIndex, int pageSize);
-        Task<ApiResponse<bool>> GradeStudentAssAsync(StudentAssScorseNumberViewModel model);
+        Task<ApiResponse<bool>> GradeStudentAssignmentAsync(StudentAssScorseNumberViewModel model);
         Task<ApiResponse<bool>> SubmitAssignmentAsync(string assignmentId, string fileSubmitUrl);
         Task<ApiResponse<Pagination<AssignmentSubmitViewModel>>> GetAssignmentSubmissionAsync(string assignmentId, int pageIndex, int pageSize);
         Task<ApiResponse<List<AsmSubmitDetailViewModel>>> GetAllAsmByClassId(Guid classId);

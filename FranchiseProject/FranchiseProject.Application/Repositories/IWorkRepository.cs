@@ -12,7 +12,8 @@ using System.Threading.Tasks;
 namespace FranchiseProject.Application.Repositories
 {
     public interface IWorkRepository : IGenericRepository<Work>
-    {
+    { 
+        Task<bool> CheckUserWorkExist(Guid workId, string userId);
         Task<Work> GetWorkDetailById(Guid id);
         IEnumerable<Work> GetAllPreWorkByAgencyId(Guid agencyId);
         Task<Pagination<Work>> FilterWorksByUserId(

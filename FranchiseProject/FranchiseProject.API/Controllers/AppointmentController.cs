@@ -55,5 +55,14 @@ namespace FranchiseProject.API.Controllers
         {
             return await _userAppointmentService.CreateUserAppointmentAsync(id, userIds);
         }
+        [Authorize(Roles = AppRole.Manager + "," +
+            AppRole.SystemConsultant + AppRole.SystemTechnician + ","
+            + AppRole.SystemInstructor)]
+        [SwaggerOperation(Summary = "Lấy cuộc hẹn của nhân viên {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor, AgencyManager}")]
+        [HttpGet("~/staff/api/v1/appointments")]
+        public async Task<ApiResponse<IEnumerable<AppointmentViewModel>>> GetScheduleByLoginAsync([FromQuery] FilterScheduleAppointmentViewModel search)
+        {
+            return await _appointmentService.GetScheduleByLoginAsync(search);
+        }
     }
 }

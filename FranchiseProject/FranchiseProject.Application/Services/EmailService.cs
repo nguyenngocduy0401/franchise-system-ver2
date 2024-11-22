@@ -233,7 +233,7 @@ namespace FranchiseProject.Application.Services
                 await ConnectAndAuthenticateAsync(client);
                 await SendMessageAsync(client, message); // Gửi email với thông tin từ MessageModel
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

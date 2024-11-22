@@ -5,12 +5,14 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AppointmentViewModels;
+using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,13 +22,15 @@ namespace FranchiseProject.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IClaimsService _claimsService;
         private readonly IValidator<CreateAppointmentModel> _createAppointmentValidator;
         private readonly IValidator<UpdateAppointmentModel> _updateAppointmentValidator;
-        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper,
+        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IClaimsService claimsService,
                 IValidator<CreateAppointmentModel> createAppointmentValidator, IValidator<UpdateAppointmentModel> updateAppointmentValidator)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _claimsService = claimsService;
             _createAppointmentValidator = createAppointmentValidator;
             _updateAppointmentValidator = updateAppointmentValidator;
         }
@@ -145,6 +149,30 @@ namespace FranchiseProject.Application.Services
             catch (Exception ex)
             {
                 response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
+        public async Task<ApiResponse<IEnumerable<AppointmentViewModel>>> GetScheduleByLoginAsync(FilterScheduleAppointmentViewModel search) 
+        {
+            var response = new ApiResponse<IEnumerable<AppointmentViewModel>>();
+            try
+            {
+                var userId = _claimsService.GetCurrentUserId.ToString();
+
+                var filter = (Expression<Func<Appointment, bool>>)(e => 
+                (search.StartTime.HasValue || search.StartTime <= e.StartTime) && 
+                (search.EndTime.HasValue || search.EndTime >= e.StartTime));
+
+                var appointment = await _unitOfWork.AppointmentRepository.GetAppointmentByLoginAsync(userId, filter);
+
+                var appointmentModel = _mapper.Map<IEnumerable<AppointmentViewModel>>(appointment);
+
+                response = ResponseHandler.Success(appointmentModel);
+
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<IEnumerable<AppointmentViewModel>>(ex.Message);
             }
             return response;
         }

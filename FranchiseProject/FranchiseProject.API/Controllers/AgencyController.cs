@@ -31,7 +31,6 @@ namespace FranchiseProject.API.Controllers
         {
             return await _workService.GetAllWorkByAgencyId(id);
         }
-
         [SwaggerOperation(Summary = "Đăng kí đối tác  ")]
         [HttpPost("")]
         public async Task<ApiResponse<bool>> RegisterAgencyAsync(CreateAgencyViewModel create) => await _agencyService.CreateAgencyAsync(create);

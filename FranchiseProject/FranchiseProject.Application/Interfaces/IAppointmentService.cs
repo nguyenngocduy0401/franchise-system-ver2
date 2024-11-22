@@ -16,5 +16,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> DeleteAppointmentAsync(Guid id);
         Task<ApiResponse<AppointmentDetailViewModel>> GetAppointmentDetailByIdAsync(Guid id);
         Task<ApiResponse<bool>> UpdateAppointmentAsync(Guid id, UpdateAppointmentModel updateAppointmentModel);
+        Task<ApiResponse<IEnumerable<AppointmentViewModel>>> GetScheduleByLoginAsync(FilterScheduleAppointmentViewModel search);
     }
 }
