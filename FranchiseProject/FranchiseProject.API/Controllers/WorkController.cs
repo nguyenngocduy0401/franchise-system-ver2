@@ -56,7 +56,7 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.Manager + "," +
             AppRole.SystemConsultant + AppRole.SystemTechnician + ","
             + AppRole.SystemInstructor)]
-        [SwaggerOperation(Summary = "cập nhật trạng thái công việc {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor, AgencyManager}")]
+        [SwaggerOperation(Summary = "cập nhật trạng thái công việc {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor}")]
         [HttpPut("~/staff/api/v1/works/{id}/status")]
         public async Task<ApiResponse<bool>> UpdateWorkStatusSubmitByStaffAsync(Guid id, WorkStatusSubmitEnum workStatusSubmitEnum)
         {
@@ -65,7 +65,7 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.Manager + "," +
             AppRole.SystemConsultant + AppRole.SystemTechnician + ","
             + AppRole.SystemInstructor)]
-        [SwaggerOperation(Summary = "nộp báo cáo công việc {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor, AgencyManager}")]
+        [SwaggerOperation(Summary = "nộp báo cáo công việc {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor}")]
         [HttpPut("~/staff/api/v1/works/{id}")]
         public async Task<ApiResponse<bool>> UpdateWorkByStaffAsync(Guid id,UpdateWorkByStaffModel updateWorkByStaffModel)
         {

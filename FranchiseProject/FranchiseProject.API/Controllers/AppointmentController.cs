@@ -58,7 +58,7 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.Manager + "," +
             AppRole.SystemConsultant + AppRole.SystemTechnician + ","
             + AppRole.SystemInstructor)]
-        [SwaggerOperation(Summary = "Lấy cuộc hẹn của nhân viên {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor, AgencyManager}")]
+        [SwaggerOperation(Summary = "Lấy cuộc hẹn của nhân viên {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor}")]
         [HttpGet("~/staff/api/v1/appointments")]
         public async Task<ApiResponse<IEnumerable<AppointmentViewModel>>> GetScheduleByLoginAsync([FromQuery] FilterScheduleAppointmentViewModel search)
         {
