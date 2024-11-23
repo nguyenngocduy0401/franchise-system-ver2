@@ -12,5 +12,6 @@ namespace FranchiseProject.Application.Repositories
     {
         Task<Appointment> GetAppointmentAsyncById(Guid id);
         Task<IEnumerable<Appointment>> GetAppointmentByLoginAsync(string userId, Expression<Func<Appointment, bool>> expression);
+        Task<IEnumerable<Appointment>> GetAppointmentAgencyByLoginAsync(string userId, Expression<Func<Appointment, bool>> expression);
     }
 }

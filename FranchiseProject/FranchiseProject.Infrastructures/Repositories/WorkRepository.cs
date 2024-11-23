@@ -51,7 +51,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         }
         public IEnumerable<Work> GetAllPreWorkByAgencyId(Guid agencyId) 
         {
-            return _dbContext.Works
+            return _dbContext.Works.AsNoTracking()
                 .Where(e => e.AgencyId == agencyId && e.IsDeleted != true &&
                 (e.Type == WorkTypeEnum.Interview || e.Type == WorkTypeEnum.AgreementSigned ||
                  e.Type == WorkTypeEnum.BusinessRegistered || e.Type == WorkTypeEnum.SiteSurvey ||

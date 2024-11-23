@@ -206,7 +206,7 @@ namespace FranchiseProject.Application.Services
                 (!search.EndTime.HasValue || search.EndTime >= e.StartTime) &&
                 e.IsDeleted != true && e.Type == AppointmentTypeEnum.WithAgency);
 
-                var appointment = await _unitOfWork.AppointmentRepository.GetAppointmentByLoginAsync(userId, filter);
+                var appointment = await _unitOfWork.AppointmentRepository.GetAppointmentAgencyByLoginAsync(userId, filter);
 
                 var appointmentModel = _mapper.Map<IEnumerable<AppointmentViewModel>>(appointment);
 
