@@ -52,8 +52,8 @@ namespace FranchiseProject.Application.Services
                 var filter = (Expression<Func<Work, bool>>)(e =>
                     (string.IsNullOrEmpty(filterWorkByLoginModel.Search) || e.Title.Contains(filterWorkByLoginModel.Search)
                     || e.Description.Contains(filterWorkByLoginModel.Search)) &&
-                    (filterWorkByLoginModel.Status.HasValue || e.Status == filterWorkByLoginModel.Status) &&
-                    (filterWorkByLoginModel.Level.HasValue || e.Level == filterWorkByLoginModel.Level)
+                    (!filterWorkByLoginModel.Status.HasValue || e.Status == filterWorkByLoginModel.Status) &&
+                    (!filterWorkByLoginModel.Level.HasValue || e.Level == filterWorkByLoginModel.Level)
                 );
                 var worksPagination = await _unitOfWork.WorkRepository.FilterWorksByUserId(
                 userId: userId,
@@ -72,7 +72,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<WorkDetailViewModel>> GetWorkDetailByIdAsync(Guid id)
+        public async Task<ApiResponse<WorkDetailViewModel>> GetWorkDetailByIdAsync(Guid id) 
         {
             var response = new ApiResponse<WorkDetailViewModel>();
             try

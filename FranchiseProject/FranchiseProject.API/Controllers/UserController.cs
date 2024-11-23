@@ -30,7 +30,7 @@ namespace FranchiseProject.API.Controllers
 			_classService = classService;
 			_registerCourseService = registerCourseService;
 			_assignmentService = assignmentService;
-				_workService = workService;
+			_workService = workService;
 		}
 
         [Authorize(Roles = AppRole.Manager)]
@@ -38,10 +38,10 @@ namespace FranchiseProject.API.Controllers
         [HttpGet("~/manager/api/v1/users")]
         public async Task<ApiResponse<IEnumerable<UserWorkViewModel>>> FilterUserWorkAsync([FromQuery] FilterUserWorkModel filterUserWorkModel)
             => await _userService.FilterUserWorkAsync(filterUserWorkModel);
-        [Authorize(Roles = AppRole.Manager + "," + AppRole.AgencyManager + "," + 
+        [Authorize(Roles = AppRole.Manager  + "," + 
 			AppRole.SystemConsultant + AppRole.SystemTechnician + "," 
 			+ AppRole.SystemInstructor)]
-        [SwaggerOperation(Summary = "lấy công việc bằng login {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor, AgencyManager}")]
+        [SwaggerOperation(Summary = "lấy công việc bằng login {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor}")]
         [HttpGet("mine/works")]
         public async Task<ApiResponse<Pagination<WorkViewModel>>> FilterWorksByLoginAsync([FromQuery] FilterWorkByLoginModel filterWorkByLoginModel)
         {
