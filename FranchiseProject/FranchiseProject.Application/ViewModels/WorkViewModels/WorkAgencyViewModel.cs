@@ -11,5 +11,6 @@ namespace FranchiseProject.Application.ViewModels.WorkViewModels
     {
         public IEnumerable<WorkViewModel>? Work { get; set; }
         public AgencyStatusEnum? AgencyStatus { get; set; }
+        public Guid? AgencyId { get; set; }
     }
 }

@@ -208,10 +208,11 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<CreateWorkModel>, CreateWorkValidator>();
             services.AddTransient<IValidator<UpdateWorkByStaffModel>, UpdateWorkByStaffValidator>();
 
-
+            services.AddTransient<IValidator<SubmitAppointmentModel>, UpdateAppointmentReportValidator>();
             services.AddTransient<IValidator<UpdateAppointmentModel>, UpdateAppointmentValidator>();
             services.AddTransient<IValidator<CreateAppointmentModel>, CreateAppointmentValidator>();
             services.AddTransient<IValidator<UploadDocumentViewModel>, UploadDocumentValidator>();
+
             #endregion
             return services;
         }

@@ -22,5 +22,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<WorkDetailViewModel>> GetWorkDetailByIdAsync(Guid id);
         Task<ApiResponse<Pagination<WorkViewModel>>> FilterWorksByLogin(FilterWorkByLoginModel filterWorkByLoginModel);
         Task<ApiResponse<bool>> UpdateStatusWorkByIdAsync(Guid workId, WorkStatusEnum status);
+        Task<ApiResponse<Pagination<WorkViewModel>>> FilterWorkAsync(FilterWorkModel filterWorkModel);
     }
 }

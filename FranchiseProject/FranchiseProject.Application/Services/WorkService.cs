@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
@@ -133,7 +134,8 @@ namespace FranchiseProject.Application.Services
                 var workAgencyModel = new WorkAgencyViewModel 
                 {
                     Work = workModel,
-                    AgencyStatus = agency.Status
+                    AgencyStatus = agency.Status,
+                    AgencyId = agencyId
                 };
                 response = ResponseHandler.Success(workAgencyModel, "Successful!");
 
@@ -141,6 +143,37 @@ namespace FranchiseProject.Application.Services
             catch (Exception ex)
             {
                 response = ResponseHandler.Failure<WorkAgencyViewModel>(ex.Message);
+            }
+            return response;
+        }
+        public async Task<ApiResponse<Pagination<WorkViewModel>>> FilterWorkAsync(FilterWorkModel filterWorkModel)
+        {
+            var response = new ApiResponse<Pagination<WorkViewModel>>();
+            try
+            {
+                var filter = (Expression<Func<Work, bool>>)(e =>
+                    (string.IsNullOrEmpty(filterWorkModel.Search) || e.Title.Contains(filterWorkModel.Search)
+                    || e.Description.Contains(filterWorkModel.Search)) 
+                    &&
+                    ((!filterWorkModel.AgencyId.HasValue || filterWorkModel.AgencyId == null) 
+                    || e.AgencyId == filterWorkModel.AgencyId) &&
+                    (!filterWorkModel.Status.HasValue || e.Status == filterWorkModel.Status) &&
+                    (!filterWorkModel.Level.HasValue || e.Level == filterWorkModel.Level) &&
+                    (!filterWorkModel.Submit.HasValue || e.Submit == filterWorkModel.Submit)
+                );
+                var worksPagination = await _unitOfWork.WorkRepository.GetFilterAsync(
+                filter: filter,
+                pageIndex: filterWorkModel.PageIndex,
+                pageSize: filterWorkModel.PageSize
+                );
+                var workModel = _mapper.Map<Pagination<WorkViewModel>>(worksPagination);
+                
+                response = ResponseHandler.Success(workModel, "Successful!");
+
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<Pagination<WorkViewModel>>(ex.Message);
             }
             return response;
         }

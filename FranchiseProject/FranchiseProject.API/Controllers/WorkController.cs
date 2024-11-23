@@ -18,7 +18,12 @@ namespace FranchiseProject.API.Controllers
         {
             _workService = workService;
         }
-        
+        [SwaggerOperation(Summary = "filter công việc có thể lấy tất cả hoặc lấy cho 1 agency cụ thể {Authorize = Manager}")]
+        [HttpGet()]
+        public async Task<ApiResponse<Pagination<WorkViewModel>>> FilterWorkAsync(FilterWorkModel filterWorkModel)
+        {
+            return await _workService.FilterWorkAsync(filterWorkModel);
+        }
         [SwaggerOperation(Summary = "lấy chi tiết công việc bằng id")]
         [HttpGet("{id}")]
         public async Task<ApiResponse<WorkDetailViewModel>> GetWorkDetailByIdAsync(Guid id)
