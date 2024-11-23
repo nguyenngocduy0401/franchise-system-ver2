@@ -54,7 +54,7 @@ namespace FranchiseProject.API.Controllers
             return await _workService.UpdateStatusWorkByIdAsync(id,status);
         }
         [Authorize(Roles = AppRole.Manager + "," +
-            AppRole.SystemConsultant + AppRole.SystemTechnician + ","
+            AppRole.SystemConsultant + "," + AppRole.SystemTechnician + ","
             + AppRole.SystemInstructor)]
         [SwaggerOperation(Summary = "cập nhật trạng thái công việc {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor}")]
         [HttpPut("~/staff/api/v1/works/{id}/status")]
@@ -63,7 +63,7 @@ namespace FranchiseProject.API.Controllers
             return await _workService.UpdateWorkStatusSubmitByStaffAsync(id, workStatusSubmitEnum);
         }
         [Authorize(Roles = AppRole.Manager + "," +
-            AppRole.SystemConsultant + AppRole.SystemTechnician + ","
+            AppRole.SystemConsultant + "," + AppRole.SystemTechnician + ","
             + AppRole.SystemInstructor)]
         [SwaggerOperation(Summary = "nộp báo cáo công việc {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor}")]
         [HttpPut("~/staff/api/v1/works/{id}")]

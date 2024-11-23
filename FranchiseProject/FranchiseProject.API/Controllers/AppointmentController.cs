@@ -56,7 +56,7 @@ namespace FranchiseProject.API.Controllers
             return await _userAppointmentService.CreateUserAppointmentAsync(id, userIds);
         }
         [Authorize(Roles = AppRole.Manager + "," +
-            AppRole.SystemConsultant + AppRole.SystemTechnician + ","
+            AppRole.SystemConsultant + "," + AppRole.SystemTechnician + ","
             + AppRole.SystemInstructor)]
         [SwaggerOperation(Summary = "Lấy cuộc hẹn của nhân viên {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor}")]
         [HttpGet("~/staff/api/v1/appointments")]

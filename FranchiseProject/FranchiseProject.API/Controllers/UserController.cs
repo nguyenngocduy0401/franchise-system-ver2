@@ -39,7 +39,7 @@ namespace FranchiseProject.API.Controllers
         public async Task<ApiResponse<IEnumerable<UserWorkViewModel>>> FilterUserWorkAsync([FromQuery] FilterUserWorkModel filterUserWorkModel)
             => await _userService.FilterUserWorkAsync(filterUserWorkModel);
         [Authorize(Roles = AppRole.Manager  + "," + 
-			AppRole.SystemConsultant + AppRole.SystemTechnician + "," 
+			AppRole.SystemConsultant + "," + AppRole.SystemTechnician + "," 
 			+ AppRole.SystemInstructor)]
         [SwaggerOperation(Summary = "lấy công việc bằng login {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor}")]
         [HttpGet("mine/works")]
