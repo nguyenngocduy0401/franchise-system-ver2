@@ -163,8 +163,8 @@ namespace FranchiseProject.Application.Services
                 var userId = _claimsService.GetCurrentUserId.ToString();
 
                 var filter = (Expression<Func<Appointment, bool>>)(e => 
-                (search.StartTime.HasValue || search.StartTime <= e.StartTime) && 
-                (search.EndTime.HasValue || search.EndTime >= e.StartTime) &&
+                (!search.StartTime.HasValue || search.StartTime <= e.StartTime) && 
+                (!search.EndTime.HasValue || search.EndTime >= e.StartTime) &&
                 e.IsDeleted != true);
 
                 var appointment = await _unitOfWork.AppointmentRepository.GetAppointmentByLoginAsync(userId, filter);
@@ -188,8 +188,8 @@ namespace FranchiseProject.Application.Services
                 var userId = _claimsService.GetCurrentUserId.ToString();
 
                 var filter = (Expression<Func<Appointment, bool>>)(e =>
-                (search.StartTime.HasValue || search.StartTime <= e.StartTime) &&
-                (search.EndTime.HasValue || search.EndTime >= e.StartTime) &&
+                (!search.StartTime.HasValue || search.StartTime <= e.StartTime) &&
+                (!search.EndTime.HasValue || search.EndTime >= e.StartTime) &&
                 e.IsDeleted != true && e.Type == AppointmentTypeEnum.WithAgency);
 
                 var appointment = await _unitOfWork.AppointmentRepository.GetAppointmentByLoginAsync(userId, filter);
