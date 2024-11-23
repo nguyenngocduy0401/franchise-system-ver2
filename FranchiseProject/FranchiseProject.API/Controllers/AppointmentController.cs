@@ -44,7 +44,7 @@ namespace FranchiseProject.API.Controllers
         }
         [Authorize(Roles = AppRole.Manager)]
         [SwaggerOperation(Summary = "Nộp báo cáo cuộc hẹn{Authorize = Manager}")]
-        [HttpPut("{id}")]
+        [HttpPut("~/staff/api/v1/appointments/{id}")]
         public async Task<ApiResponse<bool>> SubmitAppointmentReportAsync(Guid id, SubmitAppointmentModel submitAppointmentModel)
         {
             return await _appointmentService.SubmitAppointmentReportAsync(id, submitAppointmentModel);
