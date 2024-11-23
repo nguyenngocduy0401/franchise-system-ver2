@@ -23,14 +23,17 @@ namespace FranchiseProject.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IClaimsService _claimsService;
+        private readonly IWorkService _workService;
         private readonly IValidator<CreateAppointmentModel> _createAppointmentValidator;
         private readonly IValidator<UpdateAppointmentModel> _updateAppointmentValidator;
-        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IClaimsService claimsService,
-                IValidator<CreateAppointmentModel> createAppointmentValidator, IValidator<UpdateAppointmentModel> updateAppointmentValidator)
+        public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IClaimsService claimsService, IWorkService workService,
+                IValidator<CreateAppointmentModel> createAppointmentValidator, IValidator<UpdateAppointmentModel> updateAppointmentValidator
+                )
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _claimsService = claimsService;
+            _workService = workService;
             _createAppointmentValidator = createAppointmentValidator;
             _updateAppointmentValidator = updateAppointmentValidator;
         }
@@ -177,5 +180,31 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<IEnumerable<AppointmentViewModel>>> GetScheduleAgencyByLoginAsync(FilterScheduleAppointmentViewModel search)
+        {
+            var response = new ApiResponse<IEnumerable<AppointmentViewModel>>();
+            try
+            {
+                var userId = _claimsService.GetCurrentUserId.ToString();
+
+                var filter = (Expression<Func<Appointment, bool>>)(e =>
+                (search.StartTime.HasValue || search.StartTime <= e.StartTime) &&
+                (search.EndTime.HasValue || search.EndTime >= e.StartTime) &&
+                e.IsDeleted != true && e.Type == AppointmentTypeEnum.WithAgency);
+
+                var appointment = await _unitOfWork.AppointmentRepository.GetAppointmentByLoginAsync(userId, filter);
+
+                var appointmentModel = _mapper.Map<IEnumerable<AppointmentViewModel>>(appointment);
+
+                response = ResponseHandler.Success(appointmentModel);
+
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<IEnumerable<AppointmentViewModel>>(ex.Message);
+            }
+            return response;
+        }
+
     }
 }

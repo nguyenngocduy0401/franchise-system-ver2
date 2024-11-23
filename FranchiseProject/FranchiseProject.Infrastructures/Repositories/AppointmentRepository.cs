@@ -34,6 +34,14 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Select(up => up.Appointment)
                 .Where(expression).ToListAsync();
         }
+        public async Task<IEnumerable<Appointment>> GetAppointmentAgencyByLoginAsync(string userId, Expression<Func<Appointment, bool>> expression)
+        {
+            return await _dbContext.Users
+                .Where(e => e.Id == userId)
+                .SelectMany(up => up.Agency.Works)
+                .SelectMany(w => w.Appointments).Where(expression).ToListAsync()
+                ;
+        }
         public async Task<Appointment> GetAppointmentAsyncById(Guid id) 
         {
             return await _dbContext.Appointments.Where(e => e.Id == id && e.IsDeleted != true)

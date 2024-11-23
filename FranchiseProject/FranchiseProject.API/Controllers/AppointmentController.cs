@@ -64,5 +64,11 @@ namespace FranchiseProject.API.Controllers
         {
             return await _appointmentService.GetScheduleByLoginAsync(search);
         }
+        [SwaggerOperation(Summary = "Lấy cuộc hẹn của nhân viên {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor}")]
+        [HttpGet("~/agency/api/v1/appointments")]
+        public async Task<ApiResponse<IEnumerable<AppointmentViewModel>>> GetScheduleAgencyByLoginAsync([FromQuery] FilterScheduleAppointmentViewModel search)
+        {
+            return await _appointmentService.GetScheduleAgencyByLoginAsync(search);
+        }
     }
 }
