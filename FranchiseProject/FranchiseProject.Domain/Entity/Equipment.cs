@@ -11,7 +11,7 @@ namespace FranchiseProject.Domain.Entity
     public class Equipment:BaseEntity
     {
         public EquipmentTypeEnum? Type { get; set; }
-       // public string? SerialNumber { get; set; }
+        public string? SerialNumber { get; set; }
         public EquipmentStatusEnum? Status { get; set;  }
         public int? Quantity { get; set; }
         public string? Note { get; set; }

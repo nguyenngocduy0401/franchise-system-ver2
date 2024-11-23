@@ -57,6 +57,7 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Agency, AgencyViewModel>();
             CreateMap<Agency, AgencyAddressViewModel>()
                 .ForMember(dest => dest.FullAddress, opt => opt.MapFrom(src => $"{src.Address}, {src.Ward}, {src.District}, {src.City}"));
+            CreateMap<Agency, AgencyNameViewModel>().ForMember(dest => dest.AgencyName, otp => otp.MapFrom(src => src.Name));
             #endregion
             #region Contract
             CreateMap<CreateContractViewModel, Contract>().ReverseMap();

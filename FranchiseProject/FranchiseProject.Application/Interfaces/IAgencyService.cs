@@ -18,6 +18,8 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<AgencyViewModel>> GetAgencyById(string id);
         Task<ApiResponse<bool>> UpdateAgencyStatusAsync(string id, AgencyStatusEnum newStatus);
         Task<ApiResponse<IEnumerable<AgencyAddressViewModel>>> GetActiveAgencyAdresses();
-    
+        Task<ApiResponse<IEnumerable<AgencyNameViewModel>>> GetAllAgencyAsync();
+
+
     }
 }

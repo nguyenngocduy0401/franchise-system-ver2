@@ -393,5 +393,21 @@ namespace FranchiseProject.Application.Services
 			}
 			return response;
 		}
+        public async Task<ApiResponse<IEnumerable<AgencyNameViewModel>>> GetAllAgencyAsync()
+        {
+            var response = new ApiResponse<IEnumerable<AgencyNameViewModel>>();
+            try
+            {
+                var agencies = await _unitOfWork.AgencyRepository.FindAsync(x => x.Status != AgencyStatusEnum.Inactive);
+                var agencyAddressViewModels = _mapper.Map<IEnumerable<AgencyNameViewModel>>(agencies);
+                if (agencyAddressViewModels.IsNullOrEmpty()) return ResponseHandler.Success(agencyAddressViewModels, "Không có chi nhánh nào đang hoạt động!");
+                response = ResponseHandler.Success(agencyAddressViewModels, "Lấy các chi nhánh đang hoạt động thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<IEnumerable<AgencyNameViewModel>>(ex.Message);
+            }
+            return response;
+        }
     }
 }
