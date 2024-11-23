@@ -26,8 +26,10 @@ namespace FranchiseProject.Application.Services
         private readonly IWorkService _workService;
         private readonly IValidator<CreateAppointmentModel> _createAppointmentValidator;
         private readonly IValidator<UpdateAppointmentModel> _updateAppointmentValidator;
+        private readonly IValidator<SubmitAppointmentModel> _submitAppointmentValidator;
         public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IClaimsService claimsService, IWorkService workService,
-                IValidator<CreateAppointmentModel> createAppointmentValidator, IValidator<UpdateAppointmentModel> updateAppointmentValidator
+                IValidator<CreateAppointmentModel> createAppointmentValidator, IValidator<UpdateAppointmentModel> updateAppointmentValidator,
+                IValidator<SubmitAppointmentModel> submitAppointmentValidator
                 )
         {
             _mapper = mapper;
@@ -36,6 +38,7 @@ namespace FranchiseProject.Application.Services
             _workService = workService;
             _createAppointmentValidator = createAppointmentValidator;
             _updateAppointmentValidator = updateAppointmentValidator;
+            _submitAppointmentValidator = submitAppointmentValidator;
         }
         public async Task<ApiResponse<AppointmentDetailViewModel>> GetAppointmentDetailByIdAsync(Guid id)
         {
@@ -67,7 +70,9 @@ namespace FranchiseProject.Application.Services
                 if (!validationResult.IsValid) if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 var work = await _unitOfWork.WorkRepository.GetExistByIdAsync((Guid)createAppointmentModel.WorkId);
-                if (work == null) return ResponseHandler.Success(false, "Cơ sở nhượng quyền không khả dụng!");
+
+                var checkWork = await _workService.CheckPreWorkAvailable(work);
+                if (checkWork.Data == false) return checkWork;
 
                 if (createAppointmentModel.StartTime < work.StartDate || createAppointmentModel.EndTime > work.EndDate)
                     return ResponseHandler.Success(false, "Ngày trong cuộc hẹn phải nằm trong thời gian của nhiệm vụ!");
@@ -95,6 +100,11 @@ namespace FranchiseProject.Application.Services
             {
                 var appointment = await _unitOfWork.AppointmentRepository.GetExistByIdAsync(id);
                 var checkAppointmentAvailable = CheckAppointmentAvailable(appointment);
+
+                var work = await _unitOfWork.WorkRepository.GetExistByIdAsync((Guid)appointment.WorkId);
+                var checkWork = await _workService.CheckPreWorkAvailable(work);
+
+                if (checkWork.Data == false) return checkWork;
                 if (checkAppointmentAvailable.Data == false) return checkAppointmentAvailable;
 
 
@@ -121,6 +131,10 @@ namespace FranchiseProject.Application.Services
                 if (checkAppointmentAvailable.Data == false) return checkAppointmentAvailable;
 
                 var work = await _unitOfWork.WorkRepository.GetExistByIdAsync((Guid)appointment.WorkId);
+
+                var checkWork = await _workService.CheckPreWorkAvailable(work);
+                if (checkWork.Data == false) return checkWork;
+
                 if (updateAppointmentModel.StartTime < work.StartDate || updateAppointmentModel.EndTime > work.EndDate)
                     return ResponseHandler.Success(false, "Ngày trong cuộc hẹn phải nằm trong thời gian của nhiệm vụ!");
 
@@ -145,7 +159,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 if (appointment == null) return ResponseHandler.Success(false, "Cuộc hẹn không khả dụng!");
-                if (appointment.Status != AppointmentStatusEnum.None) return ResponseHandler.Success(false, "Cuộc hẹn không khả dụng!");
+                //if (appointment.Status != AppointmentStatusEnum.None) return ResponseHandler.Success(false, "Cuộc hẹn không khả dụng!");
                 response = ResponseHandler.Success(true);
 
             }
@@ -202,6 +216,34 @@ namespace FranchiseProject.Application.Services
             catch (Exception ex)
             {
                 response = ResponseHandler.Failure<IEnumerable<AppointmentViewModel>>(ex.Message);
+            }
+            return response;
+        }
+        public async Task<ApiResponse<bool>> SubmitAppointmentReportAsync(Guid id, SubmitAppointmentModel submitAppointmentModel)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var appointment = await _unitOfWork.AppointmentRepository.GetExistByIdAsync(id);
+                var checkAppointmentAvailable = CheckAppointmentAvailable(appointment);
+
+                var work = await _unitOfWork.WorkRepository.GetExistByIdAsync((Guid)appointment.WorkId);
+                var checkWork = await _workService.CheckPreWorkAvailable(work);
+                if (checkWork.Data == false) return checkWork;
+
+                if (checkAppointmentAvailable.Data == false) return checkAppointmentAvailable;
+
+                appointment = _mapper.Map(submitAppointmentModel, appointment);
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Update failed!");
+
+                response = ResponseHandler.Success(true);
+
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
         }

@@ -11,6 +11,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IAppointmentService
     {
+        Task<ApiResponse<bool>> SubmitAppointmentReportAsync(Guid id, SubmitAppointmentModel submitAppointmentModel);
         ApiResponse<bool> CheckAppointmentAvailable(Appointment appointment);
         Task<ApiResponse<bool>> CreateAppointmentAsync(CreateAppointmentModel createAppointmentModel);
         Task<ApiResponse<bool>> DeleteAppointmentAsync(Guid id);

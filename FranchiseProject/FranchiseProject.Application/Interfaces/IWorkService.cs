@@ -1,5 +1,6 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
+using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IWorkService
     {
+        Task<ApiResponse<bool>> CheckPreWorkAvailable(Work work);
         Task<ApiResponse<bool>> UpdateWorkStatusSubmitByStaffAsync(Guid workId, WorkStatusSubmitEnum workStatusSubmitEnum);
         Task<ApiResponse<bool>> UpdateWorkByStaffAsync(Guid workId, UpdateWorkByStaffModel updateWorkByStaffModel);
         Task<ApiResponse<bool>> CreateWorkAsync(CreateWorkModel createWorkModel);

@@ -325,6 +325,7 @@ namespace FranchiseProject.Infrastructures.Mappers
                     .ForMember(dest => dest.User, opt => opt
                     .MapFrom(src => src.UserAppointments
                     .Select(up => up.User)));
+            CreateMap<SubmitAppointmentModel, Appointment>();
             #endregion
 
             #region Document

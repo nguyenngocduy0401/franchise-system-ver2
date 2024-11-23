@@ -43,6 +43,13 @@ namespace FranchiseProject.API.Controllers
             return await _appointmentService.UpdateAppointmentAsync(id, updateAppointmentModel);
         }
         [Authorize(Roles = AppRole.Manager)]
+        [SwaggerOperation(Summary = "Nộp báo cáo cuộc hẹn{Authorize = Manager}")]
+        [HttpPut("{id}")]
+        public async Task<ApiResponse<bool>> SubmitAppointmentReportAsync(Guid id, SubmitAppointmentModel submitAppointmentModel)
+        {
+            return await _appointmentService.SubmitAppointmentReportAsync(id, submitAppointmentModel);
+        }
+        [Authorize(Roles = AppRole.Manager)]
         [SwaggerOperation(Summary = "xóa cuộc hẹn{Authorize = Manager}")]
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteAppointmentAsync(Guid id)

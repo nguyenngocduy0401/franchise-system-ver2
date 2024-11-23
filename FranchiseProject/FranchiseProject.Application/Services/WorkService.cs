@@ -321,7 +321,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        private async Task<ApiResponse<bool>> CheckPreWorkAvailable(Work work) 
+        public async Task<ApiResponse<bool>> CheckPreWorkAvailable(Work work) 
         {
             var response = new ApiResponse<bool>();
             try
