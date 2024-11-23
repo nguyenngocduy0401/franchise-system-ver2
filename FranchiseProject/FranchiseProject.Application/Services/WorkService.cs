@@ -53,7 +53,8 @@ namespace FranchiseProject.Application.Services
                     (string.IsNullOrEmpty(filterWorkByLoginModel.Search) || e.Title.Contains(filterWorkByLoginModel.Search)
                     || e.Description.Contains(filterWorkByLoginModel.Search)) &&
                     (!filterWorkByLoginModel.Status.HasValue || e.Status == filterWorkByLoginModel.Status) &&
-                    (!filterWorkByLoginModel.Level.HasValue || e.Level == filterWorkByLoginModel.Level)
+                    (!filterWorkByLoginModel.Level.HasValue || e.Level == filterWorkByLoginModel.Level) &&
+                    (!filterWorkByLoginModel.Submit.HasValue || e.Submit == filterWorkByLoginModel.Submit)
                 );
                 var worksPagination = await _unitOfWork.WorkRepository.FilterWorksByUserId(
                 userId: userId,

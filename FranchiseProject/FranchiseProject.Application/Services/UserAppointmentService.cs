@@ -50,7 +50,7 @@ namespace FranchiseProject.Application.Services
                 }
                 await _unitOfWork.UserAppointmentRepository.AddRangeAsync(listUserAppointment);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Create failed!");
+                if (!isSuccess) throw new Exception("Update failed!");
 
                 response = ResponseHandler.Success(true, "Sửa danh sách người tham gia thành công!");
 

@@ -12,6 +12,7 @@ namespace FranchiseProject.Application.ViewModels.WorkViewModels
         public string? Search { get; set; }
         public WorkLevelEnum? Level { get; set; }
         public WorkStatusEnum? Status { get; set; }
+        public WorkStatusSubmitEnum? Submit { get; set; }
         public bool? IsReported { get; set; }
         public int PageIndex { get; set; } = 1;
         public int PageSize { get; set; } = 10;
