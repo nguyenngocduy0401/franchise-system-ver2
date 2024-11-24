@@ -16,7 +16,6 @@ namespace FranchiseProject.Domain.Entity
         public string? ContractDocumentImageURL { get; set; }
         public double? RevenueSharePercentage { get; set; }
         public string? DesignFee { get; set; }
-        public string? EquipmentFee { get; set; }
         public string? FrachiseFee { get; set; }
         public Guid? AgencyId { get; set; }
         [ForeignKey("AgencyId")]
