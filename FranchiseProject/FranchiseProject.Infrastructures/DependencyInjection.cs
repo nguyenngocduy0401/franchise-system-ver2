@@ -1,5 +1,6 @@
 ﻿using FranchiseProject.Application;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.Jobs;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Application.Services;
 using FranchiseProject.Domain.Entity;
@@ -8,6 +9,7 @@ using FranchiseProject.Infrastructures.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Quartz;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -119,6 +121,27 @@ namespace FranchiseProject.Infrastructures
             });
             services.AddDbContext<AppDbContext>(option => option.UseSqlServer(appConfiguration));
             services.AddAutoMapper(typeof(MapperConfigurationsProfile).Assembly);
+            return services;
+        }
+        public static IServiceCollection AddQuarztJobsService(this IServiceCollection services)
+        {
+            services.AddQuartz(q =>
+            {
+
+                var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+                var currentTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
+                // Just use the name of your job that you created in the Jobs folder.
+                var jobKey = new JobKey("SendContractRenewalEmailJob");
+                q.AddJob<SendContractRenewalEmailJob>(opts => opts.WithIdentity(jobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(jobKey)
+                    .WithIdentity("SendContractRenewalEmailJob-trigger")
+                    //This Cron interval can be described as "run every minute" (when second is zero)
+                    .StartAt(currentTime.AddDays(3))
+                    .WithCronSchedule("0 4 1/21 * ? *", cron => cron.InTimeZone(vietnamTimeZone))
+                );
+            });
+            services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
             return services;
         }
     }

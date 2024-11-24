@@ -1,4 +1,5 @@
 ﻿using FranchiseProject.Application.Interfaces;
+using Microsoft.Extensions.Logging;
 using Quartz;
 using System;
 using System.Collections.Generic;
@@ -8,16 +9,23 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Jobs
 {
+    //[DisallowConcurrentExecution]
     public class SendContractRenewalEmailJob : IJob
     {
+        private readonly ILogger<SendContractRenewalEmailJob> _logger;
         private readonly IContractService _contractService;
-        public SendContractRenewalEmailJob(IContractService contractService)
+        public SendContractRenewalEmailJob(IContractService contractService,
+            ILogger<SendContractRenewalEmailJob> logger)
         {
             _contractService = contractService;
+            _logger = logger;
         }
-        public Task Execute(IJobExecutionContext context)
+        public async Task Execute(IJobExecutionContext context)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Hello");
+            _logger.LogInformation("{UtcNow}", DateTime.UtcNow);
+            await _contractService.NotifyCustomersOfExpiringContracts();
+            //return Task.CompletedTask;
         }
     }
 }

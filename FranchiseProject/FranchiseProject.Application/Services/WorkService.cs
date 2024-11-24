@@ -134,8 +134,7 @@ namespace FranchiseProject.Application.Services
                 var workAgencyModel = new WorkAgencyViewModel 
                 {
                     Work = workModel,
-                    AgencyStatus = agency.Status,
-                    AgencyId = agencyId
+                    AgencyStatus = agency.Status
                 };
                 response = ResponseHandler.Success(workAgencyModel, "Successful!");
 
