@@ -138,7 +138,7 @@ namespace FranchiseProject.Infrastructures
                     .WithIdentity("SendContractRenewalEmailJob-trigger")
                     //This Cron interval can be described as "run every minute" (when second is zero)
                     .StartAt(currentTime.AddDays(3))
-                    .WithCronSchedule("0 4 1/21 * ? *", cron => cron.InTimeZone(vietnamTimeZone))
+                    .WithCronSchedule("0 4 1/21 * * ?", cron => cron.InTimeZone(vietnamTimeZone))
                 );
             });
             services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
