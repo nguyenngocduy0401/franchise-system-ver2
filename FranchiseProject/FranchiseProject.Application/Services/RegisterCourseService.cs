@@ -39,7 +39,12 @@ namespace FranchiseProject.Application.Services
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
         private readonly IValidator<UpdateRegisterCourseViewModel> _updateValidator;
-        public RegisterCourseService(IValidator<UpdateRegisterCourseViewModel> updateValidator, RoleManager<Role> roleManager,IEmailService emailService, IClaimsService claimsService,UserManager<User> userManager, IMapper mapper, IUnitOfWork unitOfWork, IValidator<RegisterCourseViewModel> validator)
+        private readonly ICurrentTime _currentTime;
+        public RegisterCourseService(IValidator<UpdateRegisterCourseViewModel> updateValidator, RoleManager<Role> roleManager,
+            IEmailService emailService, IClaimsService claimsService,
+            UserManager<User> userManager, IMapper mapper, 
+            IUnitOfWork unitOfWork, IValidator<RegisterCourseViewModel> validator,
+            ICurrentTime currentTime)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -49,6 +54,7 @@ namespace FranchiseProject.Application.Services
             _emailService = emailService;
             _roleManager = roleManager;
             _updateValidator = updateValidator;
+            _currentTime = currentTime;
         }
 
 
@@ -98,7 +104,7 @@ namespace FranchiseProject.Application.Services
                     AgencyId = Guid.Parse(model.AgencyId),
                   //  StudentStatus = StudentStatusEnum.NotConsult,
                     Status = UserStatusEnum.active,
-                    CreateAt = DateTime.Now,
+                    CreateAt = _currentTime.GetCurrentTime(),
                 };
 
                 var result = await _userManager.CreateAsync(newUser);
@@ -138,7 +144,6 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<bool>(ex.Message);
             }
         }
-
       
         public async Task<ApiResponse<bool>> UpdateStatusStudentAsync( string studentId,string courseId, StudentCourseStatusEnum status)
         {

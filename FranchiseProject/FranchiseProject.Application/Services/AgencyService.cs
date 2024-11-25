@@ -21,6 +21,7 @@ namespace FranchiseProject.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClaimsService _claimsService;
+        private readonly ICurrentTime _currentTime;
         private readonly IValidator<CreateAgencyViewModel> _validator;
         private readonly IValidator<UpdateAgencyViewModel> _validatorUpdate;
         private readonly IUserService _userService;
@@ -31,7 +32,8 @@ namespace FranchiseProject.Application.Services
         public AgencyService(IMapper mapper,IUnitOfWork unitOfWork,
             IClaimsService claimsService,IValidator<CreateAgencyViewModel>  validator,
             IUserService userService,IHubContext<NotificationHub>hubContext,
-            IEmailService emailService, IValidator<UpdateAgencyViewModel> validatorUpdate)
+            IEmailService emailService, IValidator<UpdateAgencyViewModel> validatorUpdate,
+            ICurrentTime currentTime)
         {
             _unitOfWork= unitOfWork;
             _validator= validator;
@@ -41,9 +43,10 @@ namespace FranchiseProject.Application.Services
             _hubContext= hubContext;
             _emailService= emailService;
             _validatorUpdate = validatorUpdate;
+            _currentTime= currentTime;
         }
 
-        public async  Task<ApiResponse<bool>> CreateAgencyAsync(CreateAgencyViewModel create)
+        public async Task<ApiResponse<bool>> CreateAgencyAsync(CreateAgencyViewModel create)
         {
             var response = new ApiResponse<bool>();
             try
@@ -57,6 +60,8 @@ namespace FranchiseProject.Application.Services
                 }
                 var agency = _mapper.Map<Agency>(create);
                 agency.Status = AgencyStatusEnum.Processing;
+                var work = CreateWorkAppointForFranchiseFlow(agency);
+                agency.Works = work;
                 await _unitOfWork.AgencyRepository.AddAsync(agency);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                 if (isSuccess > 0)
@@ -89,7 +94,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
         public async Task<ApiResponse<Pagination<AgencyViewModel>>> FilterAgencyAsync(FilterAgencyViewModel filter)
         {
             var response = new ApiResponse<Pagination<AgencyViewModel>>();
@@ -408,6 +412,70 @@ namespace FranchiseProject.Application.Services
                 response = ResponseHandler.Failure<IEnumerable<AgencyNameViewModel>>(ex.Message);
             }
             return response;
+        }
+        private List<Work> CreateWorkAppointForFranchiseFlow(Agency agency) 
+        {
+            var works = new List<Work>();
+            works.Add(new Work
+            {
+                Title = "Phỏng vấn đối tác - " + agency.Name,
+                Description = "<p>Buổi phỏng vấn cần tập trung vào" +
+                " các nội dung chính sau:</p>\r\n\r\n<ul>\r\n    " +
+                "<li><strong>Năng lực tài chính:</strong> Xác minh khả năng tài chính của đối tác để đảm bảo họ đủ tiềm lực tham gia vào mô hình nhượng quyền.</li>\r\n   " +
+                " <li><strong>Kinh nghiệm quản lý:</strong> Tìm hiểu quá trình làm việc, các dự án đã từng tham gia, và năng lực quản lý hiện tại của đối tác.</li>\r\n    " +
+                "<li><strong>Mục tiêu phát triển:</strong> Trao đổi về định hướng chiến lược và kỳ vọng của đối tác khi tham gia vào mô hình nhượng quyền của công ty.</li>\r\n  " +
+                "  <li><strong>Cam kết hợp tác:</strong> Đảm bảo đối tác hiểu và sẵn sàng tuân thủ các quy định, tiêu chuẩn, và lộ trình mà công ty đã đề ra.</li>\r\n</ul>\r\n\r\n<p>Nhân viên cần chuẩn bị trước các tài liệu sau:</p>\r\n<ul>\r\n    " +
+                "<li>Tài liệu giới thiệu công ty</li>\r\n    " +
+                "<li>Bộ câu hỏi phỏng vấn</li>\r\n   " +
+                " <li>Biểu mẫu ghi chú hoặc checklist đánh giá</li>\r\n</ul>\r\n\r\n<p>Buổi phỏng vấn phải đảm bảo tính <strong>chuyên nghiệp</strong>, <strong>khách quan</strong>, và <strong>minh bạch</strong>," +
+                " nhằm tạo ấn tượng tốt với đối tác. Sau buổi phỏng vấn, hãy lập báo cáo chi tiết về nội dung đã trao đổi, bao gồm:</p>\r\n<ul>\r\n  " +
+                "  <li>Đánh giá sơ bộ về năng lực tài chính</li>\r\n    <li>Kinh nghiệm quản lý và điều hành</li>\r\n    " +
+                "<li>Mức độ phù hợp với quy trình nhượng quyền</li>\r\n</ul>\r\n\r\n<p><em>Thời gian thực hiện:</em> 1-2 giờ</p>\r\n<p><em>Kết quả mong đợi:</em> Báo cáo chi tiết trình quản lý để xem xét và phê duyệt.</p>",
+                Status = WorkStatusEnum.None,
+                Submit = WorkStatusSubmitEnum.None,
+                Type = WorkTypeEnum.Interview,
+                Level = WorkLevelEnum.Compulsory,
+                StartDate = _currentTime.GetCurrentTime(),
+                EndDate = _currentTime.GetCurrentTime(),
+                AgencyId = agency.Id,
+                Appointments = new List<Appointment> { new Appointment 
+                {
+                    Title = "Phỏng vấn đối tác - " + agency.Name,
+                    StartTime = _currentTime.GetCurrentTime(),
+                    EndTime = _currentTime.GetCurrentTime(),
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Địa chỉ công ty hoặc cuộc họp trực tuyến]</li>\r\n</ul>",
+                    Status = AppointmentStatusEnum.None,
+                    Type = AppointmentTypeEnum.WithAgency,
+
+                }}
+            });
+            works.Add(new Work
+            {
+                Title = "Kí hợp đồng với đối tác - " + agency.Name,
+                Description = "<p><strong>Ký Thỏa Thuận Hợp Đồng</strong> giữa công ty và đối tác là bước quan trọng trong quá trình bắt đầu hợp tác kinh doanh. Buổi ký kết hợp đồng sẽ diễn ra sau khi tất cả các điều khoản và điều kiện của hợp đồng đã được thống nhất giữa hai bên.</p>\r\n\r\n<ul>\r\n " +
+                "   <li><strong>Kiểm tra và hoàn thiện hợp đồng:</strong> Đảm bảo rằng tất cả các điều khoản trong hợp đồng đều rõ ràng, minh bạch và đã được xem xét kỹ lưỡng bởi cả hai bên.</li>\r\n    <li><strong>Ký kết hợp đồng:</strong> Đại diện của công ty và đối tác sẽ ký vào các bản hợp đồng, xác nhận sự đồng ý về các điều khoản đã được thảo luận và thống nhất.</li>\r\n    <li><strong>Thông báo hoàn tất:</strong> Sau khi hợp đồng đã được ký, các bên sẽ nhận thông báo chính thức về việc hợp tác" +
+                " chính thức và bắt đầu triển khai các bước tiếp theo trong kế hoạch hợp tác.</li>\r\n</ul>\r\n\r\n<p><em>Thời gian thực hiện:</em> 1-2 giờ</p>\r\n" +
+                "<p><em>Kết quả mong đợi:</em> Hợp đồng chính thức được ký kết, các bước tiếp theo trong hợp tác sẽ được triển khai.</p>",
+                Status = WorkStatusEnum.None,
+                Submit = WorkStatusSubmitEnum.None,
+                Type = WorkTypeEnum.SignedContract,
+
+                Level = WorkLevelEnum.Compulsory,
+                StartDate = _currentTime.GetCurrentTime(),
+                EndDate = _currentTime.GetCurrentTime(),
+                AgencyId = agency.Id,
+                Appointments = new List<Appointment> { new Appointment
+                {
+                    Title = "Kí hợp đồng với đối tác - " + agency.Name,
+                    StartTime = _currentTime.GetCurrentTime(),
+                    EndTime = _currentTime.GetCurrentTime(),
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Địa chỉ công ty hoặc cuộc họp trực tuyến]</li>\r\n    <li><strong>Tài liệu cần chuẩn bị:</strong> [Tài liệu của khách hàng hoặc nhân viên cần chuẩn bị]</li>\r\n    <li><strong>Mục đích của cuộc phỏng vấn:</strong> [Mục đích cụ thể của buổi phỏng vấn]</li>\r\n</ul>",
+                    Status = AppointmentStatusEnum.None,
+                    Type = AppointmentTypeEnum.WithAgency,
+
+                }}
+            });
+            return works;
         }
     }
 }
