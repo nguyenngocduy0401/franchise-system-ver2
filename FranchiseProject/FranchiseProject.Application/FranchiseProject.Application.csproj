@@ -31,8 +31,4 @@
     <ProjectReference Include="..\FranchiseProject.Domain\FranchiseProject.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Jobs\" />
-  </ItemGroup>
-
 </Project>

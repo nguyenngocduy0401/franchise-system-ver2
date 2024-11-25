@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation;
 using FranchiseProject.Application.Commons;
@@ -6,6 +7,7 @@ using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ConsultationViewModels;
 using FranchiseProject.Application.ViewModels.ContractViewModels;
+using FranchiseProject.Application.ViewModels.EmailViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
@@ -45,6 +47,40 @@ namespace FranchiseProject.Application.Services
             _firebaseService = firebaseService;
             _emailService = emailService;
             _validatorUpdate = validatorUpdate;
+        }
+        public async Task NotifyCustomersOfExpiringContracts()
+        {
+            var agencies = await _unitOfWork.AgencyRepository.GetAgencyExpiredAsync();
+            
+            foreach (var agency in agencies)
+            {
+                if (agency == null || string.IsNullOrEmpty(agency.Email))
+                {
+                    
+                    continue;
+                }
+
+                var emailMessage = new MessageModel
+                {
+                    To = agency.Email,
+                    Subject = "[futuretech-noreply] Thông Báo Hết Hạn Hợp Đồng",
+                    Body = $"<p>Kính gửi {agency.Name},</p>" +
+                          $"<p>Chúng tôi xin thông báo rằng hợp đồng của bạn với Futuretech đã đến hạn kết thúc.</p>" +
+                          $"<p>Để đảm bảo việc hợp tác được duy trì và các dịch vụ không bị gián đoạn, chúng tôi kính mời bạn liên hệ với đội ngũ của chúng tôi để thực hiện các thủ tục gia hạn hợp đồng.</p>" +
+                          $"<p>Vui lòng sử dụng các thông tin dưới đây để liên hệ:</p>" +
+                          $"<ul>" +
+                          $"<li><strong>Email hỗ trợ:</strong> support@futuretech.com</li>" +
+                          $"<li><strong>Số điện thoại:</strong> 0123-456-789</li>" +
+                          $"</ul>" +
+                          $"<p>Nếu bạn đã hoàn thành gia hạn hợp đồng, vui lòng bỏ qua email này.</p>" +
+                          $"<p>Chúng tôi mong muốn tiếp tục đồng hành cùng bạn trên con đường phát triển sắp tới.</p>" +
+                          $"<p>Trân trọng,</p>" +
+                          $"<p>Đội ngũ Futuretech</p>"
+                };
+                
+                    await _emailService.SendEmailAsync(emailMessage);
+               
+            }
         }
         public async Task<ApiResponse<AgencyInfoViewModel>> GetAgencyInfoAsync(Guid agencyId)
         {

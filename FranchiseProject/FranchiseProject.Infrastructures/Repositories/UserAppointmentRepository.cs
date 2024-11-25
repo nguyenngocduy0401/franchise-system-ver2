@@ -26,6 +26,15 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
+        public async Task<IEnumerable<UserAppointment>> GetAppointmentByUserId(Expression<Func<UserAppointment, bool>> expression, string includeProperties = "")
+        {
+            IQueryable<UserAppointment> query = _dbContext.UserAppointments.Where(expression);
+            foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+            return await query.ToListAsync();
+        }
         public async Task<IEnumerable<UserAppointment>> FindAsync(Expression<Func<UserAppointment, bool>> expression, string includeProperties = "")
         {
             IQueryable<UserAppointment> query = _dbContext.UserAppointments.Where(expression);

@@ -43,6 +43,13 @@ namespace FranchiseProject.API.Controllers
             return await _appointmentService.UpdateAppointmentAsync(id, updateAppointmentModel);
         }
         [Authorize(Roles = AppRole.Manager)]
+        [SwaggerOperation(Summary = "Nộp báo cáo cuộc hẹn{Authorize = Manager}")]
+        [HttpPut("~/staff/api/v1/appointments/{id}")]
+        public async Task<ApiResponse<bool>> SubmitAppointmentReportAsync(Guid id, SubmitAppointmentModel submitAppointmentModel)
+        {
+            return await _appointmentService.SubmitAppointmentReportAsync(id, submitAppointmentModel);
+        }
+        [Authorize(Roles = AppRole.Manager)]
         [SwaggerOperation(Summary = "xóa cuộc hẹn{Authorize = Manager}")]
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteAppointmentAsync(Guid id)
@@ -54,6 +61,21 @@ namespace FranchiseProject.API.Controllers
         public async Task<ApiResponse<bool>> CreateUserAppointmentAsync(Guid id, List<string> userIds)
         {
             return await _userAppointmentService.CreateUserAppointmentAsync(id, userIds);
+        }
+        [Authorize(Roles = AppRole.Manager + "," +
+            AppRole.SystemConsultant + "," + AppRole.SystemTechnician + ","
+            + AppRole.SystemInstructor)]
+        [SwaggerOperation(Summary = "Lấy cuộc hẹn của nhân viên {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor}")]
+        [HttpGet("~/staff/api/v1/appointments")]
+        public async Task<ApiResponse<IEnumerable<AppointmentViewModel>>> GetScheduleByLoginAsync([FromQuery] FilterScheduleAppointmentViewModel search)
+        {
+            return await _appointmentService.GetScheduleByLoginAsync(search);
+        }
+        [SwaggerOperation(Summary = "Lấy cuộc hẹn của nhân viên {Authorize = Manager, SystenConsultant, SystemTechniciaan, SystemInstructor}")]
+        [HttpGet("~/agency/api/v1/appointments")]
+        public async Task<ApiResponse<IEnumerable<AppointmentViewModel>>> GetScheduleAgencyByLoginAsync([FromQuery] FilterScheduleAppointmentViewModel search)
+        {
+            return await _appointmentService.GetScheduleAgencyByLoginAsync(search);
         }
     }
 }

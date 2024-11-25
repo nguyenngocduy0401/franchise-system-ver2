@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace FranchiseProject.Application.Repositories
 {
     public interface IAgencyRepository : IGenericRepository<Agency>
-    {
+    { 
+        Task<IEnumerable<Agency>> GetAgencyExpiredAsync();
     }
 }

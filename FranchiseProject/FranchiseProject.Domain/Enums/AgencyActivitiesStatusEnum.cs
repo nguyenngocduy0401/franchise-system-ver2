@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Enums
 {
-    public  enum AgencyActivitiesStatusEnum
+    public enum AgencyActivitiesStatusEnum
     {
         //------Procesing------------
         Interview,                   // Phỏng vấn -Manager

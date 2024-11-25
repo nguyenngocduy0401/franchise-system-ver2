@@ -30,15 +30,35 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
+        public async Task<bool> CheckUserWorkExist(Guid workId, string userId)
+        {
+            var userWork = await _dbContext.UserAppointments
+                .Where(e => e.UserId == userId)
+                .Select(ua => ua.Appointment)
+                .Where(a => a.IsDeleted != true)
+                .Select(a => a.Work)
+                .Where(a => a.IsDeleted != true && a.Id == workId)
+                .Distinct().FirstOrDefaultAsync();
+            return (userWork == null) ? false : true;
+        }
+        public async Task<Work> GetWorkDetailById(Guid id) 
+        {
+            var work = await _dbContext.Works.Where(e => e.Id == id &&
+                                                   e.IsDeleted != true)
+                                       .Include(e => e.Appointments.Where(e => e.IsDeleted != true).OrderByDescending(e => e.StartTime))
+                                       .FirstOrDefaultAsync();
+            return work;
+        }
         public IEnumerable<Work> GetAllPreWorkByAgencyId(Guid agencyId) 
         {
-            return _dbContext.Works
+            return _dbContext.Works.AsNoTracking()
                 .Where(e => e.AgencyId == agencyId && e.IsDeleted != true &&
                 (e.Type == WorkTypeEnum.Interview || e.Type == WorkTypeEnum.AgreementSigned ||
                  e.Type == WorkTypeEnum.BusinessRegistered || e.Type == WorkTypeEnum.SiteSurvey ||
                  e.Type == WorkTypeEnum.Design || e.Type == WorkTypeEnum.Quotation ||
                  e.Type == WorkTypeEnum.SignedContract || e.Type == WorkTypeEnum.ConstructionAndTrainning || 
-                 e.Type == WorkTypeEnum.Handover || e.Type == WorkTypeEnum.EducationalSupervision));
+                 e.Type == WorkTypeEnum.Handover || e.Type == WorkTypeEnum.EducationalSupervision))
+                .OrderByDescending(e => e.StartDate);
         }
 
         public async Task<Pagination<Work>> FilterWorksByUserId(string userId,

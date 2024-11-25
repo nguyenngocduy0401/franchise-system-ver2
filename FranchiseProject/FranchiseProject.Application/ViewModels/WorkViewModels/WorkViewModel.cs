@@ -11,11 +11,13 @@ namespace FranchiseProject.Application.ViewModels.WorkViewModels
     {
         public Guid? Id { get; set; }
         public string? Title { get; set; }
+        public string? Description { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public WorkTypeEnum? Type { get; set; }
         public WorkStatusEnum? Status { get; set; }
         public WorkLevelEnum? Level { get; set; }
         public WorkStatusSubmitEnum? Submit { get; set; }
+        public Guid? AgencyId { get; set; }
     }
 }

@@ -314,7 +314,7 @@ namespace FranchiseProject.Application.Services
                 return response;
             }*/
 
-        public async Task<ApiResponse<bool>> GradeStudentAssAsync(StudentAssScorseNumberViewModel model)
+        public async Task<ApiResponse<bool>> GradeStudentAssignmentAsync(StudentAssScorseNumberViewModel model)
         {
             var response = new ApiResponse<bool>();
             try

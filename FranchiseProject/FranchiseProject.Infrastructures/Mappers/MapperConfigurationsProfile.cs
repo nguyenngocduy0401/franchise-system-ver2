@@ -304,6 +304,7 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<UpdateWorkModel, Work>();
             CreateMap<Work, WorkViewModel>();
             CreateMap<Work, WorkDetailViewModel>();
+            CreateMap<UpdateWorkByStaffModel, Work>();
             #endregion
             #region Appointment
             CreateMap<Appointment, AppointmentViewModel>();
@@ -325,6 +326,7 @@ namespace FranchiseProject.Infrastructures.Mappers
                     .ForMember(dest => dest.User, opt => opt
                     .MapFrom(src => src.UserAppointments
                     .Select(up => up.User)));
+            CreateMap<SubmitAppointmentModel, Appointment>();
             #endregion
 
             #region Document

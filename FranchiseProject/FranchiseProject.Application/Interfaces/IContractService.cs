@@ -11,6 +11,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IContractService
     {
+        Task NotifyCustomersOfExpiringContracts();
         Task<ApiResponse<bool>> CreateContractAsync(CreateContractViewModel create);
         Task<ApiResponse<bool>> UpdateContractAsync(UpdateContractViewModel update, string id);
         Task<ApiResponse<Pagination<ContractViewModel>>> FilterContractViewModelAsync(FilterContractViewModel filter);
