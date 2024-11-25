@@ -308,70 +308,70 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<ApiResponse<Pagination<EquipmentViewModel>>> FilterEquipmentAsync(FilterEquipmentViewModel filter)
-        {
-            try
-            {
-                IQueryable<Equipment> query;
+        //public async Task<ApiResponse<Pagination<EquipmentViewModel>>> FilterEquipmentAsync(FilterEquipmentViewModel filter)
+        //{
+        //    try
+        //    {
+        //        IQueryable<Equipment> query;
 
-                if (!filter.AgencyId.HasValue && filter.Status ==null)
-                {
-                    query = (IQueryable<Equipment>)await _unitOfWork.EquipmentRepository.GetAllAsync();
-                }
-                else if (filter.AgencyId.HasValue)
-                {
-                    // If AgencyId is provided, use GetAllEquipmentsByAgencyIdAsync
-                    var equipment = await _unitOfWork.EquipmentRepository.GetAllContractsByAgencyIdAsync(filter.AgencyId.Value);
-                    query = (IQueryable<Equipment>)equipment.AsQueryable();
-                }
-                else
-                {
-                    // If only Status is provided, start with all equipment
-                    query = (IQueryable<Equipment>)_unitOfWork.EquipmentRepository.GetAllAsync();
-                }
+        //        if (!filter.AgencyId.HasValue && filter.Status ==null)
+        //        {
+        //            query = (IQueryable<Equipment>)await _unitOfWork.EquipmentRepository.GetAllAsync();
+        //        }
+        //        else if (filter.AgencyId.HasValue)
+        //        {
+        //            // If AgencyId is provided, use GetAllEquipmentsByAgencyIdAsync
+        //            var equipment = await _unitOfWork.EquipmentRepository.GetAllContractsByAgencyIdAsync(filter.AgencyId.Value);
+        //            query = (IQueryable<Equipment>)equipment.AsQueryable();
+        //        }
+        //        else
+        //        {
+        //            // If only Status is provided, start with all equipment
+        //            query = (IQueryable<Equipment>)_unitOfWork.EquipmentRepository.GetAllAsync();
+        //        }
 
-                // Apply Status filter if provided
-                if (filter.Status!= null)
-                {
-                    query = query.Where(e => e.Status == filter.Status);
-                }
+        //        // Apply Status filter if provided
+        //        if (filter.Status!= null)
+        //        {
+        //            query = query.Where(e => e.Status == filter.Status);
+        //        }
 
-                // Apply pagination
-                var totalCount = await query.CountAsync();
-                var equipments = await query
-                    .OrderBy(e => e.EquipmentName)
-                    .Skip((filter.PageIndex - 1) * filter.PageSize)
-                    .Take(filter.PageSize)
-                    .Include(e => e.Contract)
-                    .ThenInclude(c => c.Agency)
-                    .ToListAsync();
+        //        // Apply pagination
+        //        var totalCount = await query.CountAsync();
+        //        var equipments = await query
+        //            .OrderBy(e => e.EquipmentName)
+        //            .Skip((filter.PageIndex - 1) * filter.PageSize)
+        //            .Take(filter.PageSize)
+        //            .Include(e => e.Contract)
+        //            .ThenInclude(c => c.Agency)
+        //            .ToListAsync();
 
-                var equipmentViewModels = equipments.Select(e => new EquipmentViewModel
-                {
-                    Id = e.Id,
-                    EquipmentName = e.EquipmentName,
-                    SerialNumber = e.SerialNumber,
-                    Status = e.Status,
-                    Price = e.Price,
-                    Note = e.Note,
-                    AgencyName = e.Contract?.Agency?.Name
-                }).ToList();
+        //        var equipmentViewModels = equipments.Select(e => new EquipmentViewModel
+        //        {
+        //            Id = e.Id,
+        //            EquipmentName = e.EquipmentName,
+        //            SerialNumber = e.SerialNumber,
+        //            Status = e.Status,
+        //            Price = e.Price,
+        //            Note = e.Note,
+        //            AgencyName = e.Contract?.Agency?.Name
+        //        }).ToList();
 
-                var paginatedResult = new Pagination<EquipmentViewModel>
-                {
-                    Items = equipmentViewModels,
-                    TotalItemsCount = totalCount,
-                    PageIndex = filter.PageIndex,
-                    PageSize = filter.PageSize
-                };
+        //        var paginatedResult = new Pagination<EquipmentViewModel>
+        //        {
+        //            Items = equipmentViewModels,
+        //            TotalItemsCount = totalCount,
+        //            PageIndex = filter.PageIndex,
+        //            PageSize = filter.PageSize
+        //        };
 
-                return ResponseHandler.Success(paginatedResult, "Equipment filtered successfully.");
-            }
-            catch (Exception ex)
-            {
-                return ResponseHandler.Failure<Pagination<EquipmentViewModel>>($"Error filtering equipment: {ex.Message}");
-            }
-        }
+        //        return ResponseHandler.Success(paginatedResult, "Equipment filtered successfully.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return ResponseHandler.Failure<Pagination<EquipmentViewModel>>($"Error filtering equipment: {ex.Message}");
+        //    }
+        //}
     }
 }
 
