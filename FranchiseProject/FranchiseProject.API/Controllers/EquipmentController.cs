@@ -38,7 +38,22 @@ namespace FranchiseProject.API.Controllers
 
             return File(result.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"EquipmentReport.xlsx");
         }
+        [HttpPut("contract/{id}/status")]
+        [SwaggerOperation(Summary = "Cập nhật trạng thái và số serial của thiết bị {Authorize = Manager, SystemTechnician}")]
+        //[Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician)]
+        public async Task<ApiResponse<bool>> UpdateEquipmentStatus(Guid id, [FromBody] List<UpdateEquipmentRangeViewModel> updateModels)
+        {
+            return await _equipmentService.UpdateEquipmentStatusAsync(id, updateModels);
+        }
 
+        [HttpGet("`api/v1/agency/equipments")]
+        [SwaggerOperation(Summary = "Lấy danh sách thiết bị theo AgencyId {Authorize = Manager, SystemTechnician, AgencyManager}")]
+        //[Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
+        public async Task<ApiResponse<Pagination<EquipmentViewModel>>> GetEquipmentByAgencyId( [FromQuery] FilterEquipmentViewModel filter)
+        {
+          
+            return await _equipmentService.GetEquipmentByAgencyIdAsync(filter);
+        }
     }
 }
 

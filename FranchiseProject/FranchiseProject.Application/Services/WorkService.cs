@@ -162,7 +162,7 @@ namespace FranchiseProject.Application.Services
                 );
                 var worksPagination = await _unitOfWork.WorkRepository.GetFilterAsync(
                 filter: filter,
-                pageIndex: filterWorkModel.PageIndex,
+                pageIndex: filterWorkModel.PageIndex, 
                 pageSize: filterWorkModel.PageSize
                 );
                 var workModel = _mapper.Map<Pagination<WorkViewModel>>(worksPagination);
@@ -326,6 +326,11 @@ namespace FranchiseProject.Application.Services
                         work.Status = status;
                         if (work.Type == WorkTypeEnum.BusinessRegistered)
                         {
+                            var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveAgreementContractAsync(work.AgencyId.Value);
+                            if (!hasActiveAgreementContract)
+                            {
+                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng thỏa thuận hoạt động!");
+                            }
                             var fee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
                              var contract = new Contract
                             {
@@ -339,6 +344,7 @@ namespace FranchiseProject.Application.Services
                         if (work.Type == WorkTypeEnum.Quotation)
                         {
                             var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
+                            contract.DesignFee = await _unitOfWork.EquipmentRepository.GetTotalEquipmentAmountByContractIdAsync(contract.Id);
                             contract.Total = contract.DesignFee + contract.FrachiseFee;
                             _unitOfWork.ContractRepository.Update(contract);
                         }

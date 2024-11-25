@@ -43,15 +43,14 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .FirstOrDefaultAsync();
         }
 
-       
-            public async Task<List<Equipment>> GetAllEquipmentsByAgencyIdAsync(Guid agencyId)
-            {
-                return await _dbContext.Equipments
-                    .Include(e => e.Contract)
-                    .Where(e => e.Contract != null && e.Contract.AgencyId == agencyId)
-                    .ToListAsync();
-            }
-        
+
+        public async Task<Contract> GetAllContractsByAgencyIdAsync(Guid agencyId)
+        {
+            return  _dbContext.Contracts
+                .Where(c => c.AgencyId == agencyId && c.Status == Domain.Enums.ContractStatusEnum.Active)
+                .FirstOrDefault();
+        }
+
     }
 }
 

@@ -31,11 +31,19 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Where(e => e.ContractId == contractId)
                 .ToListAsync();
         }
-        public async Task<List<Contract>> GetAllContractsByAgencyIdAsync(Guid agencyId)
+        public async Task<List<Equipment>> GetAllEquipmentsByAgencyIdAsync(Guid agencyId)
         {
-            return await _dbContext.Contracts
-                .Where(c => c.AgencyId == agencyId)
+            return await _dbContext.Equipments
+                .Include(e => e.Contract)
+                .Where(e => e.Contract != null && e.Contract.AgencyId == agencyId)
                 .ToListAsync();
         }
+        public async Task<double> GetTotalEquipmentAmountByContractIdAsync(Guid contractId)
+        {
+            return (double)await _dbContext.Equipments
+                .Where(e => e.ContractId == contractId && !e.IsDeleted)
+                .SumAsync(e => e.Price );
+        }
+
     }
 }

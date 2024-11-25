@@ -17,7 +17,6 @@ namespace FranchiseProject.Application.ViewModels.ConsultationViewModels
         public string? Ward { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Email { get; set; }
-        public string? PositionImageURL { get; set; }
         public AgencyStatusEnum Status {  get; set; }
     }
 }
