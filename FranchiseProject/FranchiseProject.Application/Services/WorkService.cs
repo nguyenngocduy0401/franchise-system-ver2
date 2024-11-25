@@ -320,6 +320,13 @@ namespace FranchiseProject.Application.Services
 
                     if (checkWorkBefore != null) return ResponseHandler.Success(false, "Phải hoàn thành nhiệm vụ ưu tiên trước!");
                 }
+                if (work.Type > WorkTypeEnum.SignedContract)
+                {
+                    var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(workId);
+                    if (agency.Status == AgencyStatusEnum.Inactive || agency.Status == AgencyStatusEnum.Processing)
+                        return ResponseHandler.Success(false, "Không thể phê duyệt khi trung tâm ở trạng thái này!");
+
+                }
                 switch (status) 
                 {
                     case WorkStatusEnum.None:
