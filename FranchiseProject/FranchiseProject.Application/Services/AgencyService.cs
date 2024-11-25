@@ -70,11 +70,11 @@ namespace FranchiseProject.Application.Services
                     response.isSuccess = true;
                     response.Message = "Tạo Thành Công !";
                     var emailMessage = EmailTemplate.AgencyRegistrationSuccess(agency.Email, agency.Name);
-                    bool emailSent = await _emailService.SendEmailAsync(emailMessage);
-                    if (!emailSent)
+                    var emailSent =  _emailService.SendEmailAsync(emailMessage);
+                    /*if (!emailSent)
                     {
                         response.Message += " (Lỗi khi gửi email)";
-                    }
+                    }*/
                 }
                 else
                 {
@@ -459,7 +459,6 @@ namespace FranchiseProject.Application.Services
                 Status = WorkStatusEnum.None,
                 Submit = WorkStatusSubmitEnum.None,
                 Type = WorkTypeEnum.SignedContract,
-
                 Level = WorkLevelEnum.Compulsory,
                 StartDate = _currentTime.GetCurrentTime(),
                 EndDate = _currentTime.GetCurrentTime(),
