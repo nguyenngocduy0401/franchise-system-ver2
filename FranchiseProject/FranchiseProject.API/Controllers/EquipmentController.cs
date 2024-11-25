@@ -28,15 +28,10 @@ namespace FranchiseProject.API.Controllers
         [HttpGet("agency/{id}")]
         [SwaggerOperation(Summary = "xuất file danh sách trang bị  {Authorize = Manager, SystemTechnician}")]
        // [Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician)]
-        public async Task<IActionResult> GenerateEquipmentReport(Guid id)
+        public async Task<ApiResponse<string>> GenerateEquipmentReportAsync(Guid id)
         {
-            var result = await _equipmentService.GenerateEquipmentReportAsync(id);
-            if (!result.isSuccess)
-            {
-                return BadRequest(result);
-            }
-
-            return File(result.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"EquipmentReport.xlsx");
+            return  await _equipmentService.GenerateEquipmentReportAsync(id);
+          
         }
         [HttpPut("contract/{id}/status")]
         [SwaggerOperation(Summary = "Cập nhật trạng thái và số serial của thiết bị {Authorize = Manager, SystemTechnician}")]
