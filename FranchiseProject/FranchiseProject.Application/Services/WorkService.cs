@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿ using AutoMapper;
 using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation;
 using FluentValidation.Results;
@@ -308,16 +308,18 @@ namespace FranchiseProject.Application.Services
                 if (checkWork.Data == false) return checkWork;
 
                 if (work.Status != WorkStatusEnum.None) return ResponseHandler.Success(false, "Nhiệm vụ đã được duyệt trước đó!");
-                var checkWorkBefore = (await _unitOfWork.WorkRepository
-                    .FindAsync(e => e.IsDeleted != true &&
-                               e.Type < work.Type && 
-                               e.Status != WorkStatusEnum.Approved &&
-                               e.Level == WorkLevelEnum.Compulsory &&
-                               e.AgencyId == work.AgencyId
-                               )).FirstOrDefault();
+                if (work.Type <= WorkTypeEnum.SignedContract)
+                {
+                    var checkWorkBefore = (await _unitOfWork.WorkRepository
+                        .FindAsync(e => e.IsDeleted != true &&
+                                   e.Type < work.Type &&
+                                   e.Status != WorkStatusEnum.Approved &&
+                                   e.Level == WorkLevelEnum.Compulsory &&
+                                   e.AgencyId == work.AgencyId
+                                   )).FirstOrDefault();
 
-                if(checkWorkBefore != null) return ResponseHandler.Success(false, "Phải hoàn thành nhiệm vụ ưu tiên trước!");
-
+                    if (checkWorkBefore != null) return ResponseHandler.Success(false, "Phải hoàn thành nhiệm vụ ưu tiên trước!");
+                }
                 switch (status) 
                 {
                     case WorkStatusEnum.None:
