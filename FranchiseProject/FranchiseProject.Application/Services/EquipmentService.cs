@@ -68,7 +68,7 @@ namespace FranchiseProject.Application.Services
                         var priceString = worksheet.Cells[row, 4].Value?.ToString().Trim();
                         var note = worksheet.Cells[row, 5].Value?.ToString().Trim();
 
-         
+
 
                         if (string.IsNullOrEmpty(equipmentName))
                         {
@@ -182,7 +182,7 @@ namespace FranchiseProject.Application.Services
                     double totalPrice = 0;
                     foreach (var equipment in equipments)
                     {
-                        worksheet.Cells[row, 1].Value = row - 1;  
+                        worksheet.Cells[row, 1].Value = row - 1;
                         worksheet.Cells[row, 2].Value = equipment.EquipmentName;
                         worksheet.Cells[row, 3].Value = equipment.SerialNumber;
                         worksheet.Cells[row, 4].Value = equipment.Price;
@@ -229,7 +229,7 @@ namespace FranchiseProject.Application.Services
                 {
                     return ResponseHandler.Failure<bool>("No matching equipment found for the given contract and equipment IDs.");
                 }
-                
+
                 foreach (var equipment in equipmentsToUpdate)
                 {
                     if (equipment.Status != EquipmentStatusEnum.Available)
@@ -308,70 +308,55 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        //public async Task<ApiResponse<Pagination<EquipmentViewModel>>> FilterEquipmentAsync(FilterEquipmentViewModel filter)
-        //{
-        //    try
-        //    {
-        //        IQueryable<Equipment> query;
+        public async Task<ApiResponse<Pagination<EquipmentViewModel>>> GetEquipmentByAgencyIdAsync(FilterEquipmentViewModel filter)
+        {
+            var response = new ApiResponse<Pagination<FilterEquipmentViewModel>>();
+            try
+            {
+                var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(filter.AgencyId.Value);
+                var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contract.Id);
+                if (filter.Status.Equals(""))
+                {
+                    equipments = equipments.Where(e => e.Status == filter.Status).ToList();
+                }
+                var equipmentViewModels = equipments.Select(e => new EquipmentViewModel
+                {
+                    Id = e.Id,
+                    EquipmentName = e.EquipmentName ?? "",
+                    SerialNumber = e.SerialNumber ?? "",
+                    Status = e.Status,
+                   
+                    Note = e.Note ?? "",
+                    Price = e.Price,
+                    AgencyName = contract.Agency?.Name ?? "Unknown Agency"
+                }).ToList();
 
-        //        if (!filter.AgencyId.HasValue && filter.Status ==null)
-        //        {
-        //            query = (IQueryable<Equipment>)await _unitOfWork.EquipmentRepository.GetAllAsync();
-        //        }
-        //        else if (filter.AgencyId.HasValue)
-        //        {
-        //            // If AgencyId is provided, use GetAllEquipmentsByAgencyIdAsync
-        //            var equipment = await _unitOfWork.EquipmentRepository.GetAllContractsByAgencyIdAsync(filter.AgencyId.Value);
-        //            query = (IQueryable<Equipment>)equipment.AsQueryable();
-        //        }
-        //        else
-        //        {
-        //            // If only Status is provided, start with all equipment
-        //            query = (IQueryable<Equipment>)_unitOfWork.EquipmentRepository.GetAllAsync();
-        //        }
+                var totalItems = equipmentViewModels.Count;
+                var totalPages = (int)Math.Ceiling(totalItems / (double)filter.PageSize);
+                var paginatedEquipments = equipmentViewModels
+                    .Skip((filter.PageIndex - 1) * filter.PageSize)
+                    .Take(filter.PageSize)
+                    .ToList();
 
-        //        // Apply Status filter if provided
-        //        if (filter.Status!= null)
-        //        {
-        //            query = query.Where(e => e.Status == filter.Status);
-        //        }
+                var paginationResult = new Pagination<EquipmentViewModel>
+                {
+                    Items = paginatedEquipments,
+                    PageIndex = filter.PageIndex,
+                    PageSize = filter.PageSize,
+                    TotalItemsCount = totalItems,
+          
+                };
 
-        //        // Apply pagination
-        //        var totalCount = await query.CountAsync();
-        //        var equipments = await query
-        //            .OrderBy(e => e.EquipmentName)
-        //            .Skip((filter.PageIndex - 1) * filter.PageSize)
-        //            .Take(filter.PageSize)
-        //            .Include(e => e.Contract)
-        //            .ThenInclude(c => c.Agency)
-        //            .ToListAsync();
+                return ResponseHandler.Success(paginationResult, "Truy xuất danh sách trang thiết bị thành công");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<Pagination<EquipmentViewModel>>($"Error filtering equipment: {ex.Message}");
+            }
 
-        //        var equipmentViewModels = equipments.Select(e => new EquipmentViewModel
-        //        {
-        //            Id = e.Id,
-        //            EquipmentName = e.EquipmentName,
-        //            SerialNumber = e.SerialNumber,
-        //            Status = e.Status,
-        //            Price = e.Price,
-        //            Note = e.Note,
-        //            AgencyName = e.Contract?.Agency?.Name
-        //        }).ToList();
 
-        //        var paginatedResult = new Pagination<EquipmentViewModel>
-        //        {
-        //            Items = equipmentViewModels,
-        //            TotalItemsCount = totalCount,
-        //            PageIndex = filter.PageIndex,
-        //            PageSize = filter.PageSize
-        //        };
 
-        //        return ResponseHandler.Success(paginatedResult, "Equipment filtered successfully.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return ResponseHandler.Failure<Pagination<EquipmentViewModel>>($"Error filtering equipment: {ex.Message}");
-        //    }
-        //}
+        }
     }
 }
 

@@ -10,6 +10,8 @@ namespace FranchiseProject.Application.Repositories
     public interface IEquipmentRepository:IGenericRepository<Equipment>
     {
         Task<List<Equipment>> GetEquipmentByContractIdAsync(Guid contractId);
-        Task<List<Contract>> GetAllContractsByAgencyIdAsync(Guid agencyId);
+        
+        Task<List<Equipment>> GetAllEquipmentsByAgencyIdAsync(Guid agencyId);
+        Task<double> GetTotalEquipmentAmountByContractIdAsync(Guid contractId);
     }
 }

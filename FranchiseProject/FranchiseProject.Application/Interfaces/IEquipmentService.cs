@@ -14,5 +14,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<object>> ImportEquipmentsFromExcelAsync(IFormFile file, Guid agencyId);
         Task<ApiResponse<byte[]>> GenerateEquipmentReportAsync(Guid agencyId);
         Task<ApiResponse<bool>> UpdateEquipmentStatusAsync(Guid contractId, List<UpdateEquipmentRangeViewModel> updateModels);
+        Task<ApiResponse<Pagination<EquipmentViewModel>>> GetEquipmentByAgencyIdAsync(FilterEquipmentViewModel filter);
     }
 }

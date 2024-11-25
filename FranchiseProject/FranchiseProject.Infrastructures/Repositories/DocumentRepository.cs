@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,12 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
-
+        public async Task<bool> HasActiveAgreementContractAsync(Guid agencyId)
+        {
+            return await _dbContext.Documents
+                .AnyAsync(d => d.AgencyId == agencyId &&
+                               d.Type == Domain.Enums.DocumentType.AgreementContract &&
+                               d.Status == Domain.Enums.DocumentStatus.Active);
+        }
     }
 }
