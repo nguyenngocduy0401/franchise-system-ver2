@@ -51,19 +51,26 @@ namespace FranchiseProject.API.Controllers
         {
             return _contractService.FilterContractViewModelAsync(filter);
         }
-        [SwaggerOperation(Summary = "Truy xuất thông tin đối tác cho hợp đồng  {Authorize = Manager,Admin}")]
-        [HttpGet("agency/{id}")]
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
-        public Task<ApiResponse<AgencyInfoViewModel>> GetAgencyInfoAsync(Guid id)
-        {
-            return _contractService.GetAgencyInfoAsync(id);
-        }
+        //[SwaggerOperation(Summary = "Truy xuất thông tin đối tác cho hợp đồng  {Authorize = Manager,Admin}")]
+        //[HttpGet("agency/{id}")]
+        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        //public Task<ApiResponse<AgencyInfoViewModel>> GetAgencyInfoAsync(Guid id)
+        //{
+        //    return _contractService.GetAgencyInfoAsync(id);
+        //}
         [SwaggerOperation(Summary = "Tải xuống hợp đồng dưới dạng file .doc {Authorize = Manager,Admin}")]
         [HttpGet("download/agency/{id}")]
         [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         public async Task<ApiResponse<string>> DownloadContractAsPdfAsync(Guid id)
         {
             return await  _contractService.DownloadContractAsPdfAsync(id);
+        }
+        [SwaggerOperation(Summary = "truy xuất hợp đồng bằng AgencyId{Authorize = Manager,Admin}")]
+        [HttpGet("agency/{id}")]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        public async Task<ApiResponse<ContractViewModel>> GetContractbyAgencyId(Guid id)
+        {
+            return await _contractService.GetContractbyAgencyId(id);
         }
     }
 }

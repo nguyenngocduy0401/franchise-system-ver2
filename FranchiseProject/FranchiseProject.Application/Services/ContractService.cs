@@ -10,6 +10,7 @@ using System.Data.Common;
 using System.Linq.Expressions;
 using Contract = FranchiseProject.Domain.Entity.Contract;
 using Microsoft.AspNetCore.Mvc;
+using FranchiseProject.Domain.Entity;
 
 namespace FranchiseProject.Application.Services
 {
@@ -352,6 +353,28 @@ namespace FranchiseProject.Application.Services
                 response.Message = ex.Message;
             }
             return response;
+        }
+
+        public async Task<ApiResponse<ContractViewModel>> GetContractbyAgencyId(Guid agencyId)
+        {
+            var response = new ApiResponse<ContractViewModel>();
+            try
+            {
+                var contract =await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
+                if (contract == null)
+                {
+                    return ResponseHandler.Success<ContractViewModel>(null, "Không tìm thấy hợp đồng");
+                }
+                var contractViewModel = _mapper.Map<ContractViewModel>(contract);
+                var agency =await _unitOfWork.AgencyRepository.GetByIdAsync(contract.AgencyId.Value);
+                contractViewModel.AgencyName = agency.Name;
+
+                return ResponseHandler.Success(contractViewModel, "Truy xuất hợp đồng thành công");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<ContractViewModel>($"Lỗi truy xuất hợp đồng: {ex.Message}");
+            }
         }
 
         public async Task<ApiResponse<string>> DownloadContractAsPdfAsync(Guid agencyId)
