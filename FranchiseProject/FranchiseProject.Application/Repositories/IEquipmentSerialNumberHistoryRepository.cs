@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Repositories
 {
-    public interface IEquipmentRepository:IGenericRepository<Equipment>
+    public interface IEquipmentSerialNumberHistoryRepository :IGenericRepository<EquipmentSerialNumberHistory>
     {
-        Task<List<Equipment>> GetEquipmentByContractIdAsync(Guid contractId);
     }
 }

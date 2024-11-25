@@ -8,10 +8,7 @@ using FranchiseProject.Application.ViewModels.EmailViewModels;
 using FranchiseProject.Domain.Enums;
 using System.Data.Common;
 using System.Linq.Expressions;
-using Spire.Pdf;
-using System.IO;
 using Contract = FranchiseProject.Domain.Entity.Contract;
-using FranchiseProject.Domain.Entity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FranchiseProject.Application.Services

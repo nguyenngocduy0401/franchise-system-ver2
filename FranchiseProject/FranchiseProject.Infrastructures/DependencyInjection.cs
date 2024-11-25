@@ -108,6 +108,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IEquipmentRepository, EquipmentRepository>();
             services.AddScoped<IEquipmentTypePriceRepository, EquipmentTypePriceRepository>();
             services.AddScoped<IFranchiseFeesRepository, FranchiseFeeRepository>();
+            services.AddScoped<IEquipmentSerialNumberHistoryRepository, EquipmentSerialNumberHistoryRepository>();
             #endregion
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>

@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 namespace FranchiseProject.Application.Interfaces
 {
     public interface IEquipmentService
-    { 
-        Task<ApiResponse<object>> ImportEquipmentsFromExcelAsync(IFormFile file);
+    {
+        Task<ApiResponse<object>> ImportEquipmentsFromExcelAsync(IFormFile file, Guid agencyId);
+        Task<ApiResponse<byte[]>> GenerateEquipmentReportAsync(Guid agencyId);
     }
 }

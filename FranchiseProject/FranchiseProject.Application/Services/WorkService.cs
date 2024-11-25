@@ -348,7 +348,23 @@ namespace FranchiseProject.Application.Services
                             contract.Status = ContractStatusEnum.Active;
                              _unitOfWork.ContractRepository.Update(contract);
                         }
-                        
+                        if (work.Type == WorkTypeEnum.Handover)
+                        {
+                            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
+                            var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contract.Id);
+                            foreach (var equipment in equipments)
+                            {
+                                var equipmentHistory = await _unitOfWork.EquipmentSerialNumberHistoryRepository
+                                    .FindAsync(e => e.EquipmentId == equipment.Id &&
+                                                    e.StartDate == null);
+
+                                foreach (var history in equipmentHistory)
+                                {
+                                    history.StartDate = DateTime.Now;
+                                    _unitOfWork.EquipmentSerialNumberHistoryRepository.Update(history);
+                                }
+                            }
+                        }
                         break;
                     case WorkStatusEnum.Rejected:
                         work.Status = status;

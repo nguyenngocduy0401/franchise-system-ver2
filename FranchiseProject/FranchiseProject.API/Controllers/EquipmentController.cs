@@ -18,15 +18,27 @@ namespace FranchiseProject.API.Controllers
             _equipmentService = equipmentService;
         }
 
-        [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager)]
-        [SwaggerOperation(Summary = "Import equipments from Excel file {Authorize = AgencyStaff, AgencyManager}")]
-        [HttpPost("import")]
-        public async Task<ApiResponse<object>> ImportEquipmentsFromExcelAsync(IFormFile file)
+       // [Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician)]
+        [SwaggerOperation(Summary = "thêm trang thiết bị {Authorize = Manager, SystemTechnician}")]
+        [HttpPost("agency/{id}")]
+        public async Task<ApiResponse<object>> ImportEquipmentsFromExcelAsync(IFormFile file, Guid id)
         {
-            return await _equipmentService.ImportEquipmentsFromExcelAsync(file);
+            return await _equipmentService.ImportEquipmentsFromExcelAsync(file, id);
+        }
+        [HttpGet("agency/{id}")]
+        [SwaggerOperation(Summary = "xuất file danh sách trang bị  {Authorize = Manager, SystemTechnician}")]
+       // [Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician)]
+        public async Task<IActionResult> GenerateEquipmentReport(Guid id)
+        {
+            var result = await _equipmentService.GenerateEquipmentReportAsync(id);
+            if (!result.isSuccess)
+            {
+                return BadRequest(result);
+            }
+
+            return File(result.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"EquipmentReport.xlsx");
         }
 
-        
     }
 }
 

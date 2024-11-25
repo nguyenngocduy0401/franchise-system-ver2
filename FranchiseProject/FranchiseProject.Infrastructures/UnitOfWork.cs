@@ -53,6 +53,7 @@ namespace FranchiseProject.Infrastructures
         private readonly IEquipmentRepository _equipmentRepository;
         private readonly IEquipmentTypePriceRepository _equipmentTypePriceRepository;
         private readonly IFranchiseFeesRepository _franchiseFeesRepository;
+        private readonly IEquipmentSerialNumberHistoryRepository _equipmentSerialNumberHistoryRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -68,7 +69,8 @@ namespace FranchiseProject.Infrastructures
             IAppointmentRepository appointmentRepository, IWorkRepository workRepository,
             IUserAppointmentRepository userAppointmentRepository
             ,IDocumentRepository documentRepository
-            ,IEquipmentRepository equipmentRepository,IEquipmentTypePriceRepository equipmentTypePriceRepository,IFranchiseFeesRepository franchiseFeesRepository)
+            ,IEquipmentRepository equipmentRepository,IEquipmentTypePriceRepository equipmentTypePriceRepository,IFranchiseFeesRepository franchiseFeesRepository
+            ,IEquipmentSerialNumberHistoryRepository equipmentSerialNumberHistoryRepository)
 
            
         {
@@ -114,6 +116,7 @@ namespace FranchiseProject.Infrastructures
             _equipmentRepository = equipmentRepository;
             _equipmentTypePriceRepository =equipmentTypePriceRepository;
             _franchiseFeesRepository = franchiseFeesRepository;
+            _equipmentSerialNumberHistoryRepository = equipmentSerialNumberHistoryRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -194,6 +197,8 @@ namespace FranchiseProject.Infrastructures
         public IEquipmentTypePriceRepository EquipmentTypePriceRepository => _equipmentTypePriceRepository;
 
         public IFranchiseFeesRepository FranchiseFeesRepository => _franchiseFeesRepository;
+
+        public IEquipmentSerialNumberHistoryRepository EquipmentSerialNumberHistoryRepository => _equipmentSerialNumberHistoryRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

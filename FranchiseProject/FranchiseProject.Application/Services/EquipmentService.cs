@@ -35,10 +35,10 @@ namespace FranchiseProject.Application.Services
             _validator = validator;
         }
         #endregion
-     
-       
-       
-        public async Task<ApiResponse<object>> ImportEquipmentsFromExcelAsync(IFormFile file)
+
+
+
+        public async Task<ApiResponse<object>> ImportEquipmentsFromExcelAsync(IFormFile file, Guid agencyId)
         {
             try
             {
@@ -48,12 +48,15 @@ namespace FranchiseProject.Application.Services
                 {
                     var worksheet = package.Workbook.Worksheets[0];
                     var rowCount = worksheet.Dimension.Rows;
-                    var equipments = new List<Equipment>();
+                    var equipmentsToAdd = new List<Equipment>();
+                    var serialNumberHistoriesToAdd = new List<EquipmentSerialNumberHistory>();
                     var errors = new List<string>();
-                    var existingSerialNumbers = await _unitOfWork.EquipmentRepository
+                    var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
+
+                    var existingEquipments = await _unitOfWork.EquipmentRepository
                         .GetTableAsTracking()
-                        .Select(e => e.SerialNumber)
                         .ToListAsync();
+                    var existingSerialNumbers = existingEquipments.Select(e => e.SerialNumber).ToList();
 
                     for (int row = 2; row <= rowCount; row++)
                     {
@@ -62,69 +65,104 @@ namespace FranchiseProject.Application.Services
                         var priceString = worksheet.Cells[row, 4].Value?.ToString().Trim();
                         var note = worksheet.Cells[row, 5].Value?.ToString().Trim();
 
-                        if (string.IsNullOrEmpty(equipmentName) || string.IsNullOrEmpty(serialNumber) || string.IsNullOrEmpty(priceString))
+                        if (string.IsNullOrEmpty(equipmentName))
                         {
-                            errors.Add($"Dòng {row}: Thiếu thông tin bắt buộc");
+                            errors.Add($"Row {row}: Equipment name is required.");
                             continue;
                         }
 
-                        if (equipmentName.Length > 50 || note?.Length > 50)
+                        if (string.IsNullOrEmpty(serialNumber))
                         {
-                            errors.Add($"Dòng {row}: Tên thiết bị hoặc ghi chú không được quá 50 ký tự");
+                            errors.Add($"Row {row}: Serial number is required.");
                             continue;
                         }
 
                         if (existingSerialNumbers.Contains(serialNumber))
                         {
-                            errors.Add($"Dòng {row}: Serial number '{serialNumber}' đã tồn tại");
+                            errors.Add($"Row {row}: Serial number '{serialNumber}' already exists.");
                             continue;
                         }
 
-                        if (!double.TryParse(priceString, out double price))
+                        if (string.IsNullOrEmpty(priceString) || !double.TryParse(priceString, out double price))
                         {
-                            errors.Add($"Dòng {row}: Giá không hợp lệ");
+                            errors.Add($"Row {row}: Invalid price format.");
                             continue;
                         }
 
-                        var equipment = new Equipment
+                        if (price < 0)
                         {
-                            EquipmentName = equipmentName,
-                            SerialNumber = serialNumber,
-                            Price = price,
-                            Note = note,
-                            Status = EquipmentStatusEnum.Available
-                        };
+                            errors.Add($"Row {row}: Price cannot be negative.");
+                            continue;
+                        }
 
-                        equipments.Add(equipment);
-                        existingSerialNumbers.Add(serialNumber);
+                        if (equipmentName.Length > 100)
+                        {
+                            errors.Add($"Row {row}: Equipment name exceeds 100 characters.");
+                            continue;
+                        }
+
+                        if (serialNumber.Length > 50)
+                        {
+                            errors.Add($"Row {row}: Serial number exceeds 50 characters.");
+                            continue;
+                        }
+
+                        if (!string.IsNullOrEmpty(note) && note.Length > 500)
+                        {
+                            errors.Add($"Row {row}: Note exceeds 500 characters.");
+                            continue;
+                        }
+
+                        var existingEquipment = existingEquipments.FirstOrDefault(e =>
+                            e.EquipmentName == equipmentName &&
+                            e.SerialNumber == serialNumber &&
+                            e.Price ==double.Parse( priceString )&&
+                            e.Note == note);
+
+                        if (existingEquipment == null)
+                        {
+                            var equipment = new Equipment
+                            {
+                                EquipmentName = equipmentName,
+                                SerialNumber = serialNumber,
+                                Price = double.Parse(priceString),
+                                Note = note,
+                                Status = EquipmentStatusEnum.Available,
+                                ContractId = contract.Id
+                            };
+                            equipmentsToAdd.Add(equipment);
+
+                            var serialNumberHistory = new EquipmentSerialNumberHistory
+                            {
+                                Equipment = equipment,
+                                SerialNumber = serialNumber,
+                                
+                            };
+                            serialNumberHistoriesToAdd.Add(serialNumberHistory);
+
+                            existingSerialNumbers.Add(serialNumber);
+                        }
                     }
 
                     if (errors.Any())
                     {
-                        var errorWorksheet = package.Workbook.Worksheets.Add("Errors");
-                        errorWorksheet.Cells["A1"].Value = "Lỗi";
-                        for (int i = 0; i < errors.Count; i++)
-                        {
-                            errorWorksheet.Cells[i + 2, 1].Value = errors[i];
-                        }
-
-                        var errorFileName = $"{Path.GetFileNameWithoutExtension(file.FileName)}_error.xlsx";
-                        var errorFileStream = new MemoryStream();
-                        package.SaveAs(errorFileStream);
-                        errorFileStream.Position = 0;
-
-                        return ResponseHandler.Success<object>(
-                            new { ErrorFile = errorFileStream, FileName = errorFileName },
-                            "Import không thành công. Vui lòng xem file lỗi."
-                        );
+                        return ResponseHandler.Failure<object>("Import partially failed. " + string.Join(" ", errors));
                     }
 
-                    await _unitOfWork.EquipmentRepository.AddRangeAsync(equipments);
-                    var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                    if (equipmentsToAdd.Any())
+                    {
+                        await _unitOfWork.EquipmentRepository.AddRangeAsync(equipmentsToAdd);
+                        await _unitOfWork.EquipmentSerialNumberHistoryRepository.AddRangeAsync(serialNumberHistoriesToAdd);
+                        var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
 
-                    if (!isSuccess) throw new Exception("Import failed!");
+                        if (!isSuccess) throw new Exception("Import failed!");
 
-                    return ResponseHandler.Success<object>(true, "Equipment imported successfully!");
+                        return ResponseHandler.Success<object>(true, $"Đã thêm thành công {equipmentsToAdd.Count} thiết bị mới!");
+                    }
+                    else
+                    {
+                        return ResponseHandler.Success<object>(true, "Không có thiết bị mới để thêm.");
+                    }
                 }
             }
             catch (Exception ex)
@@ -132,7 +170,109 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<object>(ex.Message);
             }
         }
-        
+
+        public async Task<ApiResponse<byte[]>> GenerateEquipmentReportAsync(Guid agencyId)
+        {
+            try
+            {
+                var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
+                if (contract == null)
+                {
+                    return ResponseHandler.Failure<byte[]>("No contract found for this agency.");
+                }
+                var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contract.Id);
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                using (var package = new ExcelPackage())
+                {
+                    var worksheet = package.Workbook.Worksheets.Add("Equipment Report");
+                    worksheet.Cells[1, 1].Value = "STT";
+                    worksheet.Cells[1, 2].Value = "TÊN THIẾT BỊ";
+                    worksheet.Cells[1, 3].Value = "SERINUMBER";
+                    worksheet.Cells[1, 4].Value = "GIÁ(VND)";
+                    worksheet.Cells[1, 5].Value = "NOTE";
+
+                    using (var range = worksheet.Cells[1, 1, 1, 5])
+                    {
+                        range.Style.Font.Bold = true;
+                        range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        range.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                        range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                    }
+
+                    int row = 2;
+                    double totalPrice = 0;
+                    foreach (var equipment in equipments)
+                    {
+                        worksheet.Cells[row, 1].Value = row - 1;  
+                        worksheet.Cells[row, 2].Value = equipment.EquipmentName;
+                        worksheet.Cells[row, 3].Value = equipment.SerialNumber;
+                        worksheet.Cells[row, 4].Value = equipment.Price;
+                        worksheet.Cells[row, 5].Value = equipment.Note;
+
+                        totalPrice += equipment.Price ?? 0;
+                        row++;
+                    }
+
+                    worksheet.Cells[row, 3].Value = "TỔNG TIỀN:";
+                    worksheet.Cells[row, 4].Value = totalPrice;
+                    using (var range = worksheet.Cells[row, 3, row, 4])
+                    {
+                        range.Style.Font.Bold = true;
+                        range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                    }
+
+                    worksheet.Cells.AutoFitColumns();
+                    var content = package.GetAsByteArray();
+
+                    return ResponseHandler.Success(content, "Equipment report generated successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<byte[]>($"Failed to generate equipment report: {ex.Message}");
+            }
+        }
+        public async Task<ApiResponse<bool>> UpdateEquipmentStatusAsync(Guid contractId, List<Guid> equipmentIds)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var contract = await _unitOfWork.ContractRepository.GetByIdAsync(contractId);
+                if (contract == null)
+                {
+                    return ResponseHandler.Failure<bool>("Contract not found.");
+                }
+                var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contractId);
+
+                var equipmentsToUpdate = equipments.Where(e => equipmentIds.Contains(e.Id)).ToList();
+
+                if (equipmentsToUpdate.Count == 0)
+                {
+                    return ResponseHandler.Failure<bool>("No matching equipment found for the given contract and equipment IDs.");
+                }
+                
+                foreach (var equipment in equipmentsToUpdate)
+                {
+                    if (equipment.Status != EquipmentStatusEnum.Available)
+                    {
+                        return ResponseHandler.Failure<bool>($"Equipment {equipment.Id} is not in Available status.");
+                    }
+
+                    equipment.Status = EquipmentStatusEnum.Repair;
+                    _unitOfWork.EquipmentRepository.Update(equipment);
+
+                }
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Failed to update equipment status.");
+
+                response = ResponseHandler.Success(true, "Equipment status updated successfully from Available to Repair.");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>($"Error updating equipment status: {ex.Message}");
+            }
+            return response;
+        }
     }
 }
 
