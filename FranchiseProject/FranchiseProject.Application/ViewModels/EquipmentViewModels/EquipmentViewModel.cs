@@ -10,12 +10,16 @@ namespace FranchiseProject.Application.ViewModels.EquipmentViewModels
 {
     public class EquipmentViewModel
     {
-        public Guid? Id { get; set; }
-        public EquipmentTypeEnum? Type { get; set; }
-        public EquipmentStatusEnum? Status { get; set; }
-        public int? Quantity { get; set; }
-        public string? Note { get; set; }
-        public double? Price { get; set; }
-       
+            public Guid? Id { get; set; }
+            public string? EquipmentName { get; set; }
+            public string? SerialNumber { get; set; }
+            public EquipmentStatusEnum? Status { get; set; }
+            public int? Quantity { get; set; }
+            public string? Note { get; set; }
+            public double? Price { get; set; }
+            public  string? AgencyName { get; set; }
+
+
+
     }
 }

@@ -12,5 +12,6 @@ namespace FranchiseProject.Application.Repositories
         Task<bool> IsExpiringContract(Guid contractId);
         Task<Contract> GetActiveContractByAgencyIdAsync(Guid agencyId);
         Task<Contract> GetMostRecentContractByAgencyIdAsync(Guid agencyId);
+        Task<List<Equipment>> GetAllEquipmentsByAgencyIdAsync(Guid agencyId);
     }
 }

@@ -42,6 +42,16 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .OrderByDescending(c => c.CreationDate)
                 .FirstOrDefaultAsync();
         }
+
+       
+            public async Task<List<Equipment>> GetAllEquipmentsByAgencyIdAsync(Guid agencyId)
+            {
+                return await _dbContext.Equipments
+                    .Include(e => e.Contract)
+                    .Where(e => e.Contract != null && e.Contract.AgencyId == agencyId)
+                    .ToListAsync();
+            }
+        
     }
 }
 
