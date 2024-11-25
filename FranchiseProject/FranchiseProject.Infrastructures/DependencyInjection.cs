@@ -106,7 +106,6 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
             services.AddScoped<IDocumentRepository, DocumentRepository>();
             services.AddScoped<IEquipmentRepository, EquipmentRepository>();
-            services.AddScoped<IEquipmentTypePriceRepository, EquipmentTypePriceRepository>();
             services.AddScoped<IFranchiseFeesRepository, FranchiseFeeRepository>();
             services.AddScoped<IEquipmentSerialNumberHistoryRepository, EquipmentSerialNumberHistoryRepository>();
             #endregion

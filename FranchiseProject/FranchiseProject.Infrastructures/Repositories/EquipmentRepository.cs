@@ -31,5 +31,11 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Where(e => e.ContractId == contractId)
                 .ToListAsync();
         }
+        public async Task<List<Contract>> GetAllContractsByAgencyIdAsync(Guid agencyId)
+        {
+            return await _dbContext.Contracts
+                .Where(c => c.AgencyId == agencyId)
+                .ToListAsync();
+        }
     }
 }

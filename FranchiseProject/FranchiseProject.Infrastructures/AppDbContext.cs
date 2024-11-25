@@ -54,7 +54,6 @@ namespace FranchiseProject.Infrastructures
         public DbSet<ChapterMaterial> ChapterMaterials { get; set; }
         public DbSet<Document> Documents { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
-        public DbSet<EquipmentTypePrice> EquipmentTypePrices { get; set; }
         public DbSet<FranchiseFees> FranchiseFees { get; set; }
         public DbSet<EquipmentSerialNumberHistory> EquipmentSerialNumberHistories { get; set; }
         #endregion
@@ -341,22 +340,7 @@ namespace FranchiseProject.Infrastructures
         );
             #endregion
 
-            #region EquipmentPrice
-            modelBuilder.Entity<EquipmentTypePrice>().HasData(
-                     new EquipmentTypePrice
-                     {
-                         Id = Guid.Parse("7CC69321-2180-44ED-84A6-A4AFDD775092"),
-                       Type=EquipmentTypeEnum.Table,
-                       Price=800000
-                     },
-                      new EquipmentTypePrice
-                      {
-                          Id = Guid.Parse("A2863B86-1CD8-4921-BC64-C01706CAFFE2"),
-                          Type = EquipmentTypeEnum.Chair,
-                          Price = 300000
-                      }
-                     );
-            #endregion
+        
             #region FrachiseFee
             modelBuilder.Entity<FranchiseFees>().HasData(
                      new FranchiseFees

@@ -51,7 +51,6 @@ namespace FranchiseProject.Infrastructures
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IDocumentRepository _documentRepository;
         private readonly IEquipmentRepository _equipmentRepository;
-        private readonly IEquipmentTypePriceRepository _equipmentTypePriceRepository;
         private readonly IFranchiseFeesRepository _franchiseFeesRepository;
         private readonly IEquipmentSerialNumberHistoryRepository _equipmentSerialNumberHistoryRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
@@ -69,7 +68,7 @@ namespace FranchiseProject.Infrastructures
             IAppointmentRepository appointmentRepository, IWorkRepository workRepository,
             IUserAppointmentRepository userAppointmentRepository
             ,IDocumentRepository documentRepository
-            ,IEquipmentRepository equipmentRepository,IEquipmentTypePriceRepository equipmentTypePriceRepository,IFranchiseFeesRepository franchiseFeesRepository
+            ,IEquipmentRepository equipmentRepository,IFranchiseFeesRepository franchiseFeesRepository
             ,IEquipmentSerialNumberHistoryRepository equipmentSerialNumberHistoryRepository)
 
            
@@ -114,7 +113,6 @@ namespace FranchiseProject.Infrastructures
             _workRepository = workRepository;
             _documentRepository = documentRepository;
             _equipmentRepository = equipmentRepository;
-            _equipmentTypePriceRepository =equipmentTypePriceRepository;
             _franchiseFeesRepository = franchiseFeesRepository;
             _equipmentSerialNumberHistoryRepository = equipmentSerialNumberHistoryRepository;
         }
@@ -194,7 +192,6 @@ namespace FranchiseProject.Infrastructures
         public IDocumentRepository DocumentRepository => _documentRepository;
 
         public IEquipmentRepository EquipmentRepository => _equipmentRepository;
-        public IEquipmentTypePriceRepository EquipmentTypePriceRepository => _equipmentTypePriceRepository;
 
         public IFranchiseFeesRepository FranchiseFeesRepository => _franchiseFeesRepository;
 

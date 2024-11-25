@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
+using System.Linq.Expressions;
 
 namespace FranchiseProject.Application.Services
 {
@@ -55,8 +56,10 @@ namespace FranchiseProject.Application.Services
 
                     var existingEquipments = await _unitOfWork.EquipmentRepository
                         .GetTableAsTracking()
+                        .Where(e => e.ContractId == contract.Id)
                         .ToListAsync();
-                    var existingSerialNumbers = existingEquipments.Select(e => e.SerialNumber).ToList();
+
+                    _unitOfWork.EquipmentRepository.HardRemoveRange(existingEquipments);
 
                     for (int row = 2; row <= rowCount; row++)
                     {
@@ -64,6 +67,8 @@ namespace FranchiseProject.Application.Services
                         var serialNumber = worksheet.Cells[row, 3].Value?.ToString().Trim();
                         var priceString = worksheet.Cells[row, 4].Value?.ToString().Trim();
                         var note = worksheet.Cells[row, 5].Value?.ToString().Trim();
+
+         
 
                         if (string.IsNullOrEmpty(equipmentName))
                         {
@@ -74,12 +79,6 @@ namespace FranchiseProject.Application.Services
                         if (string.IsNullOrEmpty(serialNumber))
                         {
                             errors.Add($"Row {row}: Serial number is required.");
-                            continue;
-                        }
-
-                        if (existingSerialNumbers.Contains(serialNumber))
-                        {
-                            errors.Add($"Row {row}: Serial number '{serialNumber}' already exists.");
                             continue;
                         }
 
@@ -113,56 +112,37 @@ namespace FranchiseProject.Application.Services
                             continue;
                         }
 
-                        var existingEquipment = existingEquipments.FirstOrDefault(e =>
-                            e.EquipmentName == equipmentName &&
-                            e.SerialNumber == serialNumber &&
-                            e.Price ==double.Parse( priceString )&&
-                            e.Note == note);
-
-                        if (existingEquipment == null)
+                        var equipment = new Equipment
                         {
-                            var equipment = new Equipment
-                            {
-                                EquipmentName = equipmentName,
-                                SerialNumber = serialNumber,
-                                Price = double.Parse(priceString),
-                                Note = note,
-                                Status = EquipmentStatusEnum.Available,
-                                ContractId = contract.Id
-                            };
-                            equipmentsToAdd.Add(equipment);
+                            EquipmentName = equipmentName,
+                            SerialNumber = serialNumber,
+                            Price = double.Parse(priceString),
+                            Note = note,
+                            Status = EquipmentStatusEnum.Available,
+                            ContractId = contract.Id
+                        };
+                        equipmentsToAdd.Add(equipment);
 
-                            var serialNumberHistory = new EquipmentSerialNumberHistory
-                            {
-                                Equipment = equipment,
-                                SerialNumber = serialNumber,
-                                
-                            };
-                            serialNumberHistoriesToAdd.Add(serialNumberHistory);
-
-                            existingSerialNumbers.Add(serialNumber);
-                        }
+                        var serialNumberHistory = new EquipmentSerialNumberHistory
+                        {
+                            Equipment = equipment,
+                            SerialNumber = serialNumber,
+                        };
+                        serialNumberHistoriesToAdd.Add(serialNumberHistory);
                     }
 
                     if (errors.Any())
                     {
-                        return ResponseHandler.Failure<object>("Import partially failed. " + string.Join(" ", errors));
+                        return ResponseHandler.Failure<object>("Import failed. " + string.Join(" ", errors));
                     }
 
-                    if (equipmentsToAdd.Any())
-                    {
-                        await _unitOfWork.EquipmentRepository.AddRangeAsync(equipmentsToAdd);
-                        await _unitOfWork.EquipmentSerialNumberHistoryRepository.AddRangeAsync(serialNumberHistoriesToAdd);
-                        var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                    await _unitOfWork.EquipmentRepository.AddRangeAsync(equipmentsToAdd);
+                    await _unitOfWork.EquipmentSerialNumberHistoryRepository.AddRangeAsync(serialNumberHistoriesToAdd);
+                    var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
 
-                        if (!isSuccess) throw new Exception("Import failed!");
+                    if (!isSuccess) throw new Exception("Import failed!");
 
-                        return ResponseHandler.Success<object>(true, $"Đã thêm thành công {equipmentsToAdd.Count} thiết bị mới!");
-                    }
-                    else
-                    {
-                        return ResponseHandler.Success<object>(true, "Không có thiết bị mới để thêm.");
-                    }
+                    return ResponseHandler.Success<object>(true, $"Đã cập nhật thành công {equipmentsToAdd.Count} thiết bị mới!");
                 }
             }
             catch (Exception ex)
@@ -170,7 +150,6 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<object>(ex.Message);
             }
         }
-
         public async Task<ApiResponse<byte[]>> GenerateEquipmentReportAsync(Guid agencyId)
         {
             try
@@ -273,6 +252,126 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<bool>> UpdateEquipmentStatusAsync(Guid contractId, List<UpdateEquipmentRangeViewModel> updateModels)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var contract = await _unitOfWork.ContractRepository.GetByIdAsync(contractId);
+                if (contract == null)
+                {
+                    return ResponseHandler.Failure<bool>("Contract not found.");
+                }
+
+                var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contractId);
+                var now = DateTime.Now;
+
+                foreach (var updateModel in updateModels)
+                {
+                    var equipment = equipments.FirstOrDefault(e => e.Id == updateModel.EquipmentId);
+                    if (equipment == null)
+                    {
+                        return ResponseHandler.Failure<bool>($"Equipment with ID {updateModel.EquipmentId} not found.");
+                    }
+
+                    equipment.Status = EquipmentStatusEnum.Available;
+                    var currentSerialNumberHistory = await _unitOfWork.EquipmentSerialNumberHistoryRepository
+                        .GetTableAsTracking()
+                        .Where(h => h.EquipmentId == equipment.Id && h.EndDate == null)
+                        .FirstOrDefaultAsync();
+
+                    if (currentSerialNumberHistory != null)
+                    {
+                        currentSerialNumberHistory.EndDate = now;
+                    }
+                    var newSerialNumberHistory = new EquipmentSerialNumberHistory
+                    {
+                        EquipmentId = equipment.Id,
+                        SerialNumber = updateModel.SerialNumber,
+                        StartDate = now,
+                        EndDate = null
+                    };
+
+                    await _unitOfWork.EquipmentSerialNumberHistoryRepository.AddAsync(newSerialNumberHistory);
+                    equipment.SerialNumber = updateModel.SerialNumber;
+                }
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Failed to update equipment status and serial numbers.");
+
+                response = ResponseHandler.Success(true, "Equipment status and serial numbers updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>($"Error updating equipment status and serial numbers: {ex.Message}");
+            }
+            return response;
+        }
+
+        //public async Task<ApiResponse<Pagination<EquipmentViewModel>>> FilterEquipmentAsync(FilterEquipmentViewModel filter)
+        //{
+        //    try
+        //    {
+        //        IQueryable<Equipment> query;
+
+        //        if (!filter.AgencyId.HasValue && filter.Status ==null)
+        //        {
+        //            query = (IQueryable<Equipment>)await _unitOfWork.EquipmentRepository.GetAllAsync();
+        //        }
+        //        else if (filter.AgencyId.HasValue)
+        //        {
+        //            // If AgencyId is provided, use GetAllEquipmentsByAgencyIdAsync
+        //            var equipment = await _unitOfWork.EquipmentRepository.GetAllContractsByAgencyIdAsync(filter.AgencyId.Value);
+        //            query = (IQueryable<Equipment>)equipment.AsQueryable();
+        //        }
+        //        else
+        //        {
+        //            // If only Status is provided, start with all equipment
+        //            query = (IQueryable<Equipment>)_unitOfWork.EquipmentRepository.GetAllAsync();
+        //        }
+
+        //        // Apply Status filter if provided
+        //        if (filter.Status!= null)
+        //        {
+        //            query = query.Where(e => e.Status == filter.Status);
+        //        }
+
+        //        // Apply pagination
+        //        var totalCount = await query.CountAsync();
+        //        var equipments = await query
+        //            .OrderBy(e => e.EquipmentName)
+        //            .Skip((filter.PageIndex - 1) * filter.PageSize)
+        //            .Take(filter.PageSize)
+        //            .Include(e => e.Contract)
+        //            .ThenInclude(c => c.Agency)
+        //            .ToListAsync();
+
+        //        var equipmentViewModels = equipments.Select(e => new EquipmentViewModel
+        //        {
+        //            Id = e.Id,
+        //            EquipmentName = e.EquipmentName,
+        //            SerialNumber = e.SerialNumber,
+        //            Status = e.Status,
+        //            Price = e.Price,
+        //            Note = e.Note,
+        //            AgencyName = e.Contract?.Agency?.Name
+        //        }).ToList();
+
+        //        var paginatedResult = new Pagination<EquipmentViewModel>
+        //        {
+        //            Items = equipmentViewModels,
+        //            TotalItemsCount = totalCount,
+        //            PageIndex = filter.PageIndex,
+        //            PageSize = filter.PageSize
+        //        };
+
+        //        return ResponseHandler.Success(paginatedResult, "Equipment filtered successfully.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return ResponseHandler.Failure<Pagination<EquipmentViewModel>>($"Error filtering equipment: {ex.Message}");
+        //    }
+        //}
     }
 }
 
