@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FranchiseProject.Application.Utils;
 using FranchiseProject.Application.ViewModels.AppointmentViewModels;
 
 namespace FranchiseProject.API.Validator.AppointmentValidator
@@ -7,7 +8,7 @@ namespace FranchiseProject.API.Validator.AppointmentValidator
     {
         public UpdateAppointmentReportValidator()
         {
-            RuleFor(x => x.Report)
+            RuleFor(x => x.Report.GetTextWithoutHtml())
                 .MaximumLength(3000);
             RuleFor(x => x.ReportImageURL)
                 .MaximumLength(500);

@@ -11,8 +11,8 @@ namespace FranchiseProject.Domain.Entity
     {
         public Guid EquipmentId { get; set; }
         [ForeignKey("EquipmentId")]
-        public Equipment Equipment { get; set; }
-        public string SerialNumber { get; set; }
+        public Equipment? Equipment { get; set; }
+        public string? SerialNumber { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
     }
