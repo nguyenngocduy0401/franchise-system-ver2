@@ -273,6 +273,61 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<bool>> UpdateEquipmentStatusAsync(Guid contractId, List<UpdateEquipmentRangeViewModel> updateModels)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var contract = await _unitOfWork.ContractRepository.GetByIdAsync(contractId);
+                if (contract == null)
+                {
+                    return ResponseHandler.Failure<bool>("Contract not found.");
+                }
+
+                var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contractId);
+                var now = DateTime.Now;
+
+                foreach (var updateModel in updateModels)
+                {
+                    var equipment = equipments.FirstOrDefault(e => e.Id == updateModel.EquipmentId);
+                    if (equipment == null)
+                    {
+                        return ResponseHandler.Failure<bool>($"Equipment with ID {updateModel.EquipmentId} not found.");
+                    }
+
+                    equipment.Status = EquipmentStatusEnum.Available;
+                    var currentSerialNumberHistory = await _unitOfWork.EquipmentSerialNumberHistoryRepository
+                        .GetTableAsTracking()
+                        .Where(h => h.EquipmentId == equipment.Id && h.EndDate == null)
+                        .FirstOrDefaultAsync();
+
+                    if (currentSerialNumberHistory != null)
+                    {
+                        currentSerialNumberHistory.EndDate = now;
+                    }
+                    var newSerialNumberHistory = new EquipmentSerialNumberHistory
+                    {
+                        EquipmentId = equipment.Id,
+                        SerialNumber = updateModel.SerialNumber,
+                        StartDate = now,
+                        EndDate = null
+                    };
+
+                    await _unitOfWork.EquipmentSerialNumberHistoryRepository.AddAsync(newSerialNumberHistory);
+                    equipment.SerialNumber = updateModel.SerialNumber;
+                }
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Failed to update equipment status and serial numbers.");
+
+                response = ResponseHandler.Success(true, "Equipment status and serial numbers updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>($"Error updating equipment status and serial numbers: {ex.Message}");
+            }
+            return response;
+        }
     }
 }
 
