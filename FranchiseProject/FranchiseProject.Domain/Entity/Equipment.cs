@@ -10,7 +10,8 @@ namespace FranchiseProject.Domain.Entity
 {
     public class Equipment:BaseEntity
     {
-        public EquipmentTypeEnum? Type { get; set; }
+       // public EquipmentTypeEnum? Type { get; set; }
+        public string? EquipmentName { get; set; }
         public string? SerialNumber { get; set; }
         public EquipmentStatusEnum? Status { get; set;  }
         public int? Quantity { get; set; }
@@ -19,5 +20,6 @@ namespace FranchiseProject.Domain.Entity
         public Guid? ContractId { get; set; }
         [ForeignKey("ContractId")]
         public Contract? Contract { get; set; }
+        public ICollection<EquipmentSerialNumberHistory>? SerialNumberHistories { get; set; }
     }
 }

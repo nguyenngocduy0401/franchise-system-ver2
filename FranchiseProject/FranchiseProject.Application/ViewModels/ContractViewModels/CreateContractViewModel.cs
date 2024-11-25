@@ -8,15 +8,12 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModels
 {
     public class CreateContractViewModel
     {
-        public string? Title { get; set; }     //
+        public string? Title { get; set; }     //không quá 25 kí tự
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public string? ContractDocumentImageURL { get; set; }
-        public double? RevenueSharePercentage { get; set; } //
+        public string? ContractDocumentImageURL { get; set; }// không null
+        public double? RevenueSharePercentage { get; set; } //lớn hơn 0 bé hon 100
        
-/*        public int? Total { get; set; }
-        public string? DesignFee { get; set; }
-        public string? FrachiseFee { get; set; }*/
         public string? AgencyId { get; set; }
     }
 }

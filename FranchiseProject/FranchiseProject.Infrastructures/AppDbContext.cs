@@ -56,6 +56,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<EquipmentTypePrice> EquipmentTypePrices { get; set; }
         public DbSet<FranchiseFees> FranchiseFees { get; set; }
+        public DbSet<EquipmentSerialNumberHistory> EquipmentSerialNumberHistories { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

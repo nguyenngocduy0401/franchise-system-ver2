@@ -7,6 +7,7 @@ using FranchiseProject.Application.ViewModels.DocumentViewModels;
 using FranchiseProject.Application.ViewModels.EquipmentViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
@@ -34,269 +35,104 @@ namespace FranchiseProject.Application.Services
             _validator = validator;
         }
         #endregion
-        public async Task<ApiResponse<bool>> CreateEquipmentAsync(List<EquipmentRequestViewModel> models)
+     
+       
+       
+        public async Task<ApiResponse<object>> ImportEquipmentsFromExcelAsync(IFormFile file)
         {
-            var response = new ApiResponse<bool>();
             try
             {
-                if (models == null || !models.Any())
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                using (var stream = file.OpenReadStream())
+                using (var package = new ExcelPackage(stream))
                 {
-                    return ResponseHandler.Failure<bool>("Danh sách thiết bị không được để trống.");
-                }
+                    var worksheet = package.Workbook.Worksheets[0];
+                    var rowCount = worksheet.Dimension.Rows;
+                    var equipments = new List<Equipment>();
+                    var errors = new List<string>();
+                    var existingSerialNumbers = await _unitOfWork.EquipmentRepository
+                        .GetTableAsTracking()
+                        .Select(e => e.SerialNumber)
+                        .ToListAsync();
 
-                var equipmentsToAdd = new List<Equipment>();
-                var equipmentsToUpdate = new List<Equipment>();
-
-                foreach (var model in models)
-                {
-                    var contract = await _unitOfWork.ContractRepository.GetByIdAsync(model.ContractId);
-                    if (contract == null)
+                    for (int row = 2; row <= rowCount; row++)
                     {
-                        return ResponseHandler.Failure<bool>($"Không tìm thấy hợp đồng !");
-                    }
+                        var equipmentName = worksheet.Cells[row, 2].Value?.ToString().Trim();
+                        var serialNumber = worksheet.Cells[row, 3].Value?.ToString().Trim();
+                        var priceString = worksheet.Cells[row, 4].Value?.ToString().Trim();
+                        var note = worksheet.Cells[row, 5].Value?.ToString().Trim();
 
-                    var equipmentTypePrice = await _unitOfWork.EquipmentTypePriceRepository.FindAsync(e => e.Type == model.Type);
-                    if (equipmentTypePrice == null || !equipmentTypePrice.Any())
-                    {
-                        return ResponseHandler.Failure<bool>($"Không tìm thấy giá cho loại thiết bị: {model.Type}");
-                    }
-                    var price = equipmentTypePrice.First().Price;
-
-                    var existingEquipment = await _unitOfWork.EquipmentRepository.FindAsync(e =>
-                        e.ContractId == model.ContractId && e.Type == model.Type);
-
-                    if (existingEquipment.Any())
-                    {
-                        var equipment = existingEquipment.First();
-                        equipment.Quantity += model.Quantity;
-                        equipment.Note = model.Note;
-                        equipmentsToUpdate.Add(equipment);
-
-                    }
-                    else
-                    {
-                        var newEquipment = new Equipment
+                        if (string.IsNullOrEmpty(equipmentName) || string.IsNullOrEmpty(serialNumber) || string.IsNullOrEmpty(priceString))
                         {
-                            Id = Guid.NewGuid(),
-                            Type = model.Type,
-                            ContractId = model.ContractId,
-                            CreationDate = DateTime.UtcNow,
-                            Status = EquipmentStatusEnum.Available,
+                            errors.Add($"Dòng {row}: Thiếu thông tin bắt buộc");
+                            continue;
+                        }
+
+                        if (equipmentName.Length > 50 || note?.Length > 50)
+                        {
+                            errors.Add($"Dòng {row}: Tên thiết bị hoặc ghi chú không được quá 50 ký tự");
+                            continue;
+                        }
+
+                        if (existingSerialNumbers.Contains(serialNumber))
+                        {
+                            errors.Add($"Dòng {row}: Serial number '{serialNumber}' đã tồn tại");
+                            continue;
+                        }
+
+                        if (!double.TryParse(priceString, out double price))
+                        {
+                            errors.Add($"Dòng {row}: Giá không hợp lệ");
+                            continue;
+                        }
+
+                        var equipment = new Equipment
+                        {
+                            EquipmentName = equipmentName,
+                            SerialNumber = serialNumber,
                             Price = price,
-                            Note=model.Note,
-                            Quantity = model.Quantity
+                            Note = note,
+                            Status = EquipmentStatusEnum.Available
                         };
-                        equipmentsToAdd.Add(newEquipment);
-                    }
-                }
 
-                if (equipmentsToAdd.Any())
-                    await _unitOfWork.EquipmentRepository.AddRangeAsync(equipmentsToAdd);
-
-                if (equipmentsToUpdate.Any())
-                    _unitOfWork.EquipmentRepository.UpdateRange(equipmentsToUpdate);
-
-                var result = await _unitOfWork.SaveChangeAsync() > 0;
-
-                if (result)
-                {
-                    return ResponseHandler.Success(true, "Tạo/Cập nhật thiết bị thành công.");
-                }
-                else
-                {
-                    return ResponseHandler.Failure<bool>("Không thể tạo/cập nhật thiết bị. Vui lòng thử lại.");
-                }
-            }
-            catch (Exception ex)
-            {
-                return ResponseHandler.Failure<bool>($"Lỗi khi tạo/cập nhật thiết bị: {ex.Message}");
-            }
-        }
-        public async Task<ApiResponse<byte[]>> ExportEquipmentsToExcelAsync(Guid contractId)
-        {
-            try
-            {
-                var equipments = await _unitOfWork.EquipmentRepository.FindAsync(e => e.ContractId == contractId);
-                if (!equipments.Any())
-                {
-                    return ResponseHandler.Failure<byte[]>("Không tìm thấy thiết bị cho hợp đồng này.");
-                }
-
-                using (var package = new ExcelPackage())
-                {
-                    var worksheet = package.Workbook.Worksheets.Add("Thiết bị");
-
-                    worksheet.Cells["A1"].Value = "STT";
-                    worksheet.Cells["B1"].Value = "Loại thiết bị";
-                    worksheet.Cells["C1"].Value = "Số lượng";
-                    worksheet.Cells["D1"].Value = "Giá";
-                    worksheet.Cells["E1"].Value = "Tổng giá";
-
-                    var headerCells = worksheet.Cells["A1:E1"];
-                    headerCells.Style.Font.Bold = true;
-                    headerCells.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    headerCells.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
-
-                    int row = 2;
-                    decimal totalPrice = 0;
-
-                    foreach (var equipment in equipments)
-                    {
-                        worksheet.Cells[row, 1].Value = row - 1;
-                        worksheet.Cells[row, 2].Value = TranslateEquipmentType(equipment.Type.ToString());
-                        worksheet.Cells[row, 3].Value = equipment.Quantity;
-                        worksheet.Cells[row, 4].Value = equipment.Price;
-                        worksheet.Cells[row, 5].Formula = $"C{row}*D{row}";
-
-                        totalPrice += (decimal)(equipment.Quantity ?? 0) * (decimal)(equipment.Price ?? 0);
-                        row++;
+                        equipments.Add(equipment);
+                        existingSerialNumbers.Add(serialNumber);
                     }
 
-                    worksheet.Cells[row + 1, 4].Value = "Tổng giá trị:";
-                    worksheet.Cells[row + 1, 5].Value = totalPrice;
-                    worksheet.Cells[row + 1, 5].Style.Font.Bold = true;
-
-                    worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
-
-                    return ResponseHandler.Success(package.GetAsByteArray(), "Xuất Excel thành công.");
-                }
-            }
-            catch (Exception ex)
-            {
-                return ResponseHandler.Failure<byte[]>($"Lỗi khi xuất Excel: {ex.Message}");
-            }
-        }
-        public async Task<ApiResponse<bool>> AddEquipmentAfterContractSigningAsync(Guid contractId, List<EquipmentRequestViewModel> equipmentRequests)
-        {
-            try
-            {
-                var contract = await _unitOfWork.ContractRepository.GetByIdAsync(contractId);
-                if (contract == null)
-                {
-                    return ResponseHandler.Failure<bool>("Không tìm thấy hợp đồng.");
-                }
-
-                if (contract.AgencyId == null)
-                {
-                    return ResponseHandler.Failure<bool>("Hợp đồng này chưa được liên kết với Agency.");
-                }
-
-                var equipmentsToAdd = new List<Equipment>();
-
-                foreach (var request in equipmentRequests)
-                {
-                    var equipmentTypePrice = await _unitOfWork.EquipmentTypePriceRepository.FindAsync(e => e.Type == request.Type);
-                    if (!equipmentTypePrice.Any())
+                    if (errors.Any())
                     {
-                        return ResponseHandler.Failure<bool>($"Không tìm thấy giá cho loại thiết bị: {request.Type}");
+                        var errorWorksheet = package.Workbook.Worksheets.Add("Errors");
+                        errorWorksheet.Cells["A1"].Value = "Lỗi";
+                        for (int i = 0; i < errors.Count; i++)
+                        {
+                            errorWorksheet.Cells[i + 2, 1].Value = errors[i];
+                        }
+
+                        var errorFileName = $"{Path.GetFileNameWithoutExtension(file.FileName)}_error.xlsx";
+                        var errorFileStream = new MemoryStream();
+                        package.SaveAs(errorFileStream);
+                        errorFileStream.Position = 0;
+
+                        return ResponseHandler.Success<object>(
+                            new { ErrorFile = errorFileStream, FileName = errorFileName },
+                            "Import không thành công. Vui lòng xem file lỗi."
+                        );
                     }
 
-                    var price = equipmentTypePrice.First().Price;
+                    await _unitOfWork.EquipmentRepository.AddRangeAsync(equipments);
+                    var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
 
-                    var newEquipment = new Equipment
-                    {
-                        Id = Guid.NewGuid(),
-                        Type = request.Type,
-                        ContractId = contractId,
-                        CreationDate = DateTime.UtcNow,
-                        Status = EquipmentStatusEnum.Available,
-                        Price = price,
-                        Quantity = request.Quantity
-                    };
+                    if (!isSuccess) throw new Exception("Import failed!");
 
-                    equipmentsToAdd.Add(newEquipment);
-                }
-
-                await _unitOfWork.EquipmentRepository.AddRangeAsync(equipmentsToAdd);
-                var result = await _unitOfWork.SaveChangeAsync() > 0;
-
-                if (result)
-                {
-                    return ResponseHandler.Success(true, "Thêm thiết bị cho Agency thành công.");
-                }
-                else
-                {
-                    return ResponseHandler.Failure<bool>("Không thể thêm thiết bị. Vui lòng thử lại.");
+                    return ResponseHandler.Success<object>(true, "Equipment imported successfully!");
                 }
             }
             catch (Exception ex)
             {
-                return ResponseHandler.Failure<bool>($"Lỗi khi thêm thiết bị: {ex.Message}");
+                return ResponseHandler.Failure<object>(ex.Message);
             }
         }
-        public async Task<ApiResponse<Pagination<EquipmentViewModel>>> GetEquipmentsByAgencyIdAsync(Guid agencyId, int pageIndex, int pageSize)
-        {
-            var response = new ApiResponse<Pagination<EquipmentViewModel>>();
-
-            try
-            {
-                var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
-                if (agency == null)
-                {
-                    return ResponseHandler.Failure<Pagination<EquipmentViewModel>>("Không tìm thấy Agency.");
-                }
-
-                var contracts = await _unitOfWork.ContractRepository.FindAsync(c => c.AgencyId == agencyId);
-                if (!contracts.Any())
-                {
-                    return ResponseHandler.Success<Pagination<EquipmentViewModel>>(null, "Agency này chưa có hợp đồng nào.");
-                }
-
-                var contractIds = contracts.Select(c => c.Id).ToList();
-
-                var query = _unitOfWork.EquipmentRepository.GetTableAsTracking()
-                    .Where(e => contractIds.Contains(e.ContractId.Value));
-
-                var totalCount = await query.CountAsync();
-
-                var equipments = await query
-                    .Skip((pageIndex - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
-
-                var equipmentViewModels = equipments.Select(e => new EquipmentViewModel
-                {
-                    Id = e.Id,
-                    Type = e.Type,
-                    Status = e.Status,
-                    Quantity = e.Quantity,
-                    Note = e.Note,
-                    Price = e.Price,
-                  //  ContractId = e.ContractId
-                }).ToList();
-
-                var equipmentPagination = new Pagination<EquipmentViewModel>
-                {
-                    Items = equipmentViewModels,
-                    TotalItemsCount = totalCount,
-                    PageIndex = pageIndex,
-                    PageSize = pageSize
-                };
-
-                response = ResponseHandler.Success(equipmentPagination, "Lấy danh sách thiết bị thành công.");
-            }
-            catch (Exception ex)
-            {
-                response = ResponseHandler.Failure<Pagination<EquipmentViewModel>>($"Lỗi khi lấy danh sách thiết bị: {ex.Message}");
-            }
-
-            return response;
-        }
-
-        private string TranslateEquipmentType(string type)
-        {
-          
-            switch (type)
-            {
-                case "Table":
-                    return "Bàn";
-                case "Chair":
-                    return "Ghế";
-
-                default:
-                    return type;
-            }
-        }
+        
     }
 }
 

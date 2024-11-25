@@ -64,7 +64,7 @@ namespace FranchiseProject.Application.Services
                     response.Data=true;
                     response.isSuccess = true;
                     response.Message = "Tạo Thành Công !";
-                    var emailMessage = EmailTemplate.AgencyRegistrationSuccess(agency.Name, agency.Email);
+                    var emailMessage = EmailTemplate.AgencyRegistrationSuccess(agency.Email, agency.Name);
                     bool emailSent = await _emailService.SendEmailAsync(emailMessage);
                     if (!emailSent)
                     {

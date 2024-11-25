@@ -326,13 +326,21 @@ namespace FranchiseProject.Application.Services
                         work.Status = status;
                         if (work.Type == WorkTypeEnum.BusinessRegistered)
                         {
+                            var fee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
                              var contract = new Contract
                             {
                                 AgencyId = work.AgencyId.Value,
                                 Status = ContractStatusEnum.None,
+                                FrachiseFee=fee.Sum(f => f.FeeAmount),
                                                           
                             };
                             await _unitOfWork.ContractRepository.AddAsync(contract);
+                        }
+                        if (work.Type == WorkTypeEnum.Quotation)
+                        {
+                            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
+                            contract.Total = contract.DesignFee + contract.FrachiseFee;
+                            _unitOfWork.ContractRepository.Update(contract);
                         }
                         if (work.Type == WorkTypeEnum.SignedContract)
                         {

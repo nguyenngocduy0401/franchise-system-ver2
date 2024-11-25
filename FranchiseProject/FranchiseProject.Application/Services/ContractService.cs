@@ -92,7 +92,7 @@ namespace FranchiseProject.Application.Services
 
         }
 
-        public async Task<ApiResponse<bool>> CreateContractAsync(CreateContractViewModel create)
+        public async Task<ApiResponse<bool>> UploadContractAsync(CreateContractViewModel create)
         {
             var response = new ApiResponse<bool>();
             try
@@ -129,22 +129,27 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Đối tác đã có hợp đồng đang trong thời hạn.";
                     return response;
                 }
-                var contract = _mapper.Map<FranchiseProject.Domain.Entity.Contract>(create);
+                var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
                 contract.ContractCode = await GenerateUniqueContractCode();
                 var franchiseFee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
-                contract.FrachiseFee = franchiseFee.Sum(f => f.FeeAmount);
-                await _unitOfWork.ContractRepository.AddAsync(contract);
+                contract.Title = create.Title;
+                contract.StartTime = create.StartTime;
+                contract.EndTime = create.EndTime;
+                contract.ContractDocumentImageURL = create.ContractDocumentImageURL;
+                contract.RevenueSharePercentage = create.RevenueSharePercentage;
+               // contract.FrachiseFee = franchiseFee.Sum(f => f.FeeAmount);
+                 _unitOfWork.ContractRepository.Update(contract);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                 if (isSuccess > 0)
                 {
                     var emailResponse = await _emailService.SendContractEmailAsync(existAgency.Email, contract.ContractDocumentImageURL);
                     if (!emailResponse.isSuccess)
                     {
-                        response.Message = "Tạo Thành Công, nhưng không thể gửi email đính kèm hợp đồng.";
+                        response.Message = "Tải lên thành công, nhưng không thể gửi email đính kèm hợp đồng.";
                     }
                     response.Data = true;
                     response.isSuccess = true;
-                    response.Message = "Tạo Thành Công !";
+                    response.Message = "Tải lên thành công !";
                 }
                 else
                 {
