@@ -15,6 +15,7 @@ namespace FranchiseProject.API.Controllers
         {
             _consultationService = consultationService;
         }
+        [Authorize(Roles = AppRole.SystemConsultant + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "khách đăng kí nhượng quyền ")]
         [HttpPost("")]
         public async Task<ApiResponse<bool>> RegisterConsultationAsync([FromBody] RegisterConsultationViewModel regis)=> await _consultationService.RegisterConsultationAsync(regis);
