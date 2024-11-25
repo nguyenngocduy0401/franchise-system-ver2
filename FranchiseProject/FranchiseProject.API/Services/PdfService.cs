@@ -15,7 +15,7 @@ namespace FranchiseProject.API.Services
         }
         public async Task<Stream> FillPdfTemplate(InputContractViewModel contract)
         {
-            string firebaseUrl = "https://firebasestorage.googleapis.com/v0/b/franchise-project-1ea45.firebasestorage.app/o/Contract%2Fhop-dong-nhuong-quyen-thuong-mai_1010092534%20(3).pdf?alt=media&token=38cd36c7-a187-4716-891b-52a30132dc16";
+            string firebaseUrl = "https://firebasestorage.googleapis.com/v0/b/franchise-project-1ea45.firebasestorage.app/o/Contract%2Fhop-dong-nhuong-quyen-thuong-mai_1010092534%20(3).pdf?alt=media&token=8491cae1-1ca2-4d0b-b0e9-2be67bb0be60";
             Stream pdfTemplateStream = await DownloadFileFromFirebaseAsync(firebaseUrl);
             var Deposit = contract.TotalMoney * 20;
             var totalMoneyParse = NumberToWordsConverter.ConvertToWords(contract.TotalMoney.Value);
@@ -38,6 +38,7 @@ namespace FranchiseProject.API.Services
                     form.SetField("DepositParse", depositParse.ToString());
                     form.SetField("DesignFeeParse", depositParse.ToString());
                     form.SetField("FrachiseFeeParse", FranchiseFeeParse.ToString());
+                    form.SetField("ContractCcode", contract.ContractCode.ToString());
                     stamper.FormFlattening = true;
                 }
             }

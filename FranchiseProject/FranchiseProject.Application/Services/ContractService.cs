@@ -1,27 +1,15 @@
 ﻿using AutoMapper;
-using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
-using FranchiseProject.Application.ViewModels.ConsultationViewModels;
 using FranchiseProject.Application.ViewModels.ContractViewModels;
 using FranchiseProject.Application.ViewModels.EmailViewModels;
-using FranchiseProject.Application.ViewModels.SlotViewModels;
-using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using Spire.Pdf;
+using System.IO;
 using Contract = FranchiseProject.Domain.Entity.Contract;
 
 namespace FranchiseProject.Application.Services
@@ -140,6 +128,7 @@ namespace FranchiseProject.Application.Services
                     return response;
                 }
                 var contract = _mapper.Map<FranchiseProject.Domain.Entity.Contract>(create);
+                contract.ContractCode = await GenerateUniqueContractCode();
                 await _unitOfWork.ContractRepository.AddAsync(contract);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                 if (isSuccess > 0)
@@ -359,13 +348,68 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<byte[]>();
             try
             {
-                var contrac= _unitOfWork.
+                var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
+                if (contract == null)
+                {
+                    return ResponseHandler.Failure<byte[]>("Không tìm thấy hợp đồng cho đối tác này.");
+                }
+
+                var inputInfo = new InputContractViewModel
+                {
+                    DesignFee = contract.DesignFee,
+                    FranchiseFee = contract.FrachiseFee,
+                    TotalMoney = contract.Total,
+                    ContractCode = contract.ContractCode ?? await GenerateUniqueContractCode()
+                };
+                using (var pdfStream =await  _pdfService.FillPdfTemplate(inputInfo))
+                {
+                    using (var docxStream = new MemoryStream())
+                    {
+                        Spire.Pdf.PdfDocument pdfDocument = new Spire.Pdf.PdfDocument();
+                        pdfDocument.LoadFromStream(pdfStream);
+                        pdfDocument.SaveToStream(docxStream, Spire.Pdf.FileFormat.DOCX);
+                        docxStream.Position = 0;
+
+ 
+                        byte[] docxBytes = docxStream.ToArray();
+
+
+                        if (string.IsNullOrEmpty(contract.ContractCode))
+                        {
+                            contract.ContractCode = inputInfo.ContractCode;
+                             _unitOfWork.ContractRepository.Update(contract);
+                            await _unitOfWork.SaveChangeAsync();
+                        }
+                        response.Data = docxBytes;
+                        response.isSuccess = true;
+                        response.Message = "Tải xuống hợp đồng thành công.";
+                        return response;
+                    }
+                }
             }
             catch (Exception ex)
             {
                 return ResponseHandler.Failure<byte[]>($"Lỗi khi tạo file hợp đồng: {ex.Message}");
             }
         }
+        private async Task<string> GenerateUniqueContractCode()
+        {
+            string contractCode;
+            bool isUnique;
+            do
+            {
+                // Tạo mã dựa trên timestamp và chuỗi ngẫu nhiên
+                var timestamp = DateTime.Now.ToString("yyMMddHHmm");
+                var random = new Random();
+                var randomPart = new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 5)
+                    .Select(s => s[random.Next(s.Length)]).ToArray());
+                contractCode = timestamp + randomPart;
 
+                // Kiểm tra xem mã đã tồn tại chưa
+                isUnique = !await _unitOfWork.ContractRepository.AnyAsync(c => c.ContractCode == contractCode);
+            } while (!isUnique);
+
+            return contractCode;
+        }
     }
 }

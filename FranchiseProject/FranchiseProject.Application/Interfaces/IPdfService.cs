@@ -9,7 +9,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IPdfService
     {
-      /*  Task<Stream> FillPdfTemplate(CreateContractViewModel contract);
-        Task<Stream> FillUpdatePdfTemplate(UpdateContractViewModel contract);*/
+       Task<Stream> FillPdfTemplate(InputContractViewModel contract);
+      /*  Task<Stream> FillUpdatePdfTemplate(UpdateContractViewModel contract);*/
     }
 }

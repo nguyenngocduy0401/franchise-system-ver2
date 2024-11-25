@@ -10,13 +10,14 @@ namespace FranchiseProject.Domain.Entity
     public class Contract : BaseEntity
     {
         public string? Title { get; set; }
+        public string? ContractCode { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
-        public int? Total { get; set; }
+        public double? Total { get; set; }
         public string? ContractDocumentImageURL { get; set; }
         public double? RevenueSharePercentage { get; set; }
-        public string? DesignFee { get; set; }
-        public string? FrachiseFee { get; set; }
+        public double? DesignFee { get; set; }
+        public double? FrachiseFee { get; set; }
         public Guid? AgencyId { get; set; }
         [ForeignKey("AgencyId")]
         public Agency? Agency { get; set; }

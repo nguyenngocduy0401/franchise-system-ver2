@@ -9,6 +9,7 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModels
 {
     public class InputContractViewModel
     {
+        public string? ContractCode { get; set; }
         public double? TotalMoney { get; set; }
      //   public double? Deposit { get; set; }
         public double? DesignFee { get; set; }

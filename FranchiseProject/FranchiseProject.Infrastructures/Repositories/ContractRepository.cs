@@ -35,6 +35,13 @@ namespace FranchiseProject.Infrastructures.Repositories
             return await _dbContext.Contracts
                 .FirstOrDefaultAsync(c => c.AgencyId == agencyId && c.StartTime <= DateTime.Now && c.EndTime >= DateTime.Now);
         }
+        public async Task<Contract> GetMostRecentContractByAgencyIdAsync(Guid agencyId)
+        {
+            return await _dbContext.Contracts
+                .Where(c => c.AgencyId == agencyId)
+                .OrderByDescending(c => c.CreationDate)
+                .FirstOrDefaultAsync();
+        }
     }
 }
 

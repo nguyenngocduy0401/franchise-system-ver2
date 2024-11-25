@@ -25,6 +25,7 @@
     <PackageReference Include="Quartz" Version="3.13.1" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.13.1" />
     <PackageReference Include="Quartzmin" Version="1.0.3" />
+    <PackageReference Include="Spire.PDF" Version="10.11.1" />
   </ItemGroup>
 
   <ItemGroup>

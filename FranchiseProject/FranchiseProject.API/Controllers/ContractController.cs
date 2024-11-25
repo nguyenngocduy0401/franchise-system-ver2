@@ -58,5 +58,13 @@ namespace FranchiseProject.API.Controllers
         {
             return _contractService.GetAgencyInfoAsync(id);
         }
+        [SwaggerOperation(Summary = "Tải xuống hợp đồng dưới dạng file .doc {Authorize = Manager,Admin}")]
+        [HttpGet("download/agency/{id}")]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        public async Task<ApiResponse<byte[]>> DownloadContractAsync(Guid id)
+        {
+            var response = await _contractService.DownloadContractAsDocAsync(id);
+            return response;
+        }
     }
 }
