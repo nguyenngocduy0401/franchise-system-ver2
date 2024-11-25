@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FranchiseProject.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -18,6 +19,7 @@ namespace FranchiseProject.Domain.Entity
         public double? RevenueSharePercentage { get; set; }
         public double? DesignFee { get; set; }
         public double? FrachiseFee { get; set; }
+        public ContractStatusEnum? Status { get; set; }
         public Guid? AgencyId { get; set; }
         [ForeignKey("AgencyId")]
         public Agency? Agency { get; set; }

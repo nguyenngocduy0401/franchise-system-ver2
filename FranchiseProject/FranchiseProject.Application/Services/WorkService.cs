@@ -324,6 +324,23 @@ namespace FranchiseProject.Application.Services
                         throw new Exception("Cannot update this status!");
                     case WorkStatusEnum.Approved:
                         work.Status = status;
+                        if (work.Type == WorkTypeEnum.BusinessRegistered)
+                        {
+                             var contract = new Contract
+                            {
+                                AgencyId = work.AgencyId.Value,
+                                Status = ContractStatusEnum.None,
+                                                          
+                            };
+                            await _unitOfWork.ContractRepository.AddAsync(contract);
+                        }
+                        if (work.Type == WorkTypeEnum.SignedContract)
+                        {
+                            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
+                            contract.Status = ContractStatusEnum.Active;
+                             _unitOfWork.ContractRepository.Update(contract);
+                        }
+                        
                         break;
                     case WorkStatusEnum.Rejected:
                         work.Status = status;

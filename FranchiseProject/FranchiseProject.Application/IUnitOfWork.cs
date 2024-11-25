@@ -48,6 +48,7 @@ namespace FranchiseProject.Application
         public IDocumentRepository DocumentRepository { get; }
         public IEquipmentRepository EquipmentRepository { get; }
         public IEquipmentTypePriceRepository EquipmentTypePriceRepository { get; }
+        public IFranchiseFeesRepository FranchiseFeesRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

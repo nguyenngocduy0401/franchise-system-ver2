@@ -55,6 +55,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<Document> Documents { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<EquipmentTypePrice> EquipmentTypePrices { get; set; }
+        public DbSet<FranchiseFees> FranchiseFees { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -354,6 +355,15 @@ namespace FranchiseProject.Infrastructures
                           Price = 300000
                       }
                      );
+            #endregion
+            #region FrachiseFee
+            modelBuilder.Entity<FranchiseFees>().HasData(
+                     new FranchiseFees
+                     {
+                         Id = Guid.Parse("7CC69321-2180-44ED-84A6-A4AFDD775F23"),
+                         FeeAmount=360000000
+                     }
+                         );
             #endregion
 
             modelBuilder.HasAnnotation("TriggerSetup", true);

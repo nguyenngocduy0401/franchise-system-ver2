@@ -15,33 +15,46 @@ namespace FranchiseProject.API.Services
         }
         public async Task<Stream> FillPdfTemplate(InputContractViewModel contract)
         {
-            string firebaseUrl = "https://firebasestorage.googleapis.com/v0/b/franchise-project-1ea45.firebasestorage.app/o/Contract%2Fhop-dong-nhuong-quyen-thuong-mai_1010092534%20(3).pdf?alt=media&token=8491cae1-1ca2-4d0b-b0e9-2be67bb0be60";
+            string firebaseUrl = "https://firebasestorage.googleapis.com/v0/b/franchise-project-1ea45.firebasestorage.app/o/Contract%2Fhop-dong-nhuong-quyen-thuong-mai_1010092534%20(3).pdf?alt=media&token=367beaa1-68f5-4734-9a0f-841d7d17fe99";
             Stream pdfTemplateStream = await DownloadFileFromFirebaseAsync(firebaseUrl);
-            var Deposit = contract.TotalMoney * 20;
-            var totalMoneyParse = NumberToWordsConverter.ConvertToWords(contract.TotalMoney.Value);
-            var depositParse = NumberToWordsConverter.ConvertToWords(Deposit.Value);
-            var designFeeParse = NumberToWordsConverter.ConvertToWords(contract.DesignFee.Value);
-            var FranchiseFeeParse = NumberToWordsConverter.ConvertToWords(contract.FranchiseFee.Value);
+
+            var Deposit = contract.TotalMoney * 0.2; // 20% of TotalMoney
+            var totalMoneyParse = contract.TotalMoney.HasValue ? NumberToWordsConverter.ConvertToWords(contract.TotalMoney.Value) : "";
+            var depositParse = Deposit.HasValue ? NumberToWordsConverter.ConvertToWords(Deposit.Value) : "";
+            var designFeeParse = contract.DesignFee.HasValue ? NumberToWordsConverter.ConvertToWords(contract.DesignFee.Value) : "";
+            var FranchiseFeeParse = contract.FranchiseFee.HasValue ? NumberToWordsConverter.ConvertToWords(contract.FranchiseFee.Value) : "";
 
             var outputStream = new MemoryStream();
             using (var reader = new PdfReader(pdfTemplateStream))
             {
                 using (var stamper = new PdfStamper(reader, outputStream))
                 {
-                   var form = stamper.AcroFields;
-                    form.SetField("TotalMoney", contract.TotalMoney.ToString());
-                     form.SetField("Deposit", Deposit.ToString());
-                                   
-                    form.SetField("DesignFee", contract.DesignFee.ToString());
-                    form.SetField("FranchiseFee", contract.FranchiseFee.ToString());
-                    form.SetField("TotalMoneyParse", totalMoneyParse.ToString());
-                    form.SetField("DepositParse", depositParse.ToString());
-                    form.SetField("DesignFeeParse", depositParse.ToString());
-                    form.SetField("FrachiseFeeParse", FranchiseFeeParse.ToString());
-                    form.SetField("ContractCcode", contract.ContractCode.ToString());
+                    var bf = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+                    float fontSize = 12.50f;
+                    var form = stamper.AcroFields;
+
+                    void SetFieldWithFontSize(string fieldName, string value)
+                    {
+                        form.SetFieldProperty(fieldName, "textfont", bf, null);
+                        form.SetFieldProperty(fieldName, "textsize", fontSize, null);
+                        form.SetFieldProperty(fieldName, "alignment", PdfFormField.Q_CENTER, null);
+                        form.SetField(fieldName, value);
+                    }
+
+                    SetFieldWithFontSize("TotalMoney", contract.TotalMoney?.ToString("#,##0") ?? "");
+                    SetFieldWithFontSize("Deposit", Deposit?.ToString("#,##0") ?? "");
+                    SetFieldWithFontSize("DesignFee", contract.DesignFee?.ToString("#,##0") ?? "");
+                    SetFieldWithFontSize("FranchiseFee", contract.FranchiseFee?.ToString("#,##0") ?? "");
+                  //  SetFieldWithFontSize("TotalMoneyParse", totalMoneyParse);
+                 //   SetFieldWithFontSize("DepositParse", depositParse);
+                 //   SetFieldWithFontSize("DesignFeeParse", designFeeParse);
+                  //  SetFieldWithFontSize("FranchiseFeeParse", FranchiseFeeParse);
+                    SetFieldWithFontSize("ContractCode", contract.ContractCode ?? "");
+
                     stamper.FormFlattening = true;
                 }
             }
+
             var finalOutputStream = new MemoryStream(outputStream.ToArray());
             finalOutputStream.Position = 0;
             return finalOutputStream;
@@ -59,40 +72,37 @@ namespace FranchiseProject.API.Services
         }
         public class NumberToWordsConverter
         {
-            private static readonly string[] Units = { "", "mươi", "trăm", "ngàn", "triệu", "tỷ" };
+            private static readonly string[] Units = { "", "nghìn", "triệu", "tỷ", "nghìn tỷ", "triệu tỷ" };
             private static readonly string[] Numbers = { "không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín" };
 
             public static string ConvertToWords(double number)
             {
-                if (number == 0) return "không";
+                if (number == 0) return "không đồng";
 
                 var words = new List<string>();
-                var numStr = ((long)number).ToString();
-                var length = numStr.Length;
-                var groupCount = 0;
+                var numStr = ((long)number).ToString("000000000000");
+                var groups = new string[4];
 
-                while (length > 0)
+                for (int i = 0; i < 4; i++)
                 {
-                    int startIndex = Math.Max(0, length - 3);
-                    var group = numStr.Substring(startIndex, length - startIndex);
-                    var groupValue = int.Parse(group);
-
-                    if (groupValue > 0 || groupCount == 0)
-                    {
-                        var groupWords = ConvertGroupToWords(groupValue);
-                        if (groupCount > 0)
-                        {
-                            groupWords += " " + Units[3 + (groupCount - 1) * 2];
-                        }
-
-                        words.Insert(0, groupWords.Trim());
-                    }
-
-                    length -= 3;
-                    groupCount++;
+                    groups[i] = numStr.Substring(i * 3, 3);
                 }
 
-                return string.Join(" ", words).Trim();
+                for (int i = 0; i < 4; i++)
+                {
+                    var groupNum = int.Parse(groups[i]);
+                    if (groupNum != 0)
+                    {
+                        words.Add(ConvertGroupToWords(groupNum));
+                        if (i < 3) words.Add(Units[3 - i]);
+                    }
+                }
+
+                var result = string.Join(" ", words).Trim();
+                result = result.Replace("một mươi", "mười");
+                result = result.Replace("mười năm", "mười lăm");
+                result = result.Replace("mươi năm", "mươi lăm");
+                return result + " đồng";
             }
 
             private static string ConvertGroupToWords(int number)
@@ -101,39 +111,40 @@ namespace FranchiseProject.API.Services
                 var hundreds = number / 100;
                 var remainder = number % 100;
                 var tens = remainder / 10;
-                var units = remainder % 10;
+                var ones = remainder % 10;
 
                 if (hundreds > 0)
                 {
                     words.Add(Numbers[hundreds] + " trăm");
+                    if (remainder > 0 && remainder < 10)
+                    {
+                        words.Add("lẻ");
+                    }
                 }
 
-                if (tens > 0)
+                if (tens > 1)
                 {
-                    if (tens == 1)
+                    words.Add(Numbers[tens] + " mươi");
+                    if (ones == 1)
                     {
-                        words.Add("mười");
+                        words.Add("mốt");
                     }
-                    else
+                    else if (ones > 0)
                     {
-                        words.Add(Numbers[tens] + " mươi");
+                        words.Add(Numbers[ones]);
                     }
                 }
-                else if (remainder > 0 && hundreds > 0)
+                else if (tens == 1)
                 {
-                    words.Add("lẻ");
+                    words.Add("mười");
+                    if (ones > 0)
+                    {
+                        words.Add(Numbers[ones]);
+                    }
                 }
-
-                if (units > 0)
+                else if (ones > 0)
                 {
-                    if (tens > 1 && units == 5)
-                    {
-                        words.Add("lăm");
-                    }
-                    else
-                    {
-                        words.Add(Numbers[units]);
-                    }
+                    words.Add(Numbers[ones]);
                 }
 
                 return string.Join(" ", words).Trim();

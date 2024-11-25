@@ -61,10 +61,17 @@ namespace FranchiseProject.API.Controllers
         [SwaggerOperation(Summary = "Tải xuống hợp đồng dưới dạng file .doc {Authorize = Manager,Admin}")]
         [HttpGet("download/agency/{id}")]
         [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
-        public async Task<ApiResponse<byte[]>> DownloadContractAsync(Guid id)
+        public async Task<IActionResult> DownloadContractAsync(Guid id)
         {
-            var response = await _contractService.DownloadContractAsDocAsync(id);
-            return response;
+            try
+            {
+                var fileResult = await _contractService.DownloadContractAsPdfAsync(id);
+                return fileResult;
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

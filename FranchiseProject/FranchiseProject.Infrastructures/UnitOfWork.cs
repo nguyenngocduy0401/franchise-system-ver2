@@ -52,6 +52,7 @@ namespace FranchiseProject.Infrastructures
         private readonly IDocumentRepository _documentRepository;
         private readonly IEquipmentRepository _equipmentRepository;
         private readonly IEquipmentTypePriceRepository _equipmentTypePriceRepository;
+        private readonly IFranchiseFeesRepository _franchiseFeesRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -67,7 +68,7 @@ namespace FranchiseProject.Infrastructures
             IAppointmentRepository appointmentRepository, IWorkRepository workRepository,
             IUserAppointmentRepository userAppointmentRepository
             ,IDocumentRepository documentRepository
-            ,IEquipmentRepository equipmentRepository,IEquipmentTypePriceRepository equipmentTypePriceRepository)
+            ,IEquipmentRepository equipmentRepository,IEquipmentTypePriceRepository equipmentTypePriceRepository,IFranchiseFeesRepository franchiseFeesRepository)
 
            
         {
@@ -112,6 +113,7 @@ namespace FranchiseProject.Infrastructures
             _documentRepository = documentRepository;
             _equipmentRepository = equipmentRepository;
             _equipmentTypePriceRepository =equipmentTypePriceRepository;
+            _franchiseFeesRepository = franchiseFeesRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -190,6 +192,8 @@ namespace FranchiseProject.Infrastructures
 
         public IEquipmentRepository EquipmentRepository => _equipmentRepository;
         public IEquipmentTypePriceRepository EquipmentTypePriceRepository => _equipmentTypePriceRepository;
+
+        public IFranchiseFeesRepository FranchiseFeesRepository => _franchiseFeesRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

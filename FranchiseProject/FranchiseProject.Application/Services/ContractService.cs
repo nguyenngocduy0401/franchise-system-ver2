@@ -11,6 +11,8 @@ using System.Linq.Expressions;
 using Spire.Pdf;
 using System.IO;
 using Contract = FranchiseProject.Domain.Entity.Contract;
+using FranchiseProject.Domain.Entity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FranchiseProject.Application.Services
 {
@@ -39,12 +41,12 @@ namespace FranchiseProject.Application.Services
         public async Task NotifyCustomersOfExpiringContracts()
         {
             var agencies = await _unitOfWork.AgencyRepository.GetAgencyExpiredAsync();
-            
+
             foreach (var agency in agencies)
             {
                 if (agency == null || string.IsNullOrEmpty(agency.Email))
                 {
-                    
+
                     continue;
                 }
 
@@ -65,9 +67,9 @@ namespace FranchiseProject.Application.Services
                           $"<p>Trân trọng,</p>" +
                           $"<p>Đội ngũ Futuretech</p>"
                 };
-                
-                    await _emailService.SendEmailAsync(emailMessage);
-               
+
+                await _emailService.SendEmailAsync(emailMessage);
+
             }
         }
         public async Task<ApiResponse<AgencyInfoViewModel>> GetAgencyInfoAsync(Guid agencyId)
@@ -129,6 +131,8 @@ namespace FranchiseProject.Application.Services
                 }
                 var contract = _mapper.Map<FranchiseProject.Domain.Entity.Contract>(create);
                 contract.ContractCode = await GenerateUniqueContractCode();
+                var franchiseFee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
+                contract.FrachiseFee = franchiseFee.Sum(f => f.FeeAmount);
                 await _unitOfWork.ContractRepository.AddAsync(contract);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                 if (isSuccess > 0)
@@ -234,12 +238,14 @@ namespace FranchiseProject.Application.Services
             try
             {
                 Expression<Func<Contract, bool>> filter = c =>
-                    (!filterContractModel.StartTime.HasValue || filterContractModel.StartTime <= c.StartTime) &&
-                    (!filterContractModel.EndTime.HasValue || filterContractModel.EndTime >= c.EndTime) &&
-                    (string.IsNullOrEmpty(filterContractModel.SearchInput) ||
-                        (c.Title.Contains(filterContractModel.SearchInput) ||
-                        (c.Agency != null && c.Agency.Name.Contains(filterContractModel.SearchInput)))
-                    );
+                   (!filterContractModel.StartTime.HasValue || filterContractModel.StartTime <= c.StartTime) &&
+            (!filterContractModel.EndTime.HasValue || filterContractModel.EndTime >= c.EndTime) &&
+            (!filterContractModel.Status.HasValue || c.Status == filterContractModel.Status) &&
+            (!filterContractModel.AgencyId.HasValue || c.AgencyId == filterContractModel.AgencyId) &&
+            (string.IsNullOrEmpty(filterContractModel.SearchInput) ||
+                (c.Title.Contains(filterContractModel.SearchInput) ||
+                (c.Agency != null && c.Agency.Name.Contains(filterContractModel.SearchInput)))
+            );
 
                 var contracts = await _unitOfWork.ContractRepository.GetFilterAsync(
                     filter: filter,
@@ -258,7 +264,10 @@ namespace FranchiseProject.Application.Services
                         StartTime = c.StartTime ?? DateTime.MinValue,
                         EndTime = c.EndTime ?? DateTime.MinValue,
                         ContractDocumentImageURL = c.ContractDocumentImageURL,
+                        Total=c.Total,
+                        Status = c.Status,
                         RevenueSharePercentage = c.RevenueSharePercentage,
+
                         AgencyName = c.Agency != null ? c.Agency.Name : string.Empty
                     }).ToList(),
                     TotalItemsCount = contracts.TotalItemsCount,
@@ -343,15 +352,14 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<ApiResponse<byte[]>> DownloadContractAsDocAsync(Guid agencyId)
+        public async Task<FileContentResult> DownloadContractAsPdfAsync(Guid agencyId)
         {
-            var response = new ApiResponse<byte[]>();
             try
             {
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
                 if (contract == null)
                 {
-                    return ResponseHandler.Failure<byte[]>("Không tìm thấy hợp đồng cho đối tác này.");
+                    throw new Exception("Không tìm thấy hợp đồng cho đối tác này.");
                 }
 
                 var inputInfo = new InputContractViewModel
@@ -361,35 +369,35 @@ namespace FranchiseProject.Application.Services
                     TotalMoney = contract.Total,
                     ContractCode = contract.ContractCode ?? await GenerateUniqueContractCode()
                 };
-                using (var pdfStream =await  _pdfService.FillPdfTemplate(inputInfo))
+
+                using (var pdfStream = await _pdfService.FillPdfTemplate(inputInfo))
                 {
-                    using (var docxStream = new MemoryStream())
+                    using (var memoryStream = new MemoryStream())
                     {
-                        Spire.Pdf.PdfDocument pdfDocument = new Spire.Pdf.PdfDocument();
-                        pdfDocument.LoadFromStream(pdfStream);
-                        pdfDocument.SaveToStream(docxStream, Spire.Pdf.FileFormat.DOCX);
-                        docxStream.Position = 0;
-
- 
-                        byte[] docxBytes = docxStream.ToArray();
-
+                        await pdfStream.CopyToAsync(memoryStream);
+                        byte[] pdfBytes = memoryStream.ToArray();
 
                         if (string.IsNullOrEmpty(contract.ContractCode))
                         {
                             contract.ContractCode = inputInfo.ContractCode;
-                             _unitOfWork.ContractRepository.Update(contract);
+                            _unitOfWork.ContractRepository.Update(contract);
                             await _unitOfWork.SaveChangeAsync();
                         }
-                        response.Data = docxBytes;
-                        response.isSuccess = true;
-                        response.Message = "Tải xuống hợp đồng thành công.";
-                        return response;
+
+                        string fileName = $"Contract_{contract.ContractCode}.pdf";
+                        string contentType = "application/pdf";
+
+                        return new FileContentResult(pdfBytes, contentType)
+                        {
+                            FileDownloadName = fileName
+                        };
                     }
                 }
             }
             catch (Exception ex)
             {
-                return ResponseHandler.Failure<byte[]>($"Lỗi khi tạo file hợp đồng: {ex.Message}");
+                // Log the exception
+                throw new Exception($"Lỗi khi tạo file hợp đồng: {ex.Message}");
             }
         }
         private async Task<string> GenerateUniqueContractCode()

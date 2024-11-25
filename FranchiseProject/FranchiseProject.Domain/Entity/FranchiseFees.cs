@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Domain.Enums
+namespace FranchiseProject.Domain.Entity
 {
-    public enum ContractStatusEnum
+    public class FranchiseFees:BaseEntity
     {
-        None,
-        Active,
-        Expired
+        public double? FeeAmount { get; set; }
+
     }
 }

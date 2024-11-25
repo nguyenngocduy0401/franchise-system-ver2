@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.ConsultationViewModels;
 using FranchiseProject.Application.ViewModels.ContractViewModels;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<Pagination<ContractViewModel>>> FilterContractViewModelAsync(FilterContractViewModel filter);
         Task<ApiResponse<ContractViewModel>> GetContractByIdAsync(string id);
         Task<ApiResponse<AgencyInfoViewModel>> GetAgencyInfoAsync(Guid agencyId);
-        Task<ApiResponse<byte[]>> DownloadContractAsDocAsync(Guid agencyId);
+        Task<FileContentResult> DownloadContractAsPdfAsync(Guid agencyId);
     }
 }
