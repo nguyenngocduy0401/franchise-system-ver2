@@ -259,11 +259,10 @@ namespace FranchiseProject.Application.Services
                                 UserName = userCredentials.UserName,
                                  PasswordHash= userCredentials.Password,
                                 AgencyId = agencyId,
-                                Status = UserStatusEnum.active,
+                            //    Status = UserStatusEnum.active,
                                 Email=agency.Email,
                                 PhoneNumber=agency.PhoneNumber,
-                                
-
+ 
                             };
                           var user2=  _unitOfWork.UserRepository.CreateUserAndAssignRoleAsync(newUser, RolesEnum.AgencyManager.ToString());
                             var emailMessage = new MessageModel

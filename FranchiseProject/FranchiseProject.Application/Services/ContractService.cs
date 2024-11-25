@@ -354,7 +354,7 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<FileContentResult> DownloadContractAsPdfAsync(Guid agencyId)
+        public async Task<ApiResponse<string>> DownloadContractAsPdfAsync(Guid agencyId)
         {
             try
             {
@@ -387,19 +387,25 @@ namespace FranchiseProject.Application.Services
                         }
 
                         string fileName = $"Contract_{contract.ContractCode}.pdf";
-                        string contentType = "application/pdf";
 
-                        return new FileContentResult(pdfBytes, contentType)
+                        // Tạo MemoryStream mới từ mảng byte
+                        using (var uploadStream = new MemoryStream(pdfBytes))
                         {
-                            FileDownloadName = fileName
-                        };
+                            string firebaseUrl = await _firebaseService.UploadFileAsync(uploadStream, fileName);
+
+                            contract.ContractDocumentImageURL = firebaseUrl;
+                            _unitOfWork.ContractRepository.Update(contract);
+                            await _unitOfWork.SaveChangeAsync();
+
+                            return ResponseHandler.Success(firebaseUrl, "File hợp đồng đã được tải lên thành công.");
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
                 // Log the exception
-                throw new Exception($"Lỗi khi tạo file hợp đồng: {ex.Message}");
+                return ResponseHandler.Failure<string>($"Lỗi khi tạo và tải lên file hợp đồng: {ex.Message}");
             }
         }
         private async Task<string> GenerateUniqueContractCode()
