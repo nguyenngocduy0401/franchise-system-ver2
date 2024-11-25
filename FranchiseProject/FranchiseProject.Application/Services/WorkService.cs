@@ -328,10 +328,10 @@ namespace FranchiseProject.Application.Services
                         work.Status = status;
                         if (work.Type == WorkTypeEnum.BusinessRegistered)
                         {
-                            var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveAgreementContractAsync(work.AgencyId.Value);
+                            var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveBusinessLicenseAsync(work.AgencyId.Value);
                             if (!hasActiveAgreementContract)
                             {
-                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng thỏa thuận hoạt động!");
+                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có giấy đăng kí doanh nghiệp hoạt động!");
                             }
                             var fee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
                              var contract = new Contract
@@ -342,6 +342,15 @@ namespace FranchiseProject.Application.Services
                                                           
                             };
                             await _unitOfWork.ContractRepository.AddAsync(contract);
+                        }
+                        if (work.Type == WorkTypeEnum.AgreementSigned)
+                        {
+                            var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveAgreementContractAsync(work.AgencyId.Value);
+                            if (!hasActiveAgreementContract)
+                            {
+                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng thỏa thuận!");
+                            }
+
                         }
                         if (work.Type == WorkTypeEnum.Quotation)
                         {
