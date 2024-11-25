@@ -10,5 +10,6 @@ namespace FranchiseProject.Application.Repositories
     public interface IDocumentRepository :IGenericRepository<Document>
     {
         Task<bool> HasActiveAgreementContractAsync(Guid agencyId);
+        Task<bool> HasActiveBusinessLicenseAsync(Guid agencyId);
     }
 }
