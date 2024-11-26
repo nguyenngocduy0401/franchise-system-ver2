@@ -57,7 +57,7 @@ namespace FranchiseProject.Infrastructures.Repositories
                  e.Type == WorkTypeEnum.BusinessRegistered || e.Type == WorkTypeEnum.SiteSurvey ||
                  e.Type == WorkTypeEnum.Design || e.Type == WorkTypeEnum.Quotation ||
                  e.Type == WorkTypeEnum.SignedContract || e.Type == WorkTypeEnum.ConstructionAndTrainning || 
-                 e.Type == WorkTypeEnum.Handover || e.Type == WorkTypeEnum.EducationalSupervision))
+                 e.Type == WorkTypeEnum.Handover || e.Type == WorkTypeEnum.EducationLicenseRegistered))
                 .OrderByDescending(e => e.StartDate);
         }
 
