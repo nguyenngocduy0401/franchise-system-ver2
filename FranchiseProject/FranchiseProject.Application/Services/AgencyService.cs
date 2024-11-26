@@ -441,12 +441,75 @@ namespace FranchiseProject.Application.Services
                 {
                     Title = "Phỏng vấn đối tác - " + agency.Name,
                     StartTime = _currentTime.GetCurrentTime(),
-                    EndTime = _currentTime.GetCurrentTime(),
+                    EndTime = _currentTime.GetCurrentTime().AddHours(1),
                     Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Địa chỉ công ty hoặc cuộc họp trực tuyến]</li>\r\n</ul>",
                     Status = AppointmentStatusEnum.None,
                     Type = AppointmentTypeEnum.WithAgency,
 
                 }}
+            });
+            works.Add(new Work
+            {
+                Title = "Ký thỏa thuận với đối tác - " + agency.Name,
+                Description = "<p>Buổi ký thỏa thuận nhằm đảm bảo đối tác đồng ý với các điều khoản cơ bản.</p>\r\n<ul>\r\n    " +
+                  "<li><strong>Kiểm tra:</strong> Rà soát kỹ các điều khoản thỏa thuận.</li>\r\n    " +
+                  "<li><strong>Ký thỏa thuận:</strong> Đại diện hai bên chính thức xác nhận đồng ý hợp tác.</li>\r\n</ul>\r\n" +
+                  "<p><strong>Nhân viên cần chuẩn bị:</strong> Bản dự thảo thỏa thuận và tài liệu pháp lý liên quan.</p>\r\n" +
+                  "<p><strong>Thời gian:</strong> 1-2 giờ</p>\r\n<p><strong>Kết quả:</strong> Thỏa thuận được ký và lưu trữ.</p>",
+                Status = WorkStatusEnum.None,
+                Submit = WorkStatusSubmitEnum.None,
+                Type = WorkTypeEnum.AgreementSigned,
+                Level = WorkLevelEnum.Compulsory,
+                StartDate = _currentTime.GetCurrentTime(),
+                EndDate = _currentTime.GetCurrentTime().AddDays(1),
+                AgencyId = agency.Id,
+                Appointments = new List<Appointment>
+    {
+        new Appointment
+        {
+            Title = "Ký thỏa thuận với đối tác - " + agency.Name,
+            StartTime = _currentTime.GetCurrentTime(),
+            EndTime = _currentTime.GetCurrentTime().AddHours(2),
+            Description = "<ul>\r\n    " +
+                          "<li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    " +
+                          "<li><strong>Địa điểm:</strong> [Địa chỉ công ty hoặc họp trực tuyến]</li>\r\n    " +
+                          "<li><strong>Tài liệu cần chuẩn bị:</strong> Dự thảo thỏa thuận, tài liệu pháp lý.</li>\r\n    " +
+                          "<li><strong>Mục đích:</strong> Xác nhận hợp tác và đồng ý các điều khoản.</li>\r\n</ul>",
+            Status = AppointmentStatusEnum.None,
+            Type = AppointmentTypeEnum.WithAgency,
+        }
+    }
+            }); works.Add(new Work
+            {
+                Title = "Ký thỏa thuận với đối tác - " + agency.Name,
+                Description = "<p>Buổi ký thỏa thuận nhằm đảm bảo đối tác đồng ý với các điều khoản cơ bản.</p>\r\n<ul>\r\n    " +
+                  "<li><strong>Kiểm tra:</strong> Rà soát kỹ các điều khoản thỏa thuận.</li>\r\n    " +
+                  "<li><strong>Ký thỏa thuận:</strong> Đại diện hai bên chính thức xác nhận đồng ý hợp tác.</li>\r\n</ul>\r\n" +
+                  "<p><strong>Nhân viên cần chuẩn bị:</strong> Bản dự thảo thỏa thuận và tài liệu pháp lý liên quan.</p>\r\n" +
+                  "<p><strong>Thời gian:</strong> 1-2 giờ</p>\r\n<p><strong>Kết quả:</strong> Thỏa thuận được ký và lưu trữ.</p>",
+                Status = WorkStatusEnum.None,
+                Submit = WorkStatusSubmitEnum.None,
+                Type = WorkTypeEnum.AgreementSigned,
+                Level = WorkLevelEnum.Compulsory,
+                StartDate = _currentTime.GetCurrentTime(),
+                EndDate = _currentTime.GetCurrentTime().AddDays(1),
+                AgencyId = agency.Id,
+                Appointments = new List<Appointment>
+                {
+                    new Appointment
+                    {
+                        Title = "Ký thỏa thuận với đối tác - " + agency.Name,
+                        StartTime = _currentTime.GetCurrentTime(),
+                        EndTime = _currentTime.GetCurrentTime().AddHours(2),
+                        Description = "<ul>\r\n    " +
+                                      "<li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    " +
+                                      "<li><strong>Địa điểm:</strong> [Địa chỉ công ty hoặc họp trực tuyến]</li>\r\n    " +
+                                      "<li><strong>Tài liệu cần chuẩn bị:</strong> Dự thảo thỏa thuận, tài liệu pháp lý.</li>\r\n    " +
+                                      "<li><strong>Mục đích:</strong> Xác nhận hợp tác và đồng ý các điều khoản.</li>\r\n</ul>",
+                        Status = AppointmentStatusEnum.None,
+                        Type = AppointmentTypeEnum.WithAgency,
+                    }
+                }
             });
             works.Add(new Work
             {
@@ -466,7 +529,7 @@ namespace FranchiseProject.Application.Services
                 {
                     Title = "Kí hợp đồng với đối tác - " + agency.Name,
                     StartTime = _currentTime.GetCurrentTime(),
-                    EndTime = _currentTime.GetCurrentTime(),
+                    EndTime = _currentTime.GetCurrentTime().AddHours(2),
                     Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Địa chỉ công ty hoặc cuộc họp trực tuyến]</li>\r\n    <li><strong>Tài liệu cần chuẩn bị:</strong> [Tài liệu của khách hàng hoặc nhân viên cần chuẩn bị]</li>\r\n    <li><strong>Mục đích của cuộc phỏng vấn:</strong> [Mục đích cụ thể của buổi phỏng vấn]</li>\r\n</ul>",
                     Status = AppointmentStatusEnum.None,
                     Type = AppointmentTypeEnum.WithAgency,

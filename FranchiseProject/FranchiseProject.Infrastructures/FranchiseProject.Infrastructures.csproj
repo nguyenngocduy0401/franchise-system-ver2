@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <Folder Include="DataInitializer\" />
+    <Folder Include="RabbitMQ\Consumers\" />
+    <Folder Include="RabbitMQ\Producers\" />
   </ItemGroup>
 
   <ItemGroup>
