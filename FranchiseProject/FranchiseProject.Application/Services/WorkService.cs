@@ -254,8 +254,8 @@ namespace FranchiseProject.Application.Services
                 var work = await _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
 
                 work = _mapper.Map(updateWorkModel, work);
-                var checkDate = await CheckPreviousWorkDateValidation(work);
-                if (checkDate.Data == false) return checkDate;
+                //var checkDate = await CheckPreviousWorkDateValidation(work);
+                //if (checkDate.Data == false) return checkDate;
 
                 var checkWork = await CheckPreWorkAvailable(work);
                 if (checkWork.Data == false) return checkWork;
@@ -285,8 +285,8 @@ namespace FranchiseProject.Application.Services
                 work.Status = WorkStatusEnum.None;
                 work.Submit = WorkStatusSubmitEnum.None;
 
-                var checkDate = await CheckPreviousWorkDateValidation(work);
-                if (checkDate.Data == false) return checkDate;
+                //var checkDate = await CheckPreviousWorkDateValidation(work);
+                //if (checkDate.Data == false) return checkDate;
 
                 var checkWork = await CheckPreWorkAvailable(work);
                 if (checkWork.Data == false) return checkWork;
