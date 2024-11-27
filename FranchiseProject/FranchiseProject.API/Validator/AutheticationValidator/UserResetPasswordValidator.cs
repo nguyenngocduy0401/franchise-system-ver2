@@ -7,14 +7,27 @@ namespace FranchiseProject.API.Validator.AutheticationValidator
     {
         public UserResetPasswordValidator()
         {
-            RuleFor(x => x.UserName).NotEmpty();
-            RuleFor(x => x.OTP).NotEmpty().Length(6);
-            RuleFor(x => x.NewPassword).NotEmpty().MinimumLength(6)
-               .WithMessage("Password must be at least 6 characters long!")
-           .Matches(@"^(?=.*[a-zA-Z])(?=.*\d).+$")
-               .WithMessage("Your password must contain at least one number!");
-            RuleFor(x => x.ConfirmPassword).Equal(x => x.ConfirmPassword)
-                .WithMessage("Your password confirmed is wrong!");
+            RuleFor(x => x.UserName)
+                .NotEmpty()
+                .WithMessage("Tên người dùng không được để trống.");
+
+            RuleFor(x => x.OTP)
+                .NotEmpty()
+                .WithMessage("Mã OTP không được để trống.")
+                .Length(6)
+                .WithMessage("Mã OTP phải có 6 ký tự.");
+
+            RuleFor(x => x.NewPassword)
+                .NotEmpty()
+                .WithMessage("Mật khẩu mới không được để trống.")
+                .MinimumLength(6)
+                .WithMessage("Mật khẩu phải có ít nhất 6 ký tự.")
+                .Matches(@"^(?=.*[a-zA-Z])(?=.*\d).+$")
+                .WithMessage("Mật khẩu của bạn phải chứa ít nhất một chữ cái và một số.");
+
+            RuleFor(x => x.ConfirmPassword)
+                .Equal(x => x.NewPassword)
+                .WithMessage("Mật khẩu xác nhận không đúng.");
         }
     }
 }

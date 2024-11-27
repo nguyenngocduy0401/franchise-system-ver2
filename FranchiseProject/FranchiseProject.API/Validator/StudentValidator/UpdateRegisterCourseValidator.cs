@@ -7,12 +7,13 @@ namespace FranchiseProject.API.Validator.StudentValidator
     {
         public UpdateRegisterCourseValidator() {
             RuleFor(x => x.StudentName)
-                 .NotEmpty().WithMessage("Student name is required.")
-                 .Length(2, 100).WithMessage("Student name must be between 2 and 100 characters.");
+                .NotEmpty().WithMessage("Tên học sinh là bắt buộc.")
+                .Length(2, 100).WithMessage("Tên học sinh phải có độ dài từ 2 đến 100 ký tự.");
+
             RuleFor(x => x.DateTime)
-                .NotEmpty().WithMessage("DateTime is required.");
-               
-           
+                .NotEmpty().WithMessage("Ngày giờ là bắt buộc.");
+
+
         }  
     }
 }

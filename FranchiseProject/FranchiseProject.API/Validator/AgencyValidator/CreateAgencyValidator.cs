@@ -11,7 +11,6 @@ namespace FranchiseProject.API.Validator.AgencyValidation
             RuleFor(x => x.Name)
                 .MaximumLength(50)
                 .WithMessage("Name cannot exceed 50 characters.");
-
             RuleFor(x => x.Address)
                 .MaximumLength(50)
                 .WithMessage("Address cannot exceed 50 characters.");
@@ -27,7 +26,6 @@ namespace FranchiseProject.API.Validator.AgencyValidation
             RuleFor(x => x.PhoneNumber).
                   NotEmpty().Matches(@"^0[0-9]{9}$")
                   .WithMessage("The phone number must have 10 digits and start with 0!");
-
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("Email is required.")
                 .EmailAddress().WithMessage("Email is not valid.");

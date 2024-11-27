@@ -9,8 +9,8 @@ namespace FranchiseProject.API.Validator.CourseMaterialValidator
         public CreateCourseMaterialValidator()
         {
             RuleFor(x => x.URL)
-                .NotEmpty()
-                .WithMessage("URL is required.");
+            .NotEmpty()
+            .WithMessage("URL không được để trống.");
         }
     }
 }

@@ -8,7 +8,11 @@ namespace FranchiseProject.API.Validator.CourseCategoryValidator
     {
         public CreateCourseCategoryValidator()
         {
-            RuleFor(x => x.Name).NotEmpty();
+            RuleFor(x => x.Name)
+            .NotEmpty()
+            .WithMessage("Tên danh mục không được để trống.")
+            .MaximumLength(150)
+            .WithMessage("Tên danh mục không được dài quá 150 ký tự.");
         }
     }
 }

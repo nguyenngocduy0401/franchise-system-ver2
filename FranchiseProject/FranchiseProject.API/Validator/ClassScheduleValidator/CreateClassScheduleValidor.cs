@@ -8,10 +8,13 @@ namespace FranchiseProject.API.Validator.ClassScheduleValidator
     {
         public CreateClassScheduleValidor() 
         {
-            RuleFor(x => x.Room).NotEmpty().WithMessage("Room is not empty!");
+            RuleFor(x => x.Room)
+                .NotEmpty()
+                .WithMessage("Phòng không được để trống!");
+
             RuleFor(x => x.Date)
-               .Must(BeAValidStartDate)
-               .WithMessage("\r\nThe start date cannot be a date in the past.");
+                .Must(BeAValidStartDate)
+                .WithMessage("Ngày bắt đầu không được là ngày trong quá khứ.");
         }
         private bool BeAValidStartDate(string date)
         {

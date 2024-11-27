@@ -8,21 +8,17 @@ namespace FranchiseProject.API.Validator.PaymentValidator
     {
         public PaymentStudentValidator() {
             RuleFor(x => x.Title)
-            .NotEmpty().WithMessage("Title is required.")
-            .Length(1, 100).WithMessage("Title must be between 1 and 100 characters.");
-
-        /*    RuleFor(x => x.StudentName)
-                .NotEmpty().WithMessage("Student Name is required.")
-                .Length(1, 50).WithMessage("Student Name must be between 1 and 50 characters.");*/
+                .NotEmpty().WithMessage("Tiêu đề là bắt buộc.")
+                .Length(1, 100).WithMessage("Tiêu đề phải có độ dài từ 1 đến 100 ký tự.");
 
             RuleFor(x => x.Description)
-                .MaximumLength(500).WithMessage("Description must not exceed 500 characters.");
+                .MaximumLength(500).WithMessage("Mô tả không được vượt quá 500 ký tự.");
 
             RuleFor(x => x.Amount)
-                .NotNull().WithMessage("Amount is required.")
-                .GreaterThan(0).WithMessage("Amount must be greater than zero.");
+                .NotNull().WithMessage("Số tiền là bắt buộc.")
+                .GreaterThan(0).WithMessage("Số tiền phải lớn hơn 0.");
 
-           
+
         }
     }
 }

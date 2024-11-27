@@ -9,11 +9,12 @@ namespace FranchiseProject.API.Validator.ClassValidator
         public UpdateClassValidator()
         {
             RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Name  is required.")
-            .Length(2, 100).WithMessage("Name  must be between 2 and 100 characters.");
+                .NotEmpty().WithMessage("Tên là bắt buộc.")
+                .Length(2, 100).WithMessage("Tên phải có độ dài từ 2 đến 100 ký tự.");
+
             RuleFor(x => x.Capacity)
-                .NotEmpty().WithMessage("Capacity is required.")
-                .GreaterThan(0).WithMessage("Capacity must be geater than 0");
+                .NotEmpty().WithMessage("Sức chứa là bắt buộc.")
+                .GreaterThan(0).WithMessage("Sức chứa phải lớn hơn 0.");
 
 
         }

@@ -10,13 +10,21 @@ namespace FranchiseProject.API.Validator.ChapterMaterialValidator
         {
             RuleFor(x => x.Number)
                 .NotEmpty()
-                .GreaterThan(0);
+                .WithMessage("Số không được để trống.")
+                .GreaterThan(0)
+                .WithMessage("Số phải lớn hơn 0.");
+
             RuleFor(x => x.URL)
-                    .NotEmpty()
-                    .MaximumLength(200);
+                .NotEmpty()
+                .WithMessage("URL không được để trống.")
+                .MaximumLength(200)
+                .WithMessage("URL không được dài quá 200 ký tự.");
+
             RuleFor(x => x.Description)
-                    .NotEmpty()
-                    .MaximumLength(500);
+                .NotEmpty()
+                .WithMessage("Mô tả không được để trống.")
+                .MaximumLength(500)
+                .WithMessage("Mô tả không được dài quá 500 ký tự.");
         }
     }
 }
