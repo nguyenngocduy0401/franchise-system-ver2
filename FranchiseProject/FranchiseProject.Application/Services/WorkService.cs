@@ -254,8 +254,8 @@ namespace FranchiseProject.Application.Services
                 var work = await _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
 
                 work = _mapper.Map(updateWorkModel, work);
-                //var checkDate = await CheckPreviousWorkDateValidation(work);
-                //if (checkDate.Data == false) return checkDate;
+                var checkDate = await CheckPreviousWorkDateValidation(work);
+                if (checkDate.Data == false) return checkDate;
 
                 var checkWork = await CheckPreWorkAvailable(work);
                 if (checkWork.Data == false) return checkWork;
@@ -285,8 +285,8 @@ namespace FranchiseProject.Application.Services
                 work.Status = WorkStatusEnum.None;
                 work.Submit = WorkStatusSubmitEnum.None;
 
-                //var checkDate = await CheckPreviousWorkDateValidation(work);
-                //if (checkDate.Data == false) return checkDate;
+                var checkDate = await CheckPreviousWorkDateValidation(work);
+                if (checkDate.Data == false) return checkDate;
 
                 var checkWork = await CheckPreWorkAvailable(work);
                 if (checkWork.Data == false) return checkWork;
@@ -466,8 +466,11 @@ namespace FranchiseProject.Application.Services
             try
             {
                 if (work.Type > WorkTypeEnum.Interview && work.Type <= WorkTypeEnum.EducationLicenseRegistered)
-                { 
-                    var previousWork = await _unitOfWork.WorkRepository.GetPreviousWorkByAgencyId((Guid)work.AgencyId);
+                {
+                    var filter = (Expression<Func<Work, bool>>)(e => e.IsDeleted != true &&
+                    e.Type < work.Type &&
+                    work.Level == WorkLevelEnum.Compulsory);
+                    var previousWork = await _unitOfWork.WorkRepository.GetPreviousWorkByAgencyId((Guid)work.AgencyId, filter);
                     if (previousWork != null) 
                     {
                         if(previousWork.EndDate > work.StartDate) 
