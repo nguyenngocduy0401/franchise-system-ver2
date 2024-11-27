@@ -106,6 +106,16 @@ namespace FranchiseProject.Infrastructures.Repositories
             };
             return result;
         }
+        public async Task<Work> GetPreviousWorkByAgencyId(Guid agencyId, Expression<Func<Work, bool>>? filter = null) 
+        {
+            var work = await _dbContext.Agencies.Where(e => e.Id == agencyId)
+                                       .SelectMany(e => e.Works)
+                                       .Where(filter)
+                                       .OrderByDescending(e => e.EndDate)
+                                       .FirstOrDefaultAsync();
+            return work;
+        }
+        
     }
 }
 
