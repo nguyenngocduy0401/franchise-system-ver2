@@ -118,7 +118,7 @@ namespace FranchiseProject.Application.Services
                     UserId = newUser.Id,
                     CourseId = Guid.Parse(model.CourseId),
                     StudentCourseStatus = StudentCourseStatusEnum.NotConsult
-                   ,CreatDate=DateTime.Now,
+               
                 };
                  await _unitOfWork.RegisterCourseRepository.AddAsync(newRegisterCourse);
                 var emailMessage = EmailTemplate.SuccessRegisterCourseEmaill(model.Email, model.StudentName, course.Name, agency.Name);
@@ -237,7 +237,7 @@ namespace FranchiseProject.Application.Services
                     CourseId = registerCourse.CourseId,
                     DateTime = await GetDateTimeFromRegisterCourseAsync(id, registerCourse.CourseId.Value),
                     CoursePrice = registerCourse.Course?.Price,
-                    RegisterDate = registerCourse.CreatDate?.ToString(),
+                    RegisterDate = registerCourse.CreationDate.ToString(),
                     PaymentStatus=registerCourse.StudentPaymentStatus,
                 };
 
@@ -299,7 +299,7 @@ namespace FranchiseProject.Application.Services
                     PhoneNumber = rc.User?.PhoneNumber,
                     CourseCode = rc.Course?.Code,
                     CoursePrice = rc.Course?.Price,
-                    RegisterDate = rc.CreatDate?.ToString("dd/MM/yyyy"),
+                    RegisterDate = rc.CreationDate.ToString("dd/MM/yyyy"),
                     StudentStatus = rc.StudentCourseStatus,
                     PaymentStatus = rc.StudentPaymentStatus,
                     DateTime = rc.DateTime,
@@ -384,7 +384,6 @@ namespace FranchiseProject.Application.Services
                 var registerC = new RegisterCourse { 
                 CourseId= courseGuidId,
                 UserId= studentId,
-                CreatDate= DateTime.Now,
                 StudentCourseStatus= StudentCourseStatusEnum.Pending,
                 };
                await _unitOfWork.RegisterCourseRepository.AddAsync(registerC);

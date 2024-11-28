@@ -48,6 +48,7 @@ namespace FranchiseProject.Application.Services
                 var franchiseRequest = _mapper.Map<RegisterForm>(regis);
                 franchiseRequest.Status = ConsultationStatusEnum.NotConsulted;
                 franchiseRequest.CustomerName = regis.CustomerName;
+                franchiseRequest.ModificationDate = DateTime.Now;
                 await _unitOfWork.FranchiseRegistrationRequestRepository.AddAsync(franchiseRequest);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                if (isSuccess > 0)

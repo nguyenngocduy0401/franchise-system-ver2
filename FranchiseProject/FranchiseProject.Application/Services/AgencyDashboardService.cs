@@ -55,7 +55,7 @@ namespace FranchiseProject.Application.Services
                     var TotalMoney = 0;
                     var studentCount = 0; 
                     var validRegistrations = filteredRegisterCourses
-                .Where(r => r.CreatDate.HasValue && r.CreatDate.Value.Date >= startDate.Date && r.CreatDate.Value.Date <= endDate.Date)
+                .Where(r => r.CreationDate.Date <= endDate.Date)
                 .ToList();
                     foreach (var registration in validRegistrations)
                     {

@@ -16,6 +16,7 @@ namespace FranchiseProject.Application.ViewModels.ConsultationViewModels
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
         public ConsultationStatusEnum Status { get; set; }
+        public DateTime? ModificationDate { get; set; }
          public string? ConsultantUserName { get; set; }
     }
 }
