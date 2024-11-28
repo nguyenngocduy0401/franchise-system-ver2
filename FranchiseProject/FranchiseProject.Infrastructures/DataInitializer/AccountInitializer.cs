@@ -1,4 +1,5 @@
 ﻿using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Domain.Entity;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -13,10 +14,13 @@ namespace FranchiseProject.Infrastructures.DataInitializer
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
-        public AccountInitializer(UserManager<User> userManager, RoleManager<Role> roleManager)
+        private readonly ICurrentTime _currentTime;
+        public AccountInitializer(UserManager<User> userManager, RoleManager<Role> roleManager,
+            ICurrentTime currentTime)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _currentTime = currentTime;
         }
 
         public async Task AccountInitializeAsync()
@@ -38,7 +42,7 @@ namespace FranchiseProject.Infrastructures.DataInitializer
 
                 if (userRole == null)
                 {
-                    var newUser = await _userManager.CreateAsync(new User { UserName = role, FullName = role }, "abc123");
+                    var newUser = await _userManager.CreateAsync(new User { UserName = role, FullName = role, CreateAt = _currentTime.GetCurrentTime() }, "abc123");
 
                     if (newUser.Succeeded)
                     {
@@ -46,17 +50,19 @@ namespace FranchiseProject.Infrastructures.DataInitializer
                         await _userManager.AddToRoleAsync(getUser, role);
                     }
                 }
-                for (int i = 1; i <= 10; i++)
-                {
-                    userRole = await _userManager.FindByNameAsync(role + $"{i}");
-                    if (userRole == null)
+                if(role != AppRole.Student && role != AppRole.Instructor && role != AppRole.AgencyManager && role != AppRole.AgencyStaff){
+                    for (int i = 1; i <= 10; i++)
                     {
-                        var newUser = await _userManager.CreateAsync(new User { UserName = role + $"{i}", FullName = role + $"{i}" }, "abc123");
-
-                        if (newUser.Succeeded)
+                        userRole = await _userManager.FindByNameAsync(role + $"{i}");
+                        if (userRole == null)
                         {
-                            var getUser = await _userManager.FindByNameAsync(role + $"{i}");
-                            await _userManager.AddToRoleAsync(getUser, role);
+                            var newUser = await _userManager.CreateAsync(new User { UserName = role + $"{i}", FullName = role + $"{i}", CreateAt = _currentTime.GetCurrentTime().AddSeconds(i) }, "abc123");
+
+                            if (newUser.Succeeded)
+                            {
+                                var getUser = await _userManager.FindByNameAsync(role + $"{i}");
+                                await _userManager.AddToRoleAsync(getUser, role);
+                            }
                         }
                     }
                 }
