@@ -15,6 +15,7 @@ using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -123,7 +124,8 @@ namespace FranchiseProject.Application.Services
                 {
                     UserId = newUser.Id,
                     CourseId = Guid.Parse(model.CourseId),
-                    StudentCourseStatus = StudentCourseStatusEnum.NotConsult
+                    StudentCourseStatus = StudentCourseStatusEnum.NotConsult,
+                    ModificationDate=DateTime.Now
                
                 };
                  await _unitOfWork.RegisterCourseRepository.AddAsync(newRegisterCourse);
@@ -158,7 +160,7 @@ namespace FranchiseProject.Application.Services
                 var courseGuidId = Guid.Parse(courseId);
                 var registerCourse = await _unitOfWork.RegisterCourseRepository
                     .GetFirstOrDefaultAsync(rc => rc.UserId == studentId && rc.CourseId == courseGuidId);
-
+              //  var userCurrent = await _userManager.FindByIdAsync(_claimsService.GetCurrentUserId.ToString());
                 if (registerCourse == null)
                 {
                     return ResponseHandler.Success<bool>(false, "Không tìm thấy bản ghi khóa học của học sinh!");
@@ -185,8 +187,8 @@ namespace FranchiseProject.Application.Services
                         registerCourse.StudentCourseStatus = StudentCourseStatusEnum.Waitlisted;
                         break;
                 }
+                registerCourse.ModificationBy = _claimsService.GetCurrentUserId;
 
-               
                 await  _unitOfWork.RegisterCourseRepository.UpdateAsync(registerCourse);
                 await _unitOfWork.SaveChangeAsync();
 
@@ -229,7 +231,12 @@ namespace FranchiseProject.Application.Services
                 }
                 var rc = await _unitOfWork.RegisterCourseRepository.GetFirstOrDefaultAsync(rc=> rc.UserId==id&&rc.CourseId==Guid.Parse(courseId));
                 var courseCodes = await _unitOfWork.RegisterCourseRepository.GetCourseCodeByUserIdAsync(id);
-
+                string consultantName = null;
+                if (!string.IsNullOrEmpty(registerCourse.ModificationBy.ToString()))
+                {
+                    var consultant = await _userManager.FindByIdAsync(registerCourse.ModificationBy.ToString());
+                    consultantName = consultant?.UserName;
+                }
                 var studentViewModel = new StudentRegisterViewModel
                 {
                     Id = rc.Id,
@@ -241,8 +248,9 @@ namespace FranchiseProject.Application.Services
                     StudentStatus = rc.StudentCourseStatus,
                     CourseId = registerCourse.CourseId,
                     DateTime = await GetDateTimeFromRegisterCourseAsync(id, registerCourse.CourseId.Value),
+                    ConsultantName = consultantName,
                     CoursePrice = registerCourse.Course?.Price,
-                    RegisterDate = registerCourse.CreationDate.ToString(),
+                    ModificationDate = registerCourse.ModificationDate.ToString(),
                     PaymentStatus=registerCourse.StudentPaymentStatus,
                 };
 
@@ -294,7 +302,25 @@ namespace FranchiseProject.Application.Services
                 var paymentTotalByCourse = payments
                     .GroupBy(p => p.RegisterCourseId)
                     .ToDictionary(g => g.Key, g => g.Sum(p => p.Amount));
-                var studentRegisterViewModels = registerCourses.Items.Select(rc => new StudentRegisterViewModel
+
+                var modificationByIds = registerCourses.Items
+          .Where(rc => rc.ModificationBy != null)
+          .Select(rc => rc.ModificationBy.Value)
+          .Distinct()
+          .ToList();
+
+                var consultants = await Task.WhenAll(modificationByIds.Select(async id =>
+                {
+                    var user = await _userManager.FindByIdAsync(id.ToString());
+                    return new { Id = id, UserName = user?.UserName };
+                }));
+
+                var consultantDictionary = consultants
+                    .Where(c => c.UserName != null)
+                    .ToDictionary(c => c.Id, c => c.UserName);
+
+
+                var studentRegisterViewModels = registerCourses.Items.OrderByDescending(item => item.ModificationDate).Select(rc => new StudentRegisterViewModel
                 {
                     Id = rc.Id,
                     UserId=rc.UserId,
@@ -304,7 +330,10 @@ namespace FranchiseProject.Application.Services
                     PhoneNumber = rc.User?.PhoneNumber,
                     CourseCode = rc.Course?.Code,
                     CoursePrice = rc.Course?.Price,
-                    RegisterDate = rc.CreationDate.ToString("dd/MM/yyyy"),
+                    ModificationDate = rc.ModificationDate.ToString(),
+                    ConsultantName = rc.ModificationBy != null && consultantDictionary.TryGetValue(rc.ModificationBy.Value, out var userName)
+                ? userName
+                : null,
                     StudentStatus = rc.StudentCourseStatus,
                     PaymentStatus = rc.StudentPaymentStatus,
                     DateTime = rc.DateTime,
