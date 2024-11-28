@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ConsultationViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -142,21 +144,48 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var paginationResult = await _unitOfWork.FranchiseRegistrationRequestRepository.GetFilterAsync(
-                       filter: s =>
-                     (!filterModel.Status.HasValue || s.Status == filterModel.Status), includeProperties: "User",
+                    filter: s => (!filterModel.Status.HasValue || s.Status == filterModel.Status),
+                    includeProperties: "User",
+                    pageIndex: filterModel.PageIndex,
+                    pageSize: filterModel.PageSize
+                );
 
+                if (paginationResult?.Items == null)
+                {
+                    return ResponseHandler.Failure<Pagination<ConsultationViewModel>>("No items found.");
+                }
 
-                     pageIndex: filterModel.PageIndex,
-                     pageSize: filterModel.PageSize
-                 );
-                var consultationViewModel = _mapper.Map<List<ConsultationViewModel>>(paginationResult.Items);
+                var consultantIds = paginationResult.Items
+                    .Where(item => item?.ConsultanId != null)
+                    .Select(item => item.ConsultanId)
+                    .Distinct()
+                    .ToList();
+
+                var consultants = await _userManager.Users
+                    .Where(u => consultantIds.Contains(u.Id))
+                    .ToDictionaryAsync(u => u.Id, u => u.UserName);
+
+                var consultationViewModels = paginationResult.Items.OrderByDescending(item => item.ModificationDate).Select(item => new ConsultationViewModel
+                {
+                    Id = item.Id,
+                    CusomterName = item.CustomerName,
+                    Email = item.Email,
+                    PhoneNumber = item.PhoneNumber,
+                    Status = item.Status,
+                    ModificationDate = item.ModificationDate,
+                    ConsultantUserName = item.ConsultanId != null && consultants.TryGetValue(item.ConsultanId, out var userName)
+                        ? userName
+                        : null
+                }).ToList();
+
                 var paginationViewModel = new Pagination<ConsultationViewModel>
                 {
                     PageIndex = paginationResult.PageIndex,
                     PageSize = paginationResult.PageSize,
                     TotalItemsCount = paginationResult.TotalItemsCount,
-                    Items = consultationViewModel
+                    Items = consultationViewModels
                 };
+
                 response.Data = paginationViewModel;
                 response.isSuccess = true;
                 response.Message = "Truy xuất thành công";
@@ -171,7 +200,8 @@ namespace FranchiseProject.Application.Services
                 response.isSuccess = false;
                 response.Message = ex.Message;
             }
-            return response; 
+
+            return response;
         }
         public async Task<ApiResponse<ConsultationViewModel>> GetByIdAsync(Guid id)
         {
