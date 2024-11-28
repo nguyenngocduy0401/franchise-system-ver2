@@ -162,7 +162,8 @@ namespace FranchiseProject.Application.Services
                     || e.AgencyId == filterWorkModel.AgencyId) &&
                     (!filterWorkModel.Status.HasValue || e.Status == filterWorkModel.Status) &&
                     (!filterWorkModel.Level.HasValue || e.Level == filterWorkModel.Level) &&
-                    (!filterWorkModel.Submit.HasValue || e.Submit == filterWorkModel.Submit)
+                    (!filterWorkModel.Submit.HasValue || e.Submit == filterWorkModel.Submit) &&
+                    (!filterWorkModel.Type.HasValue || e.Type == filterWorkModel.Type)
                 );
                 var worksPagination = await _unitOfWork.WorkRepository.GetFilterAsync(
                 filter: filter,
