@@ -47,6 +47,16 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
+                var twentyFourHoursAgo = DateTime.Now.AddHours(-24);
+                bool existsWithin24Hours = await _unitOfWork.FranchiseRegistrationRequestRepository.ExistsWithinLast24HoursAsync(regis.Email, regis.PhoneNumber);
+
+                if (existsWithin24Hours)
+                {
+                    response.isSuccess = false;
+                    response.Message = "Bạn đã đăng ký tư vấn trong vòng 24 giờ qua. Vui lòng thử lại sau.";
+                    return response;
+                }
+
                 var franchiseRequest = _mapper.Map<RegisterForm>(regis);
                 franchiseRequest.Status = ConsultationStatusEnum.NotConsulted;
                 franchiseRequest.CustomerName = regis.CustomerName;

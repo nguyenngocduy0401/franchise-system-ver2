@@ -89,7 +89,13 @@ namespace FranchiseProject.Application.Services
                     finalUserName = $"{baseUserName}{counter}"; 
                 }
 
-      
+                var twentyFourHoursAgo = DateTime.Now.AddHours(-24);
+                bool existsWithin24Hours = await _unitOfWork.RegisterCourseRepository.ExistsWithinLast24HoursAsync(model.Email, model.PhoneNumber, model.CourseId);
+
+                if (existsWithin24Hours)
+                {
+                    return ResponseHandler.Success<bool>(false, "Bạn đã đăng ký khóa học này trong vòng 24 giờ qua. Vui lòng thử lại sau.");
+                }
                 var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(Guid.Parse(model.CourseId));
                 if (course == null) return ResponseHandler.Success<bool>(false, "Khóa học không khả dụng!");
 
