@@ -25,7 +25,9 @@ namespace FranchiseProject.Application.Repositories
         Task<IEnumerable<User>> GetUserWorkAsync(
          Expression<Func<User, bool>>? filter = null,
          Func<IQueryable<User>, IOrderedQueryable<User>>? orderBy = null,
-         string? role = null);
+         string? role = null,
+         DateTime? StartTime = null,
+         DateTime? EndTime = null);
         Task<User> GetUserByUserName(string username);
         Task<User> GetUserByLogin(string username, string password);
         Task CreateUserAndAssignRoleAsync(User user, string role);

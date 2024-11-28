@@ -38,12 +38,26 @@ namespace FranchiseProject.Infrastructures.DataInitializer
 
                 if (userRole == null)
                 {
-                    var newUser = await _userManager.CreateAsync(new User { UserName = role}, "abc123");
+                    var newUser = await _userManager.CreateAsync(new User { UserName = role, FullName = role }, "abc123");
 
                     if (newUser.Succeeded)
                     {
                         var getUser = await _userManager.FindByNameAsync(role);
                         await _userManager.AddToRoleAsync(getUser, role);
+                    }
+                }
+                for (int i = 1; i <= 10; i++)
+                {
+                    userRole = await _userManager.FindByNameAsync(role + $"{i}");
+                    if (userRole == null)
+                    {
+                        var newUser = await _userManager.CreateAsync(new User { UserName = role + $"{i}", FullName = role + $"{i}" }, "abc123");
+
+                        if (newUser.Succeeded)
+                        {
+                            var getUser = await _userManager.FindByNameAsync(role + $"{i}");
+                            await _userManager.AddToRoleAsync(getUser, role);
+                        }
                     }
                 }
             }

@@ -6,6 +6,7 @@ using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -131,16 +132,31 @@ namespace FranchiseProject.Infrastructures.Repositories
         public async Task<IEnumerable<User>> GetUserWorkAsync(
          Expression<Func<User, bool>>? filter = null,
          Func<IQueryable<User>, IOrderedQueryable<User>>? orderBy = null,
-         string? role = null)
+         string? role = null,
+         DateTime? StartTime = null,
+         DateTime? EndTime = null)
         {
             IQueryable<User> query = _dbContext.Users
                 .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role);
-           
-           query = query.Where(u =>
-                        (u.LockoutEnd <= DateTimeOffset.UtcNow || u.LockoutEnd == null)
-                        );
-            
+
+            query = query.Where(u =>
+                          (u.LockoutEnd <= DateTimeOffset.UtcNow || u.LockoutEnd == null)
+                          );
+            if (StartTime.HasValue && StartTime != null && EndTime.HasValue && EndTime != null)
+            {
+                var user = _dbContext.Appointments.Where(e => (StartTime <= e.StartTime && e.StartTime <= EndTime) || 
+                                                              (StartTime <= e.EndTime && e.EndTime <= EndTime) || 
+                                                              (e.StartTime <= StartTime && EndTime <= e.EndTime))
+                                                  .SelectMany(e => e.UserAppointments)
+                                                  .Select(e => e.User)
+                                                  .Distinct();
+                if (!user.IsNullOrEmpty() || user.Any()) 
+                {
+                    query = query.Where(u => !user.Contains(u));
+                }
+            }
+
             if (filter != null)
             {
                 query = query.Where(filter);

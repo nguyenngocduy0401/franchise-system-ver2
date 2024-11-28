@@ -134,8 +134,8 @@ namespace FranchiseProject.API
 
             #region Seed
             services.AddHostedService<SetupIdentityDataSeeder>();
-            services.AddScoped<RoleInitializer>();
-            services.AddScoped<AccountInitializer>();
+            services.AddTransient<RoleInitializer>();
+            services.AddTransient<AccountInitializer>();
 
             #endregion
             #region Validator
