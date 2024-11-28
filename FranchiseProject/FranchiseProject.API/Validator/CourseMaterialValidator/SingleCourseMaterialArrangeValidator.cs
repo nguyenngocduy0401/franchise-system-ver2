@@ -9,7 +9,7 @@ namespace FranchiseProject.API.Validator.CourseMaterialValidator
         {
             RuleFor(x => x.URL)
                 .NotEmpty()
-                .WithMessage("URL không được để trống.");không được để trống
+                .WithMessage("URL không được để trống.");
         }
     }
 }
