@@ -9,15 +9,15 @@ namespace FranchiseProject.API.Validator.StudentValidator
         public RegisterCourseValidator()
         {
             RuleFor(x => x.StudentName)
-            .NotEmpty().WithMessage("Student name is required.")
-            .Length(2, 100).WithMessage("Student name must be between 2 and 100 characters.");
+                 .NotEmpty().WithMessage("Tên học sinh là bắt buộc.")
+                 .Length(2, 100).WithMessage("Tên học sinh phải có độ dài từ 2 đến 100 ký tự.");
             RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("Email is required.")
-                .EmailAddress().WithMessage("A valid email is required.");
+                .NotEmpty().WithMessage("Email là bắt buộc.")
+                .EmailAddress().WithMessage("Email phải hợp lệ.");
             RuleFor(x => x.PhoneNumber)
-                .NotEmpty().WithMessage("Phone number is required.")
-                .Matches(@"^\d+$").WithMessage("Phone number must be numeric.")
-                .Length(10, 15).WithMessage("Phone number must be between 10 and 15 digits.");
+                .NotEmpty().WithMessage("Số điện thoại là bắt buộc.")
+                .Matches(@"^\d+$").WithMessage("Số điện thoại phải là chữ số.")
+                .Length(10, 15).WithMessage("Số điện thoại phải có độ dài từ 10 đến 15 chữ số.");
         }
     }
 }

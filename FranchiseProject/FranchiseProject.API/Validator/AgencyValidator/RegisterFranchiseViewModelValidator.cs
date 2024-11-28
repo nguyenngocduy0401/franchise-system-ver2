@@ -7,20 +7,20 @@ namespace FranchiseProject.API.Validator.AgencyValidation
     {
         public RegisterFranchiseViewModelValidator()
         {
-          
-         
-
             RuleFor(x => x.CustomerName)
-                .MaximumLength(50)
-                .WithMessage("CustomerName cannot exceed 100 characters.");
+              .MaximumLength(50)
+              .WithMessage("Tên khách hàng không được vượt quá 50 ký tự.");
 
-            RuleFor(x => x.PhoneNumber).
-                  NotEmpty().Matches(@"^0[0-9]{9}$")
-                  .WithMessage("The phone number must have 10 digits and start with 0!");
+            RuleFor(x => x.PhoneNumber)
+                .NotEmpty()
+                .Matches(@"^0[0-9]{9}$")
+                .WithMessage("Số điện thoại phải có 10 chữ số và bắt đầu bằng 0.");
 
             RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("Email is required.")
-                .EmailAddress().WithMessage("Email is not valid.");
+                .NotEmpty()
+                .WithMessage("Email là bắt buộc.")
+                .EmailAddress()
+                .WithMessage("Email không hợp lệ.");
         }
     }
 }

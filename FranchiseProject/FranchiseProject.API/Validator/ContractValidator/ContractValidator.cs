@@ -51,7 +51,7 @@ namespace FranchiseProject.API.Validator.ContractValidator
 
             RuleFor(x => x.AgencyId)
                 .NotNull()
-                .WithMessage("Agency ID cannot be null.");
+                .WithMessage("Agency ID không thể để trống.");
         }
         private bool BeAValidDate(string date)
         {

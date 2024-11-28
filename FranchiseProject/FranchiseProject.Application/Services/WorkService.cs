@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿ using AutoMapper;
 using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation;
 using FluentValidation.Results;
@@ -9,6 +9,7 @@ using FranchiseProject.Application.ViewModels.AppointmentViewModels;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using MailKit.Search;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -57,9 +58,12 @@ namespace FranchiseProject.Application.Services
                     (!filterWorkByLoginModel.Level.HasValue || e.Level == filterWorkByLoginModel.Level) &&
                     (!filterWorkByLoginModel.Submit.HasValue || e.Submit == filterWorkByLoginModel.Submit)
                 );
+
+                var order = (Func<IQueryable<Work>, IOrderedQueryable<Work>>)(order => order.OrderByDescending(e => e.StartDate));
                 var worksPagination = await _unitOfWork.WorkRepository.FilterWorksByUserId(
                 userId: userId,
                 filter: filter,
+                orderBy: order,
                 pageIndex: filterWorkByLoginModel.PageIndex,
                 pageSize: filterWorkByLoginModel.PageSize
                 );
@@ -74,7 +78,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<WorkDetailViewModel>> GetWorkDetailByIdAsync(Guid id) 
+        public async Task<ApiResponse<WorkDetailViewModel>> GetWorkDetailByIdAsync(Guid id)
         {
             var response = new ApiResponse<WorkDetailViewModel>();
             try
@@ -83,9 +87,9 @@ namespace FranchiseProject.Application.Services
                 if (work == null) return ResponseHandler.Success(new WorkDetailViewModel(), "Nhiệm vụ không khả dụng!");
                 var approvedBy = await _userManager.FindByIdAsync((work.ApproveBy).ToString());
                 var workModel = _mapper.Map<WorkDetailViewModel>(work);
-                if (approvedBy != null) 
+                if (approvedBy != null)
                 {
-                    workModel.ApprovedBy = new AppointmentUserViewModel 
+                    workModel.ApprovedBy = new AppointmentUserViewModel
                     {
                         FullName = approvedBy.FullName,
                         Id = approvedBy.Id,
@@ -128,10 +132,10 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<WorkAgencyViewModel>();
             try
             {
-                var agency =await _unitOfWork.AgencyRepository.GetExistByIdAsync(agencyId);
+                var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(agencyId);
                 var work = _unitOfWork.WorkRepository.GetAllPreWorkByAgencyId(agencyId);
                 var workModel = _mapper.Map<IEnumerable<WorkViewModel>>(work);
-                var workAgencyModel = new WorkAgencyViewModel 
+                var workAgencyModel = new WorkAgencyViewModel
                 {
                     Work = workModel,
                     AgencyStatus = agency.Status
@@ -152,21 +156,22 @@ namespace FranchiseProject.Application.Services
             {
                 var filter = (Expression<Func<Work, bool>>)(e =>
                     (string.IsNullOrEmpty(filterWorkModel.Search) || e.Title.Contains(filterWorkModel.Search)
-                    || e.Description.Contains(filterWorkModel.Search)) 
+                    || e.Description.Contains(filterWorkModel.Search))
                     &&
-                    ((!filterWorkModel.AgencyId.HasValue || filterWorkModel.AgencyId == null) 
+                    ((!filterWorkModel.AgencyId.HasValue || filterWorkModel.AgencyId == null)
                     || e.AgencyId == filterWorkModel.AgencyId) &&
                     (!filterWorkModel.Status.HasValue || e.Status == filterWorkModel.Status) &&
                     (!filterWorkModel.Level.HasValue || e.Level == filterWorkModel.Level) &&
-                    (!filterWorkModel.Submit.HasValue || e.Submit == filterWorkModel.Submit)
+                    (!filterWorkModel.Submit.HasValue || e.Submit == filterWorkModel.Submit) &&
+                    (!filterWorkModel.Type.HasValue || e.Type == filterWorkModel.Type)
                 );
                 var worksPagination = await _unitOfWork.WorkRepository.GetFilterAsync(
                 filter: filter,
-                pageIndex: filterWorkModel.PageIndex, 
+                pageIndex: filterWorkModel.PageIndex,
                 pageSize: filterWorkModel.PageSize
                 );
                 var workModel = _mapper.Map<Pagination<WorkViewModel>>(worksPagination);
-                
+
                 response = ResponseHandler.Success(workModel, "Successful!");
 
             }
@@ -184,7 +189,7 @@ namespace FranchiseProject.Application.Services
                 var userId = _claimsService.GetCurrentUserId.ToString();
 
                 var checkUserExist = await _unitOfWork.WorkRepository.CheckUserWorkExist(workId, userId);
-                if(checkUserExist == false) 
+                if (checkUserExist == false)
                     return ResponseHandler.Success(false, "Người dùng không có quyền để thao tác với nhiệm vụ!");
 
                 var work = await _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
@@ -217,7 +222,7 @@ namespace FranchiseProject.Application.Services
                 if (checkUserExist == false)
                     return ResponseHandler.Success(false, "Người dùng không có quyền để thao tác với nhiệm vụ!");
 
-                ValidationResult validationResult = await _updateWorkByStaffValidator.ValidateAsync(updateWorkByStaffModel                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 );
+                ValidationResult validationResult = await _updateWorkByStaffValidator.ValidateAsync(updateWorkByStaffModel);
                 if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 var work = await _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
@@ -250,6 +255,8 @@ namespace FranchiseProject.Application.Services
                 var work = await _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
 
                 work = _mapper.Map(updateWorkModel, work);
+                var checkDate = await CheckPreviousWorkDateValidation(work);
+                if (checkDate.Data == false) return checkDate;
 
                 var checkWork = await CheckPreWorkAvailable(work);
                 if (checkWork.Data == false) return checkWork;
@@ -278,6 +285,9 @@ namespace FranchiseProject.Application.Services
                 var work = _mapper.Map<Work>(createWorkModel);
                 work.Status = WorkStatusEnum.None;
                 work.Submit = WorkStatusSubmitEnum.None;
+
+                var checkDate = await CheckPreviousWorkDateValidation(work);
+                if (checkDate.Data == false) return checkDate;
 
                 var checkWork = await CheckPreWorkAvailable(work);
                 if (checkWork.Data == false) return checkWork;
@@ -308,17 +318,26 @@ namespace FranchiseProject.Application.Services
                 if (checkWork.Data == false) return checkWork;
 
                 if (work.Status != WorkStatusEnum.None) return ResponseHandler.Success(false, "Nhiệm vụ đã được duyệt trước đó!");
-                var checkWorkBefore = (await _unitOfWork.WorkRepository
-                    .FindAsync(e => e.IsDeleted != true &&
-                               e.Type < work.Type && 
-                               e.Status != WorkStatusEnum.Approved &&
-                               e.Level == WorkLevelEnum.Compulsory &&
-                               e.AgencyId == work.AgencyId
-                               )).FirstOrDefault();
+                if (work.Type <= WorkTypeEnum.SignedContract)
+                {
+                    var checkWorkBefore = (await _unitOfWork.WorkRepository
+                        .FindAsync(e => e.IsDeleted != true &&
+                                   e.Type < work.Type &&
+                                   e.Status != WorkStatusEnum.Approved &&
+                                   e.Level == WorkLevelEnum.Compulsory &&
+                                   e.AgencyId == work.AgencyId
+                                   )).FirstOrDefault();
 
-                if(checkWorkBefore != null) return ResponseHandler.Success(false, "Phải hoàn thành nhiệm vụ ưu tiên trước!");
+                    if (checkWorkBefore != null) return ResponseHandler.Success(false, "Phải hoàn thành nhiệm vụ ưu tiên trước!");
+                }
+                if (work.Type > WorkTypeEnum.SignedContract)
+                {
+                    var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync((Guid)work.AgencyId);
+                    if (agency.Status == AgencyStatusEnum.Inactive || agency.Status == AgencyStatusEnum.Processing)
+                        return ResponseHandler.Success(false, "Không thể phê duyệt khi trung tâm ở trạng thái này!");
 
-                switch (status) 
+                }
+                switch (status)
                 {
                     case WorkStatusEnum.None:
                         throw new Exception("Cannot update this status!");
@@ -326,20 +345,29 @@ namespace FranchiseProject.Application.Services
                         work.Status = status;
                         if (work.Type == WorkTypeEnum.BusinessRegistered)
                         {
-                            var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveAgreementContractAsync(work.AgencyId.Value);
+                            var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveBusinessLicenseAsync(work.AgencyId.Value);
                             if (!hasActiveAgreementContract)
                             {
-                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng thỏa thuận hoạt động!");
+                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có giấy đăng kí doanh nghiệp hoạt động!");
                             }
                             var fee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
-                             var contract = new Contract
+                            var contract = new Contract
                             {
                                 AgencyId = work.AgencyId.Value,
                                 Status = ContractStatusEnum.None,
-                                FrachiseFee=fee.Sum(f => f.FeeAmount),
-                                                          
+                                FrachiseFee = fee.Sum(f => f.FeeAmount),
+
                             };
                             await _unitOfWork.ContractRepository.AddAsync(contract);
+                        }
+                        if (work.Type == WorkTypeEnum.AgreementSigned)
+                        {
+                            var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveAgreementContractAsync(work.AgencyId.Value);
+                            if (!hasActiveAgreementContract)
+                            {
+                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng thỏa thuận!");
+                            }
+
                         }
                         if (work.Type == WorkTypeEnum.Quotation)
                         {
@@ -352,7 +380,7 @@ namespace FranchiseProject.Application.Services
                         {
                             var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
                             contract.Status = ContractStatusEnum.Active;
-                             _unitOfWork.ContractRepository.Update(contract);
+                            _unitOfWork.ContractRepository.Update(contract);
                         }
                         if (work.Type == WorkTypeEnum.Handover)
                         {
@@ -400,22 +428,56 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> CheckPreWorkAvailable(Work work) 
+        public async Task<ApiResponse<bool>> CheckPreWorkAvailable(Work work)
         {
             var response = new ApiResponse<bool>();
             try
             {
                 var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync((Guid)work.AgencyId);
                 if (agency == null || agency.Status == AgencyStatusEnum.Inactive) return ResponseHandler.Success(false, "Trung tâm không khả dụng!");
-                if (work.Type <= WorkTypeEnum.SignedContract)
+                if (work.Type <= WorkTypeEnum.EducationLicenseRegistered)
                 {
+                    if (work.Type <= WorkTypeEnum.SignedContract)
+                    {
+                        if (agency.Status == AgencyStatusEnum.Suspended ||
+                            agency.Status == AgencyStatusEnum.Active ||
+                            agency.Status == AgencyStatusEnum.Approved)
+                            return ResponseHandler.Success(false, "Trung tâm đã kí hợp đồng không thể tương tác với các nhiệm vụ trước đó!");
+                    }
+
                     if (agency.Status == AgencyStatusEnum.Suspended ||
                         agency.Status == AgencyStatusEnum.Active)
                         return ResponseHandler.Success(false, "Không thể tương tác với nhiệm vụ khi đã kết thúc quá trình nhượng quyền!");
                 }
+                
 
                 if (work == null) return ResponseHandler.Success(false, "Nhiệm vụ không khả dụng!");
                 if (work.Status != WorkStatusEnum.None) return ResponseHandler.Success(false, "Không thể thao tác với nhiệm vụ đã được kiểm duyệt!");
+                response = ResponseHandler.Success(true);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
+        private async Task<ApiResponse<bool>> CheckPreviousWorkDateValidation(Work work)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                if (work.Type > WorkTypeEnum.Interview && work.Type <= WorkTypeEnum.EducationLicenseRegistered)
+                {
+                    var filter = (Expression<Func<Work, bool>>)(e => e.IsDeleted != true &&
+                    e.Type < work.Type &&
+                    work.Level == WorkLevelEnum.Compulsory);
+                    var previousWork = await _unitOfWork.WorkRepository.GetPreviousWorkByAgencyId((Guid)work.AgencyId, filter);
+                    if (previousWork != null) 
+                    {
+                        if(previousWork.EndDate > work.StartDate) 
+                            return ResponseHandler.Success(false, "Ngày bắt đầu phải lớn hơn ngày kết thúc của nhiệm vụ được ràng buộc ở quy trình trước!");
+                    }
+                }
                 response = ResponseHandler.Success(true);
             }
             catch (Exception ex)

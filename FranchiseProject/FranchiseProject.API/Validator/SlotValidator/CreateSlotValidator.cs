@@ -8,14 +8,14 @@ namespace FranchiseProject.API.Validator.SlotValidator
     {
         public CreateSlotValidator()
         {
-            RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required.");
+            RuleFor(x => x.Name)
+                .NotEmpty().WithMessage("Tên là bắt buộc.");
             RuleFor(x => x.StartTime)
-                .NotEmpty().WithMessage("Start time is required.");
-
+                .NotEmpty().WithMessage("Thời gian bắt đầu là bắt buộc.");
             RuleFor(x => x.EndTime)
-                .NotEmpty().WithMessage("End time is required.")
+                .NotEmpty().WithMessage("Thời gian kết thúc là bắt buộc.")
                 .GreaterThan(x => x.StartTime)
-                .WithMessage("End time must be greater than start time.");
+                .WithMessage("Thời gian kết thúc phải lớn hơn thời gian bắt đầu.");
         }
     }
 }

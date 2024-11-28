@@ -10,6 +10,7 @@ using System.Data.Common;
 using System.Linq.Expressions;
 using Contract = FranchiseProject.Domain.Entity.Contract;
 using Microsoft.AspNetCore.Mvc;
+using FranchiseProject.Domain.Entity;
 
 namespace FranchiseProject.Application.Services
 {
@@ -354,7 +355,29 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<FileContentResult> DownloadContractAsPdfAsync(Guid agencyId)
+        public async Task<ApiResponse<ContractViewModel>> GetContractbyAgencyId(Guid agencyId)
+        {
+            var response = new ApiResponse<ContractViewModel>();
+            try
+            {
+                var contract =await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
+                if (contract == null)
+                {
+                    return ResponseHandler.Success<ContractViewModel>(null, "Không tìm thấy hợp đồng");
+                }
+                var contractViewModel = _mapper.Map<ContractViewModel>(contract);
+                var agency =await _unitOfWork.AgencyRepository.GetByIdAsync(contract.AgencyId.Value);
+                contractViewModel.AgencyName = agency.Name;
+
+                return ResponseHandler.Success(contractViewModel, "Truy xuất hợp đồng thành công");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<ContractViewModel>($"Lỗi truy xuất hợp đồng: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse<string>> DownloadContractAsPdfAsync(Guid agencyId)
         {
             try
             {
@@ -387,19 +410,25 @@ namespace FranchiseProject.Application.Services
                         }
 
                         string fileName = $"Contract_{contract.ContractCode}.pdf";
-                        string contentType = "application/pdf";
 
-                        return new FileContentResult(pdfBytes, contentType)
+                        // Tạo MemoryStream mới từ mảng byte
+                        using (var uploadStream = new MemoryStream(pdfBytes))
                         {
-                            FileDownloadName = fileName
-                        };
+                            string firebaseUrl = await _firebaseService.UploadFileAsync(uploadStream, fileName);
+
+                            contract.ContractDocumentImageURL = firebaseUrl;
+                            _unitOfWork.ContractRepository.Update(contract);
+                            await _unitOfWork.SaveChangeAsync();
+
+                            return ResponseHandler.Success(firebaseUrl, "File hợp đồng đã được tải lên thành công.");
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
                 // Log the exception
-                throw new Exception($"Lỗi khi tạo file hợp đồng: {ex.Message}");
+                return ResponseHandler.Failure<string>($"Lỗi khi tạo và tải lên file hợp đồng: {ex.Message}");
             }
         }
         private async Task<string> GenerateUniqueContractCode()

@@ -9,7 +9,8 @@ namespace FranchiseProject.API.Validator.QuestionValidator
         public UpdateQuestionValidator() 
         {
             RuleFor(x => x.Description)
-               .NotEmpty();
+               .NotEmpty()
+               .WithMessage("Mô tả không được để trống.");;
             RuleFor(x => x.QuestionOptions)
             .ForEach(material =>
             {

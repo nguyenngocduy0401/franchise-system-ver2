@@ -33,5 +33,12 @@ namespace FranchiseProject.Infrastructures.Repositories
                                d.Type == Domain.Enums.DocumentType.AgreementContract &&
                                d.Status == Domain.Enums.DocumentStatus.Active);
         }
+        public async Task<bool> HasActiveBusinessLicenseAsync(Guid agencyId)
+        {
+            return await _dbContext.Documents
+                .AnyAsync(d => d.AgencyId == agencyId &&
+                               d.Type == Domain.Enums.DocumentType.BusinessLicense &&
+                               d.Status == Domain.Enums.DocumentStatus.Active);
+        }
     }
 }

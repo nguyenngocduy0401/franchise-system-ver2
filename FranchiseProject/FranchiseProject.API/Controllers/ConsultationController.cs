@@ -15,16 +15,17 @@ namespace FranchiseProject.API.Controllers
         {
             _consultationService = consultationService;
         }
+     //   [Authorize(Roles = AppRole.SystemConsultant + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "khách đăng kí nhượng quyền ")]
         [HttpPost("")]
         public async Task<ApiResponse<bool>> RegisterConsultationAsync([FromBody] RegisterConsultationViewModel regis)=> await _consultationService.RegisterConsultationAsync(regis);
-        [SwaggerOperation(Summary = "nhân viên tu vấn chuyển trạng thái 'đã tư vấn'")]
+        [SwaggerOperation(Summary = "nhân viên tu vấn chuyển trạng thái 'đã tư vấn'{Authorize = SystemConsultant}")]
         [HttpPut("{id}")]
-        [Authorize(Roles = AppRole.Manager)]
+        [Authorize(Roles = AppRole.SystemConsultant)]
         public async Task<ApiResponse<bool>> UpdateConsultationStatusAsync(string id) => await _consultationService.UpdateConsultationStatusAsync(id);
-        [SwaggerOperation(Summary = "lấy danh sách đăng kí tư vấn theo trạng thái")]
+        [SwaggerOperation(Summary = "lấy danh sách đăng kí tư vấn theo trạng thái{Authorize = SystemConsultant}")]
         [HttpGet("")]
-        [Authorize(Roles = AppRole.Manager)]
+        [Authorize(Roles = AppRole.SystemConsultant)]
         public async Task<ApiResponse<Pagination<ConsultationViewModel>>> FilterConsultationAsync(FilterConsultationViewModel filterModel) => await _consultationService.FilterConsultationAsync(filterModel);
     }
 }

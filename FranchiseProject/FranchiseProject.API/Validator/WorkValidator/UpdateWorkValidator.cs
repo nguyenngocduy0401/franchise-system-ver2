@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FranchiseProject.Application.Utils;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
 
 namespace FranchiseProject.API.Validator.WorkValidator
@@ -10,8 +11,8 @@ namespace FranchiseProject.API.Validator.WorkValidator
             RuleFor(x => x.Title)
                 .NotEmpty()
                 .MaximumLength(150);
-            RuleFor(x => x.Description)
-                .MaximumLength(300);
+            RuleFor(x => x.Description.GetTextWithoutHtml())
+                .MaximumLength(2000);
             RuleFor(x => x.StartDate)
                 .NotEmpty()
                 .LessThanOrEqualTo(x => x.EndDate)

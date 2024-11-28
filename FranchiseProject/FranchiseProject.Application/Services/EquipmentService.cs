@@ -26,7 +26,8 @@ namespace FranchiseProject.Application.Services
         private readonly IValidator<UploadDocumentViewModel> _validator;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
-        public EquipmentService(IValidator<UploadDocumentViewModel> validator, IMapper mapper, IUnitOfWork unitOfWork, IClaimsService claimsService, UserManager<User> userManager, RoleManager<Role> roleManager)
+        private readonly IFirebaseService _firebaseService;
+        public EquipmentService( IFirebaseService firebaseService,IValidator<UploadDocumentViewModel> validator, IMapper mapper, IUnitOfWork unitOfWork, IClaimsService claimsService, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -34,6 +35,7 @@ namespace FranchiseProject.Application.Services
             _roleManager = roleManager;
             _userManager = userManager;
             _validator = validator;
+            _firebaseService = firebaseService;
         }
         #endregion
 
@@ -150,14 +152,14 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<object>(ex.Message);
             }
         }
-        public async Task<ApiResponse<byte[]>> GenerateEquipmentReportAsync(Guid agencyId)
+        public async Task<ApiResponse<string>> GenerateEquipmentReportAsync(Guid agencyId)
         {
             try
             {
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
                 if (contract == null)
                 {
-                    return ResponseHandler.Failure<byte[]>("No contract found for this agency.");
+                    return ResponseHandler.Failure<string>("No contract found for this agency.");
                 }
                 var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contract.Id);
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -201,14 +203,19 @@ namespace FranchiseProject.Application.Services
                     }
 
                     worksheet.Cells.AutoFitColumns();
-                    var content = package.GetAsByteArray();
+                    string fileName = $"EquipmentReport_{agencyId}_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+                    byte[] fileContents = package.GetAsByteArray();
+                    using (var ms = new MemoryStream(fileContents))
+                    {
+                        string firebaseUrl = await _firebaseService.UploadFileAsync(ms, fileName);
 
-                    return ResponseHandler.Success(content, "Equipment report generated successfully.");
+                        return ResponseHandler.Success(firebaseUrl, "Equipment report generated and uploaded successfully.");
+                    }
                 }
             }
             catch (Exception ex)
             {
-                return ResponseHandler.Failure<byte[]>($"Failed to generate equipment report: {ex.Message}");
+                return ResponseHandler.Failure<string>($"Failed to generate and upload equipment report: {ex.Message}");
             }
         }
         public async Task<ApiResponse<bool>> UpdateEquipmentStatusAsync(Guid contractId, List<Guid> equipmentIds)

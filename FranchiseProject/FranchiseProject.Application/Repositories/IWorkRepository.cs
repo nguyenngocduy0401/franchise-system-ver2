@@ -22,5 +22,6 @@ namespace FranchiseProject.Application.Repositories
             Func<IQueryable<Work>, IOrderedQueryable<Work>>? orderBy = null,
             int? pageIndex = null,
             int? pageSize = null);
+        Task<Work> GetPreviousWorkByAgencyId(Guid agencyId, Expression<Func<Work, bool>>? filter = null);
     }
 }

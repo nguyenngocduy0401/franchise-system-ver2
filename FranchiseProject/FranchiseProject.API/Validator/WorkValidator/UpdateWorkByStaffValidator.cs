@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FranchiseProject.Application.Utils;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
 
 namespace FranchiseProject.API.Validator.WorkValidator
@@ -7,8 +8,8 @@ namespace FranchiseProject.API.Validator.WorkValidator
     {
         public UpdateWorkByStaffValidator()
         {
-            RuleFor(x => x.Report)
-                .MaximumLength(3000);
+            RuleFor(x => x.Report.GetTextWithoutHtml())
+                .MaximumLength(10000);
             RuleFor(x => x.ReportImageURL)
                 .MaximumLength(500);
         }

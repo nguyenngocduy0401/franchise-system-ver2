@@ -8,13 +8,18 @@ namespace FranchiseProject.API.Validator.DocumentValidator
     public class UploadDocumentValidator: AbstractValidator<UploadDocumentViewModel>
     {
         public UploadDocumentValidator() {
-            RuleFor(x => x.Title).NotEmpty().WithMessage("Title cannot be null!").MaximumLength(100).WithMessage("Title must not exceed 100 characters");
+            RuleFor(x => x.Title)
+                .NotEmpty().WithMessage("Tiêu đề không được để trống!")
+                .MaximumLength(100).WithMessage("Tiêu đề không được vượt quá 100 ký tự.");
 
-            RuleFor(X => X.URLFile).NotEmpty().WithMessage("URLFile cannot be null");
-            
-            RuleFor(x=> x.AgencyId).NotEmpty().WithMessage("AgencyId cannot be null");
-            RuleFor(x=>x.ExpirationDate)
-                    .Must(BeAFutureDate).WithMessage("Date must be in the future");
+            RuleFor(x => x.URLFile)
+                .NotEmpty().WithMessage("URLFile không được để trống.");
+
+            RuleFor(x => x.AgencyId)
+                .NotEmpty().WithMessage("AgencyId không được để trống.");
+
+            RuleFor(x => x.ExpirationDate)
+                .Must(BeAFutureDate).WithMessage("Ngày phải là một ngày trong tương lai.");
         }
         private bool BeAFutureDate(DateOnly? date)
         {

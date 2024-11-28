@@ -57,7 +57,7 @@ namespace FranchiseProject.Infrastructures.Repositories
                  e.Type == WorkTypeEnum.BusinessRegistered || e.Type == WorkTypeEnum.SiteSurvey ||
                  e.Type == WorkTypeEnum.Design || e.Type == WorkTypeEnum.Quotation ||
                  e.Type == WorkTypeEnum.SignedContract || e.Type == WorkTypeEnum.ConstructionAndTrainning || 
-                 e.Type == WorkTypeEnum.Handover || e.Type == WorkTypeEnum.EducationalSupervision))
+                 e.Type == WorkTypeEnum.Handover || e.Type == WorkTypeEnum.EducationLicenseRegistered))
                 .OrderByDescending(e => e.StartDate);
         }
 
@@ -106,6 +106,16 @@ namespace FranchiseProject.Infrastructures.Repositories
             };
             return result;
         }
+        public async Task<Work> GetPreviousWorkByAgencyId(Guid agencyId, Expression<Func<Work, bool>>? filter = null) 
+        {
+            var work = await _dbContext.Agencies.Where(e => e.Id == agencyId)
+                                       .SelectMany(e => e.Works)
+                                       .Where(filter)
+                                       .OrderByDescending(e => e.EndDate)
+                                       .FirstOrDefaultAsync();
+            return work;
+        }
+        
     }
 }
 

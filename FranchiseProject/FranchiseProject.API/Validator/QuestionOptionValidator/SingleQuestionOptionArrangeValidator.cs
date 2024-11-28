@@ -9,7 +9,8 @@ namespace FranchiseProject.API.Validator.QuestionOptionValidator
         public SingleQuestionOptionArrangeValidator()
         {
             RuleFor(x => x.Description)
-               .NotEmpty();
+                .NotEmpty()
+                .WithMessage("Mô tả không được để trống.");
         }
     }
 }
