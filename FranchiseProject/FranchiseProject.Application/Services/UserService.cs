@@ -115,10 +115,12 @@ namespace FranchiseProject.Application.Services
                     (string.IsNullOrEmpty(filterUserWorkModel.Search) || e.UserName.Contains(filterUserWorkModel.Search)
                     || e.Email.Contains(filterUserWorkModel.Search) || e.PhoneNumber.Contains(filterUserWorkModel.Search))
                 );
+                var order = (Func<IQueryable<User>, IOrderedQueryable<User>>)(order => order.OrderByDescending(e => e.CreateAt));
                 var rolee = filterUserWorkModel.Role.ToString();
                 var users = await _unitOfWork.UserRepository.GetUserWorkAsync(
                     filter: filter,
-                    role: rolee
+                    role: rolee,
+                    orderBy : order
                 );
                 var userViewModels = _mapper.Map<IEnumerable<UserWorkViewModel>>(users);
 

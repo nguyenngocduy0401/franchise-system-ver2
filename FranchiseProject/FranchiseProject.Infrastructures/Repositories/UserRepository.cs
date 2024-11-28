@@ -91,6 +91,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             else
             {
                 query = query.OrderByDescending(e => EF.Property<DateTime>(e, "CreateAt"));
+                query = query.OrderByDescending(e => e.CreateAt);
             }
 
             if (!string.IsNullOrEmpty(foreignKey) && foreignKeyId != null)
@@ -166,6 +167,14 @@ namespace FranchiseProject.Infrastructures.Repositories
                 var usersInRole = await _userManager.GetUsersInRoleAsync(role);
                 var userIdsInRole = usersInRole.Select(u => u.Id);
                 query = query.Where(u => userIdsInRole.Contains(u.Id));
+            }
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+            else
+            {
+                query = query.OrderByDescending(e => EF.Property<DateTime>(e, "CreateAt"));
             }
             return query;
         }
