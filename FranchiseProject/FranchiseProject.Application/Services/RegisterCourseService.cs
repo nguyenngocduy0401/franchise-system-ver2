@@ -131,7 +131,7 @@ namespace FranchiseProject.Application.Services
                     UserId = newUser.Id,
                     CourseId = Guid.Parse(model.CourseId),
                     StudentCourseStatus = StudentCourseStatusEnum.NotConsult,
-                    ModificationDate=DateTime.Now
+                   // ModificationDate=DateTime.Now
                
                 };
                  await _unitOfWork.RegisterCourseRepository.AddAsync(newRegisterCourse);
