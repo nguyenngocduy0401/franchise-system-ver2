@@ -15,6 +15,7 @@ using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -88,7 +89,13 @@ namespace FranchiseProject.Application.Services
                     finalUserName = $"{baseUserName}{counter}"; 
                 }
 
-      
+                var twentyFourHoursAgo = DateTime.Now.AddHours(-24);
+                bool existsWithin24Hours = await _unitOfWork.RegisterCourseRepository.ExistsWithinLast24HoursAsync(model.StudentName,model.Email, model.PhoneNumber, model.CourseId);
+
+                if (existsWithin24Hours)
+                {
+                    return ResponseHandler.Success<bool>(false, "Bạn đã đăng ký khóa học này trong vòng 24 giờ qua. Vui lòng thử lại sau.");
+                }
                 var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(Guid.Parse(model.CourseId));
                 if (course == null) return ResponseHandler.Success<bool>(false, "Khóa học không khả dụng!");
 
@@ -123,8 +130,9 @@ namespace FranchiseProject.Application.Services
                 {
                     UserId = newUser.Id,
                     CourseId = Guid.Parse(model.CourseId),
-                    StudentCourseStatus = StudentCourseStatusEnum.NotConsult
-                   ,CreatDate=DateTime.Now,
+                    StudentCourseStatus = StudentCourseStatusEnum.NotConsult,
+                   // ModificationDate=DateTime.Now
+               
                 };
                  await _unitOfWork.RegisterCourseRepository.AddAsync(newRegisterCourse);
                 var emailMessage = EmailTemplate.SuccessRegisterCourseEmaill(model.Email, model.StudentName, course.Name, agency.Name);
@@ -158,7 +166,7 @@ namespace FranchiseProject.Application.Services
                 var courseGuidId = Guid.Parse(courseId);
                 var registerCourse = await _unitOfWork.RegisterCourseRepository
                     .GetFirstOrDefaultAsync(rc => rc.UserId == studentId && rc.CourseId == courseGuidId);
-
+              //  var userCurrent = await _userManager.FindByIdAsync(_claimsService.GetCurrentUserId.ToString());
                 if (registerCourse == null)
                 {
                     return ResponseHandler.Success<bool>(false, "Không tìm thấy bản ghi khóa học của học sinh!");
@@ -185,8 +193,8 @@ namespace FranchiseProject.Application.Services
                         registerCourse.StudentCourseStatus = StudentCourseStatusEnum.Waitlisted;
                         break;
                 }
+                registerCourse.ConsultanId = _claimsService.GetCurrentUserId.ToString();
 
-               
                 await  _unitOfWork.RegisterCourseRepository.UpdateAsync(registerCourse);
                 await _unitOfWork.SaveChangeAsync();
 
@@ -229,7 +237,12 @@ namespace FranchiseProject.Application.Services
                 }
                 var rc = await _unitOfWork.RegisterCourseRepository.GetFirstOrDefaultAsync(rc=> rc.UserId==id&&rc.CourseId==Guid.Parse(courseId));
                 var courseCodes = await _unitOfWork.RegisterCourseRepository.GetCourseCodeByUserIdAsync(id);
-
+                string consultantName = null;
+                if (!string.IsNullOrEmpty(registerCourse.ModificationBy.ToString()))
+                {
+                    var consultant = await _userManager.FindByIdAsync(registerCourse.ModificationBy.ToString());
+                    consultantName = consultant?.UserName;
+                }
                 var studentViewModel = new StudentRegisterViewModel
                 {
                     Id = rc.Id,
@@ -241,8 +254,10 @@ namespace FranchiseProject.Application.Services
                     StudentStatus = rc.StudentCourseStatus,
                     CourseId = registerCourse.CourseId,
                     DateTime = await GetDateTimeFromRegisterCourseAsync(id, registerCourse.CourseId.Value),
+                    ConsultantName = consultantName,
                     CoursePrice = registerCourse.Course?.Price,
-                    RegisterDate = registerCourse.CreatDate?.ToString(),
+                    CreationDate=registerCourse.CreationDate,
+                    ModificationDate = registerCourse.ModificationDate.ToString(),
                     PaymentStatus=registerCourse.StudentPaymentStatus,
                 };
 
@@ -294,7 +309,19 @@ namespace FranchiseProject.Application.Services
                 var paymentTotalByCourse = payments
                     .GroupBy(p => p.RegisterCourseId)
                     .ToDictionary(g => g.Key, g => g.Sum(p => p.Amount));
-                var studentRegisterViewModels = registerCourses.Items.Select(rc => new StudentRegisterViewModel
+
+                var consultantIds = registerCourses.Items
+                     .Where(item => item?.ConsultanId != null)
+                     .Select(item => item.ConsultanId)
+                     .Distinct()
+                     .ToList();
+
+                var consultants = await _userManager.Users
+                    .Where(u => consultantIds.Contains(u.Id))
+                    .ToDictionaryAsync(u => u.Id, u => u.UserName);
+
+
+                var studentRegisterViewModels = registerCourses.Items.OrderByDescending(item => item.ModificationDate).Select(rc => new StudentRegisterViewModel
                 {
                     Id = rc.Id,
                     UserId=rc.UserId,
@@ -304,7 +331,11 @@ namespace FranchiseProject.Application.Services
                     PhoneNumber = rc.User?.PhoneNumber,
                     CourseCode = rc.Course?.Code,
                     CoursePrice = rc.Course?.Price,
-                    RegisterDate = rc.CreatDate?.ToString("dd/MM/yyyy"),
+                    CreationDate=rc.CreationDate,
+                    ModificationDate = rc.ModificationDate.ToString(),
+                    ConsultantName = rc.ConsultanId != null && consultants.TryGetValue(rc.ConsultanId, out var userName)
+                        ? userName
+                        : null,
                     StudentStatus = rc.StudentCourseStatus,
                     PaymentStatus = rc.StudentPaymentStatus,
                     DateTime = rc.DateTime,
@@ -389,7 +420,6 @@ namespace FranchiseProject.Application.Services
                 var registerC = new RegisterCourse { 
                 CourseId= courseGuidId,
                 UserId= studentId,
-                CreatDate= DateTime.Now,
                 StudentCourseStatus= StudentCourseStatusEnum.Pending,
                 };
                await _unitOfWork.RegisterCourseRepository.AddAsync(registerC);

@@ -71,10 +71,7 @@ namespace FranchiseProject.Application.Services
                     }
                 }
                 //Check List Học sinh có có đủ điều kiện không ==>Student đó phải có Status là waitlisted 
-                if (model.StudentId == null || model.StudentId.Count == 0)
-                {
-                    return ResponseHandler.Success<Guid?>(null,"Danh sách học sinh không hợp lệ!");
-                }
+                
                 var classWithSameName = await _unitOfWork.ClassRepository.GetFirstOrDefaultAsync(c => c.Name == model.Name && !c.IsDeleted);
                 if (classWithSameName != null)
                 {
@@ -100,22 +97,26 @@ namespace FranchiseProject.Application.Services
                 await _unitOfWork.ClassRepository.AddAsync(newClass);
                 // Kiểm tra trạng thái của từng học sinh
                 // var students = await _unitOfWork.UserRepository.GetAllAsync(u => model.StudentId.Contains(u.Id));
-                var waitlistedStudents = await _unitOfWork.ClassRoomRepository.CheckWaitlistedStatusForStudentsAsync(model.StudentId,courseId);
-                foreach (var student in model.StudentId)
-                {
-                    var check2 = await _unitOfWork.RegisterCourseRepository.FindRegisterCourseByUserId(student, Guid.Parse(model.CourseId));
-                    if (check2 == null) { return ResponseHandler.Success<Guid?>(null, "Danh sánh học sinh chưa hợp lệ !"); }
-                   check2.StudentCourseStatus = StudentCourseStatusEnum.Enrolled;
-                    await _unitOfWork.RegisterCourseRepository.UpdateAsync(check2);
-                    var newClassRoom = new ClassRoom
-                    {
-                        UserId = student,
-                        ClassId = newClass.Id,
-                        
-                    };
 
-                    await _unitOfWork.ClassRoomRepository.AddAsync(newClassRoom);
-                }  
+                if (model.StudentId != null && model.StudentId.Any())
+                {
+                    var waitlistedStudents = await _unitOfWork.ClassRoomRepository.CheckWaitlistedStatusForStudentsAsync(model.StudentId, courseId);
+                    foreach (var student in model.StudentId)
+                    {
+                        var check2 = await _unitOfWork.RegisterCourseRepository.FindRegisterCourseByUserId(student, Guid.Parse(model.CourseId));
+                        if (check2 == null) { return ResponseHandler.Success<Guid?>(null, "Danh sánh học sinh chưa hợp lệ !"); }
+                        check2.StudentCourseStatus = StudentCourseStatusEnum.Enrolled;
+                        await _unitOfWork.RegisterCourseRepository.UpdateAsync(check2);
+                        var newClassRoom = new ClassRoom
+                        {
+                            UserId = student,
+                            ClassId = newClass.Id,
+
+                        };
+
+                        await _unitOfWork.ClassRoomRepository.AddAsync(newClassRoom);
+                    }
+                }
                 if (!string.IsNullOrEmpty(model .InstructorId))
                 {
                     
@@ -451,6 +452,17 @@ namespace FranchiseProject.Application.Services
                 if (!waitlistedStudents.Any())
                 {
                     return ResponseHandler.Success(false,"Không có sinh viên nào có trạng thái chờ lớp  để thêm vào lớp học.");
+                }
+                var classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllClassScheduleAsync(cs => cs.ClassId == Guid.Parse(classId));
+                var sortedSchedules = classSchedules.OrderBy(cs => cs.Date).ToList();
+
+                var currentDate = DateTime.Now.Date;
+                var totalSchedules = sortedSchedules.Count;
+                var passedSchedules = sortedSchedules.Count(s => s.Date < currentDate);
+
+                if ((double)passedSchedules / totalSchedules > 0.1)
+                {
+                    return ResponseHandler.Success(false, "Không thể thêm học sinh vì lớp đã qua hơn 10% số buổi học.");
                 }
 
                 foreach (var studentId in waitlistedStudents.Keys)

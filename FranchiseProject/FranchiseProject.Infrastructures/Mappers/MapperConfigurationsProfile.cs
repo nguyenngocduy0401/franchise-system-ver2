@@ -50,7 +50,7 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<RegisterConsultationViewModel, RegisterForm>();
             CreateMap<RegisterForm, ConsultationViewModel>().ReverseMap();
             CreateMap<RegisterForm, ConsultationViewModel>()
-            .ForMember(dest => dest.ConsultantUserName, opt => opt.MapFrom(src => src.User != null ? src.User.UserName : string.Empty))
+            .ForMember(dest => dest.ConsultantName, opt => opt.MapFrom(src => src.User != null ? src.User.UserName : string.Empty))
             .ForMember(dest => dest.CusomterName, opt => opt.MapFrom(src => src.CustomerName));
             #endregion
             #region Agency
