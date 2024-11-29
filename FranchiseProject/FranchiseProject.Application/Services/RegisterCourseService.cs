@@ -193,7 +193,7 @@ namespace FranchiseProject.Application.Services
                         registerCourse.StudentCourseStatus = StudentCourseStatusEnum.Waitlisted;
                         break;
                 }
-                registerCourse.ModificationBy = _claimsService.GetCurrentUserId;
+                registerCourse.ConsultanId = _claimsService.GetCurrentUserId.ToString();
 
                 await  _unitOfWork.RegisterCourseRepository.UpdateAsync(registerCourse);
                 await _unitOfWork.SaveChangeAsync();
@@ -256,6 +256,7 @@ namespace FranchiseProject.Application.Services
                     DateTime = await GetDateTimeFromRegisterCourseAsync(id, registerCourse.CourseId.Value),
                     ConsultantName = consultantName,
                     CoursePrice = registerCourse.Course?.Price,
+                    CreationDate=registerCourse.CreationDate,
                     ModificationDate = registerCourse.ModificationDate.ToString(),
                     PaymentStatus=registerCourse.StudentPaymentStatus,
                 };
@@ -309,21 +310,15 @@ namespace FranchiseProject.Application.Services
                     .GroupBy(p => p.RegisterCourseId)
                     .ToDictionary(g => g.Key, g => g.Sum(p => p.Amount));
 
-                var modificationByIds = registerCourses.Items
-          .Where(rc => rc.ModificationBy != null)
-          .Select(rc => rc.ModificationBy.Value)
-          .Distinct()
-          .ToList();
+                var consultantIds = registerCourses.Items
+                     .Where(item => item?.ConsultanId != null)
+                     .Select(item => item.ConsultanId)
+                     .Distinct()
+                     .ToList();
 
-                var consultants = await Task.WhenAll(modificationByIds.Select(async id =>
-                {
-                    var user = await _userManager.FindByIdAsync(id.ToString());
-                    return new { Id = id, UserName = user?.UserName };
-                }));
-
-                var consultantDictionary = consultants
-                    .Where(c => c.UserName != null)
-                    .ToDictionary(c => c.Id, c => c.UserName);
+                var consultants = await _userManager.Users
+                    .Where(u => consultantIds.Contains(u.Id))
+                    .ToDictionaryAsync(u => u.Id, u => u.UserName);
 
 
                 var studentRegisterViewModels = registerCourses.Items.OrderByDescending(item => item.ModificationDate).Select(rc => new StudentRegisterViewModel
@@ -336,10 +331,11 @@ namespace FranchiseProject.Application.Services
                     PhoneNumber = rc.User?.PhoneNumber,
                     CourseCode = rc.Course?.Code,
                     CoursePrice = rc.Course?.Price,
+                    CreationDate=rc.CreationDate,
                     ModificationDate = rc.ModificationDate.ToString(),
-                    ConsultantName = rc.ModificationBy != null && consultantDictionary.TryGetValue(rc.ModificationBy.Value, out var userName)
-                ? userName
-                : null,
+                    ConsultantName = rc.ConsultanId != null && consultants.TryGetValue(rc.ConsultanId, out var userName)
+                        ? userName
+                        : null,
                     StudentStatus = rc.StudentCourseStatus,
                     PaymentStatus = rc.StudentPaymentStatus,
                     DateTime = rc.DateTime,

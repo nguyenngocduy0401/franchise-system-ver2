@@ -21,8 +21,8 @@ namespace FranchiseProject.Domain.Entity
         public DateTime? PaymentDeadline { get; set; }
         public StudentCourseStatusEnum? StudentCourseStatus { get; set; }
         public StudentPaymentStatusEnum? StudentPaymentStatus { get; set; }
-       
-       
-       // public DateTime? CreatDate { get; set; }
+        public string? ConsultanId { get; set; }
+
+        // public DateTime? CreatDate { get; set; }
     }
 }

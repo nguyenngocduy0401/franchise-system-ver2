@@ -60,7 +60,7 @@ namespace FranchiseProject.Application.Services
                 var franchiseRequest = _mapper.Map<RegisterForm>(regis);
                 franchiseRequest.Status = ConsultationStatusEnum.NotConsulted;
                 franchiseRequest.CustomerName = regis.CustomerName;
-                franchiseRequest.ModificationDate = DateTime.Now;
+               // franchiseRequest.ModificationDate = DateTime.Now;
                 await _unitOfWork.FranchiseRegistrationRequestRepository.AddAsync(franchiseRequest);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                if (isSuccess > 0)
@@ -182,8 +182,9 @@ namespace FranchiseProject.Application.Services
                     Email = item.Email,
                     PhoneNumber = item.PhoneNumber,
                     Status = item.Status,
+                    CreationDate=item.CreationDate,
                     ModificationDate = item.ModificationDate,
-                    ConsultantUserName = item.ConsultanId != null && consultants.TryGetValue(item.ConsultanId, out var userName)
+                    ConsultantName = item.ConsultanId != null && consultants.TryGetValue(item.ConsultanId, out var userName)
                         ? userName
                         : null
                 }).ToList();
