@@ -16,6 +16,6 @@ namespace FranchiseProject.Application.ViewModels.ClassViewModel
         public string? CourseId { get; set; }
         public string? InstructorId { get; set; }
          public List<string >? StudentId { get; set; }
-     //   public ClassStatusEnum? Status { get; set; }
+     
     }
 }

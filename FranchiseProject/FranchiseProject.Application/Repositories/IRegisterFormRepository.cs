@@ -13,6 +13,6 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IRegisterFormRepository :IGenericRepository<RegisterForm>
     {
-
+        Task<bool> ExistsWithinLast24HoursAsync(string email, string phoneNumber);
     }
 }

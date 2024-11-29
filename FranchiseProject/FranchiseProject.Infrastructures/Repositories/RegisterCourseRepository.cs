@@ -111,5 +111,16 @@ namespace FranchiseProject.Infrastructures.Repositories
             return await _dbContext.RegisterCourses
                     .Where(rc => rc.UserId==userId&&rc.CourseId==courseId&&rc.StudentCourseStatus==StudentCourseStatusEnum.Waitlisted).FirstOrDefaultAsync();
         }
+
+        public async Task<bool> ExistsWithinLast24HoursAsync(string name,string email, string phoneNumber, string courseId)
+        {
+            var twentyFourHoursAgo = DateTime.Now.AddHours(-24);
+            return await _dbSet.AnyAsync(r =>
+                r.User.Email == email &&
+                r.User.PhoneNumber == phoneNumber &&
+                r.CourseId == Guid.Parse(courseId) &&
+                r.User.FullName==name &&
+                r.ModificationDate >= twentyFourHoursAgo);
+        }
     }
 }

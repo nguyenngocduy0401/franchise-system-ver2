@@ -27,6 +27,12 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
-        
+        public async Task<bool> ExistsWithinLast24HoursAsync(string email, string phoneNumber)
+        {
+            var twentyFourHoursAgo = DateTime.Now.AddHours(-24);
+            return await _dbSet.AnyAsync(fr =>
+                (fr.Email == email || fr.PhoneNumber == phoneNumber) &&
+                fr.ModificationDate >= twentyFourHoursAgo);
+        }
     }
 }

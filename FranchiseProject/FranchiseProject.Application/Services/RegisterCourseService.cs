@@ -90,7 +90,7 @@ namespace FranchiseProject.Application.Services
                 }
 
                 var twentyFourHoursAgo = DateTime.Now.AddHours(-24);
-                bool existsWithin24Hours = await _unitOfWork.RegisterCourseRepository.ExistsWithinLast24HoursAsync(model.Email, model.PhoneNumber, model.CourseId);
+                bool existsWithin24Hours = await _unitOfWork.RegisterCourseRepository.ExistsWithinLast24HoursAsync(model.StudentName,model.Email, model.PhoneNumber, model.CourseId);
 
                 if (existsWithin24Hours)
                 {
