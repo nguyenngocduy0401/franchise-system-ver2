@@ -120,7 +120,7 @@ namespace FranchiseProject.Infrastructures.Repositories
                 r.User.PhoneNumber == phoneNumber &&
                 r.CourseId == Guid.Parse(courseId) &&
                 r.User.FullName==name &&
-                r.ModificationDate >= twentyFourHoursAgo);
+                r.CreationDate >= twentyFourHoursAgo);
         }
     }
 }

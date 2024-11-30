@@ -31,8 +31,8 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             var twentyFourHoursAgo = DateTime.Now.AddHours(-24);
             return await _dbSet.AnyAsync(fr =>
-                (fr.Email == email || fr.PhoneNumber == phoneNumber) &&
-                fr.ModificationDate >= twentyFourHoursAgo);
+                (fr.Email == email && fr.PhoneNumber == phoneNumber) &&
+                fr.CreationDate >= twentyFourHoursAgo);
         }
     }
 }

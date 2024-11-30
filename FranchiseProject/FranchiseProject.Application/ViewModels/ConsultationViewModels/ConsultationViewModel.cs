@@ -9,15 +9,16 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.ViewModels.ConsultationViewModels
 {
-    public  class ConsultationViewModel
+    public class ConsultationViewModel
     {
         public Guid Id { get; set; }
         public string? CusomterName { get; set; }
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
         public ConsultationStatusEnum Status { get; set; }
+        public CustomerStatus? CustomerStatus { get; set; }
         public DateTime? CreationDate { get; set; }
         public DateTime? ModificationDate { get; set; }
-         public string? ConsultantName { get; set; }
+        public string? ConsultantName { get; set; }
     }
 }

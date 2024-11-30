@@ -16,6 +16,7 @@ namespace FranchiseProject.Domain.Entity
         public string? Address { get; set; }
         public DateTime? ConsultTime { get; set; }
         public ConsultationStatusEnum Status { get; set; }
+        public CustomerStatus? CustomerStatus { get; set; }
         public string? ConsultanId {  get; set; }
         [ForeignKey("UserId")]
         public User? User { get; set; }

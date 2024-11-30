@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Services
 {
-    public class RegisterFormService :IRegisterFormSevice
+    public class RegisterFormService : IRegisterFormSevice
     {
         private readonly IClaimsService _claimsService;
         private readonly IUnitOfWork _unitOfWork;
@@ -25,13 +25,13 @@ namespace FranchiseProject.Application.Services
         private readonly IValidator<RegisterConsultationViewModel> _validator;
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
-        public RegisterFormService(IEmailService emailService,IUnitOfWork unitOfWork,IClaimsService claimsService, IValidator<RegisterConsultationViewModel> validator,
-            IMapper mapper,UserManager<User> userManager)
+        public RegisterFormService(IEmailService emailService, IUnitOfWork unitOfWork, IClaimsService claimsService, IValidator<RegisterConsultationViewModel> validator,
+            IMapper mapper, UserManager<User> userManager)
         {
             _unitOfWork = unitOfWork;
-                _claimsService = claimsService;
-                _validator = validator;
-            _mapper = mapper; 
+            _claimsService = claimsService;
+            _validator = validator;
+            _mapper = mapper;
             _userManager = userManager;
             _emailService = emailService;
         }
@@ -60,15 +60,15 @@ namespace FranchiseProject.Application.Services
                 var franchiseRequest = _mapper.Map<RegisterForm>(regis);
                 franchiseRequest.Status = ConsultationStatusEnum.NotConsulted;
                 franchiseRequest.CustomerName = regis.CustomerName;
-               // franchiseRequest.ModificationDate = DateTime.Now;
+                // franchiseRequest.ModificationDate = DateTime.Now;
                 await _unitOfWork.FranchiseRegistrationRequestRepository.AddAsync(franchiseRequest);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
-               if (isSuccess > 0)
+                if (isSuccess > 0)
                 {
-                    var emailResponse = await _emailService.SendRegistrationSuccessEmailAsync(regis.Email); 
+                    var emailResponse = await _emailService.SendRegistrationSuccessEmailAsync(regis.Email);
                     if (!emailResponse.isSuccess)
                     {
-                     response.Message = "Tạo Thành Công, nhưng không thể gửi email xác nhận.";
+                        response.Message = "Tạo Thành Công, nhưng không thể gửi email xác nhận.";
                     }
                     response.Data = true;
                     response.isSuccess = true;
@@ -91,21 +91,21 @@ namespace FranchiseProject.Application.Services
                 response.Message = ex.Message;
             }
             return response;
-          
+
         }
 
-        public async Task<ApiResponse<bool>> UpdateConsultationStatusAsync(string requestId)
+        public async Task<ApiResponse<bool>> UpdateConsultationStatusAsync(string requestId, CustomerStatus customerStatus)
         {
             var response = new ApiResponse<bool>();
             try
             {
-                var userId= _claimsService.GetCurrentUserId.ToString();
-                
-                var id= Guid.Parse(requestId);
+                var userId = _claimsService.GetCurrentUserId.ToString();
+
+                var id = Guid.Parse(requestId);
                 var exist = await _unitOfWork.FranchiseRegistrationRequestRepository.GetByIdAsync(id);
                 if (exist == null)
                 {
-                 
+
                     response.Data = false;
                     response.isSuccess = true;
                     response.Message = "không tìm thấy";
@@ -115,13 +115,14 @@ namespace FranchiseProject.Application.Services
                 var currentUser = await _userManager.FindByIdAsync(userId);
                 if (currentUser == null)
                 {
-                    response.Data=false;
+                    response.Data = false;
                     response.isSuccess = true;
                     response.Message = "Current user not found.";
-                    
+
                 }
-               exist.ConsultanId = userId;
-               _unitOfWork.FranchiseRegistrationRequestRepository.Update(exist);
+                exist.CustomerStatus = customerStatus;
+                exist.ConsultanId = userId;
+                _unitOfWork.FranchiseRegistrationRequestRepository.Update(exist);
                 var result = await _unitOfWork.SaveChangeAsync();
                 if (result > 0)
                 {
@@ -154,7 +155,14 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var paginationResult = await _unitOfWork.FranchiseRegistrationRequestRepository.GetFilterAsync(
-                    filter: s => (!filterModel.Status.HasValue || s.Status == filterModel.Status),
+                    filter: s => (!filterModel.Status.HasValue || s.Status == filterModel.Status) &&
+                     (!filterModel.CustomerStatus.HasValue || s.CustomerStatus == filterModel.CustomerStatus) &&
+                    (string.IsNullOrEmpty(filterModel.SearchInput) || (
+                    s.Email != null && s.Email.Contains(filterModel.SearchInput) ||
+                    s.CustomerName != null && s.CustomerName.Contains(filterModel.SearchInput) ||
+                    s.PhoneNumber != null && s.PhoneNumber.Contains(filterModel.SearchInput)
+
+                )),
                     includeProperties: "User",
                     pageIndex: filterModel.PageIndex,
                     pageSize: filterModel.PageSize
@@ -182,7 +190,8 @@ namespace FranchiseProject.Application.Services
                     Email = item.Email,
                     PhoneNumber = item.PhoneNumber,
                     Status = item.Status,
-                    CreationDate=item.CreationDate,
+                    CustomerStatus = item.CustomerStatus,
+                    CreationDate = item.CreationDate,
                     ModificationDate = item.ModificationDate,
                     ConsultantName = item.ConsultanId != null && consultants.TryGetValue(item.ConsultanId, out var userName)
                         ? userName
@@ -220,7 +229,7 @@ namespace FranchiseProject.Application.Services
 
             try
             {
-              
+
                 var franchiseRequest = await _unitOfWork.FranchiseRegistrationRequestRepository.GetByIdAsync(id);
 
                 if (franchiseRequest == null)

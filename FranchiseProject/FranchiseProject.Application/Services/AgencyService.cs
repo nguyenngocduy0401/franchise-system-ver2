@@ -58,11 +58,19 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
+                
                 var agency = _mapper.Map<Agency>(create);
                 agency.Status = AgencyStatusEnum.Processing;
                 var work = CreateWorkAppointForFranchiseFlow(agency);
                 agency.Works = work;
                 await _unitOfWork.AgencyRepository.AddAsync(agency);
+                var consult = await _unitOfWork.FranchiseRegistrationRequestRepository.GetExistByIdAsync(create.RegisterFormId.Value);
+                if(consult == null)
+                {
+                    return ResponseHandler.Success<bool>(false, "Không tìm thấy tư vấn !");
+                }
+                consult.Status = ConsultationStatusEnum.ProspectivePartner;
+                 _unitOfWork.FranchiseRegistrationRequestRepository.Update(consult);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                 if (isSuccess > 0)
                 {
@@ -70,11 +78,11 @@ namespace FranchiseProject.Application.Services
                     response.isSuccess = true;
                     response.Message = "Tạo Thành Công !";
                     var emailMessage = EmailTemplate.AgencyRegistrationSuccess(agency.Email, agency.Name);
-                    var emailSent = _emailService.SendEmailAsync(emailMessage);
-                    /*if (!emailSent)
+                    var emailSent = await _emailService.SendEmailAsync(emailMessage);
+                    if (!emailSent)
                     {
                         response.Message += " (Lỗi khi gửi email)";
-                    }*/
+                    }
                 }
                 else
                 {

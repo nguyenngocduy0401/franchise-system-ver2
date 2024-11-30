@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ConsultationViewModels;
+using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -22,7 +23,7 @@ namespace FranchiseProject.API.Controllers
         [SwaggerOperation(Summary = "nhân viên tu vấn chuyển trạng thái 'đã tư vấn'{Authorize = SystemConsultant}")]
         [HttpPut("{id}")]
         [Authorize(Roles = AppRole.SystemConsultant)]
-        public async Task<ApiResponse<bool>> UpdateConsultationStatusAsync(string id) => await _consultationService.UpdateConsultationStatusAsync(id);
+        public async Task<ApiResponse<bool>> UpdateConsultationStatusAsync(string id, CustomerStatus customerStatus) => await _consultationService.UpdateConsultationStatusAsync(id,customerStatus);
         [SwaggerOperation(Summary = "lấy danh sách đăng kí tư vấn theo trạng thái{Authorize = SystemConsultant}")]
         [HttpGet("")]
         [Authorize(Roles = AppRole.SystemConsultant)]

@@ -8,6 +8,7 @@ namespace FranchiseProject.Application.ViewModels.ConsultationViewModels
 {
     public class CreateAgencyViewModel
     {
+        public Guid? RegisterFormId { get; set; }
         public string? Name { get; set; }
         public string? Address { get; set; }
         public string? City { get; set; }

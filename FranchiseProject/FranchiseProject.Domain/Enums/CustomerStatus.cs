@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Enums
 {
-    public enum ConsultationStatusEnum
+    public enum CustomerStatus
     {
-        NotConsulted = 0,  //chưa tư vấn 
-        Consulted = 1   ,
-        ProspectivePartner,
-        // đã tư vẫn 
+       Approved,
+       Reject
     }
 }
