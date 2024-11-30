@@ -311,7 +311,8 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Không thể khóa tài khoản nằm ngoài phạm vi trung tâm!";
                 }
                 if (!await _userManager.IsInRoleAsync(user, RolesEnum.Student.ToString()) &&
-                    !await _userManager.IsInRoleAsync(user, RolesEnum.Instructor.ToString()))
+                    !await _userManager.IsInRoleAsync(user, RolesEnum.Instructor.ToString()) &&
+                    !await _userManager.IsInRoleAsync(user, RolesEnum.AgencyStaff.ToString()))
                 {
                     response.Data = false;
                     response.isSuccess = true;
