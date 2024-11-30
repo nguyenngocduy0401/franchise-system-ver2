@@ -23,5 +23,7 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> ChangePasswordAsync(UpdatePasswordModel updatePasswordModel);
         Task<ApiResponse<CreateUserViewModel>> CreateUserByAgencyAsync(CreateUserByAgencyModel createUserModel);
         Task<UserLoginModel> GenerateUserCredentials(string fullname);
+        Task<ApiResponse<bool>> BanAndUnbanUserByAgencyAsync(string id);
+        Task<ApiResponse<bool>> UpdateUserByAgencyAsync(string id, UpdateUserByAgencyModel updateUserByAgencyModel);
     }
 }

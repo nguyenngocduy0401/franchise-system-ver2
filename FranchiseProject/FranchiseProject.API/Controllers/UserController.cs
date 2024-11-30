@@ -61,7 +61,13 @@ namespace FranchiseProject.API.Controllers
 		public async Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAdminAsync([FromQuery] FilterUserByAdminModel filterUserByAdminModel)
 			=> await _userService.FilterUserByAdminAsync(filterUserByAdminModel);
 
-		[Authorize(Roles = AppRole.Admin)]
+        [Authorize(Roles = AppRole.AgencyManager)]
+        [SwaggerOperation(Summary = "cấm và bỏ lệnh cấm người dùng {Authorize = AgencyManager}")]
+        [HttpPut("~/agency-manager/api/v1/users/{id}/status")]
+        public async Task<ApiResponse<bool>> BanAndUnbanUserByAgencyAsync(string id)
+            => await _userService.BanAndUnbanUserByAgencyAsync(id);
+
+        [Authorize(Roles = AppRole.Admin)]
 		[SwaggerOperation(Summary = "cấm và bỏ lệnh cấm người dùng {Authorize = Administrator}")]
 		[HttpPut("~/admin/api/v1/users/{id}/status")]
 		public async Task<ApiResponse<bool>> BanAndUnbanUserByAdminAsync(string id)
@@ -73,7 +79,13 @@ namespace FranchiseProject.API.Controllers
 		public async Task<ApiResponse<CreateUserByAdminModel>> CreateUserByAdminAsync(CreateUserByAdminModel createUserByAdminModel)
 			=> await _userService.CreateUserByAdminAsync(createUserByAdminModel);
 
-		[Authorize(Roles = AppRole.Admin)]
+        [Authorize(Roles = AppRole.AgencyManager)]
+        [SwaggerOperation(Summary = "cập nhật người dùng {Authorize = AgencyManager}")]
+        [HttpPut("~/agency-manager/api/v1/users")]
+        public async Task<ApiResponse<bool>> UpdateUserByAgencyAsync(string id, UpdateUserByAgencyModel updateUserByAgencyModel)
+            => await _userService.UpdateUserByAgencyAsync(id, updateUserByAgencyModel);
+
+        [Authorize(Roles = AppRole.Admin)]
 		[SwaggerOperation(Summary = "cập nhật người dùng {Authorize = Administrator}")]
 		[HttpPut("~/admin/api/v1/users")]
 		public async Task<ApiResponse<bool>> UpdateUserByAdminAsync(string id, UpdateUserByAdminModel updateUserByAdminModel)
