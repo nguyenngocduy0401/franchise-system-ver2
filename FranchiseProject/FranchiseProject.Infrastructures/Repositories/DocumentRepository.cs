@@ -1,13 +1,9 @@
-﻿using FranchiseProject.Application.Interfaces;
+﻿
+using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FranchiseProject.Infrastructures.Repositories
 {
@@ -39,6 +35,13 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .AnyAsync(d => d.AgencyId == agencyId &&
                                d.Type == Domain.Enums.DocumentType.BusinessLicense &&
                                d.Status == Domain.Enums.DocumentStatus.Active);
+        }
+        public async Task<Document> GetMostRecentAgreeSignByAgencyIdAsync(Guid agencyId,DocumentType type)
+        {
+            return await _dbContext.Documents
+                .Where(c => c.AgencyId == agencyId && c.Type== type)
+                .OrderByDescending(c => c.CreationDate)
+                .FirstOrDefaultAsync();
         }
     }
 }

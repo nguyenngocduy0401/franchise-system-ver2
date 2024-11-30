@@ -110,7 +110,7 @@ namespace FranchiseProject.API.Controllers
 		[SwaggerOperation(Summary = "học sinh nộp bài tập (assignement){Authorize = Student}")]
 		[Authorize(Roles = AppRole.Student)]
 		[HttpPost("mine/assignments")]
-		public async Task<ApiResponse<bool>> SubmitAssignmentAsync(string assignmentId, string fileSubmitUrl) => await _assignmentService.SubmitAssignmentAsync(assignmentId, fileSubmitUrl);
+		public async Task<ApiResponse<bool>> SubmitAssignmentAsync(string assignmentId, string fileSubmitUrl,string fileSubmitName) => await _assignmentService.SubmitAssignmentAsync(assignmentId, fileSubmitUrl, fileSubmitName);
 		[SwaggerOperation(Summary = "Lấy danh sách lớp học bằng login  (class){Authorize = Student,Instructor}")]
 		[Authorize(Roles = AppRole.Student + "," + AppRole.Instructor)]
 		[HttpGet("mine/classes")]
