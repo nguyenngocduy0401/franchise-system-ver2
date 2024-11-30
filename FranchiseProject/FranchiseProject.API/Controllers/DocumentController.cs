@@ -2,6 +2,7 @@
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.DocumentViewModel;
 using FranchiseProject.Application.ViewModels.DocumentViewModels;
+using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -19,7 +20,7 @@ namespace FranchiseProject.API.Controllers
             _documentService = documentService;
         }
 
-       // [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin)]
+      [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin)]
         [SwaggerOperation(Summary = "Xóa tài liệu bằng id {Authorize = Manager, Admin}")]
         [HttpDelete("{id}")]
         public async Task<ApiResponse<bool>> DeleteDocumentAsync(Guid id)
@@ -27,36 +28,41 @@ namespace FranchiseProject.API.Controllers
             return await _documentService.DeleteDocumentAsync(id);
         }
 
-       // [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin)]
-        [SwaggerOperation(Summary = "Tạo mới tài liệu {Authorize = Manager, Admin}")]
+       [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin+"," + AppRole.SystemTechnician)]
+        [SwaggerOperation(Summary = "Tạo mới tài liệu {Authorize = Manager, Admin,SystemTechnician}")]
         [HttpPost]
         public async Task<ApiResponse<bool>> CreateDocumentAsync(UploadDocumentViewModel uploadDocumentModel)
         {
             return await _documentService.UpdaloadDocumentAsyc(uploadDocumentModel);
         }
 
-       // [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin)]
-        [SwaggerOperation(Summary = "Cập nhật tài liệu {Authorize = Manager, Admin}")]
+        [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician)]
+        [SwaggerOperation(Summary = "Cập nhật tài liệu {Authorize = Manager, Admin,SystemTechnician}")]
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> UpdateDocumentAsync(Guid id, UpdateDocumentViewModel updateDocumentModel)
         {
             return await _documentService.UpdateDocumentAsync(id, updateDocumentModel);
         }
-      //  [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin)]
-        [SwaggerOperation(Summary = "Tìm tài liệu bằng id{Authorize = Manager, Admin}")]
+       [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician)]
+        [SwaggerOperation(Summary = "Tìm tài liệu bằng id{Authorize = Manager, Admin,SystemTechnician}")]
         [HttpGet("{id}")]
         public async Task<ApiResponse<DocumentViewModel>> GetDocumentByIdAsync(Guid id)
         {
             return await _documentService.GetDocumentByIdAsync(id);
         }
-        //[Authorize(Roles = AppRole.Manager + "," + AppRole.Admin)]
-        [SwaggerOperation(Summary = "Tìm kiếm tài liệu{Authorize = Manager, Admin}")]
+        [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician)]
+        [SwaggerOperation(Summary = "Tìm kiếm tài liệu{Authorize = Manager, Admin,SystemTechnician}")]
         [HttpGet()]
         public async Task<ApiResponse<Pagination<DocumentViewModel>>> FilterDocumentAsync([FromQuery] FilterDocumentViewModel filterDocumentModel)
         {
             return await _documentService.FilterDocumentAsync(filterDocumentModel);
         }
-
-     
+        //[Authorize(Roles = AppRole.Manager + "," + AppRole.Admin+"," + AppRole.SystemTechnician)]
+        [SwaggerOperation(Summary = "Tìm tài liệu bằng Agencyid{Authorize = Manager, Admin,SystemTechnician}")]
+        [HttpGet("agency/{id}")]
+        public async Task<ApiResponse<DocumentViewModel>> GetDocumentbyAgencyId([FromBody]Guid id, [FromBody] DocumentType type)
+        { 
+            return await _documentService.GetDocumentbyAgencyId(id, type);
+        }
     }
 }

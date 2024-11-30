@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.DocumentViewModel;
 using FranchiseProject.Application.ViewModels.DocumentViewModels;
+using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<Pagination<DocumentViewModel>>> FilterDocumentAsync(FilterDocumentViewModel filterModel);
         Task<ApiResponse<bool>> DeleteDocumentAsync(Guid documentId);
         Task<ApiResponse<bool>> UpdateDocumentAsync(Guid documentId, UpdateDocumentViewModel updateDocumentModel);
+        Task<ApiResponse<DocumentViewModel>> GetDocumentbyAgencyId(Guid agencyId, DocumentType type);
     }
 }

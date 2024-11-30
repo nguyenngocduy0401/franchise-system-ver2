@@ -11,5 +11,6 @@ namespace FranchiseProject.Application.Repositories
     {
         Task<bool> HasActiveAgreementContractAsync(Guid agencyId);
         Task<bool> HasActiveBusinessLicenseAsync(Guid agencyId);
+        Task<Document> GetMostRecentAgreeSignByAgencyIdAsync(Guid agencyId, DocumentType type);
     }
 }

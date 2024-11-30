@@ -39,7 +39,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         public async Task<Document> GetMostRecentAgreeSignByAgencyIdAsync(Guid agencyId,DocumentType type)
         {
             return await _dbContext.Documents
-                .Where(c => c.AgencyId == agencyId && c.Type== type)
+                .Where(c => c.AgencyId == agencyId && c.Type== type && c.IsDeleted!= true)
                 .OrderByDescending(c => c.CreationDate)
                 .FirstOrDefaultAsync();
         }

@@ -7,10 +7,12 @@ using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
+using FranchiseProject.Application.ViewModels.ContractViewModels;
 using FranchiseProject.Application.ViewModels.DocumentViewModel;
 using FranchiseProject.Application.ViewModels.DocumentViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -170,6 +172,27 @@ namespace FranchiseProject.Application.Services
                 response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
+        }
+        public async Task<ApiResponse<DocumentViewModel>> GetDocumentbyAgencyId(Guid agencyId,DocumentType type)
+        {
+            var response = new ApiResponse<DocumentViewModel>();
+            try
+            {
+                var contract = await _unitOfWork.DocumentRepository.GetMostRecentAgreeSignByAgencyIdAsync(agencyId, type);
+                if (contract == null)
+                {
+                    return ResponseHandler.Success<DocumentViewModel>(null, "Không tìm thấy ");
+                }
+                var contractViewModel = _mapper.Map<DocumentViewModel>(contract);
+                var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(contract.AgencyId.Value);
+                contractViewModel.AgencyName = agency.Name;
+
+                return ResponseHandler.Success(contractViewModel, "Truy xuất thành công");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<DocumentViewModel>($"Lỗi truy xuất : {ex.Message}");
+            }
         }
     }
 }
