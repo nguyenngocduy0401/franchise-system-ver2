@@ -113,7 +113,6 @@ namespace FranchiseProject.Application.Services
         }
         public async Task<ApiResponse<AssignmentViewModel>> GetAssignmentByIdAsync(string slotId)
         {
-
             var response = new ApiResponse<AssignmentViewModel>();
             try
             {
@@ -124,10 +123,15 @@ namespace FranchiseProject.Application.Services
                 {
                     return ResponseHandler.Success<AssignmentViewModel>(null, "User hoặc Agency không khả dụng!");
                 }
+
                 var ass = await _unitOfWork.AssignmentRepository.GetByIdAsync(Guid.Parse(slotId));
-                if (ass == null) throw new Exception("Bài tập  không tồn tại!");
+                if (ass == null) throw new Exception("Bài tập không tồn tại!");
+
                 var assViewModel = _mapper.Map<AssignmentViewModel>(ass);
-                response = ResponseHandler.Success(assViewModel, "Lấy thông tin bài tập  thành công!");
+                var submittedAssignments = await _unitOfWork.AssignmentSubmitRepository.GetAllSubmitAsync(ass.Id);
+                assViewModel.AsmSubmits = _mapper.Map<List<AsmSubmitViewModel>>(submittedAssignments);
+
+                response = ResponseHandler.Success(assViewModel, "Lấy thông tin bài tập thành công!");
             }
             catch (Exception ex)
             {
@@ -369,6 +373,58 @@ namespace FranchiseProject.Application.Services
 
                 return response;
             }
+        }
+        public async Task<ApiResponse<List<StudentAsmViewModel>>> GetAssignmentsForStudentByClassIdAsync(Guid classId)
+        {
+            var response = new ApiResponse<List<StudentAsmViewModel>>();
+            try
+            {
+                var userCurrentId = _claimsService.GetCurrentUserId.ToString();
+                var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
+
+                if (userCurrent == null)
+                {
+                    return ResponseHandler.Failure<List<StudentAsmViewModel>>("Người dùng không tồn tại.");
+                }
+
+               
+                // Get all assignments for the class
+                var assignments = await _unitOfWork.AssignmentRepository.GetAllAsync1(a => a.ClassId == classId);
+
+                var assignmentViewModels = new List<StudentAsmViewModel>();
+
+                foreach (var assignment in assignments)
+                {
+                    var assignmentViewModel = _mapper.Map<StudentAsmViewModel>(assignment);
+
+           
+                    var submissions = await _unitOfWork.AssignmentSubmitRepository.GetAllAsync1(am => am.AssignmentId == assignment.Id && am.UserId == userCurrentId.ToString());
+
+                    if (submissions != null)
+                    {
+                        foreach (var submission in submissions)
+                        {
+                            assignmentViewModel.AsmSubmits = new AsmSubmitViewModel
+                            {
+                                UserId = userCurrentId.ToString(),
+                                UserName = userCurrent.UserName,
+                                FileSubmitURL = submission.FileSubmitURL,
+                                SubmitDate = submission.SubmitDate,
+                                ScoreNumber = submission.ScoreNumber ?? 0
+                            };
+                        }
+                    }
+
+                    assignmentViewModels.Add(assignmentViewModel);
+                }
+
+                response = ResponseHandler.Success(assignmentViewModels, "Lấy danh sách bài tập thành công.");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<List<StudentAsmViewModel>>($"Lỗi khi lấy danh sách bài tập: {ex.Message}");
+            }
+            return response;
         }
     }
 }

@@ -18,5 +18,6 @@ namespace FranchiseProject.Application.ViewModels.AssignmentViewModels
             public DateTime? EndTime { get; set; }
             public AssigmentStatusEnum Status { get; set; }
             public Guid? ClassId { get; set; }
+            public List<AsmSubmitViewModel>? AsmSubmits { get; set; }
     }
 }

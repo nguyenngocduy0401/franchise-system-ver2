@@ -288,8 +288,7 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Assignment, AssignmentViewModel>();
             CreateMap<List<AssignmentSubmitViewModel>, Pagination<AssignmentSubmitViewModel>>();
             CreateMap<Assignment, AsmSubmitDetailViewModel>()
-           
-            .ForMember(dest => dest.UserScores, opt => opt.MapFrom(src => src.AssignmentSubmits.Select(us => new UserSubmitScoreViewModel
+           .ForMember(dest => dest.UserScores, opt => opt.MapFrom(src => src.AssignmentSubmits.Select(us => new UserSubmitScoreViewModel
             {
                 UserId = us.UserId,
                 Name = us.User.FullName,
@@ -298,6 +297,11 @@ namespace FranchiseProject.Infrastructures.Mappers
                 SubmitFileName = us.FileSbumitName,
                 SubmitUrl = us.FileSubmitURL
             }).ToList())); // Chuyển đổi danh sách thành List
+            CreateMap<Assignment, StudentAsmViewModel>();
+            CreateMap<AssignmentSubmit, AsmSubmitViewModel>()
+               .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName));
+
+            CreateMap<AsmSubmitViewModel, AssignmentSubmit>();
             #endregion
 
             #region Work

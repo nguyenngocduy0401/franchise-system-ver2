@@ -42,5 +42,12 @@ namespace FranchiseProject.Infrastructures.Repositories
                           .Include(e => e.AssignmentSubmits).ThenInclude(s => s.User)
                           .ToListAsync();
         }
+        public async Task<List<AssignmentSubmit>> GetAllSubmitAsync(Guid assignmentId)
+        {
+            return await _dbContext.AssignmentSubmits
+                .Where(a => a.AssignmentId == assignmentId)
+                .Include(a => a.User)
+                .ToListAsync();
+        }
     }
 }
