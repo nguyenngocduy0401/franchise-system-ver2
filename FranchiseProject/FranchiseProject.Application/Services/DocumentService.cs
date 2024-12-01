@@ -9,6 +9,7 @@ using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
 using FranchiseProject.Application.ViewModels.DocumentViewModel;
 using FranchiseProject.Application.ViewModels.DocumentViewModels;
+using FranchiseProject.Application.ViewModels.EmailViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
 using Microsoft.AspNetCore.Identity;
@@ -29,10 +30,13 @@ namespace FranchiseProject.Application.Services
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClaimsService _claimsService;
+        private readonly IEmailService _emailService;
         private readonly IValidator<UploadDocumentViewModel> _validator;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
-        public DocumentService(IValidator<UploadDocumentViewModel> validator, IMapper mapper, IUnitOfWork unitOfWork, IClaimsService claimsService, UserManager<User> userManager, RoleManager<Role> roleManager)
+        public DocumentService(IValidator<UploadDocumentViewModel> validator, IMapper mapper, IUnitOfWork unitOfWork,
+            IClaimsService claimsService, UserManager<User> userManager, RoleManager<Role> roleManager,
+            IEmailService emailService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -40,6 +44,7 @@ namespace FranchiseProject.Application.Services
             _roleManager = roleManager;
             _userManager = userManager;
             _validator = validator;
+            _emailService = emailService;
         }
         #endregion
         public async Task<ApiResponse<bool>> UpdaloadDocumentAsyc(UploadDocumentViewModel document)
@@ -170,6 +175,41 @@ namespace FranchiseProject.Application.Services
                 response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
+        }
+
+        public async Task NotifyCustomersOfExpiringDocuments()
+        {
+            var agencies = await _unitOfWork.AgencyRepository.GetAgencyEduLicenseExpiredAsync();
+
+            foreach (var agency in agencies)
+            {
+                if (agency == null || string.IsNullOrEmpty(agency.Email))
+                {
+
+                    continue;
+                }
+
+                var emailMessage = new MessageModel
+                {
+                    To = agency.Email,
+                    Subject = "[futuretech-noreply] Thông Báo Hết Hạn Giấy Phép Giáo Dục",
+                    Body = $"<p>Kính gửi {agency.Name},</p>" +
+                      $"<p>Chúng tôi xin thông báo rằng giấy phép giáo dục của bạn với Futuretech đã hết hạn.</p>" +
+                      $"<p>Để đảm bảo các hoạt động giáo dục không bị gián đoạn, chúng tôi kính mời bạn liên hệ với đội ngũ của chúng tôi để thực hiện các thủ tục gia hạn giấy phép.</p>" +
+                      $"<p>Vui lòng sử dụng các thông tin dưới đây để liên hệ:</p>" +
+                      $"<ul>" +
+                      $"<li><strong>Email hỗ trợ:</strong> support@futuretech.com</li>" +
+                      $"<li><strong>Số điện thoại:</strong> 0123-456-789</li>" +
+                      $"</ul>" +
+                      $"<p>Nếu bạn đã hoàn thành gia hạn giấy phép, vui lòng bỏ qua email này.</p>" +
+                      $"<p>Chúng tôi mong muốn tiếp tục đồng hành cùng bạn trên con đường phát triển giáo dục sắp tới.</p>" +
+                      $"<p>Trân trọng,</p>" +
+                      $"<p>Đội ngũ Futuretech</p>"
+                };
+
+                await _emailService.SendEmailAsync(emailMessage);
+
+            }
         }
     }
 }

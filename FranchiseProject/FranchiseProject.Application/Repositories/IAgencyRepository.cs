@@ -10,5 +10,6 @@ namespace FranchiseProject.Application.Repositories
     public interface IAgencyRepository : IGenericRepository<Agency>
     { 
         Task<IEnumerable<Agency>> GetAgencyExpiredAsync();
+        Task<IEnumerable<Agency>> GetAgencyEduLicenseExpiredAsync();
     }
 }

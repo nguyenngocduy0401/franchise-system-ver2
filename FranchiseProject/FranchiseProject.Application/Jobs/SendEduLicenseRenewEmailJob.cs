@@ -9,21 +9,20 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Jobs
 {
-    //[DisallowConcurrentExecution]
-    public class SendContractRenewalEmailJob : IJob
+    public class SendEduLicenseRenewEmailJob : IJob
     {
-        private readonly ILogger<SendContractRenewalEmailJob> _logger;
-        private readonly IContractService _contractService;
-        public SendContractRenewalEmailJob(IContractService contractService,
-            ILogger<SendContractRenewalEmailJob> logger)
+        private readonly ILogger<SendEduLicenseRenewEmailJob> _logger;
+        private readonly IDocumentService _documentService;
+        public SendEduLicenseRenewEmailJob(IDocumentService documentService,
+            ILogger<SendEduLicenseRenewEmailJob> logger)
         {
-            _contractService = contractService;
+            _documentService = documentService;
             _logger = logger;
         }
         public async Task Execute(IJobExecutionContext context)
         {
             _logger.LogInformation("{UtcNow}", DateTime.UtcNow);
-            await _contractService.NotifyCustomersOfExpiringContracts();
+            await _documentService.NotifyCustomersOfExpiringDocuments();
             //return Task.CompletedTask;
         }
     }

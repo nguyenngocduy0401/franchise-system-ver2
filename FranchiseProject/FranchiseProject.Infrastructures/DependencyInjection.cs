@@ -132,18 +132,28 @@ namespace FranchiseProject.Infrastructures
                 var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
                 var currentTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
                 // Just use the name of your job that you created in the Jobs folder.
-                var jobKey = new JobKey("SendContractRenewalEmailJob");
-                q.AddJob<SendContractRenewalEmailJob>(opts => opts.WithIdentity(jobKey));
+                var contractRenewalJobKey = new JobKey("SendContractRenewalEmailJob");
+                q.AddJob<SendContractRenewalEmailJob>(opts => opts.WithIdentity(contractRenewalJobKey));
                 q.AddTrigger(opts => opts
-                    .ForJob(jobKey)
+                    .ForJob(contractRenewalJobKey)
                     .WithIdentity("SendContractRenewalEmailJob-trigger")
                     //This Cron interval can be described as "run every minute" (when second is zero)
                     .StartAt(currentTime.AddDays(3))
+                    .WithCronSchedule("0 4 1/21 * * ?", cron => cron.InTimeZone(vietnamTimeZone))
+                );
+
+                var licenseExpiryJobKey = new JobKey("SendEduLicenseRenewEmailJob");
+                q.AddJob<SendEduLicenseRenewEmailJob>(opts => opts.WithIdentity(licenseExpiryJobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(licenseExpiryJobKey)
+                    .WithIdentity("SendEduLicenseRenewEmailJob-trigger")
+                    .StartAt(currentTime.AddDays(2))
                     .WithCronSchedule("0 4 1/21 * * ?", cron => cron.InTimeZone(vietnamTimeZone))
                 );
             });
             services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
             return services;
         }
+
     }
 }

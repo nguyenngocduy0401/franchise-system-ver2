@@ -36,5 +36,15 @@ namespace FranchiseProject.Infrastructures.Repositories
                         .Select(e => e.Agency).Where(e => e.Status != AgencyStatusEnum.Inactive)
                         .ToListAsync();
         }
+        public async Task<IEnumerable<Agency>> GetAgencyEduLicenseExpiredAsync()
+        {
+            return await _dbContext.Documents
+                        .AsNoTracking()
+                        .Where(e => e.ExpirationDate.HasValue &&
+                                    DateOnly.FromDateTime(_timeService.GetCurrentTime()) >= e.ExpirationDate.Value.AddDays(-40) &&
+                                    DateOnly.FromDateTime(_timeService.GetCurrentTime()) <= e.ExpirationDate.Value)
+                        .Select(e => e.Agency).Where(e => e.Status != AgencyStatusEnum.Inactive)
+                        .ToListAsync();
+        }
     }
 }
