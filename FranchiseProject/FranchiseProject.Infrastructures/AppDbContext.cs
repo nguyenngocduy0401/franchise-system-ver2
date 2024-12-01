@@ -85,6 +85,7 @@ namespace FranchiseProject.Infrastructures
             modelBuilder.Entity<HomePage>().HasData(
             new HomePage
             {
+                Id = Guid.Parse("550EE872-EA09-42A0-B9AC-809890DEBAFB"),
             }
             );
             #endregion
