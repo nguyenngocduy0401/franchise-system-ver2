@@ -19,7 +19,7 @@ namespace FranchiseProject.API.Controllers
             _equipmentService = equipmentService;
         }
 
-       // [Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician)]
+       [Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician)]
         [SwaggerOperation(Summary = "thêm trang thiết bị {Authorize = Manager, SystemTechnician}")]
         [HttpPost("agency/{id}")]
         public async Task<ApiResponse<object>> ImportEquipmentsFromExcelAsync(IFormFile file, Guid id)
@@ -28,7 +28,7 @@ namespace FranchiseProject.API.Controllers
         }
         [HttpGet("agency/{id}")]
         [SwaggerOperation(Summary = "xuất file danh sách trang bị  {Authorize = Manager, SystemTechnician}")]
-       // [Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician)]
+        [Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician)]
         public async Task<ApiResponse<string>> GenerateEquipmentReportAsync(Guid id)
         {
             return  await _equipmentService.GenerateEquipmentReportAsync(id);
@@ -36,7 +36,7 @@ namespace FranchiseProject.API.Controllers
         }
         [HttpPut("{id}/status")]
         [SwaggerOperation(Summary = "Cập nhật trạng thái của thiết bị {Authorize = Manager, SystemTechnician}")]
-        //[Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician)]
+        [Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician)]
         public async Task<ApiResponse<bool>> UpdateEquipmentStatusAsync(Guid id, EquipmentStatusEnum equipmentStatus)
         {
             return await _equipmentService.UpdateEquipmentStatusAsync(id, equipmentStatus);
@@ -44,7 +44,7 @@ namespace FranchiseProject.API.Controllers
 
         [HttpGet("`api/v1/agency/equipments")]
         [SwaggerOperation(Summary = "Lấy danh sách thiết bị theo AgencyId {Authorize = Manager, SystemTechnician, AgencyManager}")]
-        //[Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
+        [Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
         public async Task<ApiResponse<Pagination<EquipmentViewModel>>> GetEquipmentByAgencyId( [FromQuery] FilterEquipmentViewModel filter)
         {
           
@@ -52,14 +52,14 @@ namespace FranchiseProject.API.Controllers
         }
         [HttpPut("{id}")]
         [SwaggerOperation(Summary = "Cập nhật  thiết bị {Authorize = Manager, SystemTechnician}")]
-        //[Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician)]
+        [Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician)]
         public async Task<ApiResponse<bool>> UpdateEquipmentAsync(Guid id, UpdateEquipmentViewModel updateModel)
         {
             return await _equipmentService.UpdateEquipmentAsync(id, updateModel);
         }
         [HttpGet("`api/v1/agency/equipments/{id}")]
         [SwaggerOperation(Summary = "Lấy danh sách thiết bị theo AgencyId {Authorize = Manager, SystemTechnician, AgencyManager}")]
-        //[Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
+        [Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
         public async Task<ApiResponse<List<EquipmentSerialNumberHistoryViewModel>>> GetSerialNumberHistoryByEquipmentIdAsync(Guid id)
         {
 
