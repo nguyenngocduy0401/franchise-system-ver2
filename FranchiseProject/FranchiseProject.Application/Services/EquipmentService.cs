@@ -55,7 +55,11 @@ namespace FranchiseProject.Application.Services
                     var serialNumberHistoriesToAdd = new List<EquipmentSerialNumberHistory>();
                     var errors = new List<string>();
                     var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
-
+                  
+                    if (contract == null)
+                    {
+                        return ResponseHandler.Failure<object>("No active contract found for this agency.");
+                    }
                     var existingEquipments = await _unitOfWork.EquipmentRepository
                         .GetTableAsTracking()
                         .Where(e => e.ContractId == contract.Id)
@@ -218,36 +222,21 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<string>($"Failed to generate and upload equipment report: {ex.Message}");
             }
         }
-        public async Task<ApiResponse<bool>> UpdateEquipmentStatusAsync(Guid contractId, List<Guid> equipmentIds)
+        public async Task<ApiResponse<bool>> UpdateEquipmentStatusAsync( Guid equipmentIds , EquipmentStatusEnum equipmentStatus)
         {
             var response = new ApiResponse<bool>();
             try
             {
-                var contract = await _unitOfWork.ContractRepository.GetByIdAsync(contractId);
-                if (contract == null)
+              
+                var equipment = await _unitOfWork.EquipmentRepository.GetExistByIdAsync(equipmentIds);
+                if (equipment == null)
                 {
-                    return ResponseHandler.Failure<bool>("Contract not found.");
+                    response = ResponseHandler.Success(false, "Trang thiết bị không hợp lệ");
                 }
-                var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contractId);
-
-                var equipmentsToUpdate = equipments.Where(e => equipmentIds.Contains(e.Id)).ToList();
-
-                if (equipmentsToUpdate.Count == 0)
-                {
-                    return ResponseHandler.Failure<bool>("No matching equipment found for the given contract and equipment IDs.");
-                }
-
-                foreach (var equipment in equipmentsToUpdate)
-                {
-                    if (equipment.Status != EquipmentStatusEnum.Available)
-                    {
-                        return ResponseHandler.Failure<bool>($"Equipment {equipment.Id} is not in Available status.");
-                    }
-
-                    equipment.Status = EquipmentStatusEnum.Repair;
+                    equipment.Status = equipmentStatus;
                     _unitOfWork.EquipmentRepository.Update(equipment);
 
-                }
+                
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Failed to update equipment status.");
 
@@ -259,7 +248,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> UpdateEquipmentStatusAsync(Guid contractId, List<UpdateEquipmentRangeViewModel> updateModels)
+        public async Task<ApiResponse<bool>> UpdateEquipmentSeriNumberAsync(Guid contractId, List<UpdateEquipmentRangeViewModel> updateModels)
         {
             var response = new ApiResponse<bool>();
             try
@@ -363,6 +352,85 @@ namespace FranchiseProject.Application.Services
 
 
 
+        }
+
+        public async Task<ApiResponse<bool>> UpdateEquipmentAsync(Guid equipmentId, UpdateEquipmentViewModel updateModel)
+        {
+            try
+            {
+                var equipment = await _unitOfWork.EquipmentRepository.GetByIdAsync(equipmentId);
+                if (equipment == null)
+                {
+                    return ResponseHandler.Failure<bool>("Không tìm thấy trang thiết bị!.");
+                }
+
+                equipment.EquipmentName = updateModel.EquipmentName;
+                equipment.Status = updateModel.Status;
+                equipment.Note = updateModel.Note;
+                equipment.Price = updateModel.Price;
+                if (equipment.SerialNumber != updateModel.SerialNumber)
+                {
+                    var now = DateTime.UtcNow;
+                    var currentSerialNumberHistory = await _unitOfWork.EquipmentSerialNumberHistoryRepository
+                        .GetTableAsTracking()
+                        .Where(h => h.EquipmentId == equipment.Id && h.EndDate == null)
+                        .FirstOrDefaultAsync();
+
+                    if (currentSerialNumberHistory != null)
+                    {
+                        currentSerialNumberHistory.EndDate = now;
+                    }
+                    var newSerialNumberHistory = new EquipmentSerialNumberHistory
+                    {
+                        EquipmentId = equipment.Id,
+                        SerialNumber = updateModel.SerialNumber,
+                        StartDate = now,
+                        EndDate = null
+                    };
+
+                    await _unitOfWork.EquipmentSerialNumberHistoryRepository.AddAsync(newSerialNumberHistory);
+                    equipment.SerialNumber = updateModel.SerialNumber;
+                }
+
+                _unitOfWork.EquipmentRepository.Update(equipment);
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess)
+                {
+                    throw new Exception("Failed to update equipment.");
+                }
+
+                return ResponseHandler.Success(true, "Equipment updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<bool>($"Error updating equipment: {ex.Message}");
+            }
+        }
+        public async Task<ApiResponse<List<EquipmentSerialNumberHistoryViewModel>>> GetSerialNumberHistoryByEquipmentIdAsync(Guid equipmentId)
+        {
+            try
+            {
+                var equipment = await _unitOfWork.EquipmentRepository.GetExistByIdAsync(equipmentId);
+                if (equipment == null)
+                {
+                    return ResponseHandler.Failure<List<EquipmentSerialNumberHistoryViewModel>>("không tìm thấy trang thiết bị.");
+                }
+
+                var serialNumberHistories = await _unitOfWork.EquipmentSerialNumberHistoryRepository
+                    .GetTableAsTracking()
+                    .Where(h => h.EquipmentId == equipmentId)
+                    .OrderByDescending(h => h.CreationDate)
+                    .ToListAsync();
+
+                var serialNumberHistoryViewModels = _mapper.Map<List<EquipmentSerialNumberHistoryViewModel>>(serialNumberHistories);
+
+                return ResponseHandler.Success(serialNumberHistoryViewModels, "Truy xuất thành công.");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<List<EquipmentSerialNumberHistoryViewModel>>($"Error retrieving serial number history: {ex.Message}");
+            }
         }
     }
 }

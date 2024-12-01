@@ -13,6 +13,7 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModels
     {
         public Guid? Id { get; set; }
         public string? Title { get; set; }
+        public string? ContractCode { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public double? Total { get; set; }
