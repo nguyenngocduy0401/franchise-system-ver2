@@ -18,7 +18,7 @@ namespace FranchiseProject.Application.ViewModels.DocumentViewModel
         public DocumentType? Type { get; set; }
         public DocumentStatus Status { get; set; }
         public Guid? AgencyId { get; set; }
-        public string AgencyName { get; set; }
+        public string ?AgencyName { get; set; }
         
     }
 }

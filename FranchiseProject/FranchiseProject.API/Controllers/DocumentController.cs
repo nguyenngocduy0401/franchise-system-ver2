@@ -60,7 +60,7 @@ namespace FranchiseProject.API.Controllers
         //[Authorize(Roles = AppRole.Manager + "," + AppRole.Admin+"," + AppRole.SystemTechnician)]
         [SwaggerOperation(Summary = "Tìm tài liệu bằng Agencyid{Authorize = Manager, Admin,SystemTechnician}")]
         [HttpGet("agency/{id}")]
-        public async Task<ApiResponse<DocumentViewModel>> GetDocumentbyAgencyId([FromBody]Guid id, [FromBody] DocumentType type)
+        public async Task<ApiResponse<DocumentViewModel>> GetDocumentbyAgencyId(Guid id, DocumentType type)
         { 
             return await _documentService.GetDocumentbyAgencyId(id, type);
         }
