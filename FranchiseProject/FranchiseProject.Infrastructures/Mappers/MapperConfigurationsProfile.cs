@@ -37,6 +37,7 @@ using FranchiseProject.Application.ViewModels.WorkViewModels;
 using FranchiseProject.Application.ViewModels.AppointmentViewModels;
 using FranchiseProject.Application.ViewModels.DocumentViewModels;
 using FranchiseProject.Application.ViewModels.DocumentViewModel;
+using FranchiseProject.Application.ViewModels.EquipmentViewModels;
 
 
 
@@ -339,6 +340,12 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<UploadDocumentViewModel, Document>();
             CreateMap<Pagination<Document>, Pagination<DocumentViewModel>>()
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
+            CreateMap<EquipmentSerialNumberHistory, EquipmentSerialNumberHistoryViewModel>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.EquipmentId, opt => opt.MapFrom(src => src.EquipmentId))
+            .ForMember(dest => dest.SerialNumber, opt => opt.MapFrom(src => src.SerialNumber))
+            .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate))
+            .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndDate));
             #endregion
         }
     }

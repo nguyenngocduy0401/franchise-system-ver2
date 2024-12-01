@@ -7,11 +7,13 @@ using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
+using FranchiseProject.Application.ViewModels.ContractViewModels;
 using FranchiseProject.Application.ViewModels.DocumentViewModel;
 using FranchiseProject.Application.ViewModels.DocumentViewModels;
 using FranchiseProject.Application.ViewModels.EmailViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -81,6 +83,11 @@ namespace FranchiseProject.Application.Services
                 if (document == null) throw new Exception("Tài liệu không tồn tại!");
 
                 var documentViewModel = _mapper.Map<DocumentViewModel>(document);
+                if (document.AgencyId.HasValue)
+                {
+                    var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(document.AgencyId.Value);
+                    documentViewModel.AgencyName = agency?.Name;
+                }
                 response = ResponseHandler.Success(documentViewModel, "Lấy thông tin tài liệu thành công!");
             }
             catch (Exception ex)
@@ -104,12 +111,20 @@ namespace FranchiseProject.Application.Services
                 var documents = await _unitOfWork.DocumentRepository.GetFilterAsync(
                     filter: filter,
                     orderBy: q => q.OrderByDescending(d => d.CreationDate),
+                     includeProperties: "Agency",
                     pageIndex: filterModel.PageIndex,
                     pageSize: filterModel.PageSize
                 );
 
                 var documentViewModels = _mapper.Map<Pagination<DocumentViewModel>>(documents);
-
+                foreach (var doc in documentViewModels.Items)
+                {
+                    if (doc.AgencyId.HasValue)
+                    {
+                        var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(doc.AgencyId.Value);
+                        doc.AgencyName = agency?.Name;
+                    }
+                }
                 if (documentViewModels.Items.IsNullOrEmpty())
                     return ResponseHandler.Success(documentViewModels, "Không tìm thấy tài liệu phù hợp!");
 
@@ -208,7 +223,28 @@ namespace FranchiseProject.Application.Services
                 };
 
                 await _emailService.SendEmailAsync(emailMessage);
+            }
+        }
 
+        public async Task<ApiResponse<DocumentViewModel>> GetDocumentbyAgencyId(Guid agencyId,DocumentType type)
+        {
+            var response = new ApiResponse<DocumentViewModel>();
+            try
+            {
+                var contract = await _unitOfWork.DocumentRepository.GetMostRecentAgreeSignByAgencyIdAsync(agencyId, type);
+                if (contract == null)
+                {
+                    return ResponseHandler.Success<DocumentViewModel>(null, "Không tìm thấy ");
+                }
+                var contractViewModel = _mapper.Map<DocumentViewModel>(contract);
+                var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(contract.AgencyId.Value);
+                contractViewModel.AgencyName = agency.Name;
+
+                return ResponseHandler.Success(contractViewModel, "Truy xuất thành công");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<DocumentViewModel>($"Lỗi truy xuất : {ex.Message}");
             }
         }
     }

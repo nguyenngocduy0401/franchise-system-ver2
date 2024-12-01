@@ -264,6 +264,7 @@ namespace FranchiseProject.Application.Services
                     {
                         Id = c.Id,
                         Title = c.Title,
+                        ContractCode=c.ContractCode,
                         StartTime = c.StartTime ?? DateTime.MinValue,
                         EndTime = c.EndTime ?? DateTime.MinValue,
                         ContractDocumentImageURL = c.ContractDocumentImageURL,
@@ -308,7 +309,7 @@ namespace FranchiseProject.Application.Services
                     StartTime = contract.StartTime ?? DateTime.MinValue,
 
                     EndTime = contract.EndTime ?? DateTime.MinValue,
-
+                    ContractCode=contract.ContractCode,
                     ContractDocumentImageURL = contract.ContractDocumentImageURL,
                     RevenueSharePercentage = contract.RevenueSharePercentage,
                     AgencyName = contract.Agency != null ? contract.Agency.Name : string.Empty
@@ -394,7 +395,7 @@ namespace FranchiseProject.Application.Services
                     TotalMoney = contract.Total,
                     ContractCode = contract.ContractCode ?? await GenerateUniqueContractCode()
                 };
-
+              //  contract.ContractCode = inputInfo.ContractCode;
                 using (var pdfStream = await _pdfService.FillPdfTemplate(inputInfo))
                 {
                     using (var memoryStream = new MemoryStream())

@@ -73,5 +73,9 @@ namespace FranchiseProject.API.Controllers
         [SwaggerOperation(Summary = "Học sinh lấy danhh sách bài tập  bằng classId {Authorize =Student}")]
         [HttpGet("~/student/api/v1/assignments/classes/{id}")]
         public async Task<ApiResponse<List<StudentAsmViewModel>>> GetAssignmentsForStudentByClassIdAsync(Guid id) => await _assignmentService.GetAssignmentsForStudentByClassIdAsync(id);
+        [Authorize(Roles = AppRole.Student)]
+        [SwaggerOperation(Summary = "Học sinh lấy  bài tập  bằng Id {Authorize =Student}")]
+        [HttpGet("~/student/api/v1/assignment/{id}")]
+        public async Task<ApiResponse<StudentAsmViewModel>> GetAssignmentForStudentByClassIdAsync(Guid id) => await _assignmentService.GetAssignmentForStudentByClassIdAsync(id);
     }
 }

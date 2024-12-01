@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.ViewModels.EquipmentViewModels
 {
-    internal class UpdateEquipmentViewModel
+    public class UpdateEquipmentViewModel
     {
-        public Guid Id { get; set; }
+
+        public string? EquipmentName { get; set; }
+        public string? SerialNumber { get; set; }
         public EquipmentTypeEnum Type { get; set; }
         public EquipmentStatusEnum Status { get; set; }
         public string? Note { get; set; }

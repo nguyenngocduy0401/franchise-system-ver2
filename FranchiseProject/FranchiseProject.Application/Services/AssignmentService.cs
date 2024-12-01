@@ -190,7 +190,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> SubmitAssignmentAsync(string assignmentId, string fileSubmitUrl)
+        public async Task<ApiResponse<bool>> SubmitAssignmentAsync(string assignmentId, string fileSubmitUrl,string fileSubmitName)
         {
             var response = new ApiResponse<bool>();
 
@@ -219,6 +219,7 @@ namespace FranchiseProject.Application.Services
                     AssignmentId = Guid.Parse(assignmentId),
                     UserId = currentUserId.ToString(),
                     FileSubmitURL = fileSubmitUrl,
+                    FileSbumitName=fileSubmitName,
                     SubmitDate = DateTime.UtcNow
                 };
                 await _unitOfWork.AssignmentSubmitRepository.AddAsync(assignmentSubmit);
@@ -261,8 +262,9 @@ namespace FranchiseProject.Application.Services
                         UserId = a.UserId,
                         UserName = a.User?.UserName,
                         FileSubmitURL = a.FileSubmitURL,
+                        FileSubmitName=a.FileSbumitName,
                         SubmitDate = a.SubmitDate,
-                        ScoreNumber = a.ScoreNumber ?? 0
+                        ScoreNumber = a.ScoreNumber
                     })
                     .ToList();
                 var assignmentPagination = new Pagination<AssignmentSubmitViewModel>
@@ -389,7 +391,7 @@ namespace FranchiseProject.Application.Services
 
                
                 // Get all assignments for the class
-                var assignments = await _unitOfWork.AssignmentRepository.GetAllAsync1(a => a.ClassId == classId);
+                var assignments = await _unitOfWork.AssignmentRepository.GetAllAsync1(a => a.ClassId == classId && a.IsDeleted !=true);
 
                 var assignmentViewModels = new List<StudentAsmViewModel>();
 
@@ -408,9 +410,10 @@ namespace FranchiseProject.Application.Services
                             {
                                 UserId = userCurrentId.ToString(),
                                 UserName = userCurrent.UserName,
+                                FileName = submission.FileSbumitName,
                                 FileSubmitURL = submission.FileSubmitURL,
                                 SubmitDate = submission.SubmitDate,
-                                ScoreNumber = submission.ScoreNumber ?? 0
+                                ScoreNumber = submission.ScoreNumber
                             };
                         }
                     }
@@ -423,6 +426,52 @@ namespace FranchiseProject.Application.Services
             catch (Exception ex)
             {
                 response = ResponseHandler.Failure<List<StudentAsmViewModel>>($"Lỗi khi lấy danh sách bài tập: {ex.Message}");
+            }
+            return response;
+        }
+        public async Task<ApiResponse<StudentAsmViewModel>> GetAssignmentForStudentByClassIdAsync(Guid assignmentId)
+        {
+            var response = new ApiResponse<StudentAsmViewModel>();
+            try
+            {
+                var userCurrentId = _claimsService.GetCurrentUserId.ToString();
+                var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
+
+                if (userCurrent == null)
+                {
+                    return ResponseHandler.Failure<StudentAsmViewModel>("Người dùng không tồn tại.");
+                }
+
+                var assignment = await _unitOfWork.AssignmentRepository.GetExistByIdAsync(assignmentId);
+
+                if (assignment == null)
+                {
+                    return ResponseHandler.Failure<StudentAsmViewModel>("Bài tập không tồn tại.");
+                }
+
+                var assignmentViewModel = _mapper.Map<StudentAsmViewModel>(assignment);
+
+                var submission = await _unitOfWork.AssignmentSubmitRepository.GetFirstOrDefaultAsync(
+                    am => am.AssignmentId == assignmentId && am.UserId == userCurrentId.ToString());
+
+                if (submission != null)
+                {
+                    assignmentViewModel.AsmSubmits = new AsmSubmitViewModel
+                    {
+                        UserId = userCurrentId.ToString(),
+                        UserName = userCurrent.UserName,
+                        FileName=submission.FileSbumitName,
+                        FileSubmitURL = submission.FileSubmitURL,
+                        SubmitDate = submission.SubmitDate,
+                        ScoreNumber = submission.ScoreNumber
+                    };
+                }
+
+                response = ResponseHandler.Success(assignmentViewModel, "Lấy thông tin bài tập thành công.");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<StudentAsmViewModel>($"Lỗi khi lấy thông tin bài tập: {ex.Message}");
             }
             return response;
         }
