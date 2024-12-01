@@ -363,7 +363,7 @@ namespace FranchiseProject.Application.Services
                     {
                         int sheetCount = workbook.Worksheets.Count();
                         if (sheetCount != 6)
-                            return ResponseHandler.Failure<bool>(
+                            return ResponseHandler.Success(false,
                                 sheetCount < 6 ? "Số lượng bảng tính ít hơn số lượng thành phần trong khoá học." :
                                                               "Số lượng bảng tính nhiều hơn số lượng thành phần trong khoá học."
                             );
@@ -372,7 +372,7 @@ namespace FranchiseProject.Application.Services
                         var courseCheck = await ExtractChapterFromWorksheetAsync(workbook.Worksheets.Skip(2).First(),
                             courseFilesModel.QuestionFile, courseFilesModel.ChapterMaterialFile, course);
                         if (!courseCheck.isSuccess && courseCheck.Message != null) 
-                            return ResponseHandler.Failure<bool>(courseCheck.Message);
+                            return ResponseHandler.Success(false, courseCheck.Message);
                         course = courseCheck.Data;
                         course = await ExtractSessionFromWorksheetAsync(workbook.Worksheets.Skip(3).First(), course);
                         course = await ExtractAssessmentFromWorksheetAsync(workbook.Worksheets.Skip(4).First(), course);
@@ -381,7 +381,7 @@ namespace FranchiseProject.Application.Services
                         await _unitOfWork.CourseRepository.AddAsync(course);
                          
                         var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                        if (!isSuccess) throw new Exception("Create failed!");
+                        if (!isSuccess) throw new Exception("Tạo thất bại!");
                     }
                 }
 
@@ -389,7 +389,7 @@ namespace FranchiseProject.Application.Services
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<bool>(ex.Message);
+                response = ResponseHandler.Success(false, ex.Message);
             }
             return response;
         }
