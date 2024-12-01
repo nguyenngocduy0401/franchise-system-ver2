@@ -64,6 +64,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IUserAppointmentService, UserAppointmentService>();
             services.AddScoped<IDocumentService, DocumentService>();
             services.AddScoped<IEquipmentService,EquipmentService> ();
+            services.AddScoped<IHomePageService, HomePageService>();
 
             #endregion
             #region Repository DI
@@ -108,6 +109,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IEquipmentRepository, EquipmentRepository>();
             services.AddScoped<IFranchiseFeesRepository, FranchiseFeeRepository>();
             services.AddScoped<IEquipmentSerialNumberHistoryRepository, EquipmentSerialNumberHistoryRepository>();
+            services.AddScoped<IHomePageRepository, HomePageRepository>();
             #endregion
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>

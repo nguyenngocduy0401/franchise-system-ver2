@@ -56,6 +56,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<FranchiseFees> FranchiseFees { get; set; }
         public DbSet<EquipmentSerialNumberHistory> EquipmentSerialNumberHistories { get; set; }
+        public DbSet<HomePage> HomePages { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -80,6 +81,13 @@ namespace FranchiseProject.Infrastructures
                          Status = AgencyStatusEnum.Approved
                      }
                      );
+            #region HomePage
+            modelBuilder.Entity<HomePage>().HasData(
+            new HomePage
+            {
+            }
+            );
+            #endregion
             #region SLot
             modelBuilder.Entity<Slot>().HasData(
                 new Slot
@@ -152,7 +160,7 @@ namespace FranchiseProject.Infrastructures
                 }
             );
             #endregion
-            #region Syllabus
+           /* #region Syllabus
             modelBuilder.Entity<Syllabus>().HasData(
                 new Syllabus
                 {
@@ -338,7 +346,7 @@ namespace FranchiseProject.Infrastructures
                 CourseId = Guid.Parse("1b182028-e25d-43b0-ba63-08dcf207c014")
             }
         );
-            #endregion
+            #endregion*/
 
         
             #region FrachiseFee
