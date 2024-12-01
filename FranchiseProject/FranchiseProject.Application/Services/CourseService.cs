@@ -551,9 +551,13 @@ namespace FranchiseProject.Application.Services
                                 {
                                     status = false;
                                 }
+                                else if (cellValue == null)
+                                {
+                                    continue;
+                                }
                                 else
                                 {
-                                    throw new Exception($"Invalid boolean value '{cellValue}' in cell.");
+                                    throw new Exception($"Giá trị boolean '{cellValue}' trong ô không hợp lệ.");
                                 }
                                 var questionOption = new CreateQuestionOptionArrangeModel
                                 {
