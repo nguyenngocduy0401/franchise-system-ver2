@@ -4,6 +4,7 @@ using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace FranchiseProject.Infrastructures.Repositories
 {
@@ -42,6 +43,11 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Where(c => c.AgencyId == agencyId && c.Type== type && c.IsDeleted!= true)
                 .OrderByDescending(c => c.CreationDate)
                 .FirstOrDefaultAsync();
+        }
+    
+        public async Task<List<Document>> GetAllAsync(Expression<Func<Document, bool>> predicate)
+        {
+            return await _dbContext.Set<Document>().Where(predicate).ToListAsync();
         }
     }
 }
