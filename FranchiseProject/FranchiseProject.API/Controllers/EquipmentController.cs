@@ -42,7 +42,7 @@ namespace FranchiseProject.API.Controllers
             return await _equipmentService.UpdateEquipmentStatusAsync(id, equipmentStatus);
         }
 
-        [HttpGet("`api/v1/agency/equipments")]
+        [HttpGet("~/api/v1/agency/equipments")]
         [SwaggerOperation(Summary = "Lấy danh sách thiết bị theo AgencyId {Authorize = Manager, SystemTechnician, AgencyManager}")]
         [Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
         public async Task<ApiResponse<Pagination<EquipmentViewModel>>> GetEquipmentByAgencyId( [FromQuery] FilterEquipmentViewModel filter)
@@ -57,7 +57,7 @@ namespace FranchiseProject.API.Controllers
         {
             return await _equipmentService.UpdateEquipmentAsync(id, updateModel);
         }
-        [HttpGet("`api/v1/agency/equipments/{id}")]
+        [HttpGet("~/api/v1/agency/equipments/{id}")]
         [SwaggerOperation(Summary = "Lấy danh sách thiết bị theo AgencyId {Authorize = Manager, SystemTechnician, AgencyManager}")]
         [Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
         public async Task<ApiResponse<List<EquipmentSerialNumberHistoryViewModel>>> GetSerialNumberHistoryByEquipmentIdAsync(Guid id)
