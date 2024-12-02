@@ -142,7 +142,6 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<RegisterConsultationViewModel>, RegisterFranchiseViewModelValidator>();
             services.AddTransient<IValidator<CreateAgencyViewModel>,CreateAgencyValidator>();
             services.AddTransient<IValidator<UpdateAgencyViewModel>, UpdateAgencyValidator>();
-
             services.AddTransient<IValidator<CreateContractViewModel>, CreateContractValidator>();
             services.AddTransient<IValidator<UpdateContractViewModel>, UpdateContracValidator>();
             services.AddTransient<IValidator<UserResetPasswordModel>, UserResetPasswordValidator>();

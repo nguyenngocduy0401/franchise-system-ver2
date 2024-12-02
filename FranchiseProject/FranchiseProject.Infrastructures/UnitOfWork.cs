@@ -53,6 +53,7 @@ namespace FranchiseProject.Infrastructures
         private readonly IEquipmentRepository _equipmentRepository;
         private readonly IFranchiseFeesRepository _franchiseFeesRepository;
         private readonly IEquipmentSerialNumberHistoryRepository _equipmentSerialNumberHistoryRepository;
+        private readonly IHomePageRepository _homePageRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -66,10 +67,10 @@ namespace FranchiseProject.Infrastructures
             ICourseMaterialRepository courseMaterialRepository,IRegisterCourseRepository registerCourseRepository,
             IChapterMaterialRepository chapterMaterialRepository,IAgencyDashboardRepository agencyDashboardRepository,
             IAppointmentRepository appointmentRepository, IWorkRepository workRepository,
-            IUserAppointmentRepository userAppointmentRepository
-            ,IDocumentRepository documentRepository
-            ,IEquipmentRepository equipmentRepository,IFranchiseFeesRepository franchiseFeesRepository
-            ,IEquipmentSerialNumberHistoryRepository equipmentSerialNumberHistoryRepository)
+            IUserAppointmentRepository userAppointmentRepository, IDocumentRepository documentRepository,
+            IEquipmentRepository equipmentRepository,IFranchiseFeesRepository franchiseFeesRepository,
+            IEquipmentSerialNumberHistoryRepository equipmentSerialNumberHistoryRepository,
+            IHomePageRepository homePageRepository)
 
            
         {
@@ -115,6 +116,7 @@ namespace FranchiseProject.Infrastructures
             _equipmentRepository = equipmentRepository;
             _franchiseFeesRepository = franchiseFeesRepository;
             _equipmentSerialNumberHistoryRepository = equipmentSerialNumberHistoryRepository;
+            _homePageRepository = homePageRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -196,6 +198,7 @@ namespace FranchiseProject.Infrastructures
         public IFranchiseFeesRepository FranchiseFeesRepository => _franchiseFeesRepository;
 
         public IEquipmentSerialNumberHistoryRepository EquipmentSerialNumberHistoryRepository => _equipmentSerialNumberHistoryRepository;
+        public IHomePageRepository HomePageRepository => _homePageRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

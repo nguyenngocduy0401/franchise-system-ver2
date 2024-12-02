@@ -311,7 +311,7 @@ namespace FranchiseProject.Application.Services
             {
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(filter.AgencyId.Value);
                 var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contract.Id);
-                if (filter.Status.Equals(""))
+                if (!filter.Status.Equals(""))
                 {
                     equipments = equipments.Where(e => e.Status == filter.Status).ToList();
                 }

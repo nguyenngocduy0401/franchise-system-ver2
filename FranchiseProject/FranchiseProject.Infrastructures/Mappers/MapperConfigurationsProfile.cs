@@ -38,6 +38,7 @@ using FranchiseProject.Application.ViewModels.AppointmentViewModels;
 using FranchiseProject.Application.ViewModels.DocumentViewModels;
 using FranchiseProject.Application.ViewModels.DocumentViewModel;
 using FranchiseProject.Application.ViewModels.EquipmentViewModels;
+using FranchiseProject.Application.ViewModels.HomePageViewModels;
 
 
 
@@ -346,6 +347,11 @@ namespace FranchiseProject.Infrastructures.Mappers
             .ForMember(dest => dest.SerialNumber, opt => opt.MapFrom(src => src.SerialNumber))
             .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate))
             .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndDate));
+            #endregion
+
+            #region
+            CreateMap<HomePage, HomePageViewModel>();
+            CreateMap<UpdatePageModel, HomePage>();
             #endregion
         }
     }
