@@ -344,7 +344,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
         public async Task<ApiResponse<bool>> CreateCourseByFileAsync(CourseFilesModel courseFilesModel)
         {
             var response = new ApiResponse<bool>();
@@ -542,6 +541,7 @@ namespace FranchiseProject.Application.Services
                             {
                                 string cellValue = questionRow.Cell(j + 2).Value.ToString().Trim().ToLowerInvariant();
                                 bool status;
+                                
 
                                 if (cellValue == "true")
                                 {
@@ -551,13 +551,13 @@ namespace FranchiseProject.Application.Services
                                 {
                                     status = false;
                                 }
-                                else if (cellValue == null)
+                                else if (cellValue == null || string.IsNullOrEmpty(cellValue))
                                 {
                                     continue;
                                 }
                                 else
                                 {
-                                    throw new Exception($"Giá trị boolean '{cellValue}' trong ô không hợp lệ.");
+                                    throw new Exception($"Giá trị boolean trong sheet câu hỏi ở ô '{questionRow.Cell(j + 2)}' không hợp lệ.");
                                 }
                                 var questionOption = new CreateQuestionOptionArrangeModel
                                 {
