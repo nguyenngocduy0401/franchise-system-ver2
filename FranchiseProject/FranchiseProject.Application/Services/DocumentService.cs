@@ -247,6 +247,28 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<DocumentViewModel>($"Lỗi truy xuất : {ex.Message}");
             }
         }
+        public async Task<ApiResponse<List<DocumentViewModel>>> GetAllDocumentsByAgencyIdAsync(Guid agencyId)
+        {
+            try
+            {
+                var documents = await _unitOfWork.DocumentRepository.GetAllAsync(d => d.AgencyId == agencyId);
+                if (documents == null || !documents.Any())
+                {
+                    return ResponseHandler.Success<List<DocumentViewModel>>(null, "Không tìm thấy tài liệu cho Agency này");
+                }
+
+                var documentViewModels = _mapper.Map<List<DocumentViewModel>>(documents);
+                var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
+                string agencyName = agency?.Name ?? "Unknown";
+                documentViewModels.ForEach(d => d.AgencyName = agencyName);
+
+                return ResponseHandler.Success(documentViewModels, "Truy xuất thành công");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<List<DocumentViewModel>>($"Lỗi truy xuất : {ex.Message}");
+            }
+        }
     }
 }
 

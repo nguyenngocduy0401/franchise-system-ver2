@@ -58,11 +58,18 @@ namespace FranchiseProject.API.Controllers
             return await _documentService.FilterDocumentAsync(filterDocumentModel);
         }
         [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin+"," + AppRole.SystemTechnician)]
-        [SwaggerOperation(Summary = "Tìm tài liệu bằng Agencyid{Authorize = Manager, Admin,SystemTechnician}")]
+        [SwaggerOperation(Summary = "Truy xuất tài liệu bằng Agencyid{Authorize = Manager, Admin,SystemTechnician}")]
         [HttpGet("agency/{id}")]
         public async Task<ApiResponse<DocumentViewModel>> GetDocumentbyAgencyId(Guid id, DocumentType type)
         { 
             return await _documentService.GetDocumentbyAgencyId(id, type);
+        }
+        [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician)]
+        [SwaggerOperation(Summary = "Truy xuất danh sách tài liệu bằng Agencyid{Authorize = Manager, Admin,SystemTechnician}")]
+        [HttpGet("agency/{id}/all")]
+        public async Task<ApiResponse<List<DocumentViewModel>>> GetAllDocumentsByAgencyIdAsync(Guid id)
+        {
+            return await _documentService.GetAllDocumentsByAgencyIdAsync(id);
         }
     }
 }
