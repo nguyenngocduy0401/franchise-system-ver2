@@ -43,5 +43,12 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .OrderByDescending(c => c.CreationDate)
                 .FirstOrDefaultAsync();
         }
+        public async Task<Document> GetMostRecentEducationalLicenseByAgencyIdAsync(Guid agencyId, DocumentType type)
+        {
+            return await _dbContext.Documents
+                .Where(c => c.AgencyId == agencyId && c.Type == type && c.IsDeleted != true)
+                .OrderByDescending(c => c.CreationDate)
+                .FirstOrDefaultAsync();
+        }
     }
 }
