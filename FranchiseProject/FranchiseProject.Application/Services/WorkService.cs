@@ -56,7 +56,8 @@ namespace FranchiseProject.Application.Services
                     || e.Description.Contains(filterWorkByLoginModel.Search)) &&
                     (!filterWorkByLoginModel.Status.HasValue || e.Status == filterWorkByLoginModel.Status) &&
                     (!filterWorkByLoginModel.Level.HasValue || e.Level == filterWorkByLoginModel.Level) &&
-                    (!filterWorkByLoginModel.Submit.HasValue || e.Submit == filterWorkByLoginModel.Submit)
+                    (!filterWorkByLoginModel.Submit.HasValue || e.Submit == filterWorkByLoginModel.Submit) &&
+                    (!filterWorkByLoginModel.Type.HasValue || e.Type == filterWorkByLoginModel.Type)
                 );
 
                 var order = (Func<IQueryable<Work>, IOrderedQueryable<Work>>)(order => order.OrderByDescending(e => e.StartDate));
