@@ -168,6 +168,7 @@ namespace FranchiseProject.Application.Services
                 );
                 var worksPagination = await _unitOfWork.WorkRepository.GetFilterAsync(
                 filter: filter,
+                includeProperties: "Agency",
                 pageIndex: filterWorkModel.PageIndex,
                 pageSize: filterWorkModel.PageSize
                 );
@@ -345,84 +346,87 @@ namespace FranchiseProject.Application.Services
                     case WorkStatusEnum.Approved:
                         {
                             work.Status = status;
-                            switch (work.Type)
+                            if (work.Level == WorkLevelEnum.Compulsory)
                             {
-                                case WorkTypeEnum.BusinessRegistered:
-                                    {
-                                        var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveBusinessLicenseAsync(work.AgencyId.Value);
-                                        if (!hasActiveAgreementContract)
+                                switch (work.Type)
+                                {
+                                    case WorkTypeEnum.BusinessRegistered:
                                         {
-                                            return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có giấy đăng kí doanh nghiệp hoạt động!");
-                                        }
-                                        var fee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
-                                        var contract = new Contract
-                                        {
-                                            AgencyId = work.AgencyId.Value,
-                                            Status = ContractStatusEnum.None,
-                                            FrachiseFee = fee.Sum(f => f.FeeAmount),
-
-                                        };
-                                        await _unitOfWork.ContractRepository.AddAsync(contract);
-                                        break;
-                                    }
-                                case WorkTypeEnum.AgreementSigned:
-                                    {
-                                        var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveAgreementContractAsync(work.AgencyId.Value);
-                                        if (!hasActiveAgreementContract)
-                                        {
-                                            return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng thỏa thuận!");
-                                        }
-
-                                    }
-                                    break;
-                                case WorkTypeEnum.Quotation:
-                                    {
-                                        var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
-                                        contract.DesignFee = await _unitOfWork.EquipmentRepository.GetTotalEquipmentAmountByContractIdAsync(contract.Id);
-                                        contract.Total = contract.DesignFee + contract.FrachiseFee;
-                                        _unitOfWork.ContractRepository.Update(contract);
-
-                                    }
-                                    break;
-                                case WorkTypeEnum.SignedContract:
-                                    {
-                                        var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
-                                        if (string.IsNullOrEmpty(contract.ContractDocumentImageURL))
-                                        {
-                                            return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng!");
-                                        }
-                                        contract.Status = ContractStatusEnum.Active;
-                                        _unitOfWork.ContractRepository.Update(contract);
-                                    }
-                                    break;
-                                case WorkTypeEnum.Handover:
-                                    {
-                                        var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
-                                        var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contract.Id);
-                                        foreach (var equipment in equipments)
-                                        {
-                                            var equipmentHistory = await _unitOfWork.EquipmentSerialNumberHistoryRepository
-                                                .FindAsync(e => e.EquipmentId == equipment.Id &&
-                                                                e.StartDate == null);
-
-                                            foreach (var history in equipmentHistory)
+                                            var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveBusinessLicenseAsync(work.AgencyId.Value);
+                                            if (!hasActiveAgreementContract)
                                             {
-                                                history.StartDate = DateTime.Now;
-                                                _unitOfWork.EquipmentSerialNumberHistoryRepository.Update(history);
+                                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có giấy đăng kí doanh nghiệp hoạt động!");
+                                            }
+                                            var fee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
+                                            var contract = new Contract
+                                            {
+                                                AgencyId = work.AgencyId.Value,
+                                                Status = ContractStatusEnum.None,
+                                                FrachiseFee = fee.Sum(f => f.FeeAmount),
+
+                                            };
+                                            await _unitOfWork.ContractRepository.AddAsync(contract);
+                                            break;
+                                        }
+                                    case WorkTypeEnum.AgreementSigned:
+                                        {
+                                            var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveAgreementContractAsync(work.AgencyId.Value);
+                                            if (!hasActiveAgreementContract)
+                                            {
+                                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng thỏa thuận!");
+                                            }
+
+                                        }
+                                        break;
+                                    case WorkTypeEnum.Quotation:
+                                        {
+                                            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
+                                            contract.DesignFee = await _unitOfWork.EquipmentRepository.GetTotalEquipmentAmountByContractIdAsync(contract.Id);
+                                            contract.Total = contract.DesignFee + contract.FrachiseFee;
+                                            _unitOfWork.ContractRepository.Update(contract);
+
+                                        }
+                                        break;
+                                    case WorkTypeEnum.SignedContract:
+                                        {
+                                            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
+                                            if (string.IsNullOrEmpty(contract.ContractDocumentImageURL))
+                                            {
+                                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng!");
+                                            }
+                                            contract.Status = ContractStatusEnum.Active;
+                                            _unitOfWork.ContractRepository.Update(contract);
+                                        }
+                                        break;
+                                    case WorkTypeEnum.Handover:
+                                        {
+                                            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
+                                            var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contract.Id);
+                                            foreach (var equipment in equipments)
+                                            {
+                                                var equipmentHistory = await _unitOfWork.EquipmentSerialNumberHistoryRepository
+                                                    .FindAsync(e => e.EquipmentId == equipment.Id &&
+                                                                    e.StartDate == null);
+
+                                                foreach (var history in equipmentHistory)
+                                                {
+                                                    history.StartDate = DateTime.Now;
+                                                    _unitOfWork.EquipmentSerialNumberHistoryRepository.Update(history);
+                                                }
                                             }
                                         }
-                                    }
-                                    break;
-                                case WorkTypeEnum.EducationLicenseRegistered:
-                                    {
-                                        var document = await _unitOfWork.DocumentRepository
-                                            .GetMostRecentAgreeSignByAgencyIdAsync((Guid)work.AgencyId, DocumentType.EducationalOperationLicense);
-                                        if (document == null)
+                                        break;
+                                    case WorkTypeEnum.EducationLicenseRegistered:
                                         {
-                                            return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có giấy phép giáo dục!");
+                                            var document = await _unitOfWork.DocumentRepository
+                                                .GetMostRecentAgreeSignByAgencyIdAsync((Guid)work.AgencyId, DocumentType.EducationalOperationLicense);
+                                            if (document == null)
+                                            {
+                                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có giấy phép giáo dục!");
+                                            }
                                         }
-                                    }
-                                    break;
+                                        break;
+                                }
                             }
                         }
                         break;
