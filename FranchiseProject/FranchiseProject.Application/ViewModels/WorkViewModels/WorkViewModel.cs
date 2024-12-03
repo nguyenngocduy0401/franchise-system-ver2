@@ -1,4 +1,5 @@
-﻿using FranchiseProject.Domain.Enums;
+﻿using FranchiseProject.Application.ViewModels.AgenciesViewModels;
+using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,5 +21,6 @@ namespace FranchiseProject.Application.ViewModels.WorkViewModels
         public WorkLevelEnum? Level { get; set; }
         public WorkStatusSubmitEnum? Submit { get; set; }
         public Guid? AgencyId { get; set; }
+        public AgencyWorkModel? AgenciesViewModels { get; set; }
     }
 }

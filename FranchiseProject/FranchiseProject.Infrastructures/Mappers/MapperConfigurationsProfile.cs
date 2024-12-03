@@ -309,7 +309,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             #region Work
             CreateMap<CreateWorkModel, Work>();
             CreateMap<UpdateWorkModel, Work>();
-            CreateMap<Work, WorkViewModel>();
+            CreateMap<Work, WorkViewModel>()
+                .ForMember(dest => dest.AgenciesViewModels, opt => opt.MapFrom(src => src.Agency)); 
             CreateMap<Work, WorkDetailViewModel>();
             CreateMap<UpdateWorkByStaffModel, Work>();
             #endregion
