@@ -64,13 +64,14 @@ namespace FranchiseProject.Infrastructures.Repositories
         public async Task<Pagination<Work>> FilterWorksByUserId(string userId,
             Expression<Func<Work, bool>>? filter = null,
             Func<IQueryable<Work>, IOrderedQueryable<Work>>? orderBy = null,
+            AppointmentTypeEnum? type = null,
             int? pageIndex = null,
             int? pageSize = null)
         {
              var query = _dbContext.UserAppointments
                     .Where(ua => ua.UserId == userId)
                     .Select(ua => ua.Appointment)
-                    .Where(a => a.IsDeleted != true)
+                    .Where(a => a.IsDeleted != true && (!type.HasValue || a.Type == type))
                     .Select(a => a.Work)
                     .Where(a => a.IsDeleted != true)
                     .Distinct();

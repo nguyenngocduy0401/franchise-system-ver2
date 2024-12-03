@@ -45,6 +45,42 @@ namespace FranchiseProject.Application.Services
             _claimsService = claimsService;
             _updateWorkByStaffValidator = updateWorkByStaffValidator;
         }
+
+        public async Task<ApiResponse<Pagination<WorkViewModel>>> GetWorksAgencyAsync(FilterWorkByLoginModel filterWorkByLoginModel) 
+        {
+            var response = new ApiResponse<Pagination<WorkViewModel>>();
+            try
+            {
+                var userId = _claimsService.GetCurrentUserId.ToString();
+                var filter = (Expression<Func<Work, bool>>)(e =>
+                    (string.IsNullOrEmpty(filterWorkByLoginModel.Search) || e.Title.Contains(filterWorkByLoginModel.Search)
+                    || e.Description.Contains(filterWorkByLoginModel.Search)) &&
+                    (!filterWorkByLoginModel.Status.HasValue || e.Status == filterWorkByLoginModel.Status) &&
+                    (!filterWorkByLoginModel.Level.HasValue || e.Level == filterWorkByLoginModel.Level) &&
+                    (!filterWorkByLoginModel.Submit.HasValue || e.Submit == filterWorkByLoginModel.Submit) &&
+                    (!filterWorkByLoginModel.Type.HasValue || e.Type == filterWorkByLoginModel.Type)
+                );
+
+                var order = (Func<IQueryable<Work>, IOrderedQueryable<Work>>)(order => order.OrderByDescending(e => e.StartDate));
+                var worksPagination = await _unitOfWork.WorkRepository.FilterWorksByUserId(
+                userId: userId,
+                filter: filter,
+                type: AppointmentTypeEnum.WithAgency,
+                orderBy: order,
+                pageIndex: filterWorkByLoginModel.PageIndex,
+                pageSize: filterWorkByLoginModel.PageSize
+                );
+                var workModel = _mapper.Map<Pagination<WorkViewModel>>(worksPagination);
+
+                response = ResponseHandler.Success(workModel, "Successful!");
+
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<Pagination<WorkViewModel>>(ex.Message);
+            }
+            return response;
+        }
         public async Task<ApiResponse<Pagination<WorkViewModel>>> FilterWorksByLogin(FilterWorkByLoginModel filterWorkByLoginModel)
         {
             var response = new ApiResponse<Pagination<WorkViewModel>>();

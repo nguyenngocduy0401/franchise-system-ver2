@@ -2,6 +2,7 @@
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace FranchiseProject.Application.Repositories
             string userId,
             Expression<Func<Work, bool>>? filter = null,
             Func<IQueryable<Work>, IOrderedQueryable<Work>>? orderBy = null,
+            AppointmentTypeEnum? type = null,
             int? pageIndex = null,
             int? pageSize = null);
         Task<Work> GetPreviousWorkByAgencyId(Guid agencyId, Expression<Func<Work, bool>>? filter = null);

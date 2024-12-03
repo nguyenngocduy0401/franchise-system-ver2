@@ -12,6 +12,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IWorkService
     {
+        Task<ApiResponse<Pagination<WorkViewModel>>> GetWorksAgencyAsync(FilterWorkByLoginModel filterWorkByLoginModel);
         Task<ApiResponse<bool>> CheckPreWorkAvailable(Work work);
         Task<ApiResponse<bool>> UpdateWorkStatusSubmitByStaffAsync(Guid workId, WorkStatusSubmitEnum workStatusSubmitEnum);
         Task<ApiResponse<bool>> UpdateWorkByStaffAsync(Guid workId, UpdateWorkByStaffModel updateWorkByStaffModel);
