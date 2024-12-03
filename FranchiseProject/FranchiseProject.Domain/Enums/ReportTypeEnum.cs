@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Enums
 {
-    public enum ReportStatusEnum
+    public enum ReportTypeEnum
     {
-        Pending,
-        Processing,
-        Completed,
+        Course,
+        Equipment
     }
 }

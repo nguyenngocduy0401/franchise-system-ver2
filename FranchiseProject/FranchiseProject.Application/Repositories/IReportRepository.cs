@@ -9,5 +9,6 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IReportRepository : IGenericRepository<Report>
     {
+        Task<List<Equipment>> GetEquipmentsByReportIdAsync(Guid reportId);
     }
 }
