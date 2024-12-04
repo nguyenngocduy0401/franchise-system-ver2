@@ -21,6 +21,6 @@ namespace FranchiseProject.Application.ViewModels.WorkViewModels
         public WorkLevelEnum? Level { get; set; }
         public WorkStatusSubmitEnum? Submit { get; set; }
         public Guid? AgencyId { get; set; }
-        public AgencyWorkModel? AgenciesViewModels { get; set; }
+        public AgencyWorkModel? AgencyViewModel{ get; set; }
     }
 }

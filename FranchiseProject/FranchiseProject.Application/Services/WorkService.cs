@@ -6,6 +6,7 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AppointmentViewModels;
+using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
@@ -100,12 +101,12 @@ namespace FranchiseProject.Application.Services
                 var worksPagination = await _unitOfWork.WorkRepository.FilterWorksByUserId(
                 userId: userId,
                 filter: filter,
+                includeProperties: "Agency",
                 orderBy: order,
                 pageIndex: filterWorkByLoginModel.PageIndex,
                 pageSize: filterWorkByLoginModel.PageSize
                 );
                 var workModel = _mapper.Map<Pagination<WorkViewModel>>(worksPagination);
-
                 response = ResponseHandler.Success(workModel, "Successful!");
 
             }
@@ -204,7 +205,6 @@ namespace FranchiseProject.Application.Services
                 );
                 var worksPagination = await _unitOfWork.WorkRepository.GetFilterAsync(
                 filter: filter,
-                includeProperties: "Agency",
                 pageIndex: filterWorkModel.PageIndex,
                 pageSize: filterWorkModel.PageSize
                 );

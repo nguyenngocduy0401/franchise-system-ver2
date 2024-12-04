@@ -58,7 +58,7 @@ namespace FranchiseProject.Application.Services
                     response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
                     return response;
                 }
-                
+
                 var agency = _mapper.Map<Agency>(create);
                 agency.Status = AgencyStatusEnum.Processing;
 
@@ -71,24 +71,66 @@ namespace FranchiseProject.Application.Services
                 }
                 await _unitOfWork.AgencyRepository.AddAsync(agency);
                 var consult = await _unitOfWork.FranchiseRegistrationRequestRepository.GetExistByIdAsync(create.RegisterFormId.Value);
-                if(consult == null)
+                if (consult == null)
                 {
                     return ResponseHandler.Success<bool>(false, "Không tìm thấy tư vấn !");
                 }
                 consult.Status = ConsultationStatusEnum.ProspectivePartner;
-                 _unitOfWork.FranchiseRegistrationRequestRepository.Update(consult);
+
+                ///
+
+                var existingUser = await _unitOfWork.UserRepository.GetByAgencyIdAsync(agency.Id);
+                if (existingUser == null)
+                {
+                    var userCredentials = await _userService.GenerateUserCredentials(agency.Name);
+
+                    var newUser = new User
+                    {
+                        UserName = userCredentials.UserName,
+                        PasswordHash = userCredentials.Password,
+                        AgencyId = agency.Id,
+                        Status = UserStatusEnum.inactive,
+                        Email = agency.Email,
+                        PhoneNumber = agency.PhoneNumber,
+
+                    };
+                    var user2 = _unitOfWork.UserRepository.CreateUserAndAssignRoleAsync(newUser, RolesEnum.AgencyManager.ToString());
+                    var emailMessage = new MessageModel
+                    {
+                        To = agency.Email,
+                        Subject = "[futuretech-noreply] Thông Báo Cấp Tài Khoản",
+                        Body = $"<p>Chào {agency.Name},</p>" +
+                           $"<p>Chúng tôi rất vui mừng thông báo rằng bạn đã được cấp tài khoản để truy cập hệ thống của chúng tôi.</p>" +
+                           $"<p>Thông tin tài khoản của bạn như sau:</p>" +
+                           $"<ul>" +
+                           $"<li><strong>Username:</strong> {newUser.UserName}</li>" +
+                           $"<li><strong>Password:</strong> {userCredentials.Password}</li>" +
+                           $"</ul>" +
+                           $"<p>Vui lòng bảo mật thông tin đăng nhập này và không chia sẻ với bất kỳ ai.</p>" +
+                           $"<p>Đây là bước đầu tiên để bạn có thể tiếp cận và khám phá các tính năng của hệ thống.</p>" +
+                           $"<p>Nếu bạn cần hỗ trợ hoặc có bất kỳ câu hỏi nào, vui lòng liên hệ với đội ngũ hỗ trợ của chúng tôi.</p>" +
+                           $"<p>Trân trọng,</p>" +
+                           $"<p>Đội ngũ Futuretech</p>"
+                    };
+                    bool emailSent = await _emailService.SendEmailAsync(emailMessage);
+                    if (!emailSent)
+                    {
+                        response.Message += " (Lỗi khi gửi email)";
+                    }
+                }
+                _unitOfWork.FranchiseRegistrationRequestRepository.Update(consult);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                 if (isSuccess > 0)
                 {
                     response.Data = true;
                     response.isSuccess = true;
                     response.Message = "Tạo Thành Công !";
-                    var emailMessage = EmailTemplate.AgencyRegistrationSuccess(agency.Email, agency.Name);
+                    /*var emailMessage = EmailTemplate.AgencyRegistrationSuccess(agency.Email, agency.Name);
                     var emailSent = await _emailService.SendEmailAsync(emailMessage);
                     if (!emailSent)
                     {
                         response.Message += " (Lỗi khi gửi email)";
-                    }
+                    }*/
                 }
                 else
                 {
@@ -262,7 +304,7 @@ namespace FranchiseProject.Application.Services
                 }
                 switch (newStatus)
                 {
-                    case AgencyStatusEnum.Approved:
+                    case AgencyStatusEnum.Processing:
                         var existingUser = await _unitOfWork.UserRepository.GetByAgencyIdAsync(agencyId);
                         if (existingUser == null)
                         {
@@ -273,27 +315,26 @@ namespace FranchiseProject.Application.Services
                                 UserName = userCredentials.UserName,
                                 PasswordHash = userCredentials.Password,
                                 AgencyId = agencyId,
-                            //    Status = UserStatusEnum.active,
-                                Email=agency.Email,
-                                PhoneNumber=agency.PhoneNumber,
- 
+                                Status = UserStatusEnum.inactive,
+                                Email = agency.Email,
+                                PhoneNumber = agency.PhoneNumber,
+
                             };
                             var user2 = _unitOfWork.UserRepository.CreateUserAndAssignRoleAsync(newUser, RolesEnum.AgencyManager.ToString());
                             var emailMessage = new MessageModel
                             {
                                 To = agency.Email,
-                                Subject = "[futuretech-noreply] Chào Mừng Đối Tác Chính Thức",
+                                Subject = "[futuretech-noreply] Thông Báo Cấp Tài Khoản",
                                 Body = $"<p>Chào {agency.Name},</p>" +
-                                   $"<p>Chúng tôi rất vui mừng thông báo rằng bạn đã trở thành đối tác chính thức của chúng tôi!</p>" +
-                                   $"<p>Chúng tôi tin tưởng rằng sự hợp tác này sẽ mang lại lợi ích to lớn cho cả hai bên và chúng tôi mong muốn cùng nhau phát triển mạnh mẽ trong thời gian tới.</p>" +
-                                   $"<p>Đội ngũ nhân viên hổ trợ sẻ sớm  liên hệ với bạn .</p>" +
-                                    $"<p>Đây là tài khoản để bạn có thể đăng nhập hệ thống:</p>" +
+                                   $"<p>Chúng tôi rất vui mừng thông báo rằng bạn đã được cấp tài khoản để truy cập hệ thống của chúng tôi.</p>" +
+                                   $"<p>Thông tin tài khoản của bạn như sau:</p>" +
                                    $"<ul>" +
                                    $"<li><strong>Username:</strong> {newUser.UserName}</li>" +
                                    $"<li><strong>Password:</strong> {userCredentials.Password}</li>" +
                                    $"</ul>" +
-                                   $"<p>Vui lòng bảo mật thông tin đăng nhập này.</p>" +
-                                   $"<p>Chúc mừng và hẹn gặp lại!</p>" +
+                                   $"<p>Vui lòng bảo mật thông tin đăng nhập này và không chia sẻ với bất kỳ ai.</p>" +
+                                   $"<p>Đây là bước đầu tiên để bạn có thể tiếp cận và khám phá các tính năng của hệ thống.</p>" +
+                                   $"<p>Nếu bạn cần hỗ trợ hoặc có bất kỳ câu hỏi nào, vui lòng liên hệ với đội ngũ hỗ trợ của chúng tôi.</p>" +
                                    $"<p>Trân trọng,</p>" +
                                    $"<p>Đội ngũ Futuretech</p>"
                             };
@@ -309,6 +350,70 @@ namespace FranchiseProject.Application.Services
                             existingUser.Status = UserStatusEnum.active;
                         }
                         break;
+                    case AgencyStatusEnum.Approved:
+                        var existingUser1 = await _unitOfWork.UserRepository.GetByAgencyIdAsync(agencyId);
+
+                        if (existingUser1 == null)
+                        {
+                            var userCredentials = await _userService.GenerateUserCredentials(agency.Name);
+
+                            var newUser = new User
+                            {
+                                UserName = userCredentials.UserName,
+                                PasswordHash = userCredentials.Password,
+                                AgencyId = agencyId,
+                                Status = UserStatusEnum.active, 
+                                Email = agency.Email,
+                                PhoneNumber = agency.PhoneNumber,
+                            };
+                            await _unitOfWork.UserRepository.CreateUserAndAssignRoleAsync(newUser, RolesEnum.AgencyManager.ToString());
+
+                            var emailMessage = new MessageModel
+                            {
+                                To = agency.Email,
+                                Subject = "[futuretech-noreply] Chào Mừng Đối Tác Chính Thức",
+                                Body = $"<p>Chào {agency.Name},</p>" +
+                                       $"<p>Chúng tôi rất vui mừng thông báo rằng bạn đã trở thành đối tác chính thức của chúng tôi!</p>" +
+                                       $"<p>Chúng tôi tin tưởng rằng sự hợp tác này sẽ mang lại lợi ích to lớn cho cả hai bên và chúng tôi mong muốn cùng nhau phát triển mạnh mẽ trong thời gian tới.</p>" +
+                                       $"<p>Đây là thông tin tài khoản để bạn có thể đăng nhập hệ thống:</p>" +
+                                       $"<ul>" +
+                                       $"<li><strong>Username:</strong> {newUser.UserName}</li>" +
+                                       $"<li><strong>Password:</strong> {userCredentials.Password}</li>" +
+                                       $"</ul>" +
+                                       $"<p>Vui lòng bảo mật thông tin đăng nhập này và không chia sẻ với bất kỳ ai.</p>" +
+                                       $"<p>Chúng tôi rất mong được hợp tác cùng bạn. Trân trọng!</p>" +
+                                       $"<p>Đội ngũ Futuretech</p>"
+                            };
+
+                            bool emailSent = await _emailService.SendEmailAsync(emailMessage);
+                            if (!emailSent)
+                            {
+                                response.Message += " (Lỗi khi gửi email)";
+                            }
+                        }
+                        else
+                        {
+                            existingUser1.Status = UserStatusEnum.active;
+                            var emailMessage = new MessageModel
+                            {
+                                To = agency.Email,
+                                Subject = "[futuretech-noreply] Chào Mừng Đối Tác Chính Thức",
+                                Body = $"<p>Chào {agency.Name},</p>" +
+                                       $"<p>Chúng tôi rất vui mừng thông báo rằng bạn đã trở thành đối tác chính thức của chúng tôi!</p>" +
+                                       $"<p>Thông tin tài khoản đã được kích hoạt với trạng thái Active.</p>" +
+                                       $"<p>Chúng tôi rất mong được hợp tác cùng bạn. Trân trọng!</p>" +
+                                       $"<p>Đội ngũ Futuretech</p>"
+                            };
+
+                            bool emailSent = await _emailService.SendEmailAsync(emailMessage);
+                            if (!emailSent)
+                            {
+                                response.Message += " (Lỗi khi gửi email)";
+                            }
+                        }
+
+                        break;
+
                     case AgencyStatusEnum.Active:
                         var agencyregister = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
                         if (agencyregister != null)
@@ -344,7 +449,7 @@ namespace FranchiseProject.Application.Services
                                 ReceiverId = user.Id,
                                 Message = "Tạm ngưng hoạt động!"
                             };
-                            user.Status = UserStatusEnum.blocked;
+                            user.Status = UserStatusEnum.inactive;
                             await _hubContext.Clients.User(agencyId.ToString()).SendAsync("ReceivedNotification", notification.Message);
 
                             var emailMessage = new MessageModel
@@ -657,14 +762,14 @@ namespace FranchiseProject.Application.Services
                         EndTime = startSiteSurvey.AddDays(1).AddHours(3),
                         Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Vị trí mặt bằng]</li>\r\n</ul>",
                         Status = AppointmentStatusEnum.None,
-                        Type = AppointmentTypeEnum.Internal 
+                        Type = AppointmentTypeEnum.Internal
                     }
                 }
             });
 
             // Design - Thiết kế
             DateTime startDesign = endSiteSurvey.AddDays(10);
-            DateTime endDesign = startDesign .AddDays(3);
+            DateTime endDesign = startDesign.AddDays(3);
             works.Add(new Work
             {
                 Title = "Thiết kế mặt bằng - " + agency.Name,
