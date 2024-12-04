@@ -82,7 +82,7 @@ namespace FranchiseProject.Application.Services
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Update failed!");
 
-                response = ResponseHandler.Success(true, "Cập nhật nhiệm vụ thành công!");
+                response = ResponseHandler.Success(true, "Cập nhật nhiệm vụ mẫu thành công!");
             }
             catch (Exception ex)
             {
@@ -126,7 +126,7 @@ namespace FranchiseProject.Application.Services
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete failed!");
 
-                response = ResponseHandler.Success(true, "Xoá nhiệm vụ thành công!");
+                response = ResponseHandler.Success(true, "Xoá nhiệm vụ mẫu thành công!");
             }
             catch (Exception ex)
             {

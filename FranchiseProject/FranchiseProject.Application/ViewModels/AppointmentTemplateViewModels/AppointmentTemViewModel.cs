@@ -13,6 +13,8 @@ namespace FranchiseProject.Application.ViewModels.AppointmentTemplateViewModels
         public string? Title { get; set; }
         public double? StartDaysOffset { get; set; }
         public double? DurationHours { get; set; }
-        public AppointmentStatusEnum? Status { get; set; }
+        public string? Description { get; set; }
+        public AppointmentTypeEnum? Type { get; set; }
+        public Guid? WorkId { get; set; }
     }
 }

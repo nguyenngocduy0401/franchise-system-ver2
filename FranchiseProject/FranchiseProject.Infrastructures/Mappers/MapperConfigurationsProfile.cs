@@ -361,7 +361,9 @@ namespace FranchiseProject.Infrastructures.Mappers
 
             #region AppointmentTemplate
             CreateMap<AppointmentTemplate, AppointmentTemViewModel>();
-            
+            CreateMap<UpdateAppointmentTemplateModel, AppointmentTemplate>();
+            CreateMap<CreateAppointmentTemplateModel, AppointmentTemplate>();
+
             #endregion
 
             #region WorkTemplate

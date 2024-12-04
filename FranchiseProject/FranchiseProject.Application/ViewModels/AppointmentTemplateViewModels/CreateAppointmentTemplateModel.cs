@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.ViewModels.AppointmentTemplateViewModels
 {
-    public class AppointmentTemDetailViewModel
+    public class CreateAppointmentTemplateModel
     {
         public string? Title { get; set; }
         public double? StartDaysOffset { get; set; }
         public double? DurationHours { get; set; }
         public string? Description { get; set; }
-        public AppointmentStatusEnum? Status { get; set; }
         public AppointmentTypeEnum? Type { get; set; }
+        public Guid? WorkId { get; set; }
     }
 }
