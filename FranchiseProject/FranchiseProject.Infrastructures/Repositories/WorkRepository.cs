@@ -64,6 +64,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         public async Task<Pagination<Work>> FilterWorksByUserId(string userId,
             Expression<Func<Work, bool>>? filter = null,
             Func<IQueryable<Work>, IOrderedQueryable<Work>>? orderBy = null,
+            string includeProperties = "",
             AppointmentTypeEnum? type = null,
             int? pageIndex = null,
             int? pageSize = null)
@@ -81,6 +82,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             }
 
             var itemCount = await query.CountAsync();
+
             if (orderBy != null)
             {
                 query = orderBy(query);
@@ -89,7 +91,10 @@ namespace FranchiseProject.Infrastructures.Repositories
             {
                 query = query.OrderByDescending(e => e.CreationDate);
             }
-
+            foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
             if (pageIndex.HasValue && pageSize.HasValue)
             {
                 int validPageIndex = pageIndex.Value > 0 ? pageIndex.Value - 1 : 0;

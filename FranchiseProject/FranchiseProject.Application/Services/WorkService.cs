@@ -100,6 +100,7 @@ namespace FranchiseProject.Application.Services
                 var worksPagination = await _unitOfWork.WorkRepository.FilterWorksByUserId(
                 userId: userId,
                 filter: filter,
+                includeProperties: "Agency",
                 orderBy: order,
                 pageIndex: filterWorkByLoginModel.PageIndex,
                 pageSize: filterWorkByLoginModel.PageSize
@@ -204,7 +205,6 @@ namespace FranchiseProject.Application.Services
                 );
                 var worksPagination = await _unitOfWork.WorkRepository.GetFilterAsync(
                 filter: filter,
-                includeProperties: "Agency",
                 pageIndex: filterWorkModel.PageIndex,
                 pageSize: filterWorkModel.PageSize
                 );

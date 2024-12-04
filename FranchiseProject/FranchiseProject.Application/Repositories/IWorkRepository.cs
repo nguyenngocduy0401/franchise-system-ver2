@@ -21,6 +21,7 @@ namespace FranchiseProject.Application.Repositories
             string userId,
             Expression<Func<Work, bool>>? filter = null,
             Func<IQueryable<Work>, IOrderedQueryable<Work>>? orderBy = null,
+            string includeProperties = "",
             AppointmentTypeEnum? type = null,
             int? pageIndex = null,
             int? pageSize = null);
