@@ -61,8 +61,14 @@ namespace FranchiseProject.Application.Services
                 
                 var agency = _mapper.Map<Agency>(create);
                 agency.Status = AgencyStatusEnum.Processing;
-                var work = CreateWorkAppointForFranchiseFlow(agency);
-                agency.Works = work;
+
+                var template = await _unitOfWork.WorkTemplateRepository.FindAsync(e => e.IsDeleted != true, "Appointments");
+                if (template != null)
+                {
+                    var work = CreateWorkAppointForFranchiseFlow(agency, (List<WorkTemplate>)template);
+
+                    agency.Works = work;
+                }
                 await _unitOfWork.AgencyRepository.AddAsync(agency);
                 var consult = await _unitOfWork.FranchiseRegistrationRequestRepository.GetExistByIdAsync(create.RegisterFormId.Value);
                 if(consult == null)
@@ -420,7 +426,104 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        private List<Work> CreateWorkAppointForFranchiseFlow(Agency agency)
+        private List<Work> CreateWorkAppointForFranchiseFlow(Agency agency, List<WorkTemplate> workTemplates)
+        {
+            int minimumDaysBetweenProcesses = 3;
+            var currentTime = _currentTime.GetCurrentTime();
+            var works = new List<Work>();
+            DateTime previousEndTime = currentTime;
+
+            // Sắp xếp các WorkTemplate theo WorkTypeEnum
+            var sortedWorkTemplates = workTemplates.OrderBy(t => t.Type).ToList();
+
+            // Tạo danh sách các nhóm công việc theo WorkType
+            var groupedWorkTemplates = sortedWorkTemplates
+                .GroupBy(t => t.Type)
+                .OrderBy(g => g.Key)  // Sắp xếp theo thứ tự WorkTypeEnum
+                .ToList();
+
+            foreach (var group in groupedWorkTemplates)
+            {
+                // Tính thời gian bắt đầu cho nhóm công việc hiện tại
+                DateTime groupStartTime = previousEndTime;
+
+                // Đảm bảo rằng các nhóm công việc không bắt đầu quá gần nhau
+                if ((groupStartTime - previousEndTime).TotalDays < minimumDaysBetweenProcesses)
+                {
+                    groupStartTime = previousEndTime.AddDays(minimumDaysBetweenProcesses);
+                }
+
+                // Biến lưu trữ thời gian kết thúc của công việc lâu nhất trong nhóm
+                DateTime groupEndTime = groupStartTime;
+
+                // Danh sách các Appointment cần tạo cho công việc này
+                var allAppointments = new List<Appointment>();
+
+                foreach (var template in group)
+                {
+                    // Lấy danh sách AppointmentTemplates liên quan đến WorkTemplate
+                    var appointmentTemplates = template.Appointments;
+
+                    // Tính thời gian bắt đầu và kết thúc cho từng công việc
+                    var startTime = groupStartTime.AddDays((double)template.StartDaysOffset);
+                    var endTime = startTime.AddDays((double)template.DurationDays);
+
+                    // Tạo công việc từ WorkTemplate
+                    var work = CreateWork(agency, template, startTime, endTime);
+
+                    works.Add(work);
+
+                    // Cập nhật thời gian kết thúc cho công việc lâu nhất trong nhóm
+                    if (endTime > groupEndTime)
+                    {
+                        groupEndTime = endTime;
+                    }
+
+                    // Cập nhật thời gian kết thúc cho công việc tiếp theo
+                    previousEndTime = endTime;
+                }
+
+                // Cập nhật thời gian kết thúc cho nhóm công việc là thời gian kết thúc của công việc lâu nhất trong nhóm
+                previousEndTime = groupEndTime;
+            }
+
+            return works;
+        }
+
+        private Work CreateWork(Agency agency, WorkTemplate template, DateTime startTime, DateTime endTime)
+        {
+            var work = new Work
+            {
+                Title = template.Title + agency.Name,
+                Description = template.Description,
+                StartDate = startTime,
+                Type = template.Type,
+                Level = template.Level,
+                EndDate = endTime,
+                AgencyId = agency.Id,
+                Appointments = new List<Appointment>()
+            };
+
+            // Chuyển các AppointmentTemplate thành Appointment và gán vào Work
+            foreach (var appointmentTemplate in template.Appointments)
+            {
+                var appointment = new Appointment
+                {
+                    Title = appointmentTemplate.Title + agency.Name,
+                    StartTime = startTime.AddDays(appointmentTemplate.StartDaysOffset ?? 0), // Tính thời gian bắt đầu từ startTime của công việc
+                    EndTime = startTime.AddDays(appointmentTemplate.StartDaysOffset ?? 0).AddHours(appointmentTemplate.DurationHours ?? 0), // Tính thời gian kết thúc từ startTime của công việc
+                    Description = appointmentTemplate.Description,
+                    Status = AppointmentStatusEnum.None,  // Mặc định là Pending nếu không có giá trị
+                    Type = appointmentTemplate.Type ?? AppointmentTypeEnum.Internal,  // Mặc định là General nếu không có giá trị
+                    WorkId = work.Id,  // Gán ID của Work vào Appointment
+                };
+
+                work.Appointments.Add(appointment);  // Thêm Appointment vào công việc
+            }
+
+            return work;
+        }
+        /*private List<Work> CreateWorkAppointForFranchiseFlow(Agency agency)
         {
             var works = new List<Work>();
             //Phỏng vấn đối tác
@@ -773,6 +876,6 @@ namespace FranchiseProject.Application.Services
                 }
             });
             return works;
-        }
+        }*/
     }
 }

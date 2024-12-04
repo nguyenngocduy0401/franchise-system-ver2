@@ -57,6 +57,8 @@ namespace FranchiseProject.Infrastructures
         public DbSet<FranchiseFees> FranchiseFees { get; set; }
         public DbSet<EquipmentSerialNumberHistory> EquipmentSerialNumberHistories { get; set; }
         public DbSet<HomePage> HomePages { get; set; }
+        public DbSet<WorkTemplate> WorkTemplates { get; set; }
+        public DbSet<AppointmentTemplate> AppointmentTemplates { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -67,6 +69,7 @@ namespace FranchiseProject.Infrastructures
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentClassConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AssignmentSubmitConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppointmentConfiguration).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(WorkTemplateConfiguration).Assembly);
             modelBuilder.Entity<Contract>().HasData(
                      new Contract
                      {
@@ -81,6 +84,276 @@ namespace FranchiseProject.Infrastructures
                          Status = AgencyStatusEnum.Approved
                      }
                      );
+            modelBuilder.Entity<WorkTemplate>().HasData(
+            new WorkTemplate
+                {
+                    Id = Guid.Parse("0d55bc46-31f4-4022-9133-aaab78416a50"),
+                    Title = "Phỏng vấn đối tác - ",
+                    Description = "<p>Buổi phỏng vấn cần tập trung vào" +
+                " các nội dung chính sau:</p>\r\n\r\n<ul>\r\n    " +
+                "<li><strong>Năng lực tài chính:</strong> Xác minh khả năng tài chính của đối tác để đảm bảo họ đủ tiềm lực tham gia vào mô hình nhượng quyền.</li>\r\n   " +
+                " <li><strong>Kinh nghiệm quản lý:</strong> Tìm hiểu quá trình làm việc, các dự án đã từng tham gia, và năng lực quản lý hiện tại của đối tác.</li>\r\n    " +
+                "<li><strong>Mục tiêu phát triển:</strong> Trao đổi về định hướng chiến lược và kỳ vọng của đối tác khi tham gia vào mô hình nhượng quyền của công ty.</li>\r\n  " +
+                "  <li><strong>Cam kết hợp tác:</strong> Đảm bảo đối tác hiểu và sẵn sàng tuân thủ các quy định, tiêu chuẩn, và lộ trình mà công ty đã đề ra.</li>\r\n</ul>\r\n\r\n<p>Nhân viên cần chuẩn bị trước các tài liệu sau:</p>\r\n<ul>\r\n    " +
+                "<li>Tài liệu giới thiệu công ty</li>\r\n    " +
+                "<li>Bộ câu hỏi phỏng vấn</li>\r\n   " +
+                " <li>Biểu mẫu ghi chú hoặc checklist đánh giá</li>\r\n</ul>\r\n\r\n<p>Buổi phỏng vấn phải đảm bảo tính <strong>chuyên nghiệp</strong>, <strong>khách quan</strong>, và <strong>minh bạch</strong>," +
+                " nhằm tạo ấn tượng tốt với đối tác. Sau buổi phỏng vấn, hãy lập báo cáo chi tiết về nội dung đã trao đổi, bao gồm:</p>\r\n<ul>\r\n  " +
+                "  <li>Đánh giá sơ bộ về năng lực tài chính</li>\r\n    <li>Kinh nghiệm quản lý và điều hành</li>\r\n    " +
+                "<li>Mức độ phù hợp với quy trình nhượng quyền</li>\r\n</ul>\r\n\r\n<p><em>Thời gian thực hiện:</em> 1-2 giờ</p>\r\n<p><em>Kết quả mong đợi:</em> Báo cáo chi tiết trình quản lý để xem xét và phê duyệt.</p>", 
+                    Type = WorkTypeEnum.Interview,
+                    Level = WorkLevelEnum.Compulsory,
+                    StartDaysOffset = 3,
+                    DurationDays = 2,
+                },
+            //Ký thỏa thuận 2 bên
+            new WorkTemplate
+            {
+                Id = Guid.Parse("fe18b609-cd62-42e2-8cd8-a8c0d358d9ec"),
+                Title = "Ký thỏa thuận với đối tác - ",
+                Description = "<p>Buổi ký thỏa thuận nhằm đảm bảo đối tác đồng ý với các điều khoản cơ bản.</p>\r\n<ul>\r\n    " +
+                  "<li><strong>Kiểm tra:</strong> Rà soát kỹ các điều khoản thỏa thuận.</li>\r\n    " +
+                  "<li><strong>Ký thỏa thuận:</strong> Đại diện hai bên chính thức xác nhận đồng ý hợp tác.</li>\r\n</ul>\r\n" +
+                  "<p><strong>Nhân viên cần chuẩn bị:</strong> Bản dự thảo thỏa thuận và tài liệu pháp lý liên quan.</p>\r\n" +
+                  "<p><strong>Thời gian:</strong> 1-2 giờ</p>\r\n<p><strong>Kết quả:</strong> Thỏa thuận được ký và lưu trữ.</p>",
+                Type = WorkTypeEnum.AgreementSigned,
+                Level = WorkLevelEnum.Compulsory,
+                StartDaysOffset = 3,
+                DurationDays = 1,
+            },
+            // BusinessRegistered - Đăng ký doanh nghiệp
+            new WorkTemplate
+            {
+                Id = Guid.Parse("afbdf461-51f9-45cf-b559-e622fe8df67f"),
+                Title = "Đăng ký doanh nghiệp - ",
+                Description = "<p>Thực hiện đăng ký doanh nghiệp để hoàn tất thủ tục pháp lý trước khi bắt đầu hoạt động kinh doanh.</p>\r\n<ul>\r\n" +
+                "    <li><strong>Chuẩn bị hồ sơ:</strong> Bao gồm giấy tờ pháp lý, đơn đăng ký và các tài liệu liên quan.</li>\r\n" +
+                "    <li><strong>Nộp hồ sơ:</strong> Tại cơ quan đăng ký kinh doanh hoặc trực tuyến.</li>\r\n" +
+                "    <li><strong>Nhận giấy phép:</strong> Sau khi hồ sơ được xét duyệt.</li>\r\n</ul>\r\n<p><em>Thời gian thực hiện:</em> 3-5 ngày làm việc.</p>",
+                Type = WorkTypeEnum.BusinessRegistered,
+                Level = WorkLevelEnum.Compulsory,
+                StartDaysOffset = 7,
+                DurationDays = 14,
+            },
+            // SiteSurvey - Khảo sát mặt bằng
+            new WorkTemplate
+            {
+                Id = Guid.Parse("b65da998-1aa3-420c-91d5-f0991e95e7bf"),
+                Title = "Khảo sát mặt bằng - ",
+                Description = "<p>Khảo sát mặt bằng để đảm bảo địa điểm đáp ứng các yêu cầu kinh doanh.</p>\r\n<ul>\r\n" +
+                "    <li><strong>Đo đạc và phân tích:</strong> Xác định kích thước, vị trí và các yếu tố địa lý.</li>\r\n" +
+                "    <li><strong>Đánh giá tiềm năng:</strong> Phân tích lưu lượng khách hàng và điều kiện kinh doanh tại khu vực.</li>\r\n</ul>\r\n<p><em>Thời gian thực hiện:</em> 1-2 ngày.</p>",
+                Type = WorkTypeEnum.SiteSurvey,
+                Level = WorkLevelEnum.Compulsory,
+                StartDaysOffset = 10,
+                DurationDays = 3,
+            },
+            // Design - Thiết kế
+            new WorkTemplate
+            {
+                Id = Guid.Parse("94cbecc0-55be-4235-8fbe-de70c033eb5e"),
+                Title = "Thiết kế mặt bằng - ",
+                Description = "<p>Lên bản thiết kế chi tiết cho mặt bằng kinh doanh.</p>\r\n<ul>\r\n" +
+                "    <li><strong>Tiếp nhận yêu cầu:</strong> Xác định nhu cầu của đối tác.</li>\r\n" +
+                "    <li><strong>Thiết kế sơ bộ:</strong> Đưa ra các phương án thiết kế phù hợp.</li>\r\n" +
+                "    <li><strong>Phê duyệt:</strong> Lấy ý kiến đối tác và hoàn thiện bản thiết kế.</li>\r\n</ul>\r\n<p><em>Thời gian thực hiện:</em> 5-7 ngày.</p>",
+                Type = WorkTypeEnum.Design,
+                Level = WorkLevelEnum.Optional,
+                StartDaysOffset = 10,
+                DurationDays = 3,
+            },
+            // Quotation - Báo giá cho khách hàng
+            new WorkTemplate
+            {
+                Id = Guid.Parse("b87ed201-95f9-4518-bb34-dc4fd76dba5f"),
+                Title = "Báo giá cho khách hàng - ",
+                Description = "<p>Chuẩn bị và gửi bảng báo giá chi tiết cho đối tác.</p>\r\n<ul>\r\n" +
+                "    <li><strong>Xác định chi phí:</strong> Tính toán chi phí dựa trên các yêu cầu cụ thể của đối tác.</li>\r\n" +
+                "    <li><strong>Lập bảng báo giá:</strong> Bao gồm các mục chi phí cụ thể, thời gian hoàn thành và điều khoản thanh toán.</li>\r\n" +
+                "    <li><strong>Gửi và thảo luận:</strong> Trình bày và giải đáp thắc mắc của đối tác về báo giá.</li>\r\n</ul>\r\n<p><em>Thời gian thực hiện:</em> 2-3 ngày.</p>",
+                Type = WorkTypeEnum.Quotation,
+                Level = WorkLevelEnum.Optional,
+                StartDaysOffset = 4,
+                DurationDays = 2,
+                
+            },
+            // SignedContract - Ký hợp đồng 
+            new WorkTemplate
+            {
+                Id = Guid.Parse("6f4c22b7-4656-46fc-90b8-dd0722853ba9"),
+                Title = "Ký hợp đồng - ",
+                Description = "<p>Ký kết hợp đồng chính thức để hoàn tất thỏa thuận hợp tác.</p>\r\n<ul>\r\n" +
+                "    <li><strong>Rà soát hợp đồng:</strong> Đảm bảo các điều khoản đã được hai bên đồng thuận.</li>\r\n" +
+                "    <li><strong>Ký hợp đồng:</strong> Đại diện hai bên ký xác nhận thỏa thuận hợp tác.</li>\r\n" +
+                "    <li><strong>Thông báo kết quả:</strong> Thông báo chính thức việc ký kết và khởi động dự án.</li>\r\n</ul>\r\n<p><em>Thời gian thực hiện:</em> 1 ngày.</p>",
+                Type = WorkTypeEnum.SignedContract,
+                Level = WorkLevelEnum.Compulsory,
+                StartDaysOffset = 5,
+                DurationDays = 2,
+            },
+            // ConstructionAndTraining - Đào tạo và thi công
+            new WorkTemplate
+            {
+                Id = Guid.Parse("e82ec599-fade-43fc-8030-ef643643e9e1"),
+                Title = "Đào tạo nhân sự - ",
+                Description = "<p>Tiến hành đào tạo đối tác để đảm bảo vận hành hiệu quả.</p>\r\n<ul>\r\n" +
+                "    <li><strong>Đào tạo:</strong> Hướng dẫn quy trình vận hành, quản lý và kỹ năng cần thiết.</li>\r\n</ul>\r\n<p><em>Thời gian thực hiện:</em> 10-15 ngày.</p>",
+                Type = WorkTypeEnum.ConstructionAndTrainning,
+                Level = WorkLevelEnum.Compulsory,
+                StartDaysOffset = 5,
+                DurationDays = 15,
+                
+            },
+            new WorkTemplate
+            {
+                Id = Guid.Parse("7cc745a9-e95b-43bb-92e4-f5e15b7b65bd"),
+                Title = "Thi công trung tâm - ",
+                Description = "<p>Tiến hành thi công.</p>\r\n<ul>\r\n" +
+                "    <li><strong>Thi công cơ sở:</strong> Lắp đặt và bố trí nội thất, trang thiết bị.</li>\r\n",
+                Type = WorkTypeEnum.ConstructionAndTrainning,
+                Level = WorkLevelEnum.Compulsory,
+                StartDaysOffset = 5,
+                DurationDays = 15,
+                
+            },
+            // Handover - Bàn giao
+            new WorkTemplate
+            {
+                Id = Guid.Parse("e10ba8cb-2ad9-4e69-b086-ed7487b6856a"),
+                Title = "Bàn giao cơ sở - ",
+                Description = "<p>Hoàn tất quá trình thi công và bàn giao cơ sở kinh doanh.</p>\r\n<ul>\r\n" +
+                "    <li><strong>Kiểm tra hoàn tất:</strong> Đảm bảo cơ sở và trang thiết bị đã sẵn sàng hoạt động.</li>\r\n" +
+                "    <li><strong>Bàn giao:</strong> Chuyển giao tài liệu và hướng dẫn vận hành.</li>\r\n</ul>\r\n<p><em>Thời gian thực hiện:</em> 1 ngày.</p>",
+                Type = WorkTypeEnum.Handover,
+                Level = WorkLevelEnum.Compulsory,
+                StartDaysOffset = 5,
+                DurationDays = 2,
+            },
+            // EducationLicenseRegistered - Đăng ký giấy phép giáo dục
+            new WorkTemplate
+            {
+                Id = Guid.Parse("67794a20-9e8b-49d3-a0ff-de4b5366e4af"),
+                Title = "Đăng ký giấy phép giáo dục - ",
+                Description = "<p>Hoàn tất đăng ký giấy phép giáo dục để vận hành cơ sở kinh doanh.</p>\r\n<ul>\r\n" +
+                "    <li><strong>Chuẩn bị hồ sơ:</strong> Bao gồm các tài liệu cần thiết theo quy định pháp luật.</li>\r\n" +
+                "    <li><strong>Nộp hồ sơ:</strong> Tại cơ quan quản lý giáo dục địa phương.</li>\r\n" +
+                "    <li><strong>Nhận giấy phép:</strong> Sau khi hồ sơ được phê duyệt.</li>\r\n</ul>\r\n<p><em>Thời gian thực hiện:</em> 7-10 ngày.</p>",
+                Type = WorkTypeEnum.EducationLicenseRegistered,
+                Level = WorkLevelEnum.Compulsory,
+                StartDaysOffset = 2,
+                DurationDays = 14,
+                
+            }
+             );
+            modelBuilder.Entity<AppointmentTemplate>().HasData
+            (
+                new AppointmentTemplate
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Phỏng vấn đối tác - ",
+                    StartDaysOffset = 1,
+                    DurationHours = 3,
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Địa chỉ công ty hoặc cuộc họp trực tuyến]</li>\r\n</ul>",
+                    Type = AppointmentTypeEnum.WithAgency,
+                    WorkId = Guid.Parse("0d55bc46-31f4-4022-9133-aaab78416a50"),
+                },
+                new AppointmentTemplate
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Ký thỏa thuận với đối tác - ",
+                    StartDaysOffset = 1,
+                    DurationHours = 3,
+                    Description = "<ul>\r\n    " +
+                                      "<li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    " +
+                                      "<li><strong>Địa điểm:</strong> [Địa chỉ công ty hoặc họp trực tuyến]</li>\r\n    " +
+                                      "<li><strong>Tài liệu cần chuẩn bị:</strong> Dự thảo thỏa thuận, tài liệu pháp lý.</li>\r\n    " +
+                                      "<li><strong>Mục đích:</strong> Xác nhận hợp tác và đồng ý các điều khoản.</li>\r\n</ul>",
+                    Type = AppointmentTypeEnum.WithAgency,
+                    WorkId = Guid.Parse("fe18b609-cd62-42e2-8cd8-a8c0d358d9ec"),
+                },
+                new AppointmentTemplate
+                {
+                    Id = Guid.Parse("afbdf461-51f9-45cf-b559-e622fe8df67f"),
+                    Title = "Đăng ký doanh nghiệp - ",
+                    StartDaysOffset = 1,
+                    DurationHours = 3,
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Cơ quan đăng ký hoặc trực tuyến]</li>\r\n</ul>",
+                    Type = AppointmentTypeEnum.Internal,
+
+                },
+                new AppointmentTemplate
+                {
+                    Id = Guid.Parse("b65da998-1aa3-420c-91d5-f0991e95e7bf"),
+                    Title = "Khảo sát mặt bằng - ",
+                    StartDaysOffset = 1,
+                    DurationHours = 3,
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Vị trí mặt bằng]</li>\r\n</ul>",
+                    Type = AppointmentTypeEnum.Internal
+                },
+                new AppointmentTemplate
+                {
+                    Id = Guid.Parse("94cbecc0-55be-4235-8fbe-de70c033eb5e"),
+                    Title = "Thiết kế mặt bằng - ",
+                    StartDaysOffset = 1,
+                    DurationHours = 3,
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Văn phòng hoặc trực tuyến]</li>\r\n</ul>",
+                    Type = AppointmentTypeEnum.Internal,
+                },
+                new AppointmentTemplate
+                {
+                    Id = Guid.Parse("b87ed201-95f9-4518-bb34-dc4fd76dba5f"),
+                    Title = "Báo giá cho khách hàng - ",
+                    StartDaysOffset = 1,
+                    DurationHours = 3,
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Trực tuyến hoặc văn phòng]</li>\r\n</ul>",
+                    Type = AppointmentTypeEnum.WithAgency
+                },
+                new AppointmentTemplate
+                {
+                    Id = Guid.Parse("6f4c22b7-4656-46fc-90b8-dd0722853ba9"),
+                    Title = "Ký hợp đồng - ",
+                    StartDaysOffset = 1,
+                    DurationHours = 3,
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Văn phòng hoặc địa điểm ký kết]</li>\r\n</ul>",
+                    Type = AppointmentTypeEnum.WithAgency
+                },
+                new AppointmentTemplate
+                {
+                    Id = Guid.Parse("e82ec599-fade-43fc-8030-ef643643e9e1"),
+                    Title = "Đào tạo nhân sự - ",
+                    StartDaysOffset = 1,
+                    DurationHours = 6,
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Trung tâm chính]</li>\r\n</ul>",
+                    Type = AppointmentTypeEnum.WithAgency
+                },
+                new AppointmentTemplate
+                {
+                    Id = Guid.Parse("7cc745a9-e95b-43bb-92e4-f5e15b7b65bd"),
+                    Title = "Thi công - ",
+                    StartDaysOffset = 1,
+                    DurationHours = 6,
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Cơ sở kinh doanh]</li>\r\n</ul>",
+                    Type = AppointmentTypeEnum.Internal
+                },
+                new AppointmentTemplate
+                {
+                    Id = Guid.Parse("e10ba8cb-2ad9-4e69-b086-ed7487b6856a"),
+                    Title = "Bàn giao cơ sở - ",
+                    StartDaysOffset = 1,
+                    DurationHours = 5,
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Cơ sở kinh doanh]</li>\r\n</ul>",
+                    Type = AppointmentTypeEnum.WithAgency
+                },
+                new AppointmentTemplate
+                {
+                    Id = Guid.Parse("67794a20-9e8b-49d3-a0ff-de4b5366e4af"),
+                    Title = "Đăng ký giấy phép giáo dục - ",
+                    StartDaysOffset = 1,
+                    DurationHours = 3,
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Cơ quan quản lý giáo dục]</li>\r\n</ul>",
+                    Type = AppointmentTypeEnum.WithAgency
+                }
+            );
             #region HomePage
             modelBuilder.Entity<HomePage>().HasData(
             new HomePage

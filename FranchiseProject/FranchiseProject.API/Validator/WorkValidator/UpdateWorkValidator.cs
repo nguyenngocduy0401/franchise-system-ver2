@@ -10,18 +10,27 @@ namespace FranchiseProject.API.Validator.WorkValidator
         {
             RuleFor(x => x.Title)
                 .NotEmpty()
-                .MaximumLength(150);
+                .WithMessage("Tiêu đề không được để trống.")
+                .MaximumLength(150)
+                .WithMessage("Tiêu đề không được dài hơn 150 ký tự.");
+
             RuleFor(x => x.Description.GetTextWithoutHtml())
-                .MaximumLength(2000);
+                .MaximumLength(2000)
+                .WithMessage("Mô tả không được dài hơn 2000 ký tự.");
+
             RuleFor(x => x.StartDate)
                 .NotEmpty()
+                .WithMessage("Ngày bắt đầu không được để trống.")
                 .LessThanOrEqualTo(x => x.EndDate)
+                .WithMessage("Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.")
                 .GreaterThanOrEqualTo(new DateTime(2020, 1, 1))
-                .WithMessage("Start date must be in the future.");
+                .WithMessage("Ngày bắt đầu phải từ ngày 01/01/2020 trở đi.");
+
             RuleFor(x => x.EndDate)
                 .NotEmpty()
+                .WithMessage("Ngày kết thúc không được để trống.")
                 .LessThanOrEqualTo(DateTime.Now.AddYears(1))
-                .WithMessage("Start date must be within one year from today.");
+                .WithMessage("Ngày kết thúc phải trong vòng một năm kể từ hôm nay.");
         }
     }
 }

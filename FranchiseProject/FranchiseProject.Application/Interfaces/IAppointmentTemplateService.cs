@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Interfaces
 {
-    public interface TaskAfterFranchiseService
+    public interface IAppointmentTemplateService
     {
+
     }
 }

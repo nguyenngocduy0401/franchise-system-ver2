@@ -50,6 +50,8 @@ namespace FranchiseProject.Application
         public IFranchiseFeesRepository FranchiseFeesRepository { get; }
         public IEquipmentSerialNumberHistoryRepository EquipmentSerialNumberHistoryRepository { get; }
         public IHomePageRepository HomePageRepository { get; }
+        public IWorkTemplateRepository WorkTemplateRepository { get; }
+        public IAppointmentTemplateRepository AppointmentTemplateRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

@@ -170,7 +170,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(agencyId);
-                var work = _unitOfWork.WorkRepository.GetAllPreWorkByAgencyId(agencyId);
+                var work = _unitOfWork.WorkRepository.GetAllAsync();
                 var workModel = _mapper.Map<IEnumerable<WorkViewModel>>(work);
                 var workAgencyModel = new WorkAgencyViewModel
                 {

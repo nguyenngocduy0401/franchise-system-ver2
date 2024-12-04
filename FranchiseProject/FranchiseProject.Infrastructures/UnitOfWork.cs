@@ -54,6 +54,8 @@ namespace FranchiseProject.Infrastructures
         private readonly IFranchiseFeesRepository _franchiseFeesRepository;
         private readonly IEquipmentSerialNumberHistoryRepository _equipmentSerialNumberHistoryRepository;
         private readonly IHomePageRepository _homePageRepository;
+        private readonly IWorkTemplateRepository _workTemplateRepository;
+        private readonly IAppointmentTemplateRepository _appointmentTemplateRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -70,7 +72,8 @@ namespace FranchiseProject.Infrastructures
             IUserAppointmentRepository userAppointmentRepository, IDocumentRepository documentRepository,
             IEquipmentRepository equipmentRepository,IFranchiseFeesRepository franchiseFeesRepository,
             IEquipmentSerialNumberHistoryRepository equipmentSerialNumberHistoryRepository,
-            IHomePageRepository homePageRepository)
+            IHomePageRepository homePageRepository, IWorkTemplateRepository workTemplateRepository,
+            IAppointmentTemplateRepository appointmentTemplateRepository)
 
            
         {
@@ -117,6 +120,8 @@ namespace FranchiseProject.Infrastructures
             _franchiseFeesRepository = franchiseFeesRepository;
             _equipmentSerialNumberHistoryRepository = equipmentSerialNumberHistoryRepository;
             _homePageRepository = homePageRepository;
+            _workTemplateRepository = workTemplateRepository;
+            _appointmentTemplateRepository = appointmentTemplateRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -199,6 +204,8 @@ namespace FranchiseProject.Infrastructures
 
         public IEquipmentSerialNumberHistoryRepository EquipmentSerialNumberHistoryRepository => _equipmentSerialNumberHistoryRepository;
         public IHomePageRepository HomePageRepository => _homePageRepository;
+        public IWorkTemplateRepository WorkTemplateRepository => _workTemplateRepository;
+        public IAppointmentTemplateRepository AppointmentTemplateRepository => _appointmentTemplateRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

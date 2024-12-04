@@ -60,6 +60,8 @@ using FranchiseProject.Application.ViewModels.DocumentViewModels;
 using FranchiseProject.API.Validator.DocumentValidator;
 using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.API.Validator.AgencyValidator;
+using FranchiseProject.Application.ViewModels.WorkTemplateViewModels;
+using FranchiseProject.API.Validator.WorkTemplateValidator;
 
 
 namespace FranchiseProject.API
@@ -212,6 +214,8 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<CreateAppointmentModel>, CreateAppointmentValidator>();
             services.AddTransient<IValidator<UploadDocumentViewModel>, UploadDocumentValidator>();
 
+            services.AddTransient<IValidator<CreateWorkTemplateModel>, CreateWorkTemplateValidator>();
+            services.AddTransient<IValidator<UpdateWorkTemplateModel>, UpdateWorkTemplateValidator>();
             #endregion
             return services;
         }
