@@ -28,7 +28,7 @@ namespace FranchiseProject.API.Controllers
             return await _documentService.DeleteDocumentAsync(id);
         }
 
-       [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin+"," + AppRole.SystemTechnician)]
+       [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin+"," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
         [SwaggerOperation(Summary = "Tạo mới tài liệu {Authorize = Manager, Admin,SystemTechnician}")]
         [HttpPost]
         public async Task<ApiResponse<bool>> CreateDocumentAsync(UploadDocumentViewModel uploadDocumentModel)
@@ -43,7 +43,7 @@ namespace FranchiseProject.API.Controllers
         {
             return await _documentService.UpdateDocumentAsync(id, updateDocumentModel);
         }
-       [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician)]
+       [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician + ","+ AppRole.AgencyManager)]
         [SwaggerOperation(Summary = "Tìm tài liệu bằng id{Authorize = Manager, Admin,SystemTechnician}")]
         [HttpGet("{id}")]
         public async Task<ApiResponse<DocumentViewModel>> GetDocumentByIdAsync(Guid id)
@@ -57,14 +57,14 @@ namespace FranchiseProject.API.Controllers
         {
             return await _documentService.FilterDocumentAsync(filterDocumentModel);
         }
-        [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin+"," + AppRole.SystemTechnician)]
+        [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin+"," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
         [SwaggerOperation(Summary = "Truy xuất tài liệu bằng Agencyid{Authorize = Manager, Admin,SystemTechnician}")]
         [HttpGet("agency/{id}")]
         public async Task<ApiResponse<DocumentViewModel>> GetDocumentbyAgencyId(Guid id, DocumentType type)
         { 
             return await _documentService.GetDocumentbyAgencyId(id, type);
         }
-        [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician)]
+        [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
         [SwaggerOperation(Summary = "Truy xuất danh sách tài liệu bằng Agencyid{Authorize = Manager, Admin,SystemTechnician}")]
         [HttpGet("agency/{id}/all")]
         public async Task<ApiResponse<List<DocumentViewModel>>> GetAllDocumentsByAgencyIdAsync(Guid id)
