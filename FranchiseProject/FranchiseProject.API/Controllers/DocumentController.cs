@@ -36,8 +36,8 @@ namespace FranchiseProject.API.Controllers
             return await _documentService.UpdaloadDocumentAsyc(uploadDocumentModel);
         }
 
-        [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician)]
-        [SwaggerOperation(Summary = "Cập nhật tài liệu {Authorize = Manager, Admin,SystemTechnician}")]
+        [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
+        [SwaggerOperation(Summary = "Cập nhật tài liệu {Authorize = Manager, Admin,SystemTechnician, AgencyManager}")]
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> UpdateDocumentAsync(Guid id, UpdateDocumentViewModel updateDocumentModel)
         {
