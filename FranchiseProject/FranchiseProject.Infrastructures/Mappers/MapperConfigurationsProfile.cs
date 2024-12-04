@@ -58,6 +58,7 @@ namespace FranchiseProject.Infrastructures.Mappers
             #region Agency
             CreateMap<CreateAgencyViewModel, Agency>().ReverseMap();
             CreateMap<Agency, AgencyViewModel>();
+            CreateMap<Agency, AgencyWorkModel>();
             CreateMap<Agency, AgencyAddressViewModel>()
                 .ForMember(dest => dest.FullAddress, opt => opt.MapFrom(src => $"{src.Address}, {src.Ward}, {src.District}, {src.City}"));
             CreateMap<Agency, AgencyNameViewModel>().ForMember(dest => dest.AgencyName, otp => otp.MapFrom(src => src.Name));
@@ -309,8 +310,9 @@ namespace FranchiseProject.Infrastructures.Mappers
             #region Work
             CreateMap<CreateWorkModel, Work>();
             CreateMap<UpdateWorkModel, Work>();
+            CreateMap<Work, WorkViewModel>();
             CreateMap<Work, WorkViewModel>()
-                .ForMember(dest => dest.AgenciesViewModels, opt => opt.MapFrom(src => src.Agency)); 
+                .ForMember(dest => dest.AgencyViewModel, opt => opt.MapFrom(src => src.Agency));
             CreateMap<Work, WorkDetailViewModel>();
             CreateMap<UpdateWorkByStaffModel, Work>();
             #endregion
