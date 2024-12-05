@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
@@ -253,6 +254,14 @@ namespace FranchiseProject.Infrastructures.Repositories
                                  .Where(u => u.AgencyId == agencyId&&u.Status==UserStatusEnum.active && u.UserRoles.Any(ur => ur.RoleId == instructorRoleId))
                                  .ToListAsync();
         }
+        public async Task<List<string>> GetUserIdInAppoinmentAsync(Guid appointmentId) 
+        {
+            var userAppointments = await _dbContext.UserAppointments
+           .Where(e => e.AppointmentId == appointmentId)
+           .Select(e => e.UserId)
+           .ToListAsync();
 
+            return userAppointments;
+        }
     }
 }
