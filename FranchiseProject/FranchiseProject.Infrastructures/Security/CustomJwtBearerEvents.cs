@@ -30,14 +30,6 @@ public class CustomJwtBearerEvents : JwtBearerEvents
                 context.Fail("Token is no longer valid.");
             }
         }
-        var jwtExpiration = token.ValidTo; // Lấy thời gian hết hạn từ JWT
-        var currentTime = DateTime.UtcNow;
-        if (currentTime > jwtExpiration)
-        {
-            context.Fail("JWT has expired.");
-            return;
-        }
-
 
         await base.TokenValidated(context);
     }

@@ -200,7 +200,7 @@ namespace FranchiseProject.Application.Services
                 var userRole = await _userManager.GetRolesAsync(user);
                 var token = user.GenerateJsonWebToken(_appConfiguration,
                         _appConfiguration.JwtOptions.Secret,
-                        _currentTime.GetCurrentTime(),
+                        DateTime.UtcNow,
                         userRole,
                         refreshToken
                         );

@@ -47,6 +47,7 @@ namespace FranchiseProject.API.Controllers
         {
             return await _workService.FilterWorksByLogin(filterWorkByLoginModel);
         }
+        [Authorize()]
         [SwaggerOperation(Summary = "lấy thông tin User bằng đăng nhập")]
 		[HttpGet("mine")]
 		public async Task<ApiResponse<UserViewModel>> GetInfoByLoginAsync() => await _userService.GetInfoByLoginAsync();
@@ -55,7 +56,7 @@ namespace FranchiseProject.API.Controllers
 		[HttpGet("{id}")]
 		public async Task<ApiResponse<UserViewModel>> GetUserByIdAsync(string id) => await _userService.GetUserByIdAsync(id);
 
-		/*[Authorize(Roles = AppRole.Admin)]*/
+		[Authorize(Roles = AppRole.Admin)]
 		[SwaggerOperation(Summary = "tìm kiếm người dùng {Authorize = Administrator}")]
 		[HttpGet("~/admin/api/v1/users")]
 		public async Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAdminAsync([FromQuery] FilterUserByAdminModel filterUserByAdminModel)
@@ -127,8 +128,8 @@ namespace FranchiseProject.API.Controllers
 		[Authorize(Roles = AppRole.Student + "," + AppRole.Instructor)]
 		[HttpGet("mine/classes")]
 		public async Task<ApiResponse<List<ClassByLoginViewModel>>> GetAllClassByLogin() => await _classService.GetAllClassByLogin();
-
-		[SwaggerOperation(Summary = "tìm kiếm người dùng {Authorize = AgencyManager}")]
+        [Authorize(Roles = AppRole.AgencyManager)]
+        [SwaggerOperation(Summary = "tìm kiếm người dùng {Authorize = AgencyManager}")]
 		[HttpGet("~/agency-manager/api/v1/users")]
 		public async Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAgencyManagerAsync([FromQuery] FilterUserByAgencyModel filterUserByAgencyModel)
 			=> await _userService.FilterUserByAgencyManagerAsync(filterUserByAgencyModel);
