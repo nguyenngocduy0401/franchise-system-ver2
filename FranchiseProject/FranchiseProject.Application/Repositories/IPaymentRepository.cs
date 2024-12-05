@@ -11,5 +11,6 @@ namespace FranchiseProject.Application.Repositories
     public interface IPaymentRepository:IGenericRepository<Payment>
     {
         Task<List<Payment>> GetAllAsync(Expression<Func<Payment, bool>> filter);
+        Task<Payment?> GetFirstOrDefaultAsync(Expression<Func<Payment, bool>> filter);
     }
 }

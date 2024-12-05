@@ -14,6 +14,9 @@ namespace FranchiseProject.Domain.Entity
         public string? Description { get; set; }
         public int? Amount { get; set; }
         public PaymentTypeEnum? Type { get; set; }
+        public PaymentMethodEnum? Method { get; set; }
+        public PaymentStatus? Status { get; set; }
+        public string? ImageURL { get; set; }
         public Guid? ContractId { get; set; }
         [ForeignKey("ContractId")]
         public Contract? Contract { get; set; }
