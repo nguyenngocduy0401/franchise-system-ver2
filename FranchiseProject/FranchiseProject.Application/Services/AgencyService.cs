@@ -602,6 +602,8 @@ namespace FranchiseProject.Application.Services
                 Title = template.Title + agency.Name,
                 Description = template.Description,
                 StartDate = startTime,
+                Status = WorkStatusEnum.None,
+                Submit = WorkStatusSubmitEnum.None,
                 Type = template.Type,
                 Level = template.Level,
                 EndDate = endTime,
