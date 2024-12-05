@@ -1,14 +1,19 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation;
 using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
+using FranchiseProject.Application.Hubs;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AppointmentViewModels;
+using FranchiseProject.Application.ViewModels.NotificationViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,9 +32,10 @@ namespace FranchiseProject.Application.Services
         private readonly IValidator<CreateAppointmentModel> _createAppointmentValidator;
         private readonly IValidator<UpdateAppointmentModel> _updateAppointmentValidator;
         private readonly IValidator<SubmitAppointmentModel> _submitAppointmentValidator;
+        private readonly INotificationService _notificationService;
         public AppointmentService(IUnitOfWork unitOfWork, IMapper mapper, IClaimsService claimsService, IWorkService workService,
                 IValidator<CreateAppointmentModel> createAppointmentValidator, IValidator<UpdateAppointmentModel> updateAppointmentValidator,
-                IValidator<SubmitAppointmentModel> submitAppointmentValidator
+                IValidator<SubmitAppointmentModel> submitAppointmentValidator, INotificationService notificationService
                 )
         {
             _mapper = mapper;
@@ -39,6 +45,7 @@ namespace FranchiseProject.Application.Services
             _createAppointmentValidator = createAppointmentValidator;
             _updateAppointmentValidator = updateAppointmentValidator;
             _submitAppointmentValidator = submitAppointmentValidator;
+            _notificationService = notificationService;
         }
         public async Task<ApiResponse<AppointmentDetailViewModel>> GetAppointmentDetailByIdAsync(Guid id)
         {
@@ -81,6 +88,11 @@ namespace FranchiseProject.Application.Services
                 appointment.Status = AppointmentStatusEnum.None;
 
                 await _unitOfWork.AppointmentRepository.AddAsync(appointment);
+
+                if (!createAppointmentModel.UserId.IsNullOrEmpty())
+                {
+                    await SendAppointmentNoticationForStaffAsync(createAppointmentModel.UserId, Guid.Empty);
+                }
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
 
@@ -246,6 +258,17 @@ namespace FranchiseProject.Application.Services
                 response = ResponseHandler.Failure<bool>(ex.Message);
             }
             return response;
+        }
+        public async Task SendAppointmentNoticationForStaffAsync(List<string> users, Guid appointmentId) 
+        {
+            var userIds = await _unitOfWork.UserRepository.GetUserIdInAppoinmentAsync(appointmentId);
+            var userIdSender = _claimsService.GetCurrentUserId.ToString();
+            var usersNotExisted = users.Where(e => !userIds.Contains(e)).ToList();
+            if (!usersNotExisted.IsNullOrEmpty()) 
+            {
+                    var message = "Bạn đã được thêm vào một lịch hẹn trong một công việc. Vui lòng kiểm tra công việc của mình!";
+                    await _notificationService.CreateAndSendNotificationNoReponseAsync(new SendNotificationViewModel {message = message, userIds = usersNotExisted });
+            }
         }
     }
 }
