@@ -32,6 +32,11 @@ namespace FranchiseProject.API.Controllers
 			_assignmentService = assignmentService;
 			_workService = workService;
 		}
+        [Authorize()]
+        [SwaggerOperation(Summary = "cập nhật người dùng bằng login")]
+        [HttpPut()]
+        public async Task<ApiResponse<bool>> UpdateUserByLoginAsync(UpdateUserByLoginModel updateUserByLoginModel)
+            => await _userService.UpdateUserByLoginAsync(updateUserByLoginModel);
 
         [Authorize(Roles = AppRole.Manager)]
         [SwaggerOperation(Summary = "tìm kiếm nhân sự {Authorize = Manager}")]

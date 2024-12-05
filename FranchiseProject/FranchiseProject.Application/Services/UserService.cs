@@ -6,6 +6,7 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Utils;
+using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
@@ -39,13 +40,15 @@ namespace FranchiseProject.Application.Services
         private readonly IValidator<UpdateUserByAdminModel> _updateUserValidator;
         private readonly IValidator<UpdateUserByAgencyModel> _updateUserByAgencyValidator;
         private readonly IValidator<CreateUserByAgencyModel> _createUserByAgencyModel;
+        private readonly IValidator<UpdateUserByLoginModel> _updateUserByLoginValidator;
         #endregion
         public UserService(IClaimsService claimsService, IUnitOfWork unitOfWork,
             UserManager<User> userManager, RoleManager<Role> roleManager,
             IMapper mapper, IValidator<UpdatePasswordModel> updatePasswordValidator,
             IValidator<CreateUserByAdminModel> createUserValidator, IValidator<UpdateUserByAdminModel> updateUserValidator,
             IValidator<UpdateUserByAgencyModel> updateUserByAgencyValidator, ICurrentTime currentTime,
-            IValidator<CreateUserByAgencyModel> createUserByAgencyModel, IEmailService emailService)
+            IValidator<CreateUserByAgencyModel> createUserByAgencyModel, IEmailService emailService,
+            IValidator<UpdateUserByLoginModel> updateUserByLoginValidator)
         {
             _claimsService = claimsService;
             _unitOfWork = unitOfWork;
@@ -59,9 +62,32 @@ namespace FranchiseProject.Application.Services
             _currentTime = currentTime;
             _createUserByAgencyModel = createUserByAgencyModel;
             _emailService = emailService;
+            _updateUserByLoginValidator = updateUserByLoginValidator;
         }
+        public async Task<ApiResponse<bool>> UpdateUserByLoginAsync(UpdateUserByLoginModel updateUserByLoginModel)
+        {
 
+            var response = new ApiResponse<bool>();
+            try
+            {
+                ValidationResult validationResult = await _updateUserByLoginValidator.ValidateAsync(updateUserByLoginModel);
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+                var userId = _claimsService.GetCurrentUserId.ToString();
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null) throw new Exception("User not found!");
 
+                user = _mapper.Map(updateUserByLoginModel, user);
+                var isSuccess = await _userManager.UpdateAsync(user);
+                if (!isSuccess.Succeeded) throw new Exception("Update fail!");
+
+                response = ResponseHandler.Success(true, "Cập nhật người dùng thành công");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
         public async Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAgencyManagerAsync(FilterUserByAgencyModel filterUserByAgencyModel)
         {
             var response = new ApiResponse<Pagination<UserViewModel>>();
