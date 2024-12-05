@@ -87,25 +87,61 @@ namespace FranchiseProject.Infrastructures
             modelBuilder.Entity<WorkTemplate>().HasData(
             new WorkTemplate
                 {
+                    Id = Guid.Parse("84d281ba-8036-45b3-818e-f7b6b465fd21"),
+                    Title = "Chuẩn bị tài liệu cho buổi phỏng vấn đối tác - ",
+                    Description = "<p>Buổi phỏng vấn cần tập trung vào" +
+                    " các nội dung chính sau:</p>\r\n\r\n<ul>\r\n    " +
+                    "<li><strong>Năng lực tài chính:</strong> Xác minh khả năng tài chính của đối tác để đảm bảo họ đủ tiềm lực tham gia vào mô hình nhượng quyền.</li>\r\n   " +
+                    " <li><strong>Kinh nghiệm quản lý:</strong> Tìm hiểu quá trình làm việc, các dự án đã từng tham gia, và năng lực quản lý hiện tại của đối tác.</li>\r\n    " +
+                    "<li><strong>Mục tiêu phát triển:</strong> Trao đổi về định hướng chiến lược và kỳ vọng của đối tác khi tham gia vào mô hình nhượng quyền của công ty.</li>\r\n  " +
+                    "  <li><strong>Cam kết hợp tác:</strong> Đảm bảo đối tác hiểu và sẵn sàng tuân thủ các quy định, tiêu chuẩn, và lộ trình mà công ty đã đề ra.</li>\r\n</ul>\r\n\r\n<p>Nhân viên cần chuẩn bị trước các tài liệu sau:</p>\r\n<ul>\r\n    " +
+                    "<li>Tài liệu giới thiệu công ty</li>\r\n    " +
+                    "<li>Bộ câu hỏi phỏng vấn</li>\r\n   " +
+                    " <li>Biểu mẫu ghi chú hoặc checklist đánh giá</li>\r\n</ul>\r\n\r\n<p>Buổi phỏng vấn phải đảm bảo tính <strong>chuyên nghiệp</strong>, <strong>khách quan</strong>, và <strong>minh bạch</strong>," +
+                    " nhằm tạo ấn tượng tốt với đối tác. Sau buổi phỏng vấn, hãy lập báo cáo chi tiết về nội dung đã trao đổi, bao gồm:</p>\r\n<ul>\r\n  " +
+                    "  <li>Đánh giá sơ bộ về năng lực tài chính</li>\r\n    <li>Kinh nghiệm quản lý và điều hành</li>\r\n    " +
+                    "<li>Mức độ phù hợp với quy trình nhượng quyền</li>\r\n</ul>\r\n\r\n<p><em>Thời gian thực hiện:</em> 1-2 giờ</p>\r\n<p><em>Kết quả mong đợi:</em> Báo cáo chi tiết trình quản lý để xem xét và phê duyệt.</p>",
+                    Type = WorkTypeEnum.Interview,  
+                    Level = WorkLevelEnum.Optional,  
+                    StartDaysOffset = 3,
+                    DurationDays = 6,
+                },
+            new WorkTemplate
+                {
                     Id = Guid.Parse("0d55bc46-31f4-4022-9133-aaab78416a50"),
                     Title = "Phỏng vấn đối tác - ",
                     Description = "<p>Buổi phỏng vấn cần tập trung vào" +
-                " các nội dung chính sau:</p>\r\n\r\n<ul>\r\n    " +
-                "<li><strong>Năng lực tài chính:</strong> Xác minh khả năng tài chính của đối tác để đảm bảo họ đủ tiềm lực tham gia vào mô hình nhượng quyền.</li>\r\n   " +
-                " <li><strong>Kinh nghiệm quản lý:</strong> Tìm hiểu quá trình làm việc, các dự án đã từng tham gia, và năng lực quản lý hiện tại của đối tác.</li>\r\n    " +
-                "<li><strong>Mục tiêu phát triển:</strong> Trao đổi về định hướng chiến lược và kỳ vọng của đối tác khi tham gia vào mô hình nhượng quyền của công ty.</li>\r\n  " +
-                "  <li><strong>Cam kết hợp tác:</strong> Đảm bảo đối tác hiểu và sẵn sàng tuân thủ các quy định, tiêu chuẩn, và lộ trình mà công ty đã đề ra.</li>\r\n</ul>\r\n\r\n<p>Nhân viên cần chuẩn bị trước các tài liệu sau:</p>\r\n<ul>\r\n    " +
-                "<li>Tài liệu giới thiệu công ty</li>\r\n    " +
-                "<li>Bộ câu hỏi phỏng vấn</li>\r\n   " +
-                " <li>Biểu mẫu ghi chú hoặc checklist đánh giá</li>\r\n</ul>\r\n\r\n<p>Buổi phỏng vấn phải đảm bảo tính <strong>chuyên nghiệp</strong>, <strong>khách quan</strong>, và <strong>minh bạch</strong>," +
-                " nhằm tạo ấn tượng tốt với đối tác. Sau buổi phỏng vấn, hãy lập báo cáo chi tiết về nội dung đã trao đổi, bao gồm:</p>\r\n<ul>\r\n  " +
-                "  <li>Đánh giá sơ bộ về năng lực tài chính</li>\r\n    <li>Kinh nghiệm quản lý và điều hành</li>\r\n    " +
-                "<li>Mức độ phù hợp với quy trình nhượng quyền</li>\r\n</ul>\r\n\r\n<p><em>Thời gian thực hiện:</em> 1-2 giờ</p>\r\n<p><em>Kết quả mong đợi:</em> Báo cáo chi tiết trình quản lý để xem xét và phê duyệt.</p>", 
+                    " các nội dung chính sau:</p>\r\n\r\n<ul>\r\n    " +
+                    "<li><strong>Năng lực tài chính:</strong> Xác minh khả năng tài chính của đối tác để đảm bảo họ đủ tiềm lực tham gia vào mô hình nhượng quyền.</li>\r\n   " +
+                    " <li><strong>Kinh nghiệm quản lý:</strong> Tìm hiểu quá trình làm việc, các dự án đã từng tham gia, và năng lực quản lý hiện tại của đối tác.</li>\r\n    " +
+                    "<li><strong>Mục tiêu phát triển:</strong> Trao đổi về định hướng chiến lược và kỳ vọng của đối tác khi tham gia vào mô hình nhượng quyền của công ty.</li>\r\n  " +
+                    "  <li><strong>Cam kết hợp tác:</strong> Đảm bảo đối tác hiểu và sẵn sàng tuân thủ các quy định, tiêu chuẩn, và lộ trình mà công ty đã đề ra.</li>\r\n</ul>\r\n\r\n<p>Nhân viên cần chuẩn bị trước các tài liệu sau:</p>\r\n<ul>\r\n    " +
+                    "<li>Tài liệu giới thiệu công ty</li>\r\n    " +
+                    "<li>Bộ câu hỏi phỏng vấn</li>\r\n   " +
+                    " <li>Biểu mẫu ghi chú hoặc checklist đánh giá</li>\r\n</ul>\r\n\r\n<p>Buổi phỏng vấn phải đảm bảo tính <strong>chuyên nghiệp</strong>, <strong>khách quan</strong>, và <strong>minh bạch</strong>," +
+                    " nhằm tạo ấn tượng tốt với đối tác. Sau buổi phỏng vấn, hãy lập báo cáo chi tiết về nội dung đã trao đổi, bao gồm:</p>\r\n<ul>\r\n  " +
+                    "  <li>Đánh giá sơ bộ về năng lực tài chính</li>\r\n    <li>Kinh nghiệm quản lý và điều hành</li>\r\n    " +
+                    "<li>Mức độ phù hợp với quy trình nhượng quyền</li>\r\n</ul>\r\n\r\n<p><em>Thời gian thực hiện:</em> 1-2 giờ</p>\r\n<p><em>Kết quả mong đợi:</em> Báo cáo chi tiết trình quản lý để xem xét và phê duyệt.</p>", 
                     Type = WorkTypeEnum.Interview,
                     Level = WorkLevelEnum.Compulsory,
-                    StartDaysOffset = 3,
+                    StartDaysOffset = 7,
                     DurationDays = 2,
                 },
+            //Ký thỏa thuận 2 bên
+            new WorkTemplate
+            {
+                Id = Guid.Parse("94d839a2-6474-45d3-a00b-40e73fd41c0e"),
+                Title = "Chuẩn bị tài liệu thỏa thuận với đối tác - ",
+                Description = "<p>Buổi ký thỏa thuận nhằm đảm bảo đối tác đồng ý với các điều khoản cơ bản.</p>\r\n<ul>\r\n    " +
+                  "<li><strong>Kiểm tra:</strong> Rà soát kỹ các điều khoản thỏa thuận.</li>\r\n    " +
+                  "<li><strong>Ký thỏa thuận:</strong> Đại diện hai bên chính thức xác nhận đồng ý hợp tác.</li>\r\n</ul>\r\n" +
+                  "<p><strong>Nhân viên cần chuẩn bị:</strong> Bản dự thảo thỏa thuận và tài liệu pháp lý liên quan.</p>\r\n" +
+                  "<p><strong>Thời gian:</strong> 1-2 giờ</p>\r\n<p><strong>Kết quả:</strong> Thỏa thuận được ký và lưu trữ.</p>",
+                Type = WorkTypeEnum.AgreementSigned, 
+                Level = WorkLevelEnum.Optional,  
+                StartDaysOffset = 2,
+                DurationDays = 4,
+            },
             //Ký thỏa thuận 2 bên
             new WorkTemplate
             {
@@ -118,8 +154,33 @@ namespace FranchiseProject.Infrastructures
                   "<p><strong>Thời gian:</strong> 1-2 giờ</p>\r\n<p><strong>Kết quả:</strong> Thỏa thuận được ký và lưu trữ.</p>",
                 Type = WorkTypeEnum.AgreementSigned,
                 Level = WorkLevelEnum.Compulsory,
-                StartDaysOffset = 3,
-                DurationDays = 1,
+                StartDaysOffset = 5,
+                DurationDays = 2,
+            },
+            // BusinessRegistered - Đăng ký doanh nghiệp
+            new WorkTemplate
+            {
+                Id = Guid.Parse("9c2afe38-a9cb-482f-88ba-f1f043b07537"),
+                Title = "Hỗ trợ đối tác chuẩn bị đăng ký doanh nghiệp - ",
+                Description = "<p>Hỗ trợ đối tác hoàn tất thủ tục chuẩn bị giấy tờ đăng ký doanh nghiệp, đảm bảo đầy đủ và chính xác trước khi nộp hồ sơ.</p>\r\n" +
+                "<p><strong>Các bước thực hiện:</strong></p>\r\n<ul>\r\n" +
+                "    <li><strong>Hướng dẫn chuẩn bị giấy tờ:</strong> Cung cấp danh sách các tài liệu cần thiết và biểu mẫu liên quan.</li>\r\n" +
+                "    <li><strong>Kiểm tra và rà soát:</strong> Đảm bảo các giấy tờ được hoàn thiện đúng quy cách và đủ thông tin.</li>\r\n" +
+                "    <li><strong>Hỗ trợ xử lý bổ sung:</strong> Nếu có giấy tờ còn thiếu hoặc cần chỉnh sửa, hỗ trợ đối tác hoàn thiện nhanh chóng.</li>\r\n" +
+                "</ul>\r\n" +
+                "<p><strong>Danh sách giấy tờ cần chuẩn bị:</strong></p>\r\n<ul>\r\n" +
+                "    <li>Giấy chứng nhận đầu tư (nếu có)</li>\r\n" +
+                "    <li>Hợp đồng thuê văn phòng hoặc giấy xác nhận địa điểm kinh doanh</li>\r\n" +
+                "    <li>Bản sao công chứng CMND/CCCD hoặc hộ chiếu của người đại diện pháp luật</li>\r\n" +
+                "    <li>Điều lệ công ty</li>\r\n" +
+                "    <li>Danh sách thành viên/cổ đông sáng lập (nếu có)</li>\r\n" +
+                "    <li>Biểu mẫu đơn đăng ký kinh doanh</li>\r\n</ul>\r\n" +
+                "<p><strong>Kết quả mong đợi:</strong> Bộ hồ sơ đầy đủ và hợp lệ để đối tác tiến hành nộp tại cơ quan đăng ký kinh doanh hoặc qua cổng thông tin trực tuyến.</p>\r\n" +
+                "<p><em>Thời gian thực hiện:</em> 3-5 ngày</p>",
+                Type = WorkTypeEnum.BusinessRegistered, 
+                Level = WorkLevelEnum.Optional,  
+                StartDaysOffset = 2,  
+                DurationDays = 5,  
             },
             // BusinessRegistered - Đăng ký doanh nghiệp
             new WorkTemplate
@@ -136,7 +197,7 @@ namespace FranchiseProject.Infrastructures
                 DurationDays = 14,
             },
             // SiteSurvey - Khảo sát mặt bằng
-            new WorkTemplate
+            new WorkTemplate 
             {
                 Id = Guid.Parse("b65da998-1aa3-420c-91d5-f0991e95e7bf"),
                 Title = "Khảo sát mặt bằng - ",
@@ -216,6 +277,21 @@ namespace FranchiseProject.Infrastructures
                 DurationDays = 15,
                 
             },
+            // Pre-Handover Check - Kiểm tra trước khi bàn giao
+            new WorkTemplate
+            {
+                Id = Guid.Parse("cd26155a-cba6-46f7-907b-4f2cf376577b"),
+                Title = "Kiểm tra trước khi bàn giao cơ sở - ",
+                Description = "<p>Thực hiện kiểm tra cơ sở kinh doanh và các trang thiết bị để đảm bảo sẵn sàng cho bàn giao.</p>\r\n<ul>\r\n" +
+                "    <li><strong>Kiểm tra công trình:</strong> Đảm bảo cơ sở được hoàn thiện đúng tiêu chuẩn.</li>\r\n" +
+                "    <li><strong>Kiểm tra trang thiết bị:</strong> Đảm bảo các thiết bị được lắp đặt đầy đủ và vận hành tốt.</li>\r\n" +
+                "    <li><strong>Kiểm tra tài liệu:</strong> Chuẩn bị các tài liệu vận hành và hướng dẫn cần thiết.</li>\r\n" +
+                "</ul>\r\n<p><em>Thời gian thực hiện:</em> 1 ngày.</p>",
+                Type = WorkTypeEnum.Handover,  // Loại công việc mới cho kiểm tra trước
+                Level = WorkLevelEnum.Optional,  // Mức độ bắt buộc
+                StartDaysOffset = 3,  // Bắt đầu kiểm tra trước bàn giao
+                DurationDays = 1,  // Thời gian kiểm tra
+            },
             // Handover - Bàn giao
             new WorkTemplate
             {
@@ -232,6 +308,21 @@ namespace FranchiseProject.Infrastructures
             // EducationLicenseRegistered - Đăng ký giấy phép giáo dục
             new WorkTemplate
             {
+                Id = Guid.Parse("b50e9228-1d2f-46d2-b0d3-af13f2f23499"), // Tạo Guid mới
+                Title = "Hỗ trợ trung tâm chuẩn bị đăng ký giấy phép giáo dục - ",
+                Description = "<p>Hỗ trợ trung tâm chuẩn bị và hoàn thiện hồ sơ đăng ký giấy phép giáo dục.</p>\r\n<ul>\r\n" +
+                "    <li><strong>Hướng dẫn chuẩn bị hồ sơ:</strong> Cung cấp danh sách các tài liệu cần thiết và biểu mẫu theo quy định.</li>\r\n" +
+                "    <li><strong>Kiểm tra hồ sơ:</strong> Rà soát và đảm bảo hồ sơ đầy đủ, chính xác trước khi nộp.</li>\r\n" +
+                "    <li><strong>Hỗ trợ xử lý các vấn đề:</strong> Hỗ trợ trung tâm trong việc bổ sung hoặc điều chỉnh tài liệu nếu cần thiết.</li>\r\n" +
+                "</ul>\r\n<p><strong>Kết quả mong đợi:</strong> Một bộ hồ sơ hoàn chỉnh, sẵn sàng nộp tại cơ quan quản lý giáo dục.</p>\r\n<p><em>Thời gian thực hiện:</em> 3-5 ngày.</p>",
+                Type = WorkTypeEnum.EducationLicenseRegistered, 
+                Level = WorkLevelEnum.Optional, 
+                StartDaysOffset = 1,  
+                DurationDays = 5,  
+            },
+            // EducationLicenseRegistered - Đăng ký giấy phép giáo dục
+            new WorkTemplate
+            {
                 Id = Guid.Parse("67794a20-9e8b-49d3-a0ff-de4b5366e4af"),
                 Title = "Đăng ký giấy phép giáo dục - ",
                 Description = "<p>Hoàn tất đăng ký giấy phép giáo dục để vận hành cơ sở kinh doanh.</p>\r\n<ul>\r\n" +
@@ -240,7 +331,7 @@ namespace FranchiseProject.Infrastructures
                 "    <li><strong>Nhận giấy phép:</strong> Sau khi hồ sơ được phê duyệt.</li>\r\n</ul>\r\n<p><em>Thời gian thực hiện:</em> 7-10 ngày.</p>",
                 Type = WorkTypeEnum.EducationLicenseRegistered,
                 Level = WorkLevelEnum.Compulsory,
-                StartDaysOffset = 2,
+                StartDaysOffset = 6,
                 DurationDays = 14,
                 
             }
@@ -260,6 +351,17 @@ namespace FranchiseProject.Infrastructures
                 new AppointmentTemplate
                 {
                     Id = Guid.NewGuid(),
+                    Title = "Chuẩn bị tài liệu thỏa thuận với đối tác - ",
+                    StartDaysOffset = 1, // 1 ngày sau khi công việc bắt đầu
+                    DurationHours = 2, // Thời lượng 2 giờ
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Địa chỉ công ty hoặc cuộc họp trực tuyến]</li>\r\n</ul>\r\n" +
+                    "<p><strong>Hướng dẫn:</strong> Hãy chuẩn bị đầy đủ tài liệu thỏa thuận trước khi tham dự.</p>",
+                    Type = AppointmentTypeEnum.WithAgency,
+                    WorkId = Guid.Parse("84d281ba-8036-45b3-818e-f7b6b465fd21"), // Liên kết với công việc "Chuẩn bị tài liệu thỏa thuận với đối tác"
+                },
+                new AppointmentTemplate
+                {
+                    Id = Guid.NewGuid(),
                     Title = "Ký thỏa thuận với đối tác - ",
                     StartDaysOffset = 1,
                     DurationHours = 3,
@@ -273,13 +375,24 @@ namespace FranchiseProject.Infrastructures
                 },
                 new AppointmentTemplate
                 {
+                    Id = Guid.NewGuid(),
+                    Title = "Họp hỗ trợ đối tác chuẩn bị đăng ký doanh nghiệp - ",
+                    StartDaysOffset = 1, 
+                    DurationHours = 3,
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Địa chỉ công ty hoặc cuộc họp trực tuyến]</li>\r\n</ul>\r\n" +
+                  "<p><strong>Mục tiêu:</strong> Đảm bảo các giấy tờ cần thiết đã sẵn sàng để nộp hồ sơ.</p>",
+                    Type = AppointmentTypeEnum.WithAgency,
+                    WorkId = Guid.Parse("9c2afe38-a9cb-482f-88ba-f1f043b07537"), 
+                },
+                new AppointmentTemplate
+                {
                     Id = Guid.Parse("afbdf461-51f9-45cf-b559-e622fe8df67f"),
                     Title = "Đăng ký doanh nghiệp - ",
                     StartDaysOffset = 1,
                     DurationHours = 3,
                     Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Cơ quan đăng ký hoặc trực tuyến]</li>\r\n</ul>",
                     Type = AppointmentTypeEnum.Internal,
-
+                    WorkId = Guid.Parse("afbdf461-51f9-45cf-b559-e622fe8df67f"),
                 },
                 new AppointmentTemplate
                 {
@@ -288,7 +401,8 @@ namespace FranchiseProject.Infrastructures
                     StartDaysOffset = 1,
                     DurationHours = 3,
                     Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Vị trí mặt bằng]</li>\r\n</ul>",
-                    Type = AppointmentTypeEnum.Internal
+                    Type = AppointmentTypeEnum.Internal,
+                    WorkId = Guid.Parse("b65da998-1aa3-420c-91d5-f0991e95e7bf"),
                 },
                 new AppointmentTemplate
                 {
@@ -298,6 +412,7 @@ namespace FranchiseProject.Infrastructures
                     DurationHours = 3,
                     Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Văn phòng hoặc trực tuyến]</li>\r\n</ul>",
                     Type = AppointmentTypeEnum.Internal,
+                    WorkId = Guid.Parse("94cbecc0-55be-4235-8fbe-de70c033eb5e"),
                 },
                 new AppointmentTemplate
                 {
@@ -306,7 +421,8 @@ namespace FranchiseProject.Infrastructures
                     StartDaysOffset = 1,
                     DurationHours = 3,
                     Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Trực tuyến hoặc văn phòng]</li>\r\n</ul>",
-                    Type = AppointmentTypeEnum.WithAgency
+                    Type = AppointmentTypeEnum.WithAgency,
+                    WorkId = Guid.Parse("b87ed201-95f9-4518-bb34-dc4fd76dba5f"),
                 },
                 new AppointmentTemplate
                 {
@@ -315,7 +431,8 @@ namespace FranchiseProject.Infrastructures
                     StartDaysOffset = 1,
                     DurationHours = 3,
                     Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Văn phòng hoặc địa điểm ký kết]</li>\r\n</ul>",
-                    Type = AppointmentTypeEnum.WithAgency
+                    Type = AppointmentTypeEnum.WithAgency,
+                    WorkId = Guid.Parse("6f4c22b7-4656-46fc-90b8-dd0722853ba9"),
                 },
                 new AppointmentTemplate
                 {
@@ -324,7 +441,8 @@ namespace FranchiseProject.Infrastructures
                     StartDaysOffset = 1,
                     DurationHours = 6,
                     Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Trung tâm chính]</li>\r\n</ul>",
-                    Type = AppointmentTypeEnum.WithAgency
+                    Type = AppointmentTypeEnum.WithAgency,
+                    WorkId = Guid.Parse("6f4c22b7-4656-46fc-90b8-dd0722853ba9"),
                 },
                 new AppointmentTemplate
                 {
@@ -333,16 +451,40 @@ namespace FranchiseProject.Infrastructures
                     StartDaysOffset = 1,
                     DurationHours = 6,
                     Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Cơ sở kinh doanh]</li>\r\n</ul>",
-                    Type = AppointmentTypeEnum.Internal
+                    Type = AppointmentTypeEnum.Internal,
+                    WorkId = Guid.Parse("7cc745a9-e95b-43bb-92e4-f5e15b7b65bd"),
                 },
                 new AppointmentTemplate
                 {
-                    Id = Guid.Parse("e10ba8cb-2ad9-4e69-b086-ed7487b6856a"),
-                    Title = "Bàn giao cơ sở - ",
-                    StartDaysOffset = 1,
-                    DurationHours = 5,
-                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Cơ sở kinh doanh]</li>\r\n</ul>",
-                    Type = AppointmentTypeEnum.WithAgency
+                    Id = Guid.NewGuid(),
+                    Title = "Họp kiểm tra trước khi bàn giao cơ sở - ",
+                    StartDaysOffset = 1, 
+                    DurationHours = 3, 
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Địa chỉ cụ thể]</li>\r\n</ul>\r\n" +
+                  "<p><strong>Mục tiêu:</strong> Đảm bảo cơ sở, trang thiết bị, và tài liệu vận hành sẵn sàng cho bàn giao.</p>",
+                    Type = AppointmentTypeEnum.Internal, 
+                    WorkId = Guid.Parse("cd26155a-cba6-46f7-907b-4f2cf376577b"), 
+                },
+                new AppointmentTemplate
+                {
+                        Id = Guid.Parse("e10ba8cb-2ad9-4e69-b086-ed7487b6856a"),
+                        Title = "Bàn giao cơ sở - ",
+                        StartDaysOffset = 1,
+                        DurationHours = 5,
+                        Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Cơ sở kinh doanh]</li>\r\n</ul>",
+                        Type = AppointmentTypeEnum.WithAgency,
+                        WorkId = Guid.Parse("e10ba8cb-2ad9-4e69-b086-ed7487b6856a"),
+                },
+                new AppointmentTemplate
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Họp hỗ trợ chuẩn bị giấy phép giáo dục - ",
+                    StartDaysOffset = 1, // Cùng ngày bắt đầu với công việc
+                    DurationHours = 3, // Thời lượng cuộc hẹn là 3 giờ
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Địa chỉ cụ thể hoặc họp trực tuyến]</li>\r\n</ul>\r\n" +
+                    "<p><strong>Mục tiêu:</strong> Hỗ trợ trung tâm chuẩn bị hồ sơ và hoàn thiện giấy phép giáo dục.</p>",
+                    Type = AppointmentTypeEnum.WithAgency,
+                    WorkId = Guid.Parse("b50e9228-1d2f-46d2-b0d3-af13f2f23499"), // Liên kết với công việc "Hỗ trợ trung tâm chuẩn bị đăng ký giấy phép giáo dục"
                 },
                 new AppointmentTemplate
                 {
@@ -351,7 +493,8 @@ namespace FranchiseProject.Infrastructures
                     StartDaysOffset = 1,
                     DurationHours = 3,
                     Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Cơ quan quản lý giáo dục]</li>\r\n</ul>",
-                    Type = AppointmentTypeEnum.WithAgency
+                    Type = AppointmentTypeEnum.WithAgency,
+                    WorkId = Guid.Parse("67794a20-9e8b-49d3-a0ff-de4b5366e4af"),
                 }
             );
             #region HomePage
