@@ -221,6 +221,8 @@ namespace FranchiseProject.API
 
             services.AddTransient<IValidator<CreateAppointmentTemplateModel>, CreateAppointmentTemplateValidator>();
             services.AddTransient<IValidator<UpdateAppointmentTemplateModel>, UpdateAppointmentTemplateValidator>();
+
+            services.AddTransient<IValidator<UpdateUserByLoginModel>, UpdateUserByLoginValidator>();
             #endregion
             return services;
         }

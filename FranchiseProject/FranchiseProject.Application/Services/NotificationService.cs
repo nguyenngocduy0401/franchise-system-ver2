@@ -30,7 +30,39 @@ namespace FranchiseProject.Application.Services
             _hubContext = hubContext;
         }
 
-   
+        public async Task CreateAndSendNotificationNoReponseAsync(SendNotificationViewModel sendNotificationViewModel)
+        {
+
+
+            if (sendNotificationViewModel.userIds == null || sendNotificationViewModel.userIds.Count == 0 || string.IsNullOrEmpty(sendNotificationViewModel.message))
+            {
+            }
+            else
+            {
+                var notifications = new List<Notification>();
+                foreach (var userId in sendNotificationViewModel.userIds)
+                {
+                    var notification = new Notification
+                    {
+                        SenderId = _claimsService.GetCurrentUserId.ToString(),
+                        ReceiverId = userId,
+                        Message = sendNotificationViewModel.message,
+                        CreationDate = DateTime.UtcNow,
+                        IsRead = false
+                    };
+                    notifications.Add(notification);
+                }
+                await _unitOfWork.NotificationRepository.AddRangeAsync(notifications);
+                foreach (var userId in sendNotificationViewModel.userIds)
+                {
+                    var unreadCount = await _unitOfWork.NotificationRepository.GetUnreadNotificationCountByUserIdAsync(userId);
+
+                    await _hubContext.Clients.User(userId).SendAsync("ReceivedNotification", sendNotificationViewModel.message);
+                    await _hubContext.Clients.User(userId).SendAsync("UpdateUnreadNotificationCount", unreadCount);
+                }
+            }
+
+        }
 
         public async Task<ApiResponse<bool>> CreateAndSendNotificationAsync(SendNotificationViewModel sendNotificationViewModel)
         {

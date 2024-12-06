@@ -19,5 +19,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> UpdateAppointmentAsync(Guid id, UpdateAppointmentModel updateAppointmentModel);
         Task<ApiResponse<IEnumerable<AppointmentViewModel>>> GetScheduleByLoginAsync(FilterScheduleAppointmentViewModel search);
         Task<ApiResponse<IEnumerable<AppointmentViewModel>>> GetScheduleAgencyByLoginAsync(FilterScheduleAppointmentViewModel search);
+        Task SendAppointmentNoticationForStaffAsync(List<string> users, Guid appointmentId);
     }
 }

@@ -96,7 +96,7 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<User, CreateUserViewModel>();
             CreateMap<User, UserWorkViewModel>().ForMember(dest => dest.Role, opt => opt.MapFrom(src =>
             src.UserRoles == null ? null : src.UserRoles.Select(ur => ur.Role.Name).FirstOrDefault())); ;
-
+            CreateMap<UpdateUserByLoginModel, User>();
             #endregion
             #region Slot
             CreateMap<CreateSlotModel, Slot>();
@@ -312,7 +312,6 @@ namespace FranchiseProject.Infrastructures.Mappers
             #region Work
             CreateMap<CreateWorkModel, Work>();
             CreateMap<UpdateWorkModel, Work>();
-            CreateMap<Work, WorkViewModel>();
             CreateMap<Work, WorkViewModel>()
                 .ForMember(dest => dest.AgencyViewModel, opt => opt.MapFrom(src => src.Agency));
             CreateMap<Work, WorkDetailViewModel>();
