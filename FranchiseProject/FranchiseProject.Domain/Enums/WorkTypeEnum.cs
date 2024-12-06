@@ -25,6 +25,7 @@ namespace FranchiseProject.Domain.Enums
         RepairingEquipment,                    // Sửa chữa thiết bị
         EducationalSupervision,  // Giám sát hoạt động giáo dục
         RenewContract, // Gia hạn hợp đồng 
+        RenewEducationLicense, //Gia hạn giấy phép giáo dục
         Other, 
     }
 }
