@@ -24,5 +24,7 @@ namespace FranchiseProject.Application.Repositories
         Task<ClassRoom> GetClassRoomsByClassIdAndInstructorRoleAsync(Guid classId);
         Task<bool> UpdatesAsync(ClassRoom room);
         Task<List<ClassRoom>> GetClassRoomsWithNullStatusAndToDateAsync();
+        Task<List<string>> GetInstructorUserIdsByClassIdAsync(Guid classId);
+
     }
 }

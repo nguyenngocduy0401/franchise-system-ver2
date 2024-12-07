@@ -71,5 +71,9 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Where(c => c != null)
                 .ToListAsync();
         }
+        public async Task<List<Class>> GetAllAsync1(Expression<Func<Class, bool>> predicate)
+        {
+            return await _dbContext.Set<Class>().Where(predicate).ToListAsync();
+        }
     }
 }

@@ -420,9 +420,12 @@ namespace FranchiseProject.Application.Services
                         using (var uploadStream = new MemoryStream(pdfBytes))
                         {
                             string firebaseUrl = await _firebaseService.UploadFileAsync(uploadStream, fileName);
-
-                            contract.ContractDocumentImageURL = firebaseUrl;
-                            _unitOfWork.ContractRepository.Update(contract);
+                            if (contract.ContractDocumentImageURL == null)
+                            {
+                                contract.ContractDocumentImageURL = firebaseUrl;
+                                _unitOfWork.ContractRepository.Update(contract);
+                            }
+                          
                             await _unitOfWork.SaveChangeAsync();
 
                             return ResponseHandler.Success(firebaseUrl, "File hợp đồng đã được tải lên thành công.");

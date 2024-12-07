@@ -194,7 +194,7 @@ namespace FranchiseProject.Application.Services
                         break;
                 }
                 registerCourse.ConsultanId = _claimsService.GetCurrentUserId.ToString();
-
+                registerCourse.ModificationDate = DateTime.Now;
                 await  _unitOfWork.RegisterCourseRepository.UpdateAsync(registerCourse);
                 await _unitOfWork.SaveChangeAsync();
 

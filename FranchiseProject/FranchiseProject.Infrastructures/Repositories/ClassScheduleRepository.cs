@@ -87,5 +87,9 @@ namespace FranchiseProject.Infrastructures.Repositories
                     .ThenInclude(a => a.User)
                 .FirstOrDefaultAsync(cs => cs.Id == id);
         }
+        public async Task<ClassSchedule> GetFirstOrDefaultAsync(Expression<Func<ClassSchedule, bool>> predicate)
+        {
+            return await _dbContext.Set<ClassSchedule>().FirstOrDefaultAsync(predicate);
+        }
     }
 }

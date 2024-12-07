@@ -18,3 +18,4 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModels
         public string? AgencyId { get; set; }
     }
 }
+    

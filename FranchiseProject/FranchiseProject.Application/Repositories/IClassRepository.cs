@@ -15,6 +15,7 @@ namespace FranchiseProject.Application.Repositories
         Task<int> CountAsync(Expression<Func<Class, bool>> filter = null);
         Task<List<User>> GetStudentsByClassIdAsync(Guid classId);
         Task<List<Class>> GetClassesByUserIdAsync(string userId);
+        Task<List<Class>> GetAllAsync1(Expression<Func<Class, bool>> predicate);
 
     }
 }
