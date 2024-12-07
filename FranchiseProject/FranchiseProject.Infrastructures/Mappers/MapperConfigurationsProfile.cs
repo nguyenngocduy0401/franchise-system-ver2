@@ -41,6 +41,7 @@ using FranchiseProject.Application.ViewModels.EquipmentViewModels;
 using FranchiseProject.Application.ViewModels.HomePageViewModels;
 using FranchiseProject.Application.ViewModels.WorkTemplateViewModels;
 using FranchiseProject.Application.ViewModels.AppointmentTemplateViewModels;
+using FranchiseProject.Application.ViewModels.ReportViewModels;
 
 
 
@@ -371,6 +372,16 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<CreateWorkTemplateModel, WorkTemplate>();
             CreateMap<WorkTemplate, WorkTemplateDetailViewModel>()
                 .ForMember(dest => dest.Appointments, opt => opt.MapFrom(src => src.Appointments));
+            #endregion
+            #region Report
+            CreateMap<Report, ReportViewModel>();
+            CreateMap<Pagination<Report>, Pagination<ReportViewModel>>()
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
+            CreateMap<Report, ReportViewModel>()
+       .ForMember(dest => dest.Equipments, opt => opt.MapFrom(src => src.Equipments));
+            CreateMap<Pagination<Report>, Pagination<ReportViewModel>>()
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
+            CreateMap<Equipment, EquipmentViewModel>();
             #endregion
         }
     }

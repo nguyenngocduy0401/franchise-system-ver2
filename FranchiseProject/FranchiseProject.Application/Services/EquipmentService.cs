@@ -134,6 +134,7 @@ namespace FranchiseProject.Application.Services
                         {
                             Equipment = equipment,
                             SerialNumber = serialNumber,
+                            StartDate=DateTime.Now
                         };
                         serialNumberHistoriesToAdd.Add(serialNumberHistory);
                     }

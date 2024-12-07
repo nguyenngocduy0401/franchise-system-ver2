@@ -167,7 +167,75 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<bool>> AgencyUploadUploadContractAsync(string ContractDocumentImageURL,Guid AgencyId)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+               
+             //   var agencyId = Guid.Parse(create.AgencyId);
+                var existAgency = await _unitOfWork.AgencyRepository.GetByIdAsync(AgencyId);
+                if (existAgency == null)
+                {
+                    response.Data = false;
+                    response.isSuccess = true;
+                    response.Message = "Không tìm thấy đối tác ";
+                    return response;
+                }
+                if (existAgency.Status != AgencyStatusEnum.Processing)
+                {
+                    response.Data = false;
+                    response.isSuccess = true;
+                    response.Message = "Đối tác chưa thể đăng kí nhượng quyền.";
+                    return response;
+                }
+                var activeContract = await _unitOfWork.ContractRepository.GetActiveContractByAgencyIdAsync(AgencyId);
 
+                if (activeContract != null)
+                {
+                    response.Data = false;
+                    response.isSuccess = true;
+                    response.Message = "Đối tác đã có hợp đồng đang trong thời hạn.";
+                    return response;
+                }
+                var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(AgencyId);
+               // contract.ContractCode = await GenerateUniqueContractCode();
+                var franchiseFee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
+            
+                contract.ContractDocumentImageURL = ContractDocumentImageURL;
+
+                // contract.FrachiseFee = franchiseFee.Sum(f => f.FeeAmount);
+                _unitOfWork.ContractRepository.Update(contract);
+                var isSuccess = await _unitOfWork.SaveChangeAsync();
+                if (isSuccess > 0)
+                {
+                    var emailResponse = await _emailService.SendContractEmailAsync(existAgency.Email, contract.ContractDocumentImageURL);
+                    if (!emailResponse.isSuccess)
+                    {
+                        response.Message = "Tải lên thành công, nhưng không thể gửi email đính kèm hợp đồng.";
+                    }
+                    response.Data = true;
+                    response.isSuccess = true;
+                    response.Message = "Tải lên thành công !";
+                }
+                else
+                {
+                    throw new Exception("Create unsuccesfully ");
+                }
+            }
+            catch (DbException ex)
+            {
+                response.isSuccess = false;
+                response.Message = ex.Message;
+
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
         public async Task<ApiResponse<bool>> UpdateContractAsync(UpdateContractViewModel update, string id)
         {
             var response = new ApiResponse<bool>();

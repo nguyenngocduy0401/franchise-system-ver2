@@ -174,7 +174,13 @@ namespace FranchiseProject.Application.Services
             emailMessage.From.Add(new MailboxAddress("No-reply:FutureTech", _appConfiguration.EmailConfiguration.From));
             emailMessage.To.Add(new MailboxAddress(agencyEmail, agencyEmail));
             emailMessage.Subject = ": Your Contract Document";
-
+            if (string.IsNullOrEmpty(agencyEmail))
+            {
+                response.Data = false;
+                response.isSuccess = true;
+                response.Message = "Email address cannot be null or empty.";
+                return response;
+            }
             // Create email body with a link to the contract document
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
             {

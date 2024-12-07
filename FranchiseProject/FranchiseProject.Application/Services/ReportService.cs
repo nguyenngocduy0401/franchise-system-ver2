@@ -272,13 +272,13 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<Pagination<ReportViewModel>>();
             try
             {
-                var userCurrentId = _claimsService.GetCurrentUserId;
+                /*var userCurrentId = _claimsService.GetCurrentUserId;
                 var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
 
                 if (userCurrent == null || !userCurrent.AgencyId.HasValue)
                 {
                     return ResponseHandler.Failure<Pagination<ReportViewModel>>("User hoặc Agency không khả dụng!");
-                }
+                }*/
 
                 Expression<Func<Report, bool>> filter = r =>
                     (!filterReportModel.AgencyId.HasValue || r.AgencyId == filterReportModel.AgencyId) &&
