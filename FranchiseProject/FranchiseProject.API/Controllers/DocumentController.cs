@@ -50,8 +50,8 @@ namespace FranchiseProject.API.Controllers
         {
             return await _documentService.GetDocumentByIdAsync(id);
         }
-        [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician)]
-        [SwaggerOperation(Summary = "Tìm kiếm tài liệu{Authorize = Manager, Admin,SystemTechnician}")]
+        [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician+","+AppRole.AgencyManager)]
+        [SwaggerOperation(Summary = "Tìm kiếm tài liệu{Authorize = Manager, Admin,SystemTechnician,AgencyManager}")]
         [HttpGet()]
         public async Task<ApiResponse<Pagination<DocumentViewModel>>> FilterDocumentAsync([FromQuery] FilterDocumentViewModel filterDocumentModel)
         {
