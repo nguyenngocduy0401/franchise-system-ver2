@@ -12,8 +12,8 @@ namespace FranchiseProject.Application.ViewModels.PaymentViewModel.PaymentContra
     public class PaymentContractViewModel
     {
      
-            public string? Title { get; set; }
-            public string? Description { get; set; }
+            //public string? Title { get; set; }
+            //public string? Description { get; set; }
             public Guid? ContractId { get; set; }
         }
     }
