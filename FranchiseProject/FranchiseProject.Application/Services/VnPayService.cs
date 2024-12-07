@@ -78,8 +78,8 @@ namespace FranchiseProject.Application.Services
             var payment = new Payment
             {
                 Id = paymentId,
-                Title=paymentContract.Title,
-                Description=paymentContract.Description,
+                Title="Thanh toán "+ contract.Title,
+                Description= "Thanh toán " + contract.Title + DateTime.Now,
                 Type=PaymentTypeEnum.Contract,
                 Method=PaymentMethodEnum.BankTransfer,
                 Amount = amount,
