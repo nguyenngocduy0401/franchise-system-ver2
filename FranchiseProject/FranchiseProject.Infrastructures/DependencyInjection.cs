@@ -67,6 +67,8 @@ namespace FranchiseProject.Infrastructures
 
             services.AddScoped<IVnPayService, VnPayService>();
 
+            services.AddScoped<IDashboardService, DashboardService>();
+
             #endregion
             #region Repository DI
             services.AddScoped<IAgencyRepository, AgencyRepository>();

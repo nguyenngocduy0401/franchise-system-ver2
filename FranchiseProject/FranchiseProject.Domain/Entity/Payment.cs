@@ -12,7 +12,7 @@ namespace FranchiseProject.Domain.Entity
     {
         public string? Title { get; set; }
         public string? Description { get; set; }
-        public int? Amount { get; set; }
+        public double? Amount { get; set; }
         public PaymentTypeEnum? Type { get; set; }
         public PaymentMethodEnum? Method { get; set; }
         public PaymentStatus? Status { get; set; }

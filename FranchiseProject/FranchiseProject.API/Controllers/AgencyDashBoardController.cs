@@ -29,7 +29,7 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.AgencyManager)]
         [SwaggerOperation(Summary = "báo cáo doanh thu  theo ngày   {Authorize = AgencyManager}")]
         [HttpGet("")]
-        public async Task<ApiResponse<int>> GetTotalRevenueFromRegisterCourseAsync(DateTime startDate, DateTime endDate)
+        public async Task<ApiResponse<double>> GetTotalRevenueFromRegisterCourseAsync(DateTime startDate, DateTime endDate)
         {
             return await _agencyDashboardService.GetTotalRevenueFromRegisterCourseAsync(startDate,endDate);
         }

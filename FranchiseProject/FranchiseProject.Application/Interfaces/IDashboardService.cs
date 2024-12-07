@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Domain.Enums
+namespace FranchiseProject.Application.Interfaces
 {
-    public enum PaymentTypeEnum
+    public interface IDashboardService
     {
-        Contract,
-        Course,
-        MonthlyDue
     }
 }

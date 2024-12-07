@@ -52,7 +52,7 @@ namespace FranchiseProject.Application.Services
                 foreach (var course in courseList)
                 {
                     var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id);
-                    var TotalMoney = 0;
+                    var TotalMoney = (double)0;
                     var studentCount = 0; 
                     var validRegistrations = filteredRegisterCourses
                 .Where(r => r.CreationDate.Date <= endDate.Date)
@@ -87,9 +87,9 @@ namespace FranchiseProject.Application.Services
 
             return response;
         }
-        public async Task<ApiResponse<int>> GetTotalRevenueFromRegisterCourseAsync(DateTime startDate, DateTime endDate)
+        public async Task<ApiResponse<double>> GetTotalRevenueFromRegisterCourseAsync(DateTime startDate, DateTime endDate)
         {
-            var response = new ApiResponse<int>();
+            var response = new ApiResponse<double>();
 
             try
             {
@@ -97,10 +97,10 @@ namespace FranchiseProject.Application.Services
                 var userCurrentId = _claimsService.GetCurrentUserId;
                 var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
                 var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(userCurrent.AgencyId.Value);
-                var totalMoney = 0;
+                var totalMoney = (double)0;
                 if (userCurrent == null || !userCurrent.AgencyId.HasValue)
                 {
-                    return ResponseHandler.Success<int>(0,"User hoặc Agency không khả dụng!");
+                    return ResponseHandler.Success<double>(0,"User hoặc Agency không khả dụng!");
                 }
                 foreach (var registration in registerCourses)
                 {
@@ -118,7 +118,7 @@ namespace FranchiseProject.Application.Services
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<int>($"Lỗi khi tính tổng doanh thu: {ex.Message}");
+                response = ResponseHandler.Failure<double>($"Lỗi khi tính tổng doanh thu: {ex.Message}");
             }
 
             return response;

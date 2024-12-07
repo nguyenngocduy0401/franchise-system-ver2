@@ -14,6 +14,7 @@ namespace FranchiseProject.Domain.Entity
         public string? ContractCode { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
+        public double? DepositPercentage { get; set; }
         public double? Total { get; set; }
         public double? PaidAmount { get; set; }
         public string? ContractDocumentImageURL { get; set; }

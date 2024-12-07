@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
@@ -38,7 +39,8 @@ namespace FranchiseProject.Application.Services
         {
 
             var contract =await _unitOfWork.ContractRepository.GetExistByIdAsync(paymentContract.ContractId.Value);
-            var amount = contract.Total * contract.Total;
+            var amount = contract.Total *( contract.DepositPercentage/100);
+            var paidAmount = contract.Total - amount;
             var paymentId = Guid.NewGuid();
             var vnpayTxnRef = paymentId.ToString();
             var vnpayOrderInfo = $"Thanh toan hop dong {paymentContract.ContractId}";
@@ -77,14 +79,15 @@ namespace FranchiseProject.Application.Services
             {
                 Id = paymentId,
                 Title=paymentContract.Title,
+                Description=paymentContract.Description,
                 Type=PaymentTypeEnum.Contract,
                 Method=PaymentMethodEnum.BankTransfer,
-                Amount = paymentContract.Amount,
+                Amount = amount,
                 ContractId = paymentContract.ContractId,
                 Status = PaymentStatus.NotCompleted,
                 CreationDate = DateTime.UtcNow
             };
-
+           
             await _unitOfWork.PaymentRepository.AddAsync(payment);
             await _unitOfWork.SaveChangeAsync();
 
@@ -123,8 +126,12 @@ namespace FranchiseProject.Application.Services
                 if (payment != null)
                 {
                     payment.Status = PaymentStatus.Completed;
+                 var  contract= await _unitOfWork.ContractRepository.GetExistByIdAsync(payment.ContractId.Value);
+                    contract.PaidAmount = payment.Amount;
+                    _unitOfWork.ContractRepository.Update(contract);
                     _unitOfWork.PaymentRepository.Update(payment);
                     await _unitOfWork.SaveChangeAsync();
+
                     return new PaymentResult { IsSuccess = true, OrderId = orderId, Message = "Payment successful" };
                 }
                 else
