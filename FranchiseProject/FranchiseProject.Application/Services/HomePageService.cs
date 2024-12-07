@@ -36,8 +36,13 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var homePage = (await _unitOfWork.HomePageRepository.GetAllAsync()).FirstOrDefault();
-                
+                var franchiseFee = (await _unitOfWork.FranchiseFeesRepository.GetAllAsync()).FirstOrDefault();
+
                 var homePageModel = _mapper.Map<HomePageViewModel>(homePage);
+                homePageModel.FeeAmount = (
+                    franchiseFee != null  
+                    && franchiseFee.FeeAmount != null 
+                    && franchiseFee.FeeAmount > 0) ? franchiseFee.FeeAmount : 300000000;
                 response = ResponseHandler.Success(homePageModel);
 
             }
