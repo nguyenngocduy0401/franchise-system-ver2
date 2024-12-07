@@ -56,53 +56,56 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<RevenueStatisticsViewModel>($"Error retrieving revenue statistics: {ex.Message}");
             }
         }
-       //public async Task<ApiResponse<Pagination<AgencyStatisticsViewModel>>> GetAgencyStatistics(DateTime startDate, DateTime endDate, int pageNumber, int pageSize)
-       // {
-       //     try
-       //     {
-       //         var agencies = await _unitOfWork.AgencyRepository.GetAllAsync();
-       //         var agencyStatistics = new List<AgencyStatisticsViewModel>();
+        public async Task<ApiResponse<Pagination<AgencyStatisticsViewModel>>> GetAgencyStatistics(DateTime startDate, DateTime endDate, int pageNumber, int pageSize)
+        {
+            try
+            {
+                var agencies = await _unitOfWork.AgencyRepository.GetAllAsync();
+                var agencyStatistics = new List<AgencyStatisticsViewModel>();
 
-       //         foreach (var agency in agencies)
-       //         {
-       //             var latestContract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agency.Id);
-                    
+                foreach (var agency in agencies)
+                {
+                    var latestContract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agency.Id);
 
-       //             if (latestContract == null)
-       //             {
-       //                 continue; // Skip agencies without contracts
-       //             }
+                    if (latestContract == null)
+                    {
+                        continue; 
+                    }
 
-       //             var registerCourses = await _unitOfWork.RegisterCourseRepository.GetRegisterCoursesByAgencyIdAndDateRange(agency.Id, startDate, endDate);
-       //             var payments = await _unitOfWork.PaymentRepository.GetPaymentsByAgencyIdAndDateRange(agency.Id, startDate, endDate);
+                    var registerCourses = await _unitOfWork.RegisterCourseRepository.GetRegisterCoursesByAgencyIdAndDateRange(agency.Id, startDate, endDate);
+                    var payments = await _unitOfWork.PaymentRepository.GetPaymentsByAgencyIdAndDateRange(agency.Id, startDate, endDate);
 
-       //             int totalStudents = registerCourses.Count;
-       //             decimal totalRevenue = payments.Where(p => p.Type == PaymentTypeEnum.Course).Sum(p => p.Amount ?? 0);
-       //             decimal revenueToHeadquarters = totalRevenue * (latestContract.RevenueSharePercentage / 100);
+                    int totalStudents = registerCourses.Count;
+                    double totalRevenue = payments.Where(p => p.Type == PaymentTypeEnum.Course).Sum(p => p.Amount ?? 0);
+                    double revenueToHeadquarters = (double)(totalRevenue * (latestContract.RevenueSharePercentage / 100));
 
-       //             var monthlyPayments = payments.Where(p => p.Type == PaymentTypeEnum.MonthlyDue).ToList();
-       //             bool allMonthlyPaymentsPaid = monthlyPayments.All(p => p.Status == PaymentStatus.Paid);
+                    var monthlyPayments = payments.Where(p => p.Type == PaymentTypeEnum.MonthlyDue).ToList();
+                    bool allMonthlyPaymentsPaid = monthlyPayments.All(p => p.Status == PaymentStatus.Completed);
 
-       //             agencyStatistics.Add(new AgencyStatisticsViewModel
-       //             {
-       //                 AgencyId = agency.Id,
-       //                 AgencyName = agency.Name,
-       //                 TotalStudents = totalStudents,
-       //                 TotalRevenue = totalRevenue,
-       //                 RevenueToHeadquarters = revenueToHeadquarters,
-       //                 MonthlyPaymentStatus = allMonthlyPaymentsPaid ? "Paid" : "Pending"
-       //             });
-       //         }
+                    agencyStatistics.Add(new AgencyStatisticsViewModel
+                    {
+                        AgencyId = agency.Id,
+                        AgencyName = agency.Name,
+                        TotalStudents = totalStudents,
+                        TotalRevenue = totalRevenue,
+                        RevenueToHeadquarters = revenueToHeadquarters,
+                        MonthlyPaymentStatus = allMonthlyPaymentsPaid ? "Paid" : "Pending"
+                    });
+                }
+                var paginatedResult = new Pagination<AgencyStatisticsViewModel>
+                {
+                    TotalItemsCount = agencyStatistics.Count,
+                    PageSize = pageSize,
+                    PageIndex = pageNumber,
+                    Items = agencyStatistics.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList()
+                };
 
-       //         // Apply pagination
-       //         var paginatedResult = PaginatedList<AgencyStatisticsViewModel>.Create(agencyStatistics, pageNumber, pageSize);
-
-       //         return ResponseHandler.Success(paginatedResult, "Agency statistics retrieved successfully.");
-       //     }
-       //     catch (Exception ex)
-       //     {
-       //         return ResponseHandler.Failure<PaginatedList<AgencyStatisticsViewModel>>($"Error retrieving agency statistics: {ex.Message}");
-       //     }
-       // }
+                return ResponseHandler.Success(paginatedResult, "Agency statistics retrieved successfully.");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<Pagination<AgencyStatisticsViewModel>>($"Error retrieving agency statistics: {ex.Message}");
+            }
+        }
     }
 }

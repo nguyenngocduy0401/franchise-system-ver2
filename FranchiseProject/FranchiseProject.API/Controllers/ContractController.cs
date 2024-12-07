@@ -65,9 +65,9 @@ namespace FranchiseProject.API.Controllers
         {
             return await  _contractService.DownloadContractAsPdfAsync(id);
         }
-        [SwaggerOperation(Summary = "truy xuất hợp đồng bằng AgencyId{Authorize = Manager,Admin}")]
+        [SwaggerOperation(Summary = "truy xuất hợp đồng bằng AgencyId{Authorize = Manager,Admin,AgencyManager,SystemTechnician}")]
         [HttpGet("agency/{id}")]
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager +","+AppRole.SystemTechnician)]
         public async Task<ApiResponse<ContractViewModel>> GetContractbyAgencyId(Guid id)
         {
             return await _contractService.GetContractbyAgencyId(id);

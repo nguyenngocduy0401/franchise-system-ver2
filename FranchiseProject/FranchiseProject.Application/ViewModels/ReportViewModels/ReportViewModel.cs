@@ -23,6 +23,7 @@ namespace FranchiseProject.Application.ViewModels.ReportViewModels
         public string? CourseName { get; set; }
         public DateTime CreationDate { get; set; }
         public List<EquipmentViewModel>? Equipments { get; set; }
+        public string? RespondedById { get; set; }
     }
 
 }

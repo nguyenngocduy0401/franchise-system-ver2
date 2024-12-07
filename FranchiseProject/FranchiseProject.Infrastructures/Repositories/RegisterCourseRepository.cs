@@ -122,5 +122,13 @@ namespace FranchiseProject.Infrastructures.Repositories
                 r.User.FullName==name &&
                 r.CreationDate >= twentyFourHoursAgo);
         }
+        public async Task<List<RegisterCourse>> GetRegisterCoursesByAgencyIdAndDateRange(Guid agencyId, DateTime startDate, DateTime endDate)
+        {
+            return await _dbContext.RegisterCourses
+                .Where(rc => rc.User.AgencyId == agencyId &&
+                             rc.CreationDate >= startDate &&
+                             rc.CreationDate <= endDate)
+                .ToListAsync();
+        }
     }
 }

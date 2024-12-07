@@ -20,6 +20,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using FranchiseProject.Application.ViewModels.NotificationViewModels;
 namespace FranchiseProject.Application.Services
 {
     public class ReportService : IReportService
@@ -33,12 +34,13 @@ namespace FranchiseProject.Application.Services
             private readonly IMapper _mapper;
             private readonly IHubContext<NotificationHub> _hubContext;
             private readonly IEmailService _emailService;
+        private readonly INotificationService _notificationService;
              private readonly UserManager<User> _userManager;
         public ReportService(IMapper mapper, IUnitOfWork unitOfWork,
                 IClaimsService claimsService, IValidator<CreateAgencyViewModel> validator,
                 IUserService userService, IHubContext<NotificationHub> hubContext,
                 IEmailService emailService, IValidator<UpdateAgencyViewModel> validatorUpdate,
-                ICurrentTime currentTime, UserManager<User> userManager)
+                ICurrentTime currentTime, UserManager<User> userManager, INotificationService notificationService)
             {
                 _unitOfWork = unitOfWork;
                 _validator = validator;
@@ -50,7 +52,8 @@ namespace FranchiseProject.Application.Services
                 _validatorUpdate = validatorUpdate;
                 _currentTime = currentTime;
             _userManager = userManager;
-            }
+            _notificationService = notificationService;
+        }
         public async Task<ApiResponse<bool>> CreateCourseReport(CreateReportCourseViewModel model)
         {
             try
@@ -145,6 +148,125 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<bool>($"Lỗi khi tạo báo cáo thiết bị: {ex.Message}");
             }
         }
+        public async Task<ApiResponse<bool>> UpdateCourseReport(Guid reportId, UpdateReportCourseViewModel model)
+        {
+            try
+            {
+                var userCurrentId = _claimsService.GetCurrentUserId;
+                var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
+
+                if (userCurrent == null || !userCurrent.AgencyId.HasValue)
+                {
+                    return ResponseHandler.Failure<bool>("User không tồn tại hoặc không thuộc về Agency nào.");
+                }
+
+                var report = await _unitOfWork.ReportRepository.GetByIdAsync(reportId);
+                if (report == null)
+                {
+                    return ResponseHandler.Failure<bool>("Báo cáo không tồn tại.");
+                }
+
+                if (report.AgencyId != userCurrent.AgencyId)
+                {
+                    return ResponseHandler.Failure<bool>("Bạn không có quyền cập nhật báo cáo này.");
+                }
+
+                if (report.Type != ReportTypeEnum.Course)
+                {
+                    return ResponseHandler.Failure<bool>("Báo cáo này không phải là báo cáo khóa học.");
+                }
+
+                if (model.CourseId.HasValue && model.CourseId != report.CourseId)
+                {
+                    var course = await _unitOfWork.CourseRepository.GetByIdAsync(model.CourseId.Value);
+                    if (course == null)
+                    {
+                        return ResponseHandler.Failure<bool>("Khóa học không tồn tại.");
+                    }
+                    report.CourseId = model.CourseId;
+                }
+
+                report.Description = model.Description;
+                report.ModificationDate = _currentTime.GetCurrentTime();
+
+                _unitOfWork.ReportRepository.Update(report);
+                var result = await _unitOfWork.SaveChangeAsync() > 0;
+
+                if (result)
+                {
+                    return ResponseHandler.Success(true, "Cập nhật báo cáo khóa học thành công.");
+                }
+                else
+                {
+                    return ResponseHandler.Failure<bool>("Không thể cập nhật báo cáo khóa học.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<bool>($"Lỗi khi cập nhật báo cáo khóa học: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse<bool>> UpdateEquipmentReport(Guid reportId, UpdateReportEquipmentViewModel model)
+        {
+            try
+            {
+                var userCurrentId = _claimsService.GetCurrentUserId;
+                var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
+
+                if (userCurrent == null || !userCurrent.AgencyId.HasValue)
+                {
+                    return ResponseHandler.Failure<bool>("User không tồn tại hoặc không thuộc về Agency nào.");
+                }
+
+                var report = await _unitOfWork.ReportRepository.GetByIdAsync(reportId);
+                if (report == null)
+                {
+                    return ResponseHandler.Failure<bool>("Báo cáo không tồn tại.");
+                }
+
+                if (report.AgencyId != userCurrent.AgencyId)
+                {
+                    return ResponseHandler.Failure<bool>("Bạn không có quyền cập nhật báo cáo này.");
+                }
+
+                if (report.Type != ReportTypeEnum.Equipment)
+                {
+                    return ResponseHandler.Failure<bool>("Báo cáo này không phải là báo cáo thiết bị.");
+                }
+
+                var equipments = new List<Equipment>();
+                foreach (var equipmentId in model.EquipmentIds)
+                {
+                    var equipment = await _unitOfWork.EquipmentRepository.GetByIdAsync(equipmentId);
+                    if (equipment == null)
+                    {
+                        return ResponseHandler.Failure<bool>($"Thiết bị với ID {equipmentId} không tồn tại.");
+                    }
+                    equipments.Add(equipment);
+                }
+
+                report.Description = model.Description;
+                report.ModificationDate = _currentTime.GetCurrentTime();
+                report.Equipments = equipments;
+
+                _unitOfWork.ReportRepository.Update(report);
+                var result = await _unitOfWork.SaveChangeAsync() > 0;
+
+                if (result)
+                {
+                    return ResponseHandler.Success(true, "Cập nhật báo cáo thiết bị thành công.");
+                }
+                else
+                {
+                    return ResponseHandler.Failure<bool>("Không thể cập nhật báo cáo thiết bị.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<bool>($"Lỗi khi cập nhật báo cáo thiết bị: {ex.Message}");
+            }
+        }
         public async Task<ApiResponse<Pagination<ReportViewModel>>> FilterReportAsync(FilterReportModel filterReportModel)
         {
             var response = new ApiResponse<Pagination<ReportViewModel>>();
@@ -233,6 +355,60 @@ namespace FranchiseProject.Application.Services
             catch (Exception ex)
             {
                 return ResponseHandler.Failure<bool>($"Lỗi khi cập nhật trạng thái báo cáo: {ex.Message}");
+            }
+        }
+      
+
+        public async Task<ApiResponse<bool>> RespondToReportAsync(Guid reportId, string response)
+        {
+            try
+            {
+                var report = await _unitOfWork.ReportRepository.GetByIdAsync(reportId);
+                if (report == null)
+                {
+                    return ResponseHandler.Success<bool>(false, "Báo cáo không tồn tại.");
+                }
+
+                var userCurrentId = _claimsService.GetCurrentUserId;
+                var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
+
+                if (userCurrent == null)
+                {
+                    return ResponseHandler.Success<bool>(false, "Không thể xác định người dùng hiện tại.");
+                }
+
+                report.Response = response;
+
+                _unitOfWork.ReportRepository.Update(report);
+
+
+                var result = await _unitOfWork.SaveChangeAsync() > 0;
+                if (result)
+                {
+                    var agencyManagerUserId = await _unitOfWork.AgencyRepository.GetAgencyManagerUserIdByAgencyIdAsync(report.AgencyId.Value);
+
+                    if (agencyManagerUserId != string.Empty)
+                    {
+                        var noti = new SendNotificationViewModel
+                        {
+                            message = "Báo cáo của bạn đã được phản hồi!",
+                            userIds = new List<string> { agencyManagerUserId }
+                        };
+                        await _notificationService.CreateAndSendNotificationNoReponseAsync(noti);
+                        await _unitOfWork.SaveChangeAsync();
+                    }
+
+                    var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(report.AgencyId.Value);
+                    return ResponseHandler.Success(true, "Phản hồi báo cáo thành công.");
+                }
+                else
+                {
+                    return ResponseHandler.Failure<bool>("Không thể lưu phản hồi báo cáo.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<bool>($"Lỗi khi phản hồi báo cáo: {ex.Message}");
             }
         }
     }

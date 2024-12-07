@@ -37,5 +37,13 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.Payments.FirstOrDefaultAsync(filter);
         }
+        public async Task<List<Payment>> GetPaymentsByAgencyIdAndDateRange(Guid agencyId, DateTime startDate, DateTime endDate)
+        {
+            return await _dbContext.Payments
+                .Where(p => p.RegisterCourse.User.AgencyId == agencyId &&
+                            p.CreationDate >= startDate &&
+                            p.CreationDate <= endDate)
+                .ToListAsync();
+        }
     }
 }

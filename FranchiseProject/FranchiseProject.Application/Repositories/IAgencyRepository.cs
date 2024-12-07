@@ -11,5 +11,6 @@ namespace FranchiseProject.Application.Repositories
     { 
         Task<IEnumerable<Agency>> GetAgencyExpiredAsync();
         Task<IEnumerable<Agency>> GetAgencyEduLicenseExpiredAsync();
+        Task<string?> GetAgencyManagerUserIdByAgencyIdAsync(Guid agencyId);
     }
 }

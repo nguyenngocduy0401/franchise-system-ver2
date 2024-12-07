@@ -21,6 +21,6 @@ namespace FranchiseProject.Domain.Entity
         public Course? Course { get; set; }
         public ICollection<Equipment>? Equipments { get; set; }
 
-        public string? RespondedById { get; set; }
+        public string? Response { get; set; }
     }
 }

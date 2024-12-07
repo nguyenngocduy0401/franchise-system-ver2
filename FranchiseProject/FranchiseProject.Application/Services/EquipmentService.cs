@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using Quartz.Util;
 using System.Drawing;
 using System.Linq.Expressions;
 
@@ -314,26 +315,28 @@ namespace FranchiseProject.Application.Services
 
         public async Task<ApiResponse<Pagination<EquipmentViewModel>>> GetEquipmentByAgencyIdAsync(FilterEquipmentViewModel filter)
         {
-            var response = new ApiResponse<Pagination<FilterEquipmentViewModel>>();
             try
             {
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(filter.AgencyId.Value);
                 var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contract.Id);
+
                 if (equipments == null || !equipments.Any())
                 {
                     return ResponseHandler.Success<Pagination<EquipmentViewModel>>(null, "Không có thiết bị nào được tìm thấy cho hợp đồng này.");
                 }
-                if (!filter.Status.Equals(""))
+
+                // Chỉ áp dụng bộ lọc Status nếu nó được cung cấp và không rỗng
+                if (!string.IsNullOrWhiteSpace(filter.Status.ToString()) && filter.Status!=EquipmentStatusEnum.none)
                 {
                     equipments = equipments.Where(e => e.Status == filter.Status).ToList();
                 }
+
                 var equipmentViewModels = equipments.Select(e => new EquipmentViewModel
                 {
                     Id = e.Id,
                     EquipmentName = e.EquipmentName ?? "",
                     SerialNumber = e.SerialNumber ?? "",
                     Status = e.Status,
-                   
                     Note = e.Note ?? "",
                     Price = e.Price,
                     AgencyName = contract.Agency?.Name ?? "Unknown Agency"
@@ -352,7 +355,6 @@ namespace FranchiseProject.Application.Services
                     PageIndex = filter.PageIndex,
                     PageSize = filter.PageSize,
                     TotalItemsCount = totalItems,
-          
                 };
 
                 return ResponseHandler.Success(paginationResult, "Truy xuất danh sách trang thiết bị thành công");
@@ -361,11 +363,7 @@ namespace FranchiseProject.Application.Services
             {
                 return ResponseHandler.Failure<Pagination<EquipmentViewModel>>($"Error filtering equipment: {ex.Message}");
             }
-
-
-
         }
-
         public async Task<ApiResponse<bool>> UpdateEquipmentAsync(Guid equipmentId, UpdateEquipmentViewModel updateModel)
         {
             try

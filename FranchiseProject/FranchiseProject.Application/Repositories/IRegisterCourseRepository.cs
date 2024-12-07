@@ -21,5 +21,6 @@ namespace FranchiseProject.Application.Repositories
         Task<IEnumerable<RegisterCourse>> GetAllAsync(Expression<Func<RegisterCourse, bool>> filter = null, string includeProperties = "");
         Task<RegisterCourse> FindRegisterCourseByUserId(string userId, Guid courseId);
         Task<bool> ExistsWithinLast24HoursAsync(string name, string email, string phoneNumber, string courseId);
+        Task<List<RegisterCourse>> GetRegisterCoursesByAgencyIdAndDateRange(Guid agencyId, DateTime startDate, DateTime endDate);
     }
 }

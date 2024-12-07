@@ -65,7 +65,7 @@ namespace FranchiseProject.API.Controllers
             return await _documentService.GetDocumentbyAgencyId(id, type);
         }
         [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
-        [SwaggerOperation(Summary = "Truy xuất danh sách tài liệu bằng Agencyid{Authorize = Manager, Admin,SystemTechnician}")]
+        [SwaggerOperation(Summary = "Truy xuất danh sách tài liệu bằng Agencyid{Authorize = Manager, Admin,SystemTechnician,AgencyManager}")]
         [HttpGet("agency/{id}/all")]
         public async Task<ApiResponse<List<DocumentViewModel>>> GetAllDocumentsByAgencyIdAsync(Guid id)
         {
