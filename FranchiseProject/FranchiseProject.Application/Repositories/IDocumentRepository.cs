@@ -3,6 +3,7 @@ using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,5 +14,6 @@ namespace FranchiseProject.Application.Repositories
         Task<bool> HasActiveAgreementContractAsync(Guid agencyId);
         Task<bool> HasActiveBusinessLicenseAsync(Guid agencyId);
         Task<Document> GetMostRecentAgreeSignByAgencyIdAsync(Guid agencyId, DocumentType type);
+        Task<List<Document>> GetAllAsync(Expression<Func<Document, bool>> predicate);
     }
 }

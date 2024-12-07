@@ -10,6 +10,7 @@ namespace FranchiseProject.Application.ViewModels.WorkViewModels
     public class FilterWorkByLoginModel
     {
         public string? Search { get; set; }
+        public WorkTypeEnum? Type { get; set; }
         public WorkLevelEnum? Level { get; set; }
         public WorkStatusEnum? Status { get; set; }
         public WorkStatusSubmitEnum? Submit { get; set; }

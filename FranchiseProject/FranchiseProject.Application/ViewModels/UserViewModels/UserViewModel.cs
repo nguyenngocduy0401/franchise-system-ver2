@@ -1,4 +1,5 @@
 ﻿using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,6 +17,7 @@ namespace FranchiseProject.Application.ViewModels.UserViewModels
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
         public string? FullName { get; set; }
+        public UserStatusEnum? status { get; set; }
         public DateTimeOffset? LockoutEnd { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public DateTime? CreateAt { get; set; }

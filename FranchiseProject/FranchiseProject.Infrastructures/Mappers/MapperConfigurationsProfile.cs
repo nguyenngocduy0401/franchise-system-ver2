@@ -38,6 +38,9 @@ using FranchiseProject.Application.ViewModels.AppointmentViewModels;
 using FranchiseProject.Application.ViewModels.DocumentViewModels;
 using FranchiseProject.Application.ViewModels.DocumentViewModel;
 using FranchiseProject.Application.ViewModels.EquipmentViewModels;
+using FranchiseProject.Application.ViewModels.HomePageViewModels;
+using FranchiseProject.Application.ViewModels.WorkTemplateViewModels;
+using FranchiseProject.Application.ViewModels.AppointmentTemplateViewModels;
 
 
 
@@ -57,6 +60,7 @@ namespace FranchiseProject.Infrastructures.Mappers
             #region Agency
             CreateMap<CreateAgencyViewModel, Agency>().ReverseMap();
             CreateMap<Agency, AgencyViewModel>();
+            CreateMap<Agency, AgencyWorkModel>();
             CreateMap<Agency, AgencyAddressViewModel>()
                 .ForMember(dest => dest.FullAddress, opt => opt.MapFrom(src => $"{src.Address}, {src.Ward}, {src.District}, {src.City}"));
             CreateMap<Agency, AgencyNameViewModel>().ForMember(dest => dest.AgencyName, otp => otp.MapFrom(src => src.Name));
@@ -92,7 +96,7 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<User, CreateUserViewModel>();
             CreateMap<User, UserWorkViewModel>().ForMember(dest => dest.Role, opt => opt.MapFrom(src =>
             src.UserRoles == null ? null : src.UserRoles.Select(ur => ur.Role.Name).FirstOrDefault())); ;
-
+            CreateMap<UpdateUserByLoginModel, User>();
             #endregion
             #region Slot
             CreateMap<CreateSlotModel, Slot>();
@@ -308,7 +312,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             #region Work
             CreateMap<CreateWorkModel, Work>();
             CreateMap<UpdateWorkModel, Work>();
-            CreateMap<Work, WorkViewModel>();
+            CreateMap<Work, WorkViewModel>()
+                .ForMember(dest => dest.AgencyViewModel, opt => opt.MapFrom(src => src.Agency));
             CreateMap<Work, WorkDetailViewModel>();
             CreateMap<UpdateWorkByStaffModel, Work>();
             #endregion
@@ -346,6 +351,26 @@ namespace FranchiseProject.Infrastructures.Mappers
             .ForMember(dest => dest.SerialNumber, opt => opt.MapFrom(src => src.SerialNumber))
             .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate))
             .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndDate));
+            #endregion
+
+            #region HomePage
+            CreateMap<HomePage, HomePageViewModel>();
+            CreateMap<UpdatePageModel, HomePage>();
+            #endregion
+
+            #region AppointmentTemplate
+            CreateMap<AppointmentTemplate, AppointmentTemViewModel>();
+            CreateMap<UpdateAppointmentTemplateModel, AppointmentTemplate>();
+            CreateMap<CreateAppointmentTemplateModel, AppointmentTemplate>();
+
+            #endregion
+
+            #region WorkTemplate
+            CreateMap<WorkTemplate, WorkTemplateViewModel>();
+            CreateMap<UpdateWorkTemplateModel, WorkTemplate>();
+            CreateMap<CreateWorkTemplateModel, WorkTemplate>();
+            CreateMap<WorkTemplate, WorkTemplateDetailViewModel>()
+                .ForMember(dest => dest.Appointments, opt => opt.MapFrom(src => src.Appointments));
             #endregion
         }
     }

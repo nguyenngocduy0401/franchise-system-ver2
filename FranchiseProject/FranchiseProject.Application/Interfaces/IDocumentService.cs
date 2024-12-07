@@ -17,6 +17,8 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<Pagination<DocumentViewModel>>> FilterDocumentAsync(FilterDocumentViewModel filterModel);
         Task<ApiResponse<bool>> DeleteDocumentAsync(Guid documentId);
         Task<ApiResponse<bool>> UpdateDocumentAsync(Guid documentId, UpdateDocumentViewModel updateDocumentModel);
+        Task NotifyCustomersOfExpiringDocuments();
         Task<ApiResponse<DocumentViewModel>> GetDocumentbyAgencyId(Guid agencyId, DocumentType type);
+        Task<ApiResponse<List<DocumentViewModel>>> GetAllDocumentsByAgencyIdAsync(Guid agencyId);
     }
 }

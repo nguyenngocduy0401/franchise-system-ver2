@@ -1,4 +1,4 @@
-﻿ using AutoMapper;
+﻿using AutoMapper;
 using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation;
 using FluentValidation.Results;
@@ -6,6 +6,7 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AppointmentViewModels;
+using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
@@ -45,6 +46,42 @@ namespace FranchiseProject.Application.Services
             _claimsService = claimsService;
             _updateWorkByStaffValidator = updateWorkByStaffValidator;
         }
+
+        public async Task<ApiResponse<Pagination<WorkViewModel>>> GetWorksAgencyAsync(FilterWorkByLoginModel filterWorkByLoginModel) 
+        {
+            var response = new ApiResponse<Pagination<WorkViewModel>>();
+            try
+            {
+                var userId = _claimsService.GetCurrentUserId.ToString();
+                var filter = (Expression<Func<Work, bool>>)(e =>
+                    (string.IsNullOrEmpty(filterWorkByLoginModel.Search) || e.Title.Contains(filterWorkByLoginModel.Search)
+                    || e.Description.Contains(filterWorkByLoginModel.Search)) &&
+                    (!filterWorkByLoginModel.Status.HasValue || e.Status == filterWorkByLoginModel.Status) &&
+                    (!filterWorkByLoginModel.Level.HasValue || e.Level == filterWorkByLoginModel.Level) &&
+                    (!filterWorkByLoginModel.Submit.HasValue || e.Submit == filterWorkByLoginModel.Submit) &&
+                    (!filterWorkByLoginModel.Type.HasValue || e.Type == filterWorkByLoginModel.Type)
+                );
+
+                var order = (Func<IQueryable<Work>, IOrderedQueryable<Work>>)(order => order.OrderByDescending(e => e.StartDate));
+                var worksPagination = await _unitOfWork.WorkRepository.FilterWorksByUserId(
+                userId: userId,
+                filter: filter,
+                type: AppointmentTypeEnum.WithAgency,
+                orderBy: order,
+                pageIndex: filterWorkByLoginModel.PageIndex,
+                pageSize: filterWorkByLoginModel.PageSize
+                );
+                var workModel = _mapper.Map<Pagination<WorkViewModel>>(worksPagination);
+
+                response = ResponseHandler.Success(workModel, "Successful!");
+
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<Pagination<WorkViewModel>>(ex.Message);
+            }
+            return response;
+        }
         public async Task<ApiResponse<Pagination<WorkViewModel>>> FilterWorksByLogin(FilterWorkByLoginModel filterWorkByLoginModel)
         {
             var response = new ApiResponse<Pagination<WorkViewModel>>();
@@ -56,19 +93,20 @@ namespace FranchiseProject.Application.Services
                     || e.Description.Contains(filterWorkByLoginModel.Search)) &&
                     (!filterWorkByLoginModel.Status.HasValue || e.Status == filterWorkByLoginModel.Status) &&
                     (!filterWorkByLoginModel.Level.HasValue || e.Level == filterWorkByLoginModel.Level) &&
-                    (!filterWorkByLoginModel.Submit.HasValue || e.Submit == filterWorkByLoginModel.Submit)
+                    (!filterWorkByLoginModel.Submit.HasValue || e.Submit == filterWorkByLoginModel.Submit) &&
+                    (!filterWorkByLoginModel.Type.HasValue || e.Type == filterWorkByLoginModel.Type)
                 );
 
                 var order = (Func<IQueryable<Work>, IOrderedQueryable<Work>>)(order => order.OrderByDescending(e => e.StartDate));
                 var worksPagination = await _unitOfWork.WorkRepository.FilterWorksByUserId(
                 userId: userId,
                 filter: filter,
+                includeProperties: "Agency",
                 orderBy: order,
                 pageIndex: filterWorkByLoginModel.PageIndex,
                 pageSize: filterWorkByLoginModel.PageSize
                 );
                 var workModel = _mapper.Map<Pagination<WorkViewModel>>(worksPagination);
-
                 response = ResponseHandler.Success(workModel, "Successful!");
 
             }
@@ -342,60 +380,88 @@ namespace FranchiseProject.Application.Services
                     case WorkStatusEnum.None:
                         throw new Exception("Cannot update this status!");
                     case WorkStatusEnum.Approved:
-                        work.Status = status;
-                        if (work.Type == WorkTypeEnum.BusinessRegistered)
                         {
-                            var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveBusinessLicenseAsync(work.AgencyId.Value);
-                            if (!hasActiveAgreementContract)
+                            work.Status = status;
+                            if (work.Level == WorkLevelEnum.Compulsory)
                             {
-                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có giấy đăng kí doanh nghiệp hoạt động!");
-                            }
-                            var fee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
-                            var contract = new Contract
-                            {
-                                AgencyId = work.AgencyId.Value,
-                                Status = ContractStatusEnum.None,
-                                FrachiseFee = fee.Sum(f => f.FeeAmount),
-
-                            };
-                            await _unitOfWork.ContractRepository.AddAsync(contract);
-                        }
-                        if (work.Type == WorkTypeEnum.AgreementSigned)
-                        {
-                            var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveAgreementContractAsync(work.AgencyId.Value);
-                            if (!hasActiveAgreementContract)
-                            {
-                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng thỏa thuận!");
-                            }
-
-                        }
-                        if (work.Type == WorkTypeEnum.Quotation)
-                        {
-                            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
-                            contract.DesignFee = await _unitOfWork.EquipmentRepository.GetTotalEquipmentAmountByContractIdAsync(contract.Id);
-                            contract.Total = contract.DesignFee + contract.FrachiseFee;
-                            _unitOfWork.ContractRepository.Update(contract);
-                        }
-                        if (work.Type == WorkTypeEnum.SignedContract)
-                        {
-                            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
-                            contract.Status = ContractStatusEnum.Active;
-                            _unitOfWork.ContractRepository.Update(contract);
-                        }
-                        if (work.Type == WorkTypeEnum.Handover)
-                        {
-                            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
-                            var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contract.Id);
-                            foreach (var equipment in equipments)
-                            {
-                                var equipmentHistory = await _unitOfWork.EquipmentSerialNumberHistoryRepository
-                                    .FindAsync(e => e.EquipmentId == equipment.Id &&
-                                                    e.StartDate == null);
-
-                                foreach (var history in equipmentHistory)
+                                switch (work.Type)
                                 {
-                                    history.StartDate = DateTime.Now;
-                                    _unitOfWork.EquipmentSerialNumberHistoryRepository.Update(history);
+                                    case WorkTypeEnum.BusinessRegistered:
+                                        {
+                                            var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveBusinessLicenseAsync(work.AgencyId.Value);
+                                            if (!hasActiveAgreementContract)
+                                            {
+                                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có giấy đăng kí doanh nghiệp hoạt động!");
+                                            }
+                                            var fee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
+                                            var contract = new Contract
+                                            {
+                                                AgencyId = work.AgencyId.Value,
+                                                Status = ContractStatusEnum.None,
+                                                FrachiseFee = fee.Sum(f => f.FeeAmount),
+
+                                            };
+                                            await _unitOfWork.ContractRepository.AddAsync(contract);
+                                            break;
+                                        }
+                                    case WorkTypeEnum.AgreementSigned:
+                                        {
+                                            var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveAgreementContractAsync(work.AgencyId.Value);
+                                            if (!hasActiveAgreementContract)
+                                            {
+                                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng thỏa thuận!");
+                                            }
+
+                                        }
+                                        break;
+                                    case WorkTypeEnum.Quotation:
+                                        {
+                                            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
+                                            contract.DesignFee = await _unitOfWork.EquipmentRepository.GetTotalEquipmentAmountByContractIdAsync(contract.Id);
+                                            contract.Total = contract.DesignFee + contract.FrachiseFee;
+                                            _unitOfWork.ContractRepository.Update(contract);
+
+                                        }
+                                        break;
+                                    case WorkTypeEnum.SignedContract:
+                                        {
+                                            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
+                                            if (string.IsNullOrEmpty(contract.ContractDocumentImageURL))
+                                            {
+                                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng!");
+                                            }
+                                            contract.Status = ContractStatusEnum.Active;
+                                            _unitOfWork.ContractRepository.Update(contract);
+                                        }
+                                        break;
+                                    case WorkTypeEnum.Handover:
+                                        {
+                                            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
+                                            var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contract.Id);
+                                            foreach (var equipment in equipments)
+                                            {
+                                                var equipmentHistory = await _unitOfWork.EquipmentSerialNumberHistoryRepository
+                                                    .FindAsync(e => e.EquipmentId == equipment.Id &&
+                                                                    e.StartDate == null);
+
+                                                foreach (var history in equipmentHistory)
+                                                {
+                                                    history.StartDate = DateTime.Now;
+                                                    _unitOfWork.EquipmentSerialNumberHistoryRepository.Update(history);
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    case WorkTypeEnum.EducationLicenseRegistered:
+                                        {
+                                            var document = await _unitOfWork.DocumentRepository
+                                                .GetMostRecentAgreeSignByAgencyIdAsync((Guid)work.AgencyId, DocumentType.EducationalOperationLicense);
+                                            if (document == null)
+                                            {
+                                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có giấy phép giáo dục!");
+                                            }
+                                        }
+                                        break;
                                 }
                             }
                         }
@@ -449,7 +515,7 @@ namespace FranchiseProject.Application.Services
                         agency.Status == AgencyStatusEnum.Active)
                         return ResponseHandler.Success(false, "Không thể tương tác với nhiệm vụ khi đã kết thúc quá trình nhượng quyền!");
                 }
-                
+
 
                 if (work == null) return ResponseHandler.Success(false, "Nhiệm vụ không khả dụng!");
                 if (work.Status != WorkStatusEnum.None) return ResponseHandler.Success(false, "Không thể thao tác với nhiệm vụ đã được kiểm duyệt!");
@@ -472,9 +538,9 @@ namespace FranchiseProject.Application.Services
                     e.Type < work.Type &&
                     work.Level == WorkLevelEnum.Compulsory);
                     var previousWork = await _unitOfWork.WorkRepository.GetPreviousWorkByAgencyId((Guid)work.AgencyId, filter);
-                    if (previousWork != null) 
+                    if (previousWork != null)
                     {
-                        if(previousWork.EndDate > work.StartDate) 
+                        if (previousWork.EndDate > work.StartDate)
                             return ResponseHandler.Success(false, "Ngày bắt đầu phải lớn hơn ngày kết thúc của nhiệm vụ được ràng buộc ở quy trình trước!");
                     }
                 }

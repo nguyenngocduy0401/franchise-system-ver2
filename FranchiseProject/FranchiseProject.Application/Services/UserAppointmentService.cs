@@ -49,6 +49,7 @@ namespace FranchiseProject.Application.Services
                         });
                 }
                 await _unitOfWork.UserAppointmentRepository.AddRangeAsync(listUserAppointment);
+                await _appointmentService.SendAppointmentNoticationForStaffAsync(userIds, appointmentId);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Update failed!");
 

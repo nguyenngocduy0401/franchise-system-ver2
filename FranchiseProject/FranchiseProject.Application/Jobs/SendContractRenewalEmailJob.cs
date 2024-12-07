@@ -22,7 +22,6 @@ namespace FranchiseProject.Application.Jobs
         }
         public async Task Execute(IJobExecutionContext context)
         {
-            Console.WriteLine("Hello");
             _logger.LogInformation("{UtcNow}", DateTime.UtcNow);
             await _contractService.NotifyCustomersOfExpiringContracts();
             //return Task.CompletedTask;

@@ -8,6 +8,6 @@ namespace FranchiseProject.Domain.Enums
 {
     public  enum UserStatusEnum
     {
-        active=0, blocked=1,
+        active=0, inactive=1,
     }
 }

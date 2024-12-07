@@ -60,6 +60,10 @@ using FranchiseProject.Application.ViewModels.DocumentViewModels;
 using FranchiseProject.API.Validator.DocumentValidator;
 using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.API.Validator.AgencyValidator;
+using FranchiseProject.Application.ViewModels.WorkTemplateViewModels;
+using FranchiseProject.API.Validator.WorkTemplateValidator;
+using FranchiseProject.Application.ViewModels.AppointmentTemplateViewModels;
+using FranchiseProject.API.Validator.AppointmentTemplateValidator;
 
 
 namespace FranchiseProject.API
@@ -142,7 +146,6 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<RegisterConsultationViewModel>, RegisterFranchiseViewModelValidator>();
             services.AddTransient<IValidator<CreateAgencyViewModel>,CreateAgencyValidator>();
             services.AddTransient<IValidator<UpdateAgencyViewModel>, UpdateAgencyValidator>();
-
             services.AddTransient<IValidator<CreateContractViewModel>, CreateContractValidator>();
             services.AddTransient<IValidator<UpdateContractViewModel>, UpdateContracValidator>();
             services.AddTransient<IValidator<UserResetPasswordModel>, UserResetPasswordValidator>();
@@ -213,6 +216,13 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<CreateAppointmentModel>, CreateAppointmentValidator>();
             services.AddTransient<IValidator<UploadDocumentViewModel>, UploadDocumentValidator>();
 
+            services.AddTransient<IValidator<CreateWorkTemplateModel>, CreateWorkTemplateValidator>();
+            services.AddTransient<IValidator<UpdateWorkTemplateModel>, UpdateWorkTemplateValidator>();
+
+            services.AddTransient<IValidator<CreateAppointmentTemplateModel>, CreateAppointmentTemplateValidator>();
+            services.AddTransient<IValidator<UpdateAppointmentTemplateModel>, UpdateAppointmentTemplateValidator>();
+
+            services.AddTransient<IValidator<UpdateUserByLoginModel>, UpdateUserByLoginValidator>();
             #endregion
             return services;
         }

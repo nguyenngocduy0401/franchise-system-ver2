@@ -163,9 +163,13 @@ namespace FranchiseProject.Application.Services
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
                 if (contract == null)
                 {
-                    return ResponseHandler.Failure<string>("No contract found for this agency.");
+                    return ResponseHandler.Success<string>("No contract found for this agency.");
                 }
                 var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contract.Id);
+                if (equipments == null || !equipments.Any())
+                {
+                    return ResponseHandler.Success<string>("Không có thiết bị nào được tìm thấy cho hợp đồng này.");
+                }
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 using (var package = new ExcelPackage())
                 {
@@ -256,10 +260,14 @@ namespace FranchiseProject.Application.Services
                 var contract = await _unitOfWork.ContractRepository.GetByIdAsync(contractId);
                 if (contract == null)
                 {
-                    return ResponseHandler.Failure<bool>("Contract not found.");
+                    return ResponseHandler.Success<bool>(false,"Không tìm thấy hợp đồng !");
                 }
 
                 var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contractId);
+                if (equipments == null || !equipments.Any())
+            {
+                return ResponseHandler.Success<bool>(false,"Không có thiết bị nào được tìm thấy cho hợp đồng này.");
+            }
                 var now = DateTime.Now;
 
                 foreach (var updateModel in updateModels)
@@ -267,7 +275,7 @@ namespace FranchiseProject.Application.Services
                     var equipment = equipments.FirstOrDefault(e => e.Id == updateModel.EquipmentId);
                     if (equipment == null)
                     {
-                        return ResponseHandler.Failure<bool>($"Equipment with ID {updateModel.EquipmentId} not found.");
+                        return ResponseHandler.Success<bool>(false,"Không tìm thấy trang thiết bị");
                     }
 
                     equipment.Status = EquipmentStatusEnum.Available;
@@ -311,7 +319,11 @@ namespace FranchiseProject.Application.Services
             {
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(filter.AgencyId.Value);
                 var equipments = await _unitOfWork.EquipmentRepository.GetEquipmentByContractIdAsync(contract.Id);
-                if (filter.Status.Equals(""))
+                if (equipments == null || !equipments.Any())
+                {
+                    return ResponseHandler.Success<Pagination<EquipmentViewModel>>(null, "Không có thiết bị nào được tìm thấy cho hợp đồng này.");
+                }
+                if (!filter.Status.Equals(""))
                 {
                     equipments = equipments.Where(e => e.Status == filter.Status).ToList();
                 }
@@ -361,7 +373,7 @@ namespace FranchiseProject.Application.Services
                 var equipment = await _unitOfWork.EquipmentRepository.GetByIdAsync(equipmentId);
                 if (equipment == null)
                 {
-                    return ResponseHandler.Failure<bool>("Không tìm thấy trang thiết bị!.");
+                    return ResponseHandler.Success<bool>(false,"Không tìm thấy trang thiết bị!.");
                 }
 
                 equipment.EquipmentName = updateModel.EquipmentName;
@@ -414,7 +426,7 @@ namespace FranchiseProject.Application.Services
                 var equipment = await _unitOfWork.EquipmentRepository.GetExistByIdAsync(equipmentId);
                 if (equipment == null)
                 {
-                    return ResponseHandler.Failure<List<EquipmentSerialNumberHistoryViewModel>>("không tìm thấy trang thiết bị.");
+                    return ResponseHandler.Success<List<EquipmentSerialNumberHistoryViewModel>>(null,"không tìm thấy trang thiết bị.");
                 }
 
                 var serialNumberHistories = await _unitOfWork.EquipmentSerialNumberHistoryRepository

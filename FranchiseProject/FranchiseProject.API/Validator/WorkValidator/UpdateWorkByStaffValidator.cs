@@ -9,9 +9,12 @@ namespace FranchiseProject.API.Validator.WorkValidator
         public UpdateWorkByStaffValidator()
         {
             RuleFor(x => x.Report.GetTextWithoutHtml())
-                .MaximumLength(10000);
+                 .MaximumLength(10000)
+                 .WithMessage("Báo cáo không được dài hơn 10000 ký tự.");
+
             RuleFor(x => x.ReportImageURL)
-                .MaximumLength(500);
+                .MaximumLength(500)
+                .WithMessage("URL báo cáo không được dài hơn 500 ký tự.");
         }
     }
 }
