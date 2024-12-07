@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FranchiseProject.Domain.Entity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ namespace FranchiseProject.Application.Commons
 {
     public class AppConfiguration
     {
+        public VnPayConfig VnPay { get; set; }
         public string DatabaseConnection { get; set; }
         public JwtOptions JwtOptions { get; set; }
         public string RedisConfiguration { get; set; }

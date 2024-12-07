@@ -64,6 +64,11 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IUserAppointmentService, UserAppointmentService>();
             services.AddScoped<IDocumentService, DocumentService>();
             services.AddScoped<IEquipmentService,EquipmentService> ();
+
+            services.AddScoped<IVnPayService, VnPayService>();
+
+            services.AddScoped<IDashboardService, DashboardService>();
+
             services.AddScoped<IHomePageService, HomePageService>();
             services.AddScoped<IAppointmentTemplateService, AppointmentTemplateService>();
             services.AddScoped<IWorkTemplateService, WorkTemplateService>();

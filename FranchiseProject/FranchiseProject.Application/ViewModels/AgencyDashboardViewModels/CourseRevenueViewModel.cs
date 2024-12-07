@@ -12,6 +12,6 @@ namespace FranchiseProject.Application.ViewModels.AgencyDashboardViewModels
         public string CourseCode { get; set; }
         public string CourseName { get; set; }
         public int StudentCount { get; set; }
-        public decimal TotalRevenue { get; set; }
+        public double? TotalRevenue { get; set; }
     }
 }

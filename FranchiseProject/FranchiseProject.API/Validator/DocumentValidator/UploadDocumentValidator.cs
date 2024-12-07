@@ -18,8 +18,7 @@ namespace FranchiseProject.API.Validator.DocumentValidator
             RuleFor(x => x.AgencyId)
                 .NotEmpty().WithMessage("AgencyId không được để trống.");
 
-            RuleFor(x => x.ExpirationDate)
-                .Must(BeAFutureDate).WithMessage("Ngày phải là một ngày trong tương lai.");
+         
         }
         private bool BeAFutureDate(DateOnly? date)
         {

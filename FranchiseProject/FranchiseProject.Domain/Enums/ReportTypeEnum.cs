@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Enums
 {
-    public enum PaymentTypeEnum
+    public enum ReportTypeEnum
     {
-        Contract,
         Course,
-        MonthlyDue
+        Equipment
     }
 }

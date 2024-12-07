@@ -33,5 +33,9 @@ namespace FranchiseProject.Infrastructures.Repositories
                                  .Where(filter)
                                  .ToListAsync();
         }
+        public async Task<Payment?> GetFirstOrDefaultAsync(Expression<Func<Payment, bool>> filter)
+        {
+            return await _dbContext.Payments.FirstOrDefaultAsync(filter);
+        }
     }
 }

@@ -10,6 +10,8 @@ namespace FranchiseProject.Domain.Enums
     {
         AgreementContract,
         BusinessLicense,
-        EducationalOperationLicense
+        EducationalOperationLicense,
+        CompletionHandoverAgreement,
+        OtherDocument,
     }
 }

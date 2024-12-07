@@ -12,11 +12,15 @@ namespace FranchiseProject.Domain.Entity
     {
         public string? Description { get; set; }
         public ReportStatusEnum? Status { get; set; }
-        public string? UserId { get; set; }
-        [ForeignKey("UserId")]
-        public User? User { get; set; }
+       public ReportTypeEnum? Type { get; set; }
+        public Guid? AgencyId { get; set; }
+        [ForeignKey("AgencyId")]
+        public Agency? Agency { get; set; }
         public Guid? CourseId { get; set; }
         [ForeignKey("CourseId")]
         public Course? Course { get; set; }
+        public ICollection<Equipment>? Equipments { get; set; }
+
+        public string? RespondedById { get; set; }
     }
 }

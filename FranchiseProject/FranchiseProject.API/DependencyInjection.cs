@@ -1,4 +1,4 @@
-using FranchiseProject.API.Services;
+﻿using FranchiseProject.API.Services;
 using Microsoft.OpenApi.Models;
 using System.Diagnostics;
 using System.Text.Json.Serialization;

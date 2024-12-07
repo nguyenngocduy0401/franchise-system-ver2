@@ -21,5 +21,9 @@ namespace FranchiseProject.Domain.Entity
         [ForeignKey("ContractId")]
         public Contract? Contract { get; set; }
         public ICollection<EquipmentSerialNumberHistory>? SerialNumberHistories { get; set; }
+
+        public Guid? ReportId { get; set; }
+        [ForeignKey("ReportId")]
+        public Report? Report { get; set; }
     }
 }

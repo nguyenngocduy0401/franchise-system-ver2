@@ -10,7 +10,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IAgencyDashboardService
     {
-        Task<ApiResponse<int>> GetTotalRevenueFromRegisterCourseAsync(DateTime startDate, DateTime endDate);
+        Task<ApiResponse<double>> GetTotalRevenueFromRegisterCourseAsync(DateTime startDate, DateTime endDate);
         Task<ApiResponse<List<CourseRevenueViewModel>>> GetCourseRevenueAsync(DateTime startDate, DateTime endDate);
     }
 }
