@@ -18,6 +18,7 @@ namespace FranchiseProject.Application.ViewModels.ClassViewModel
         public string? InstructorName { get; set; }
         public string? CourseName { get; set; }
         public string? DayOfWeek { get; set; }
+        public string? StartDate { get; set; }
         public ClassStatusEnum Status { get; set; }
     }
 }
