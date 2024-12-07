@@ -47,16 +47,16 @@ namespace FranchiseProject.Application.Services
             _updateWorkByStaffValidator = updateWorkByStaffValidator;
         }
 
-        public async Task<ApiResponse<Pagination<WorkViewModel>>> GetWorksAgencyAsync(FilterWorkByLoginModel filterWorkByLoginModel) 
+        public async Task<ApiResponse<Pagination<WorkViewModel>>> GetWorksAgencyAsync(FilterWorkByLoginModel filterWorkByLoginModel)
         {
             var response = new ApiResponse<Pagination<WorkViewModel>>();
             try
             {
                 var userId = _claimsService.GetCurrentUserId.ToString();
-                
+
                 var user = await _userManager.FindByIdAsync(userId);
 
-                if(user.AgencyId != null) ResponseHandler.Success(new Pagination<WorkViewModel>() , "Người dùng không nằm trong trung tâm nào cả!");
+                if (user.AgencyId != null) ResponseHandler.Success(new Pagination<WorkViewModel>(), "Người dùng không nằm trong trung tâm nào cả!");
 
                 var filter = (Expression<Func<Work, bool>>)(e =>
                     (string.IsNullOrEmpty(filterWorkByLoginModel.Search) || e.Title.Contains(filterWorkByLoginModel.Search)
@@ -89,9 +89,9 @@ namespace FranchiseProject.Application.Services
                             break;
                     }
                 }
-                
+
                 var worksPagination = await _unitOfWork.WorkRepository.FilterWorksByAgencyId(
-                agencyId : (Guid)user.AgencyId,
+                agencyId: (Guid)user.AgencyId,
                 filter: filter,
                 type: AppointmentTypeEnum.WithAgency,
                 orderBy: orderBy,
@@ -462,15 +462,7 @@ namespace FranchiseProject.Application.Services
 
                                         }
                                         break;
-                                    case WorkTypeEnum.Quotation:
-                                        {
-                                            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
-                                            contract.DesignFee = await _unitOfWork.EquipmentRepository.GetTotalEquipmentAmountByContractIdAsync(contract.Id);
-                                            contract.Total = contract.DesignFee + contract.FrachiseFee;
-                                            _unitOfWork.ContractRepository.Update(contract);
 
-                                        }
-                                        break;
                                     case WorkTypeEnum.SignedContract:
                                         {
                                             var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
@@ -510,6 +502,21 @@ namespace FranchiseProject.Application.Services
                                             {
                                                 return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có giấy phép giáo dục!");
                                             }
+                                        }
+                                        break;
+                                }
+                            }
+                            if (work.Level == WorkLevelEnum.Optional)
+                            {
+                                switch (work.Type)
+                                {
+                                    case WorkTypeEnum.Quotation:
+                                        {
+                                            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
+                                            contract.DesignFee = await _unitOfWork.EquipmentRepository.GetTotalEquipmentAmountByContractIdAsync(contract.Id);
+                                            contract.Total = contract.DesignFee + contract.FrachiseFee;
+                                            _unitOfWork.ContractRepository.Update(contract);
+
                                         }
                                         break;
                                 }
