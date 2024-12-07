@@ -53,6 +53,11 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var userId = _claimsService.GetCurrentUserId.ToString();
+                
+                var user = await _userManager.FindByIdAsync(userId);
+
+                if(user.AgencyId != null) ResponseHandler.Success(new Pagination<WorkViewModel>() , "Người dùng không nằm trong trung tâm nào cả!");
+
                 var filter = (Expression<Func<Work, bool>>)(e =>
                     (string.IsNullOrEmpty(filterWorkByLoginModel.Search) || e.Title.Contains(filterWorkByLoginModel.Search)
                     || e.Description.Contains(filterWorkByLoginModel.Search)) &&
@@ -63,8 +68,8 @@ namespace FranchiseProject.Application.Services
                 );
 
                 var order = (Func<IQueryable<Work>, IOrderedQueryable<Work>>)(order => order.OrderByDescending(e => e.StartDate));
-                var worksPagination = await _unitOfWork.WorkRepository.FilterWorksByUserId(
-                userId: userId,
+                var worksPagination = await _unitOfWork.WorkRepository.FilterWorksByAgencyId(
+                agencyId : (Guid)user.AgencyId,
                 filter: filter,
                 type: AppointmentTypeEnum.WithAgency,
                 orderBy: order,
