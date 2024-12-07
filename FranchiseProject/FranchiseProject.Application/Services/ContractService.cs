@@ -269,6 +269,8 @@ namespace FranchiseProject.Application.Services
                         EndTime = c.EndTime ?? DateTime.MinValue,
                         ContractDocumentImageURL = c.ContractDocumentImageURL,
                         Total=c.Total,
+                        DepositPercentage=c.DepositPercentage,
+                        PaidAmount=c.PaidAmount,
                         DesignFee=c.DesignFee,
                         FrachiseFee=c.FrachiseFee,
                         Status = c.Status,

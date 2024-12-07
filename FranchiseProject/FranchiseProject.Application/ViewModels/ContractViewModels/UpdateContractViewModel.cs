@@ -11,6 +11,7 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModels
         public string? Title { get; set; }     //
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
+        public double? DepositPercentage { get; set; }
         public string? ContractDocumentImageURL { get; set; }
         public double? RevenueSharePercentage { get; set; } //
     

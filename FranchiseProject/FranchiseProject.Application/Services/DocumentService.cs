@@ -80,7 +80,7 @@ namespace FranchiseProject.Application.Services
             {
 
                 var document = await _unitOfWork.DocumentRepository.GetByIdAsync(documentId);
-                if (document == null) { return ResponseHandler.Success<DocumentViewModel>(null,"Không tìm thấy tài liệu!")}
+                if (document == null) { return ResponseHandler.Success<DocumentViewModel>(null, "Không tìm thấy tài liệu!"); }
 
                 var documentViewModel = _mapper.Map<DocumentViewModel>(document);
                 if (document.AgencyId.HasValue)
