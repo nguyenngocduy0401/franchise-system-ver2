@@ -63,13 +63,13 @@ namespace FranchiseProject.Application.Services
 
                 if (userCurrent == null || !userCurrent.AgencyId.HasValue)
                 {
-                    return ResponseHandler.Failure<bool>("User không tồn tại hoặc không thuộc về Agency nào.");
+                    return ResponseHandler.Success<bool>(false,"User không tồn tại hoặc không thuộc về Agency nào.");
                 }
 
                 var course = await _unitOfWork.CourseRepository.GetByIdAsync(model.CourseId.Value);
                 if (course == null)
                 {
-                    return ResponseHandler.Failure<bool>("Khóa học không tồn tại.");
+                    return ResponseHandler.Success<bool>(false,"Khóa học không tồn tại.");
                 }
 
                 var report = new Report
@@ -91,7 +91,7 @@ namespace FranchiseProject.Application.Services
                 }
                 else
                 {
-                    return ResponseHandler.Failure<bool>("Không thể lưu báo cáo khóa học.");
+                    return ResponseHandler.Success<bool>(false,"Không thể lưu báo cáo khóa học.");
                 }
             }
             catch (Exception ex)
@@ -108,7 +108,7 @@ namespace FranchiseProject.Application.Services
 
                 if (userCurrent == null || !userCurrent.AgencyId.HasValue)
                 {
-                    return ResponseHandler.Failure<bool>("User không tồn tại hoặc không thuộc về Agency nào.");
+                    return ResponseHandler.Success<bool>(false,"User không tồn tại hoặc không thuộc về Agency nào.");
                 }
                 var equipments = new List<Equipment>();
                 foreach (var equipmentId in model.EquipmentIds)
@@ -116,7 +116,7 @@ namespace FranchiseProject.Application.Services
                     var equipment = await _unitOfWork.EquipmentRepository.GetByIdAsync(equipmentId);
                     if (equipment == null)
                     {
-                        return ResponseHandler.Failure<bool>($"Thiết bị với ID {equipmentId} không tồn tại.");
+                        return ResponseHandler.Success<bool>(false,$"Thiết bị với ID {equipmentId} không tồn tại.");
                     }
                     equipments.Add(equipment);
                 }
@@ -157,23 +157,23 @@ namespace FranchiseProject.Application.Services
 
                 if (userCurrent == null || !userCurrent.AgencyId.HasValue)
                 {
-                    return ResponseHandler.Failure<bool>("User không tồn tại hoặc không thuộc về Agency nào.");
+                    return ResponseHandler.Success<bool>(false,"User không tồn tại hoặc không thuộc về Agency nào.");
                 }
 
                 var report = await _unitOfWork.ReportRepository.GetByIdAsync(reportId);
                 if (report == null)
                 {
-                    return ResponseHandler.Failure<bool>("Báo cáo không tồn tại.");
+                    return ResponseHandler.Success<bool>(false,"Báo cáo không tồn tại.");
                 }
 
                 if (report.AgencyId != userCurrent.AgencyId)
                 {
-                    return ResponseHandler.Failure<bool>("Bạn không có quyền cập nhật báo cáo này.");
+                    return ResponseHandler.Success<bool>(false,"Bạn không có quyền cập nhật báo cáo này.");
                 }
 
                 if (report.Type != ReportTypeEnum.Course)
                 {
-                    return ResponseHandler.Failure<bool>("Báo cáo này không phải là báo cáo khóa học.");
+                    return ResponseHandler.Success<bool>(false,"Báo cáo này không phải là báo cáo khóa học.");
                 }
 
                 if (model.CourseId.HasValue && model.CourseId != report.CourseId)
@@ -181,7 +181,7 @@ namespace FranchiseProject.Application.Services
                     var course = await _unitOfWork.CourseRepository.GetByIdAsync(model.CourseId.Value);
                     if (course == null)
                     {
-                        return ResponseHandler.Failure<bool>("Khóa học không tồn tại.");
+                        return ResponseHandler.Success<bool>(false,"Khóa học không tồn tại.");
                     }
                     report.CourseId = model.CourseId;
                 }
@@ -216,23 +216,23 @@ namespace FranchiseProject.Application.Services
 
                 if (userCurrent == null || !userCurrent.AgencyId.HasValue)
                 {
-                    return ResponseHandler.Failure<bool>("User không tồn tại hoặc không thuộc về Agency nào.");
+                    return ResponseHandler.Success<bool>(false,"User không tồn tại hoặc không thuộc về Agency nào.");
                 }
 
                 var report = await _unitOfWork.ReportRepository.GetByIdAsync(reportId);
                 if (report == null)
                 {
-                    return ResponseHandler.Failure<bool>("Báo cáo không tồn tại.");
+                    return ResponseHandler.Success<bool>(false,"Báo cáo không tồn tại.");
                 }
 
                 if (report.AgencyId != userCurrent.AgencyId)
                 {
-                    return ResponseHandler.Failure<bool>("Bạn không có quyền cập nhật báo cáo này.");
+                    return ResponseHandler.Success<bool>(false,"Bạn không có quyền cập nhật báo cáo này.");
                 }
 
                 if (report.Type != ReportTypeEnum.Equipment)
                 {
-                    return ResponseHandler.Failure<bool>("Báo cáo này không phải là báo cáo thiết bị.");
+                    return ResponseHandler.Success<bool>(false,"Báo cáo này không phải là báo cáo thiết bị.");
                 }
 
                 var equipments = new List<Equipment>();
@@ -241,7 +241,7 @@ namespace FranchiseProject.Application.Services
                     var equipment = await _unitOfWork.EquipmentRepository.GetByIdAsync(equipmentId);
                     if (equipment == null)
                     {
-                        return ResponseHandler.Failure<bool>($"Thiết bị với ID {equipmentId} không tồn tại.");
+                        return ResponseHandler.Success<bool>(false,$"Thiết bị với ID {equipmentId} không tồn tại.");
                     }
                     equipments.Add(equipment);
                 }
@@ -349,7 +349,7 @@ namespace FranchiseProject.Application.Services
                 }
                 else
                 {
-                    return ResponseHandler.Failure<bool>("Không thể cập nhật trạng thái báo cáo.");
+                    return ResponseHandler.Success<bool>(false,"Không thể cập nhật trạng thái báo cáo.");
                 }
             }
             catch (Exception ex)
@@ -409,6 +409,47 @@ namespace FranchiseProject.Application.Services
             catch (Exception ex)
             {
                 return ResponseHandler.Failure<bool>($"Lỗi khi phản hồi báo cáo: {ex.Message}");
+            }
+        }
+        public async Task<ApiResponse<bool>> DeleteReportAsync(Guid reportId)
+        {
+            try
+            {
+                var report = await _unitOfWork.ReportRepository.GetByIdAsync(reportId);
+                if (report == null)
+                {
+                    return ResponseHandler.Success<bool>(false,"Báo cáo không tồn tại.");
+                }
+
+                var userCurrentId = _claimsService.GetCurrentUserId;
+                var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
+
+                if (userCurrent == null || !userCurrent.AgencyId.HasValue)
+                {
+                    return ResponseHandler.Success<bool>(false,"User không tồn tại hoặc không thuộc về Agency nào.");
+                }
+
+                // Check if the user has permission to delete the report
+                if (report.AgencyId != userCurrent.AgencyId && !await _userManager.IsInRoleAsync(userCurrent, AppRole.Admin))
+                {
+                    return ResponseHandler.Success<bool>(false,"Bạn không có quyền xóa báo cáo này.");
+                }
+
+                _unitOfWork.ReportRepository.SoftRemove(report);
+                var result = await _unitOfWork.SaveChangeAsync() > 0;
+
+                if (result)
+                {
+                    return ResponseHandler.Success(true, "Xóa báo cáo thành công.");
+                }
+                else
+                {
+                    return ResponseHandler.Failure<bool>("Không thể xóa báo cáo.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<bool>($"Lỗi khi xóa báo cáo: {ex.Message}");
             }
         }
     }
