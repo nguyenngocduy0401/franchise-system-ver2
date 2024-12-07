@@ -14,6 +14,8 @@ namespace FranchiseProject.Application.ViewModels.WorkViewModels
         public WorkLevelEnum? Level { get; set; }
         public WorkStatusEnum? Status { get; set; }
         public WorkStatusSubmitEnum? Submit { get; set; }
+        public WorkSortByEnum? SortBy { get; set; }
+        public SortDirectionEnum? SortDirection { get; set; }
         public int PageIndex { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }

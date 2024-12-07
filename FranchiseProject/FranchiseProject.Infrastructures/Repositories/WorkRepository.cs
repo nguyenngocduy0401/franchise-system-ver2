@@ -80,7 +80,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             }
             else
             {
-                query = query.OrderByDescending(e => e.CreationDate);
+                query = query.OrderByDescending(e => e.StartDate);
             }
             foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
@@ -130,7 +130,7 @@ namespace FranchiseProject.Infrastructures.Repositories
             }
             else
             {
-                query = query.OrderByDescending(e => e.CreationDate);
+                query = query.OrderByDescending(e => e.StartDate);
             }
             foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {

@@ -67,12 +67,34 @@ namespace FranchiseProject.Application.Services
                     (!filterWorkByLoginModel.Type.HasValue || e.Type == filterWorkByLoginModel.Type)
                 );
 
-                var order = (Func<IQueryable<Work>, IOrderedQueryable<Work>>)(order => order.OrderByDescending(e => e.StartDate));
+                Func<IQueryable<Work>, IOrderedQueryable<Work>>? orderBy = null;
+                if (filterWorkByLoginModel.SortBy.HasValue && filterWorkByLoginModel.SortDirection.HasValue)
+                {
+                    switch (filterWorkByLoginModel.SortBy.Value)
+                    {
+                        case WorkSortByEnum.CreateDate:
+                            orderBy = filterWorkByLoginModel.SortDirection == SortDirectionEnum.Descending ?
+                                query => query.OrderByDescending(p => p.CreationDate) :
+                                query => query.OrderBy(p => p.CreationDate);
+                            break;
+                        case WorkSortByEnum.StartDate:
+                            orderBy = filterWorkByLoginModel.SortDirection == SortDirectionEnum.Descending ?
+                                query => query.OrderByDescending(p => p.StartDate) :
+                                query => query.OrderBy(p => p.StartDate);
+                            break;
+                        case WorkSortByEnum.EndDate:
+                            orderBy = filterWorkByLoginModel.SortDirection == SortDirectionEnum.Descending ?
+                                query => query.OrderByDescending(p => p.EndDate) :
+                                query => query.OrderBy(p => p.EndDate);
+                            break;
+                    }
+                }
+                
                 var worksPagination = await _unitOfWork.WorkRepository.FilterWorksByAgencyId(
                 agencyId : (Guid)user.AgencyId,
                 filter: filter,
                 type: AppointmentTypeEnum.WithAgency,
-                orderBy: order,
+                orderBy: orderBy,
                 pageIndex: filterWorkByLoginModel.PageIndex,
                 pageSize: filterWorkByLoginModel.PageSize
                 );
@@ -101,13 +123,34 @@ namespace FranchiseProject.Application.Services
                     (!filterWorkByLoginModel.Submit.HasValue || e.Submit == filterWorkByLoginModel.Submit) &&
                     (!filterWorkByLoginModel.Type.HasValue || e.Type == filterWorkByLoginModel.Type)
                 );
+                Func<IQueryable<Work>, IOrderedQueryable<Work>>? orderBy = null;
+                if (filterWorkByLoginModel.SortBy.HasValue && filterWorkByLoginModel.SortDirection.HasValue)
+                {
+                    switch (filterWorkByLoginModel.SortBy.Value)
+                    {
+                        case WorkSortByEnum.CreateDate:
+                            orderBy = filterWorkByLoginModel.SortDirection == SortDirectionEnum.Descending ?
+                                query => query.OrderByDescending(p => p.CreationDate) :
+                                query => query.OrderBy(p => p.CreationDate);
+                            break;
+                        case WorkSortByEnum.StartDate:
+                            orderBy = filterWorkByLoginModel.SortDirection == SortDirectionEnum.Descending ?
+                                query => query.OrderByDescending(p => p.StartDate) :
+                                query => query.OrderBy(p => p.StartDate);
+                            break;
+                        case WorkSortByEnum.EndDate:
+                            orderBy = filterWorkByLoginModel.SortDirection == SortDirectionEnum.Descending ?
+                                query => query.OrderByDescending(p => p.EndDate) :
+                                query => query.OrderBy(p => p.EndDate);
+                            break;
+                    }
+                }
 
-                var order = (Func<IQueryable<Work>, IOrderedQueryable<Work>>)(order => order.OrderByDescending(e => e.StartDate));
                 var worksPagination = await _unitOfWork.WorkRepository.FilterWorksByUserId(
                 userId: userId,
                 filter: filter,
                 includeProperties: "Agency",
-                orderBy: order,
+                orderBy: orderBy,
                 pageIndex: filterWorkByLoginModel.PageIndex,
                 pageSize: filterWorkByLoginModel.PageSize
                 );
