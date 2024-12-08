@@ -68,7 +68,7 @@ namespace FranchiseProject.Application.Services
                     (!filterWorkByLoginModel.Type.HasValue || e.Type == filterWorkByLoginModel.Type)
                 );
 
-                Func<IQueryable<Work>, IOrderedQueryable<Work>>? orderBy = null;
+                Func<IQueryable<Work>, IOrderedQueryable<Work>> orderBy = query => query.OrderBy(p => p.StartDate);
                 if (filterWorkByLoginModel.SortBy.HasValue && filterWorkByLoginModel.SortDirection.HasValue)
                 {
                     switch (filterWorkByLoginModel.SortBy.Value)
