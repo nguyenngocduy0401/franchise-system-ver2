@@ -48,4 +48,4 @@ namespace FranchiseProject.API.Controllers
             return await _agencyDashboardService.GetAmountAgencyAmountPayAsync(id, startDate, endDate);
          }
     }
-}}
+}
