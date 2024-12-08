@@ -60,7 +60,7 @@ namespace FranchiseProject.Application.Services
               
                 var doc = _mapper.Map<Document>(document);
               
-                    doc.Appoved = document.Approved;
+                doc.Appoved = document.Approved;
                               
                 doc.Type = document.DocumentType;
                 await _unitOfWork.DocumentRepository.AddAsync(doc);

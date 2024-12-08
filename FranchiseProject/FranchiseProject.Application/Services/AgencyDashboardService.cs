@@ -87,6 +87,53 @@ namespace FranchiseProject.Application.Services
 
             return response;
         }
+        public async Task<ApiResponse<List<CourseRevenueViewModel>>> GetCourseRevenueAgencyIdAsync(Guid AgencyId,DateTime startDate, DateTime endDate)
+        {
+            var response = new ApiResponse<List<CourseRevenueViewModel>>();
+            try
+            {
+                var agencyId = AgencyId;
+                var courseRevenueList = new List<CourseRevenueViewModel>();
+                var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(agencyId);
+                var courseList = await _unitOfWork.CourseRepository.GetAllAsync();
+                foreach (var course in courseList)
+                {
+                    var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id);
+                    var TotalMoney = (double)0;
+                    var studentCount = 0;
+                    var validRegistrations = filteredRegisterCourses
+                .Where(r => r.CreationDate.Date <= endDate.Date)
+                .ToList();
+                    foreach (var registration in validRegistrations)
+                    {
+                        studentCount++;
+                        var payments = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByRegisterCourseIdAsync(registration.Id);
+                        foreach (var payment in payments)
+                        {
+                            if (payment.CreationDate.Date >= startDate.Date && payment.CreationDate.Date <= endDate.Date)
+                            {
+                                TotalMoney += payment.Amount ?? 0;
+                            }
+                        }
+                    }
+                    courseRevenueList.Add(new CourseRevenueViewModel
+                    {
+                        CourseId = course.Id,
+                        StudentCount = studentCount,
+                        CourseCode = course.Code,
+                        CourseName = course.Name,
+                        TotalRevenue = TotalMoney,
+                    });
+                }
+                response = ResponseHandler.Success(courseRevenueList, "Tính doanh thu khóa học thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<List<CourseRevenueViewModel>>($"Lỗi khi tính doanh thu khóa học: {ex.Message}");
+            }
+
+            return response;
+        }
         public async Task<ApiResponse<double>> GetTotalRevenueFromRegisterCourseAsync(DateTime startDate, DateTime endDate)
         {
             var response = new ApiResponse<double>();
@@ -123,7 +170,68 @@ namespace FranchiseProject.Application.Services
 
             return response;
         }
+        public async Task<ApiResponse<double>> GetTotalRevenueFromRegisterCourseByAgencyIdAsync(Guid AgencyId,DateTime startDate, DateTime endDate)
+        {
+            var response = new ApiResponse<double>();
 
+            try
+            {
+
+                var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(AgencyId);
+                var totalMoney = (double)0;
+                foreach (var registration in registerCourses)
+                {
+
+                    var payments = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByRegisterCourseIdAsync(registration.Id);
+                    foreach (var payment in payments)
+                    {
+                        if (payment.CreationDate.Date >= startDate.Date && payment.CreationDate.Date <= endDate.Date)
+                        {
+                            totalMoney += payment.Amount ?? 0;
+                        }
+                    }
+                }
+                response = ResponseHandler.Success(totalMoney, "Tính tổng doanh thu từ Payment thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<double>($"Lỗi khi tính tổng doanh thu: {ex.Message}");
+            }
+
+            return response;
+        }
+        public async Task<ApiResponse<double>> GetAmountAgencyAmountPayAsync(Guid AgencyId, DateTime startDate, DateTime endDate)
+        {
+            var response = new ApiResponse<double>();
+
+            try
+            {
+                var contract =await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(AgencyId);
+                var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(AgencyId);
+                var totalMoney = (double)0;
+                foreach (var registration in registerCourses)
+                {
+
+                    var payments = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByRegisterCourseIdAsync(registration.Id);
+                    foreach (var payment in payments)
+                    {
+                        if (payment.CreationDate.Date >= startDate.Date && payment.CreationDate.Date <= endDate.Date)
+                        {
+                            totalMoney += payment.Amount ?? 0;
+                        }
+                    }
+                }
+                totalMoney = totalMoney * (contract.RevenueSharePercentage.Value/100);
+
+                response = ResponseHandler.Success(totalMoney, "Tính tổng doanh thu từ Payment thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<double>($"Lỗi khi tính tổng doanh thu: {ex.Message}");
+            }
+
+            return response;
+        }
 
     }
 }
