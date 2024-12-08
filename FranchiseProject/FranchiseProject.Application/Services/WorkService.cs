@@ -451,19 +451,27 @@ namespace FranchiseProject.Application.Services
 
                                             };
                                             await _unitOfWork.ContractRepository.AddAsync(contract);
+                                            var doc = await _unitOfWork.DocumentRepository.GetMostRecentAgreeSignByAgencyIdAsync(work.AgencyId.Value, DocumentType.BusinessLicense);
+                                            doc.Appoved = true;
+                                            _unitOfWork.DocumentRepository.Update(doc);
                                             break;
                                         }
                                     case WorkTypeEnum.AgreementSigned:
                                         {
+                                            var work1 = _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
                                             var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveAgreementContractAsync(work.AgencyId.Value);
+                                            var doc = await _unitOfWork.DocumentRepository.GetMostRecentAgreeSignByAgencyIdAsync(work.AgencyId.Value,DocumentType.AgreementContract);
+                                            doc.Appoved = true;
+                                             _unitOfWork.DocumentRepository.Update(doc);
                                             if (!hasActiveAgreementContract)
                                             {
                                                 return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng thỏa thuận!");
                                             }
+                                            
 
                                         }
                                         break;
-
+                                
                                     case WorkTypeEnum.SignedContract:
                                         {
                                             var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
@@ -475,6 +483,7 @@ namespace FranchiseProject.Application.Services
                                             contract.ContractDocumentImageURL = work.ReportImageURL;
                                             _unitOfWork.WorkRepository.Update(work);
                                             _unitOfWork.ContractRepository.Update(contract);
+                                            
                                         }
                                         break;
                                     case WorkTypeEnum.Handover:
@@ -503,6 +512,9 @@ namespace FranchiseProject.Application.Services
                                             {
                                                 return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có giấy phép giáo dục!");
                                             }
+                                            var doc = await _unitOfWork.DocumentRepository.GetMostRecentAgreeSignByAgencyIdAsync(work.AgencyId.Value, DocumentType.EducationalOperationLicense);
+                                            doc.Appoved = true;
+                                            _unitOfWork.DocumentRepository.Update(doc);
                                         }
                                         break;
                                 }

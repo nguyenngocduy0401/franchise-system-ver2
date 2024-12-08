@@ -135,6 +135,7 @@ namespace FranchiseProject.Application.Services
                 contract.EndTime = create.EndTime;
                 contract.ContractDocumentImageURL = create.ContractDocumentImageURL;
                 contract.RevenueSharePercentage = create.RevenueSharePercentage;
+                contract.Status = ContractStatusEnum.None;
                // contract.FrachiseFee = franchiseFee.Sum(f => f.FeeAmount);
                  _unitOfWork.ContractRepository.Update(contract);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
@@ -309,6 +310,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 Expression<Func<Contract, bool>> filter = c =>
+                 c.Status != ContractStatusEnum.None &&
                    (!filterContractModel.StartTime.HasValue || filterContractModel.StartTime <= c.StartTime) &&
             (!filterContractModel.EndTime.HasValue || filterContractModel.EndTime >= c.EndTime) &&
             (!filterContractModel.Status.HasValue || c.Status == filterContractModel.Status) &&
@@ -483,19 +485,9 @@ namespace FranchiseProject.Application.Services
                         }
 
                         string fileName = $"Contract_{contract.ContractCode}.pdf";
-
-                        // Tạo MemoryStream mới từ mảng byte
                         using (var uploadStream = new MemoryStream(pdfBytes))
                         {
-                            string firebaseUrl = await _firebaseService.UploadFileAsync(uploadStream, fileName);
-                            if (contract.ContractDocumentImageURL == null)
-                            {
-                                contract.ContractDocumentImageURL = firebaseUrl;
-                                _unitOfWork.ContractRepository.Update(contract);
-                            }
-                          
-                            await _unitOfWork.SaveChangeAsync();
-
+                            string firebaseUrl = await _firebaseService.UploadFileAsync(uploadStream, fileName);                  
                             return ResponseHandler.Success(firebaseUrl, "File hợp đồng đã được tải lên thành công.");
                         }
                     }
@@ -503,7 +495,6 @@ namespace FranchiseProject.Application.Services
             }
             catch (Exception ex)
             {
-                // Log the exception
                 return ResponseHandler.Failure<string>($"Lỗi khi tạo và tải lên file hợp đồng: {ex.Message}");
             }
         }

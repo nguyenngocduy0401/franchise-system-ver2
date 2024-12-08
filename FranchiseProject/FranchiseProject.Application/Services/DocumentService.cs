@@ -57,8 +57,11 @@ namespace FranchiseProject.Application.Services
 
                 ValidationResult validationResult = await _validator.ValidateAsync(document);
                 if (!validationResult.IsValid) if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
-
+              
                 var doc = _mapper.Map<Document>(document);
+              
+                    doc.Appoved = document.Approved;
+                              
                 doc.Type = document.DocumentType;
                 await _unitOfWork.DocumentRepository.AddAsync(doc);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
@@ -105,7 +108,8 @@ namespace FranchiseProject.Application.Services
                 Expression<Func<Document, bool>> filter = d =>
                     (!filterModel.AgencyId.HasValue || d.AgencyId == filterModel.AgencyId) &&
                     (!filterModel.Type.HasValue || d.Type == filterModel.Type) &&
-                    (d.Status == filterModel.Status);
+                    (d.Status == filterModel.Status)&&
+                    (d.Appoved==true);
            
 
                 var documents = await _unitOfWork.DocumentRepository.GetFilterAsync(
