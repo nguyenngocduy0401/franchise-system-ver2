@@ -83,13 +83,12 @@ namespace FranchiseProject.API.Controllers
         {
             return await _workService.GetWorksAgencyAsync(filterWorkByLoginModel);
         }
-        [Authorize]
-  
+
+        [Authorize(Roles = AppRole.AgencyManager)]
         [HttpPut("~/agency-manager/api/v1/works/{id}")]
-        public async Task<ApiResponse<bool>> UpdateStatusWorkForCustomer(Guid id)
-    
+        public async Task<ApiResponse<bool>> UploadFileByAgencyManager(Guid id, string fileURL)
         {
-            return await _workService.UpdateStatusWorkForCustomer(id);
+            return await _workService.UploadFileByAgencyManager(id, fileURL);
         }
-    }
+	}
 }

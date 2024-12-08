@@ -19,7 +19,7 @@ namespace FranchiseProject.Domain.Entity
         public string? Report { get; set; }
         public string? ReportImageURL { get; set; }
         public WorkStatusSubmitEnum? Submit { get; set; }
-        public bool? CustomerSubmit { get; set; }
+        public string? CustomerSubmit { get; set; }
         public WorkTypeEnum? Type { get; set; }
         public Guid? ApproveBy { get; set; }
         public Guid? AgencyId { get; set; }

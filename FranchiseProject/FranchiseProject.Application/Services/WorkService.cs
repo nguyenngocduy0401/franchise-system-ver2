@@ -461,14 +461,13 @@ namespace FranchiseProject.Application.Services
                                             var work1 = _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
                                             var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveAgreementContractAsync(work.AgencyId.Value);
                                             var doc = await _unitOfWork.DocumentRepository.GetMostRecentAgreeSignByAgencyIdAsync(work.AgencyId.Value,DocumentType.AgreementContract);
+                                            doc.URLFile = work.CustomerSubmit;
                                             doc.Appoved = true;
                                              _unitOfWork.DocumentRepository.Update(doc);
                                             if (!hasActiveAgreementContract)
                                             {
                                                 return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng thỏa thuận!");
                                             }
-                                            
-
                                         }
                                         break;
                                 
@@ -622,13 +621,13 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> UpdateStatusWorkForCustomer(Guid id)
+        public async Task<ApiResponse<bool>> UploadFileByAgencyManager(Guid id, string fileURL)
         {
             var response = new ApiResponse<bool>();
             try
             {
                 var work =await _unitOfWork.WorkRepository.GetExistByIdAsync(id);
-                work.CustomerSubmit = true;
+                work.CustomerSubmit = fileURL;
                 _unitOfWork.WorkRepository.Update(work);
                 await _unitOfWork.SaveChangeAsync();
                 return ResponseHandler.Success(true, "Cập nhật thành công !");
