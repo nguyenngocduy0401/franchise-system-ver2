@@ -8,6 +8,8 @@ namespace FranchiseProject.API.Validator.AgencyValidation
         public RegisterFranchiseViewModelValidator()
         {
             RuleFor(x => x.CustomerName)
+              .NotEmpty()
+              .WithMessage("Tên khách hàng là bắt buộc.")
               .MaximumLength(50)
               .WithMessage("Tên khách hàng không được vượt quá 50 ký tự.");
 
