@@ -93,6 +93,64 @@ namespace FranchiseProject.Application.Services
 
             return paymentUrl;
         }
+        public async Task<string> CreatePaymentUrlFromContractSeacondPayment(PaymentContractViewModel paymentContract)
+        {
+
+            var contract = await _unitOfWork.ContractRepository.GetExistByIdAsync(paymentContract.ContractId.Value);
+            var amount = contract.Total -contract.PaidAmount;
+            var paidAmount = contract.PaidAmount+ amount;
+            var paymentId = Guid.NewGuid();
+            var vnpayTxnRef = paymentId.ToString();
+            var vnpayOrderInfo = $"Thanh toán hợp đồng lần 2 {paymentContract.ContractId}";
+            var vnpayAmount = Convert.ToInt64(amount * 100);
+            var vnpayLocale = "vn";
+            var vnpayCreateDate = DateTime.Now.ToString("yyyyMMddHHmmss");
+            var vnpayExpireDate = DateTime.Now.AddMinutes(15).ToString("yyyyMMddHHmmss");
+
+            var vnpayData = new Dictionary<string, string>
+            {
+                {"vnp_Version", "2.1.0"},
+                {"vnp_Command", "pay"},
+                {"vnp_TmnCode", _vnPayConfig.TmnCode},
+                {"vnp_Amount", vnpayAmount.ToString()},
+                {"vnp_CreateDate", vnpayCreateDate},
+                {"vnp_CurrCode", "VND"},
+                {"vnp_IpAddr", "127.0.0.1"},
+                {"vnp_Locale", vnpayLocale},
+                {"vnp_OrderInfo", vnpayOrderInfo},
+                {"vnp_OrderType", "other"},
+                {"vnp_ReturnUrl", _vnPayConfig.ReturnUrl},
+                {"vnp_TxnRef", vnpayTxnRef},
+                {"vnp_ExpireDate", vnpayExpireDate}
+            };
+
+            var orderedData = new SortedList<string, string>(vnpayData);
+            var hashData = string.Join("&", orderedData.Select(kv => $"{WebUtility.UrlEncode(kv.Key)}={WebUtility.UrlEncode(kv.Value)}"));
+
+            var secureHash = ComputeHmacSha512(_vnPayConfig.HashSecret, hashData);
+            vnpayData.Add("vnp_SecureHash", secureHash);
+
+            var paymentUrl = _vnPayConfig.PaymentUrl + "?" + string.Join("&", vnpayData.Select(kv => $"{kv.Key}={WebUtility.UrlEncode(kv.Value)}"));
+
+            // Save payment information to database
+            var payment = new Payment
+            {
+                Id = paymentId,
+                Title = "Thanh toán " + contract.Title,
+                Description = "Thanh toán " + contract.Title + DateTime.Now,
+                Type = PaymentTypeEnum.Contract,
+                Method = PaymentMethodEnum.BankTransfer,
+                Amount = amount,
+                ContractId = paymentContract.ContractId,
+                Status = PaymentStatus.NotCompleted,
+                CreationDate = DateTime.UtcNow
+            };
+
+            await _unitOfWork.PaymentRepository.AddAsync(payment);
+            await _unitOfWork.SaveChangeAsync();
+
+            return paymentUrl;
+        }
 
         public async Task<PaymentResult> ProcessPaymentCallback(VnPayCallbackViewModel callbackData)
         {

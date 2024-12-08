@@ -21,6 +21,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace FranchiseProject.Application.Services
 {
@@ -602,6 +603,23 @@ namespace FranchiseProject.Application.Services
                     }
                 }
                 response = ResponseHandler.Success(true);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
+        public async Task<ApiResponse<bool>> UpdateStatusWorkForCustomer(Guid id)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var work =await _unitOfWork.WorkRepository.GetExistByIdAsync(id);
+                work.CustomerSubmit = true;
+                _unitOfWork.WorkRepository.Update(work);
+                await _unitOfWork.SaveChangeAsync();
+                return ResponseHandler.Success(true, "Cập nhật thành công !");
             }
             catch (Exception ex)
             {
