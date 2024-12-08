@@ -32,8 +32,6 @@ namespace FranchiseProject.Application.Services
 
         public async Task CreateAndSendNotificationNoReponseAsync(SendNotificationViewModel sendNotificationViewModel)
         {
-
-
             if (sendNotificationViewModel.userIds == null || sendNotificationViewModel.userIds.Count == 0 || string.IsNullOrEmpty(sendNotificationViewModel.message))
             {
             }
