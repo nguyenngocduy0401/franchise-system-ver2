@@ -8,7 +8,8 @@ namespace FranchiseProject.Domain.Enums
 {
     public enum DocumentStatus
     {
+
         Active,
-        Expired
+        Expired,
     }
 }
