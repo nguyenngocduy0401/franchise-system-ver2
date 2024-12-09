@@ -135,6 +135,7 @@ namespace FranchiseProject.Application.Services
                 contract.EndTime = create.EndTime;
                 contract.ContractDocumentImageURL = create.ContractDocumentImageURL;
                 contract.RevenueSharePercentage = create.RevenueSharePercentage;
+                contract.DepositPercentage = create.DepositPercentage;
                 contract.Status = ContractStatusEnum.None;
                // contract.FrachiseFee = franchiseFee.Sum(f => f.FeeAmount);
                  _unitOfWork.ContractRepository.Update(contract);
