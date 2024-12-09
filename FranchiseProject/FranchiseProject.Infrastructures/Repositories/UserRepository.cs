@@ -140,7 +140,10 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             IQueryable<User> query = _dbContext.Users
                 .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role);
+                .ThenInclude(ur => ur.Role)
+                .Include(U => U.UserAppointments)
+                .ThenInclude(ua => ua.Appointment)
+                .ThenInclude(a => a.Work);
 
             query = query.Where(u =>
                           (u.LockoutEnd <= DateTimeOffset.UtcNow || u.LockoutEnd == null)

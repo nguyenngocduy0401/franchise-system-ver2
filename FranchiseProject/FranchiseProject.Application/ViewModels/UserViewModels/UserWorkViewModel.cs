@@ -12,5 +12,6 @@ namespace FranchiseProject.Application.ViewModels.UserViewModels
         public string? Role { get; set; }
         public string? UserName { get; set; }
         public string? FullName { get; set; }
+        public int? WorkCount { get; set; }
     }
 }
