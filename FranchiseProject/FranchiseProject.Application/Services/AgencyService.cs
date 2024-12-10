@@ -77,8 +77,6 @@ namespace FranchiseProject.Application.Services
                 }
                 consult.Status = ConsultationStatusEnum.ProspectivePartner;
 
-                ///
-
                 var existingUser = await _unitOfWork.UserRepository.GetByAgencyIdAsync(agency.Id);
                 if (existingUser == null)
                 {
