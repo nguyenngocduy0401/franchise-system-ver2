@@ -67,7 +67,7 @@ namespace FranchiseProject.API.Controllers
 		public async Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAdminAsync([FromQuery] FilterUserByAdminModel filterUserByAdminModel)
 			=> await _userService.FilterUserByAdminAsync(filterUserByAdminModel);
 
-        [Authorize(Roles = AppRole.AgencyManager)]
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [SwaggerOperation(Summary = "cấm và bỏ lệnh cấm người dùng {Authorize = AgencyManager}")]
         [HttpPut("~/agency-manager/api/v1/users/{id}/status")]
         public async Task<ApiResponse<bool>> BanAndUnbanUserByAgencyAsync(string id)
@@ -85,7 +85,7 @@ namespace FranchiseProject.API.Controllers
 		public async Task<ApiResponse<CreateUserByAdminModel>> CreateUserByAdminAsync(CreateUserByAdminModel createUserByAdminModel)
 			=> await _userService.CreateUserByAdminAsync(createUserByAdminModel);
 
-        [Authorize(Roles = AppRole.AgencyManager)]
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [SwaggerOperation(Summary = "cập nhật người dùng {Authorize = AgencyManager}")]
         [HttpPut("~/agency-manager/api/v1/users")]
         public async Task<ApiResponse<bool>> UpdateUserByAgencyAsync(string id, UpdateUserByAgencyModel updateUserByAgencyModel)
@@ -102,12 +102,12 @@ namespace FranchiseProject.API.Controllers
 		[HttpPost("change-password")]
 		public async Task<ApiResponse<bool>> ChangePasswordAsync(UpdatePasswordModel updatePasswordModel)
 			=> await _userService.ChangePasswordAsync(updatePasswordModel);
-		[Authorize(Roles = AppRole.AgencyManager)]
+		[Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
 		[SwaggerOperation(Summary = "tạo người dùng {Authorize = AgencyManager}")]
 		[HttpPost("~/agency-manager/api/v1/users")]
 		public async Task<ApiResponse<CreateUserViewModel>> CreateUserByAgencyAsync(CreateUserByAgencyModel createUserByAgencyModel)
 			=> await _userService.CreateUserByAgencyAsync(createUserByAgencyModel);
-		[Authorize(Roles = AppRole.AgencyManager)]
+		[Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
 		[SwaggerOperation(Summary = "tạo người dùng {Authorize = AgencyManager}")]
 		[HttpPost("~/agency-manager/api/v1/users/files")]
 		public async Task<ApiResponse<List<CreateUserByAgencyModel>>> CreateListUserByAgencyAsync(IFormFile file)
