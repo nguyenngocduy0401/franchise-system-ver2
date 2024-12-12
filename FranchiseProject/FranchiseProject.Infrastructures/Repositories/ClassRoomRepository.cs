@@ -59,21 +59,21 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             await _dbContext.Set<ClassRoom>().AddAsync(classRoom);
         }
-        public async Task<List<User>> GetWaitlistedStudentsAsync(List<string> studentIds)
+      /*  public async Task<List<User>> GetWaitlistedStudentsAsync(List<string> studentIds)
         {
             return await _dbContext.Users
                 .Where(u => studentIds.Contains(u.Id) && u.StudentStatus == StudentStatusEnum.Waitlisted)
                 .ToListAsync();
         }
+*/
 
-
-        public async Task<List<string>> GetInvalidStudentsAsync(List<string> studentIds)
+      /*  public async Task<List<string>> GetInvalidStudentsAsync(List<string> studentIds)
         {
             return await _dbContext.Users
                 .Where(u => studentIds.Contains(u.Id) && u.StudentStatus != StudentStatusEnum.Waitlisted)
                 .Select(u => u.FullName)
                 .ToListAsync();
-        }
+        }*/
         public async Task<List<ClassRoom>> GetAllAsync(Expression<Func<ClassRoom, bool>> predicate)
         {
               if (predicate == null)

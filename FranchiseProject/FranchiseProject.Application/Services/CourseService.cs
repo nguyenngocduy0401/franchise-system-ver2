@@ -463,6 +463,31 @@ namespace FranchiseProject.Application.Services
             course.Syllabus = syllabus;
             return course;
         }
+        public async Task<ApiResponse<bool>> CreateCourseAsync(CreateCourseModel createCourseModel)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                ValidationResult validationResult = await _createCourseValidator.ValidateAsync(createCourseModel);
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+
+                var course = _mapper.Map<Course>(createCourseModel);
+                course.Version = 0;
+                course.Status = CourseStatusEnum.Draft;
+                await _unitOfWork.CourseRepository.AddAsync(course);
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Create failed!");
+
+                response = ResponseHandler.Success(true, "Tạo chương học thành công!");
+
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
         private async Task<ApiResponse<Course>> ExtractChapterFromWorksheetAsync(IXLWorksheet worksheet, IFormFile questionsFile, IFormFile materialsFile, Course course)
         {
             var response = new ApiResponse<Course>();

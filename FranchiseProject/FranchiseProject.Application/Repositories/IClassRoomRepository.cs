@@ -12,8 +12,8 @@ namespace FranchiseProject.Application.Repositories
     {
         Task<List<ClassRoom>> FindAsync(Expression<Func<ClassRoom, bool>> expression, string includeProperties = "");
         Task AddAsync(ClassRoom classRoom);
-        Task<List<User>> GetWaitlistedStudentsAsync(List<string> studentIds);
-        Task<List<string>> GetInvalidStudentsAsync(List<string> studentIds);
+      //  Task<List<User>> GetWaitlistedStudentsAsync(List<string> studentIds);
+     //   Task<List<string>> GetInvalidStudentsAsync(List<string> studentIds);
         Task<List<ClassRoom>> GetAllAsync(Expression<Func<ClassRoom, bool>> predicate);
         Task<ClassRoom> GetFirstOrDefaultAsync(Expression<Func<ClassRoom, bool>> predicate);
         Task DeleteAsync(ClassRoom entity);
