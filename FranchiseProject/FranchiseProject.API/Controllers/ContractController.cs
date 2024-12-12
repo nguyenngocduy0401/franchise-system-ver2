@@ -1,4 +1,5 @@
 ﻿using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ContractViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -77,6 +78,23 @@ namespace FranchiseProject.API.Controllers
         public async Task<ApiResponse<ContractViewModel>> GetContractbyAgencyId(Guid id)
         {
             return await _contractService.GetContractbyAgencyId(id);
+        }
+        [SwaggerOperation(Summary = "Upload template hợp đồng {Authorize = Admin}")]
+        [HttpPost("template")]
+       // [Authorize(Roles = AppRole.Admin)]
+        public async Task<ApiResponse<string>> UploadContractTemplate(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return ResponseHandler.Failure<string>("Không có file được chọn.");
+            }
+
+            if (!file.FileName.EndsWith(".doc") && !file.FileName.EndsWith(".docx"))
+            {
+                return ResponseHandler.Failure<string>("File phải có định dạng .doc hoặc .docx");
+            }
+
+            return await _contractService.UploadContractTemplateAsync(file);
         }
     }
 }

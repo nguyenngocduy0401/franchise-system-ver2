@@ -20,6 +20,7 @@ namespace FranchiseProject.Domain.Entity
         public string? ContractDocumentImageURL { get; set; }
         public double? RevenueSharePercentage { get; set; }
         public double? DesignFee { get; set; }
+        public double?EquipmentFee { get; set; }
         public double? FrachiseFee { get; set; }
         public ContractStatusEnum? Status { get; set; }
         public Guid? AgencyId { get; set; }

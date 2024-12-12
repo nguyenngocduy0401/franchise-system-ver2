@@ -10,10 +10,10 @@ namespace FranchiseProject.API.Services
 {
     public class PdfService : IPdfService
     {
-        private readonly HttpClient _httpClient;
-        public PdfService()
+        private readonly HttpClient _httpClient; private readonly IConfiguration _configuration;
+        public PdfService(IConfiguration configuration)
         {
-            _httpClient = new HttpClient();
+            _httpClient = new HttpClient(); _configuration = configuration;
         }
         //public async Task<Stream> FillPdfTemplate(InputContractViewModel contract)
         //{
@@ -67,8 +67,8 @@ namespace FranchiseProject.API.Services
         //}
         public async Task<Stream> FillDocumentTemplate(InputContractViewModel contract)
         {
-            //string templatePath = "D:\\FPT\\main_Frachise\\franchise-system\\FranchiseProject\\FranchiseProject.Infrastructures\\FireBase\\Resources\\Hợp đồng chuyển nhượng .docx";//chuyển thành một n=biến 
-            string templatePath = @"../../FranchiseProject.Infrastructures/FireBase/Resouces/Hợp đồng chuyển nhượng.docx";
+            string templatePath = _configuration["ContractTemplateUrl"];
+            // string templatePath = @"../../FranchiseProject.Infrastructures/FireBase/Resouces/Hợp đồng chuyển nhượng.docx";
 
             using (var doc = DocX.Load(templatePath))
             {
@@ -77,6 +77,7 @@ namespace FranchiseProject.API.Services
                 var depositParse = Deposit.HasValue ? NumberToWordsConverter.ConvertToWords(Deposit.Value) : "";
                 var designFeeParse = contract.DesignFee.HasValue ? NumberToWordsConverter.ConvertToWords(contract.DesignFee.Value) : "";
                 var FranchiseFeeParse = contract.FranchiseFee.HasValue ? NumberToWordsConverter.ConvertToWords(contract.FranchiseFee.Value) : "";
+                var EquipmentFeeParse = contract.EquipmentFee.HasValue ? NumberToWordsConverter.ConvertToWords(contract.FranchiseFee.Value) : "";
                 doc.ReplaceText("{{TotalMoney}}", contract.TotalMoney?.ToString("#,##0") ?? "");
                 doc.ReplaceText("{{Deposit}}", Deposit?.ToString("#,##0") ?? "");
                 doc.ReplaceText("{{DesignFee}}", contract.DesignFee?.ToString("#,##0") ?? "");
@@ -86,7 +87,13 @@ namespace FranchiseProject.API.Services
                 doc.ReplaceText("{{DesignFeeParse}}", designFeeParse);
                 doc.ReplaceText("{{FranchiseFeeParse}}", FranchiseFeeParse);
                 doc.ReplaceText("{{ContractCode}}", contract.ContractCode ?? "");
-                                var memoryStream = new MemoryStream();
+                doc.ReplaceText("{{EquipmentFee}}", contract.EquipmentFee?.ToString("#,##0") ?? "");
+                doc.ReplaceText("{{EquipmentFeeParse}}", EquipmentFeeParse ?? "");
+                doc.ReplaceText("{{Duration}}", contract.Druration?.ToString("#,##0") ?? "");
+                doc.ReplaceText("{{Percent}}", contract.Percent?.ToString("#,##0") ?? "");
+                doc.ReplaceText("{{Address}}", contract.Address ?? "");
+
+                var memoryStream = new MemoryStream();
                 doc.SaveAs(memoryStream);
                 memoryStream.Position = 0;
 
@@ -135,7 +142,7 @@ namespace FranchiseProject.API.Services
                 result = result.Replace("một mươi", "mười");
                 result = result.Replace("mười năm", "mười lăm");
                 result = result.Replace("mươi năm", "mươi lăm");
-                return result + " đồng";
+                return result ;
             }
 
             private static string ConvertGroupToWords(int number)

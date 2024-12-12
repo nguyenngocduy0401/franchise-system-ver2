@@ -525,8 +525,9 @@ namespace FranchiseProject.Application.Services
                                     case WorkTypeEnum.Quotation:
                                         {
                                             var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
-                                            contract.DesignFee = await _unitOfWork.EquipmentRepository.GetTotalEquipmentAmountByContractIdAsync(contract.Id);
-                                            contract.Total = contract.DesignFee + contract.FrachiseFee;
+                                            contract.EquipmentFee = await _unitOfWork.EquipmentRepository.GetTotalEquipmentAmountByContractIdAsync(contract.Id);
+                                            
+                                            contract.Total = contract.DesignFee + contract.FrachiseFee+ contract.EquipmentFee;
                                             _unitOfWork.ContractRepository.Update(contract);
 
                                         }
