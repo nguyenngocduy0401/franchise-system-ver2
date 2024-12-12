@@ -378,7 +378,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Pagination<Report>, Pagination<ReportViewModel>>()
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
             CreateMap<Report, ReportViewModel>()
-       .ForMember(dest => dest.Equipments, opt => opt.MapFrom(src => src.Equipments));
+       .ForMember(dest => dest.Equipments, opt => opt.MapFrom(src => src.Equipments))
+        .ForMember(dest => dest.RespondedById, opt => opt.MapFrom(src => src.Response));
             CreateMap<Pagination<Report>, Pagination<ReportViewModel>>()
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
             CreateMap<Equipment, EquipmentViewModel>();

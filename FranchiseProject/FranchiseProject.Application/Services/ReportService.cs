@@ -334,11 +334,13 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var report = await _unitOfWork.ReportRepository.GetByIdAsync(reportId);
+                var userCurrentId = _claimsService.GetCurrentUserId;
+                var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
                 if (report == null)
                 {
                     return ResponseHandler.Failure<bool>("Báo cáo không tồn tại.");
                 }
-
+                
                 report.Status = newStatus;
                 _unitOfWork.ReportRepository.Update(report);
                 var result = await _unitOfWork.SaveChangeAsync() > 0;
@@ -378,6 +380,7 @@ namespace FranchiseProject.Application.Services
                 }
 
                 report.Response = response;
+                report.Response = userCurrentId.ToString();
 
                 _unitOfWork.ReportRepository.Update(report);
 
