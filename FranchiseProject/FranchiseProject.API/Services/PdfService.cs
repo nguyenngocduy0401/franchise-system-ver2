@@ -67,7 +67,8 @@ namespace FranchiseProject.API.Services
         //}
         public async Task<Stream> FillDocumentTemplate(InputContractViewModel contract)
         {
-            string templatePath = "C:\\Users\\lecon\\OneDrive\\Máy tính\\Hợp đồng chuyển nhượng (1).docx";//chuyển thành một n=biến 
+            //string templatePath = "D:\\FPT\\main_Frachise\\franchise-system\\FranchiseProject\\FranchiseProject.Infrastructures\\FireBase\\Resources\\Hợp đồng chuyển nhượng .docx";//chuyển thành một n=biến 
+            string templatePath = @"../../FranchiseProject.Infrastructures/FireBase/Resouces/Hợp đồng chuyển nhượng.docx";
 
             using (var doc = DocX.Load(templatePath))
             {

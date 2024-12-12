@@ -9,7 +9,7 @@ namespace FranchiseProject.API.Controllers
 {
     [Route("api/v1/contracts")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class ContractController : ControllerBase
     {
         private readonly IContractService _contractService;
@@ -66,7 +66,7 @@ namespace FranchiseProject.API.Controllers
         //}
         [SwaggerOperation(Summary = "Tải xuống hợp đồng dưới dạng file .doc {Authorize = Manager,Admin}")]
         [HttpGet("download/agency/{id}")]
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
+       // [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
         public async Task<ApiResponse<string>> DownloadContractAsPdfAsync(Guid id)
         {
             return await  _contractService.DownloadContractAsPdfAsync(id);
