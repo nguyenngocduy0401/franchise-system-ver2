@@ -11,6 +11,9 @@ using System.Linq.Expressions;
 using Contract = FranchiseProject.Domain.Entity.Contract;
 using Microsoft.AspNetCore.Mvc;
 using FranchiseProject.Domain.Entity;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using System;
 
 namespace FranchiseProject.Application.Services
 {
@@ -24,8 +27,8 @@ namespace FranchiseProject.Application.Services
         private readonly IPdfService _pdfService;
         private readonly IFirebaseService _firebaseService;
         private readonly IEmailService _emailService;
-
-        public ContractService(IValidator<UpdateContractViewModel> validatorUpdate, IEmailService emailService, IPdfService pdfService, IFirebaseService firebaseService, IMapper mapper, IUnitOfWork unitOfWork, IValidator<CreateContractViewModel> validator, IClaimsService claimsService)
+        private readonly IConfiguration _configuration;
+        public ContractService(IConfiguration configuration,IValidator<UpdateContractViewModel> validatorUpdate, IEmailService emailService, IPdfService pdfService, IFirebaseService firebaseService, IMapper mapper, IUnitOfWork unitOfWork, IValidator<CreateContractViewModel> validator, IClaimsService claimsService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -35,6 +38,7 @@ namespace FranchiseProject.Application.Services
             _firebaseService = firebaseService;
             _emailService = emailService;
             _validatorUpdate = validatorUpdate;
+            _configuration = configuration;
         }
         public async Task NotifyCustomersOfExpiringContracts()
         {
@@ -137,6 +141,7 @@ namespace FranchiseProject.Application.Services
                 contract.RevenueSharePercentage = create.RevenueSharePercentage;
                 contract.DepositPercentage = create.DepositPercentage;
                 contract.Status = ContractStatusEnum.None;
+                contract.ContractCode = await GenerateUniqueContractCode();
                // contract.FrachiseFee = franchiseFee.Sum(f => f.FeeAmount);
                  _unitOfWork.ContractRepository.Update(contract);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
@@ -335,15 +340,16 @@ namespace FranchiseProject.Application.Services
                     {
                         Id = c.Id,
                         Title = c.Title,
-                        ContractCode=c.ContractCode,
+                        ContractCode = c.ContractCode,
                         StartTime = c.StartTime ?? DateTime.MinValue,
                         EndTime = c.EndTime ?? DateTime.MinValue,
                         ContractDocumentImageURL = c.ContractDocumentImageURL,
-                        Total=c.Total,
-                        DepositPercentage=c.DepositPercentage,
-                        PaidAmount=c.PaidAmount,
-                        DesignFee=c.DesignFee,
-                        FrachiseFee=c.FrachiseFee,
+                        Total = c.Total,
+                        DepositPercentage = c.DepositPercentage,
+                        EquipmentFee = c.EquipmentFee,
+                        PaidAmount = c.PaidAmount,
+                        DesignFee = c.DesignFee,
+                        FrachiseFee = c.FrachiseFee,
                         Status = c.Status,
                         RevenueSharePercentage = c.RevenueSharePercentage,
 
@@ -382,7 +388,7 @@ namespace FranchiseProject.Application.Services
                     Id = contract.Id,
                     Title = contract.Title,
                     StartTime = contract.StartTime ?? DateTime.MinValue,
-
+                    
                     EndTime = contract.EndTime ?? DateTime.MinValue,
                     ContractCode=contract.ContractCode,
                     ContractDocumentImageURL = contract.ContractDocumentImageURL,
@@ -453,23 +459,66 @@ namespace FranchiseProject.Application.Services
             }
         }
 
+
+        public async Task<ApiResponse<string>> UploadContractTemplateAsync(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return ResponseHandler.Failure<string>("Không có file được chọn.");
+                }
+
+                if (!file.FileName.EndsWith(".doc") && !file.FileName.EndsWith(".docx"))
+                {
+                    return ResponseHandler.Failure<string>("File phải có định dạng .doc hoặc .docx");
+                }
+
+                using (var stream = file.OpenReadStream())
+                {
+                    string fileName = $"ContractTemplate_{DateTime.Now:yyyyMMddHHmmss}.docx";
+                    string firebaseUrl = await _firebaseService.UploadFileAsync(stream, fileName);
+                    var configuration = (IConfigurationRoot)_configuration;
+                    configuration["ContractTemplateUrl"] = firebaseUrl;
+
+
+                    return ResponseHandler.Success(firebaseUrl, "Template hợp đồng đã được tải lên thành công.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<string>($"Lỗi khi tải lên template hợp đồng: {ex.Message}");
+            }
+        }
+
+
+
+
         public async Task<ApiResponse<string>> DownloadContractAsPdfAsync(Guid agencyId)
         {
             try
             {
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
+                var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
                 if (contract == null)
                 {
                     throw new Exception("Không tìm thấy hợp đồng cho đối tác này.");
                 }
-
+                 int totalMonths = (int)((contract.EndTime?.Year - contract.StartTime?.Year) * 12
+                  + (contract.EndTime?.Month - contract.StartTime?.Month));
+                var address = agency.Address + ", " + agency.Ward + ", " + agency.District + ", " + agency.City;
+                var deposit = contract.Total * (contract.DepositPercentage / 100);
                 var inputInfo = new InputContractViewModel
                 {
+                    EquipmentFee=contract.EquipmentFee,
                     DesignFee = contract.DesignFee,
                     FranchiseFee = contract.FrachiseFee,
                     TotalMoney = contract.Total,
-                    Deposit = contract.DepositPercentage,
-                    ContractCode = contract.ContractCode ?? await GenerateUniqueContractCode()
+                    Deposit = deposit,
+                    ContractCode = contract.ContractCode,
+                    Druration= totalMonths,
+                    Percent=contract.RevenueSharePercentage,
+                    Address= address
                 };
               //  contract.ContractCode = inputInfo.ContractCode;
                 using (var pdfStream = await _pdfService.FillDocumentTemplate(inputInfo))
@@ -498,6 +547,22 @@ namespace FranchiseProject.Application.Services
             catch (Exception ex)
             {
                 return ResponseHandler.Failure<string>($"Lỗi khi tạo và tải lên file hợp đồng: {ex.Message}");
+            }
+        }
+        public async Task<ApiResponse<bool>> AddDesignFee(Guid agencyId,double designFee)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
+                contract.DesignFee = designFee;
+                _unitOfWork.ContractRepository.Update(contract);
+               await _unitOfWork.SaveChangeAsync();
+                return ResponseHandler.Success<bool>(true, "cập nhật thành công!");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<bool>($"Lỗi khi tạo và tải lên file hợp đồng: {ex.Message}");
             }
         }
         private async Task<string> GenerateUniqueContractCode()

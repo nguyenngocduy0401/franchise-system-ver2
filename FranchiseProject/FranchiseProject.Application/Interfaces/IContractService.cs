@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.ConsultationViewModels;
 using FranchiseProject.Application.ViewModels.ContractViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -21,5 +22,7 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<string>> DownloadContractAsPdfAsync(Guid agencyId);
         Task<ApiResponse<ContractViewModel>> GetContractbyAgencyId(Guid agencyId);
         Task<ApiResponse<bool>> AgencyUploadUploadContractAsync(string ContractDocumentImageURL, Guid AgencyId);
+        Task<ApiResponse<bool>> AddDesignFee(Guid agencyId, double designFee);
+        Task<ApiResponse<string>> UploadContractTemplateAsync(IFormFile file);
     }
 }

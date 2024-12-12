@@ -1,5 +1,6 @@
 ﻿using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -17,6 +18,7 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModels
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public double? DepositPercentage { get; set; }
+        public double? EquipmentFee { get; set; }
         public double? DesignFee { get; set; }
         public double? FrachiseFee { get; set; }
         public double? Total { get; set; }

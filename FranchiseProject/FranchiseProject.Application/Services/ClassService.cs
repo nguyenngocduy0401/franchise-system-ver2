@@ -18,6 +18,7 @@ using iText.Kernel.Geom;
 using MailKit.Search;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -39,6 +40,7 @@ namespace FranchiseProject.Application.Services
         private readonly IValidator<UpdateClassViewModel> _validatorUpdate;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
+       
         public ClassService(IValidator<UpdateClassViewModel> validatorUpdate, IMapper mapper, IUnitOfWork unitOfWork, IClaimsService claimsService, IValidator<CreateClassViewModel> validator, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             _mapper = mapper;
