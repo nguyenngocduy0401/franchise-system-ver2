@@ -120,7 +120,8 @@ namespace FranchiseProject.Infrastructures.DataInitializer
                     {
                         UserName = role,
                         FullName = GenerateFullNameForFirstUserIni(role),
-                        CreateAt = _currentTime.GetCurrentTime()
+                        CreateAt = _currentTime.GetCurrentTime(),
+                        Email = "tinhlcse160574@fpt.edu.vn"
                     }, "abc123");
 
                     if (newUser.Succeeded)
