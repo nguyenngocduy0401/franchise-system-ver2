@@ -24,12 +24,12 @@ namespace FranchiseProject.API.Controllers
             if (result.IsSuccess)
             {
                 // Redirect to a success page
-                return Redirect($"http://localhost:5130/payment-success?orderId={result.OrderId}");
+                return Redirect($"http://localhost:5173/agency-manager/payment-success?orderId={result.OrderId}");
             }
             else
             {
                 // Redirect to a failure page
-                return Redirect($"http://localhost:5130/payment-failure?orderId={result.OrderId}&message={result.Message}");
+                return Redirect($"http://localhost:5173/agency-manager/payment-failure?orderId={result.OrderId}&message={result.Message}");
             }
         }
     }

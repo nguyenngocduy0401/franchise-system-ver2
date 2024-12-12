@@ -69,7 +69,7 @@ namespace FranchiseProject.Application.Services
 
                     agency.Works = work;
                 }
-                await _unitOfWork.AgencyRepository.AddAsync(agency);
+                  await _unitOfWork.AgencyRepository.AddAsync(agency);
                 var consult = await _unitOfWork.FranchiseRegistrationRequestRepository.GetExistByIdAsync(create.RegisterFormId.Value);
                 if (consult == null)
                 {
@@ -94,7 +94,7 @@ namespace FranchiseProject.Application.Services
                         PhoneNumber = agency.PhoneNumber,
 
                     };
-                    var user2 = _unitOfWork.UserRepository.CreateUserAndAssignRoleAsync(newUser, RolesEnum.AgencyManager.ToString());
+                    var user2 =_unitOfWork.UserRepository.CreateUserAndAssignRoleAsync(newUser, RolesEnum.AgencyManager.ToString());
                     var emailMessage = new MessageModel
                     {
                         To = agency.Email,
@@ -117,6 +117,7 @@ namespace FranchiseProject.Application.Services
                     {
                         response.Message += " (Lỗi khi gửi email)";
                     }
+                    await user2;
                 }
                 _unitOfWork.FranchiseRegistrationRequestRepository.Update(consult);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();

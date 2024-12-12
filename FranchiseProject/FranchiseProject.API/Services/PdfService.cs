@@ -1,8 +1,10 @@
 ﻿using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ContractViewModels;
+using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.IO;
 using System.Net.Http;
+using Xceed.Words.NET;
 
 namespace FranchiseProject.API.Services
 {
@@ -13,57 +15,87 @@ namespace FranchiseProject.API.Services
         {
             _httpClient = new HttpClient();
         }
-        public async Task<Stream> FillPdfTemplate(InputContractViewModel contract)
+        //public async Task<Stream> FillPdfTemplate(InputContractViewModel contract)
+        //{
+        //    string firebaseUrl = "https://firebasestorage.googleapis.com/v0/b/franchise-project-1ea45.firebasestorage.app/o/Contract%2Fhop-dong-nhuong-quyen-thuong-mai_1010092534%20(3).pdf?alt=media&token=367beaa1-68f5-4734-9a0f-841d7d17fe99";
+        //    Stream pdfTemplateStream = await DownloadFileFromFirebaseAsync(firebaseUrl);
+
+        //    var Deposit = contract.TotalMoney * 0.2; // 20% of TotalMoney
+        //    var totalMoneyParse = contract.TotalMoney.HasValue ? NumberToWordsConverter.ConvertToWords(contract.TotalMoney.Value) : "";
+        //    var depositParse = Deposit.HasValue ? NumberToWordsConverter.ConvertToWords(Deposit.Value) : "";
+        //    var designFeeParse = contract.DesignFee.HasValue ? NumberToWordsConverter.ConvertToWords(contract.DesignFee.Value) : "";
+        //    var FranchiseFeeParse = contract.FranchiseFee.HasValue ? NumberToWordsConverter.ConvertToWords(contract.FranchiseFee.Value) : "";
+
+        //    var outputStream = new MemoryStream();
+        //    using (var reader = new PdfReader(pdfTemplateStream))
+        //    {
+        //        using (var stamper = new PdfStamper(reader, outputStream))
+        //        {
+
+        //            string fontPath  = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "ARIAL.ttf");
+        //            //Font NormalFont = new iTextSharp.text.Font(bf, 12, Font.NORMAL, Color.BLACK);
+        //            //string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "seguisym.ttf");
+        //            BaseFont bf = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+        //            float fontSize = 12.50f;
+        //            var form = stamper.AcroFields;
+
+        //            void SetFieldWithFontSize(string fieldName, string value)
+        //            {
+        //                form.SetFieldProperty(fieldName, "textfont", bf, null);
+        //                form.SetFieldProperty(fieldName, "textsize", fontSize, null);
+        //                form.SetFieldProperty(fieldName, "alignment", PdfFormField.Q_CENTER, null);
+        //                form.SetField(fieldName, value);
+        //            }
+
+        //            SetFieldWithFontSize("TotalMoney", contract.TotalMoney?.ToString("#,##0") ?? "");
+        //            SetFieldWithFontSize("Deposit", Deposit?.ToString("#,##0") ?? "");
+        //            SetFieldWithFontSize("DesignFee", contract.DesignFee?.ToString("#,##0") ?? "");
+        //            SetFieldWithFontSize("FranchiseFee", contract.FranchiseFee?.ToString("#,##0") ?? "");
+        //            SetFieldWithFontSize("TotalMoneyParse", totalMoneyParse);
+        //            SetFieldWithFontSize("DepositParse", depositParse);
+        //            SetFieldWithFontSize("DesignFeeParse", designFeeParse);
+        //            SetFieldWithFontSize("FranchiseFeeParse", FranchiseFeeParse);
+        //            SetFieldWithFontSize("ContractCode", contract.ContractCode ?? "");
+
+        //            stamper.FormFlattening = true;
+        //        }
+        //    }
+
+        //    var finalOutputStream = new MemoryStream(outputStream.ToArray());
+        //    finalOutputStream.Position = 0;
+        //    return finalOutputStream;
+        //}
+        public async Task<Stream> FillDocumentTemplate(InputContractViewModel contract)
         {
-            string firebaseUrl = "https://firebasestorage.googleapis.com/v0/b/franchise-project-1ea45.firebasestorage.app/o/Contract%2Fhop-dong-nhuong-quyen-thuong-mai_1010092534%20(3).pdf?alt=media&token=367beaa1-68f5-4734-9a0f-841d7d17fe99";
-            Stream pdfTemplateStream = await DownloadFileFromFirebaseAsync(firebaseUrl);
+            string templatePath = "C:\\Users\\lecon\\OneDrive\\Máy tính\\Hợp đồng chuyển nhượng (1).docx";//chuyển thành một n=biến 
 
-            var Deposit = contract.TotalMoney * 0.2; // 20% of TotalMoney
-            var totalMoneyParse = contract.TotalMoney.HasValue ? NumberToWordsConverter.ConvertToWords(contract.TotalMoney.Value) : "";
-            var depositParse = Deposit.HasValue ? NumberToWordsConverter.ConvertToWords(Deposit.Value) : "";
-            var designFeeParse = contract.DesignFee.HasValue ? NumberToWordsConverter.ConvertToWords(contract.DesignFee.Value) : "";
-            var FranchiseFeeParse = contract.FranchiseFee.HasValue ? NumberToWordsConverter.ConvertToWords(contract.FranchiseFee.Value) : "";
-
-            var outputStream = new MemoryStream();
-            using (var reader = new PdfReader(pdfTemplateStream))
+            using (var doc = DocX.Load(templatePath))
             {
-                using (var stamper = new PdfStamper(reader, outputStream))
-                {
-                    var bf = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-                    float fontSize = 12.50f;
-                    var form = stamper.AcroFields;
+                var Deposit = contract.TotalMoney *contract.Deposit;
+                var totalMoneyParse = contract.TotalMoney.HasValue ? NumberToWordsConverter.ConvertToWords(contract.TotalMoney.Value) : "";
+                var depositParse = Deposit.HasValue ? NumberToWordsConverter.ConvertToWords(Deposit.Value) : "";
+                var designFeeParse = contract.DesignFee.HasValue ? NumberToWordsConverter.ConvertToWords(contract.DesignFee.Value) : "";
+                var FranchiseFeeParse = contract.FranchiseFee.HasValue ? NumberToWordsConverter.ConvertToWords(contract.FranchiseFee.Value) : "";
+                doc.ReplaceText("{{TotalMoney}}", contract.TotalMoney?.ToString("#,##0") ?? "");
+                doc.ReplaceText("{{Deposit}}", Deposit?.ToString("#,##0") ?? "");
+                doc.ReplaceText("{{DesignFee}}", contract.DesignFee?.ToString("#,##0") ?? "");
+                doc.ReplaceText("{{FranchiseFee}}", contract.FranchiseFee?.ToString("#,##0") ?? "");
+                doc.ReplaceText("{{TotalMoneyParse}}", totalMoneyParse);
+                doc.ReplaceText("{{DepositParse}}", depositParse);
+                doc.ReplaceText("{{DesignFeeParse}}", designFeeParse);
+                doc.ReplaceText("{{FranchiseFeeParse}}", FranchiseFeeParse);
+                doc.ReplaceText("{{ContractCode}}", contract.ContractCode ?? "");
+                                var memoryStream = new MemoryStream();
+                doc.SaveAs(memoryStream);
+                memoryStream.Position = 0;
 
-                    void SetFieldWithFontSize(string fieldName, string value)
-                    {
-                        form.SetFieldProperty(fieldName, "textfont", bf, null);
-                        form.SetFieldProperty(fieldName, "textsize", fontSize, null);
-                        form.SetFieldProperty(fieldName, "alignment", PdfFormField.Q_CENTER, null);
-                        form.SetField(fieldName, value);
-                    }
-
-                    SetFieldWithFontSize("TotalMoney", contract.TotalMoney?.ToString("#,##0") ?? "");
-                    SetFieldWithFontSize("Deposit", Deposit?.ToString("#,##0") ?? "");
-                    SetFieldWithFontSize("DesignFee", contract.DesignFee?.ToString("#,##0") ?? "");
-                    SetFieldWithFontSize("FranchiseFee", contract.FranchiseFee?.ToString("#,##0") ?? "");
-                  //  SetFieldWithFontSize("TotalMoneyParse", totalMoneyParse);
-                 //   SetFieldWithFontSize("DepositParse", depositParse);
-                 //   SetFieldWithFontSize("DesignFeeParse", designFeeParse);
-                  //  SetFieldWithFontSize("FranchiseFeeParse", FranchiseFeeParse);
-                    SetFieldWithFontSize("ContractCode", contract.ContractCode ?? "");
-
-                    stamper.FormFlattening = true;
-                }
+                return memoryStream;
             }
-
-            var finalOutputStream = new MemoryStream(outputStream.ToArray());
-            finalOutputStream.Position = 0;
-            return finalOutputStream;
         }
-
-        private async Task<Stream> DownloadFileFromFirebaseAsync(string url)
+            private async Task<Stream> DownloadFileFromFirebaseAsync(string url)
         {
             var response = await _httpClient.GetAsync(url);
-            response.EnsureSuccessStatusCode(); // Kiểm tra xem phản hồi có thành công không.
+            response.EnsureSuccessStatusCode(); 
 
             var memoryStream = new MemoryStream();
             await response.Content.CopyToAsync(memoryStream);

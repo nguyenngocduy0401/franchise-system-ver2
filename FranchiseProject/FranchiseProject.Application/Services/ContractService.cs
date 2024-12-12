@@ -468,10 +468,11 @@ namespace FranchiseProject.Application.Services
                     DesignFee = contract.DesignFee,
                     FranchiseFee = contract.FrachiseFee,
                     TotalMoney = contract.Total,
+                    Deposit = contract.DepositPercentage,
                     ContractCode = contract.ContractCode ?? await GenerateUniqueContractCode()
                 };
               //  contract.ContractCode = inputInfo.ContractCode;
-                using (var pdfStream = await _pdfService.FillPdfTemplate(inputInfo))
+                using (var pdfStream = await _pdfService.FillDocumentTemplate(inputInfo))
                 {
                     using (var memoryStream = new MemoryStream())
                     {
@@ -485,7 +486,7 @@ namespace FranchiseProject.Application.Services
                             await _unitOfWork.SaveChangeAsync();
                         }
 
-                        string fileName = $"Contract_{contract.ContractCode}.pdf";
+                        string fileName = $"Contract_{contract.ContractCode}.doc";
                         using (var uploadStream = new MemoryStream(pdfBytes))
                         {
                             string firebaseUrl = await _firebaseService.UploadFileAsync(uploadStream, fileName);                  
