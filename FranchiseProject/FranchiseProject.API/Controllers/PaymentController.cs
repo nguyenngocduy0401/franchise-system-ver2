@@ -44,7 +44,7 @@ namespace FranchiseProject.API.Controllers
 
         [SwaggerOperation(Summary = "tạo thanh toán hợp đồng trực tiếp {Authorize = Manager}  ")]
         [Authorize(Roles = AppRole.Manager)]
-        [HttpPost("")]
+        [HttpPost("/direct")]
         public async Task<ApiResponse<bool>> CreatePaymentContractDirectStudent(CreateContractDirect create) => await _paymentService.CreatePaymentContractDirect(create);
         //---------------------VNPay----------------------------------
 

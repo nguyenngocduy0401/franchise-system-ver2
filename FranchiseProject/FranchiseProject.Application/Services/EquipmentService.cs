@@ -56,10 +56,10 @@ namespace FranchiseProject.Application.Services
                     var serialNumberHistoriesToAdd = new List<EquipmentSerialNumberHistory>();
                     var errors = new List<string>();
                     var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
-                  
+
                     if (contract == null)
                     {
-                        return ResponseHandler.Failure<object>("No active contract found for this agency.");
+                        return ResponseHandler.Failure<object>("Không tìm thấy hợp đồng hoạt động cho đại lý này.");
                     }
                     var existingEquipments = await _unitOfWork.EquipmentRepository
                         .GetTableAsTracking()
@@ -67,6 +67,7 @@ namespace FranchiseProject.Application.Services
                         .ToListAsync();
 
                     _unitOfWork.EquipmentRepository.HardRemoveRange(existingEquipments);
+                    var serialNumbers = new HashSet<string>();
 
                     for (int row = 2; row <= rowCount; row++)
                     {
@@ -75,47 +76,51 @@ namespace FranchiseProject.Application.Services
                         var priceString = worksheet.Cells[row, 4].Value?.ToString().Trim();
                         var note = worksheet.Cells[row, 5].Value?.ToString().Trim();
 
-
+                        if (!serialNumbers.Add(serialNumber))
+                        {
+                            errors.Add($"Dòng {row}: Số seri '{serialNumber}' bị trùng lặp trong hợp đồng này.");
+                            continue;
+                        }
 
                         if (string.IsNullOrEmpty(equipmentName))
                         {
-                            errors.Add($"Row {row}: Equipment name is required.");
+                            errors.Add($"Dòng {row}: Tên thiết bị là bắt buộc.");
                             continue;
                         }
 
                         if (string.IsNullOrEmpty(serialNumber))
                         {
-                            errors.Add($"Row {row}: Serial number is required.");
+                            errors.Add($"Dòng {row}: Số seri là bắt buộc.");
                             continue;
                         }
 
                         if (string.IsNullOrEmpty(priceString) || !double.TryParse(priceString, out double price))
                         {
-                            errors.Add($"Row {row}: Invalid price format.");
+                            errors.Add($"Dòng {row}: Định dạng giá không hợp lệ.");
                             continue;
                         }
 
                         if (price < 0)
                         {
-                            errors.Add($"Row {row}: Price cannot be negative.");
+                            errors.Add($"Dòng {row}: Giá không thể là số âm.");
                             continue;
                         }
 
                         if (equipmentName.Length > 100)
                         {
-                            errors.Add($"Row {row}: Equipment name exceeds 100 characters.");
+                            errors.Add($"Dòng {row}: Tên thiết bị vượt quá 100 ký tự.");
                             continue;
                         }
 
                         if (serialNumber.Length > 50)
                         {
-                            errors.Add($"Row {row}: Serial number exceeds 50 characters.");
+                            errors.Add($"Dòng {row}: Số seri vượt quá 50 ký tự.");
                             continue;
                         }
 
                         if (!string.IsNullOrEmpty(note) && note.Length > 500)
                         {
-                            errors.Add($"Row {row}: Note exceeds 500 characters.");
+                            errors.Add($"Dòng {row}: Ghi chú vượt quá 500 ký tự.");
                             continue;
                         }
 
@@ -134,28 +139,151 @@ namespace FranchiseProject.Application.Services
                         {
                             Equipment = equipment,
                             SerialNumber = serialNumber,
-                            StartDate=DateTime.Now
+                            StartDate = DateTime.Now
                         };
                         serialNumberHistoriesToAdd.Add(serialNumberHistory);
                     }
 
                     if (errors.Any())
                     {
-                        return ResponseHandler.Failure<object>("Import failed. " + string.Join(" ", errors));
+                        return ResponseHandler.Failure<object>("Nhập liệu thất bại. " + string.Join(" ", errors));
                     }
 
                     await _unitOfWork.EquipmentRepository.AddRangeAsync(equipmentsToAdd);
                     await _unitOfWork.EquipmentSerialNumberHistoryRepository.AddRangeAsync(serialNumberHistoriesToAdd);
                     var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
 
-                    if (!isSuccess) throw new Exception("Import failed!");
+                    if (!isSuccess) throw new Exception("Nhập liệu thất bại!");
 
                     return ResponseHandler.Success<object>(true, $"Đã cập nhật thành công {equipmentsToAdd.Count} thiết bị mới!");
                 }
             }
             catch (Exception ex)
             {
-                return ResponseHandler.Failure<object>(ex.Message);
+                return ResponseHandler.Failure<object>("Đã xảy ra lỗi: " + ex.Message);
+            }
+        }
+        public async Task<ApiResponse<object>> ImportEquipmentsAfterFranchiseFromExcelAsync(IFormFile file, Guid agencyId)
+        {
+            try
+            {
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                using (var stream = file.OpenReadStream())
+                using (var package = new ExcelPackage(stream))
+                {
+                    var worksheet = package.Workbook.Worksheets[0];
+                    var rowCount = worksheet.Dimension.Rows;
+                    var equipmentsToAdd = new List<Equipment>();
+                    var serialNumberHistoriesToAdd = new List<EquipmentSerialNumberHistory>();
+                    var errors = new List<string>();
+                    var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
+
+                    if (contract == null)
+                    {
+                        return ResponseHandler.Failure<object>("Không tìm thấy hợp đồng hoạt động.");
+                    }
+                    var serialNumbers = new HashSet<string>();
+
+                    for (int row = 2; row <= rowCount; row++)
+                    {
+                        var equipmentName = worksheet.Cells[row, 2].Value?.ToString().Trim();
+                        var serialNumber = worksheet.Cells[row, 3].Value?.ToString().Trim();
+                        var priceString = worksheet.Cells[row, 4].Value?.ToString().Trim();
+                        var note = worksheet.Cells[row, 5].Value?.ToString().Trim();
+
+                        if (!serialNumbers.Add(serialNumber))
+                        {
+                            errors.Add($"Dòng {row}: Số seri '{serialNumber}' bị trùng lặp trong hợp đồng này.");
+                            continue;
+                        }
+                        var serialNumberExists = await _unitOfWork.EquipmentRepository
+                            .GetTableAsTracking()
+                            .AnyAsync(e => e.ContractId == contract.Id && e.SerialNumber == serialNumber);
+
+                        if (serialNumberExists)
+                        {
+                            errors.Add($"Dòng {row}: Số seri '{serialNumber}' đã tồn tại trong hợp đồng này.");
+                            continue;
+                        }
+                        if (string.IsNullOrEmpty(equipmentName))
+                        {
+                            errors.Add($"Dòng {row}: Tên thiết bị là bắt buộc.");
+                            continue;
+                        }
+
+                        if (string.IsNullOrEmpty(serialNumber))
+                        {
+                            errors.Add($"Dòng {row}: Số seri là bắt buộc.");
+                            continue;
+                        }
+
+                        if (string.IsNullOrEmpty(priceString) || !double.TryParse(priceString, out double price))
+                        {
+                            errors.Add($"Dòng {row}: Định dạng giá không hợp lệ.");
+                            continue;
+                        }
+
+                        if (price < 0)
+                        {
+                            errors.Add($"Dòng {row}: Giá không thể là số âm.");
+                            continue;
+                        }
+
+                        if (equipmentName.Length > 100)
+                        {
+                            errors.Add($"Dòng {row}: Tên thiết bị vượt quá 100 ký tự.");
+                            continue;
+                        }
+
+                        if (serialNumber.Length > 50)
+                        {
+                            errors.Add($"Dòng {row}: Số seri vượt quá 50 ký tự.");
+                            continue;
+                        }
+
+                        if (!string.IsNullOrEmpty(note) && note.Length > 500)
+                        {
+                            errors.Add($"Dòng {row}: Ghi chú vượt quá 500 ký tự.");
+                            continue;
+                        }
+
+                        var equipment = new Equipment
+                        {
+                            EquipmentName = equipmentName,
+                            SerialNumber = serialNumber,
+                            Price = double.Parse(priceString),
+                            Note = note,
+                            Status = EquipmentStatusEnum.Available,
+                            ContractId = contract.Id
+                        };
+                        equipmentsToAdd.Add(equipment);
+
+                        var serialNumberHistory = new EquipmentSerialNumberHistory
+                        {
+                            Equipment = equipment,
+                            SerialNumber = serialNumber,
+                            StartDate = DateTime.Now
+                        };
+                        serialNumberHistoriesToAdd.Add(serialNumberHistory);
+                    }
+
+                    if (errors.Any())
+                    {
+                        return ResponseHandler.Failure<object>("Nhập dữ liệu thất bại. " + string.Join(" ", errors));
+                    }
+
+                    await _unitOfWork.EquipmentRepository.AddRangeAsync(equipmentsToAdd);
+                    await _unitOfWork.EquipmentSerialNumberHistoryRepository.AddRangeAsync(serialNumberHistoriesToAdd);
+                    var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+
+                    if (!isSuccess) throw new Exception("Nhập dữ liệu thất bại!");
+
+                    return ResponseHandler.Success<object>(true, $"Đã cập nhật thành công {equipmentsToAdd.Count} thiết bị mới!");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<object>($"Lỗi: {ex.Message}");
             }
         }
         public async Task<ApiResponse<string>> GenerateEquipmentReportAsync(Guid agencyId)

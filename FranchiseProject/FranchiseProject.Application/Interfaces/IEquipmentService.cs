@@ -18,5 +18,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<Pagination<EquipmentViewModel>>> GetEquipmentByAgencyIdAsync(FilterEquipmentViewModel filter);
         Task<ApiResponse<bool>> UpdateEquipmentAsync(Guid equipmentId, UpdateEquipmentViewModel updateModel);
         Task<ApiResponse<List<EquipmentSerialNumberHistoryViewModel>>> GetSerialNumberHistoryByEquipmentIdAsync(Guid equipmentId);
+        Task<ApiResponse<object>> ImportEquipmentsAfterFranchiseFromExcelAsync(IFormFile file, Guid agencyId);
     }
 }
