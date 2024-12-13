@@ -532,6 +532,16 @@ namespace FranchiseProject.Application.Services
 
                                         }
                                         break;
+                                    case WorkTypeEnum.SignedContract:
+                                        {
+                                            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
+                                            contract.EquipmentFee = await _unitOfWork.EquipmentRepository.GetTotalEquipmentAmountByContractIdAsync(contract.Id);
+
+                                            contract.Total = contract.DesignFee + contract.FrachiseFee + contract.EquipmentFee;
+                                            _unitOfWork.ContractRepository.Update(contract);
+
+                                        }
+                                        break;
                                 }
                             }
                         }
