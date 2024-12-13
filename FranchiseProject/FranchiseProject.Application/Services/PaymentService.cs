@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DocumentFormat.OpenXml.Office2010.PowerPoint;
+using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
@@ -8,6 +9,7 @@ using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Utils;
 using FranchiseProject.Application.ViewModels.ConsultationViewModels;
 using FranchiseProject.Application.ViewModels.PaymentViewModel;
+using FranchiseProject.Application.ViewModels.PaymentViewModel.PaymentContractViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 
 using FranchiseProject.Domain.Entity;
@@ -17,6 +19,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -35,6 +38,7 @@ namespace FranchiseProject.Application.Services
         private readonly IClaimsService _claimsService;
         private readonly UserManager<User> _userManager;
         private readonly IUserService _userService;
+       
         public PaymentService(IUserService userService,UserManager<User> userManager,IUnitOfWork unitOfWork,IMapper mapper,IValidator<CreateStudentPaymentViewModel>validator
             ,IEmailService emailService,IHubContext<NotificationHub>hubContext,IClaimsService claimsService)
         {
@@ -48,20 +52,21 @@ namespace FranchiseProject.Application.Services
             _userService = userService;
         }
         #endregion
-        public async Task<ApiResponse<bool>> CreatePaymentStudent(CreateStudentPaymentViewModel create,  StudentPaymentStatusEnum status )
+        public async Task<ApiResponse<bool>> CreatePaymentStudent(CreateStudentPaymentViewModel create, StudentPaymentStatusEnum status)
         {
             var response = new ApiResponse<bool>();
             try
             {
                 var rc = await _unitOfWork.RegisterCourseRepository.GetExistByIdAsync(Guid.Parse(create.RegisterCourseId));
-                var userCurrentId =  _claimsService.GetCurrentUserId.ToString();
-                var userCurrent =await _userManager.FindByIdAsync(userCurrentId);
+                var userCurrentId = _claimsService.GetCurrentUserId.ToString();
+                var userCurrent = await _userManager.FindByIdAsync(userCurrentId);
                 switch (status)
                 {
                     case StudentPaymentStatusEnum.Advance_Payment:
-                        if (rc.StudentCourseStatus == StudentCourseStatusEnum.Pending) {
+                        if (rc.StudentCourseStatus == StudentCourseStatusEnum.Pending)
+                        {
                             var payment = _mapper.Map<Payment>(create);
-                            rc.StudentPaymentStatus=StudentPaymentStatusEnum.Advance_Payment;
+                            rc.StudentPaymentStatus = StudentPaymentStatusEnum.Advance_Payment;
                             rc.StudentCourseStatus = StudentCourseStatusEnum.Waitlisted;
                             payment.UserId = rc.UserId;
                             await _unitOfWork.RegisterCourseRepository.UpdateAsync(rc);
@@ -81,15 +86,15 @@ namespace FranchiseProject.Application.Services
                                 throw new Exception("Update User Account fail!");
                             }
                             var email = EmailTemplate.StudentPaymentSuccsess(user.Email, user.FullName, create.Amount, generate.UserName, generate.Password);
-                          var mailSuccess= await _emailService.SendEmailAsync(email);
-                           
+                            var mailSuccess = await _emailService.SendEmailAsync(email);
+
                         }
                         break;
                     case StudentPaymentStatusEnum.Completed:
                         if (rc.StudentCourseStatus == StudentCourseStatusEnum.Pending || rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted || rc.StudentCourseStatus == StudentCourseStatusEnum.Enrolled)
                         {
                             var payment = _mapper.Map<Payment>(create);
-                            rc.StudentPaymentStatus = StudentPaymentStatusEnum. Completed;
+                            rc.StudentPaymentStatus = StudentPaymentStatusEnum.Completed;
                             rc.StudentCourseStatus = StudentCourseStatusEnum.Waitlisted;
                             payment.UserId = rc.UserId;
                             await _unitOfWork.RegisterCourseRepository.UpdateAsync(rc);
@@ -114,11 +119,52 @@ namespace FranchiseProject.Application.Services
                         break;
 
 
-                       
+
                 };
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-             
+
                 return ResponseHandler.Success<bool>(true, "Tạo thanh toán thành công !");
+
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
+        public async Task<ApiResponse<bool>> CreatePaymentContractDirectStudent(CreateContractDirect create )
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var userId = _claimsService.GetCurrentUserId;
+                var contract =await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(create.AgencyId);
+                
+                var isPay = await _unitOfWork.ContractRepository.IsDepositPaidCorrectlyAsync(contract.Id);
+                if (isPay)
+                {
+                    //da thanh toan
+                    return ResponseHandler.Success<bool>(false, "Hợp đồng đã được thanh toán lần 1!");
+
+                }
+                else
+                {
+                    var payment = new Payment
+                    {
+                        Title = "Thanh toán hợp đồng nhượn quyền" + " lần 1 " + contract.ContractCode,
+                        Description = create.Description,
+                        Amount = contract.Total + (contract.DepositPercentage / 100),
+                        Type=PaymentTypeEnum.Contract,
+                        Method=PaymentMethodEnum.Direct,
+                        Status=PaymentStatus.Completed,
+                        ImageURL=create.ImageUrl,
+                        ContractId=contract.Id,
+                        UserId=
+                    };
+                    var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+
+                    return ResponseHandler.Success<bool>(true, "Tạo thanh toán thành công !");
+                }
 
             }
             catch (Exception ex)

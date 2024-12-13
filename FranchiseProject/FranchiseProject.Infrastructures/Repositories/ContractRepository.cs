@@ -50,7 +50,26 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Where(c => c.AgencyId == agencyId && c.Status == Domain.Enums.ContractStatusEnum.Active)
                 .FirstOrDefault();
         }
+        public async Task<bool> IsDepositPaidCorrectlyAsync(Guid contractId)
+        {
+            var contract = await _dbContext.Contracts
+                .Where(c => c.Id == contractId)
+                .Select(c => new { c.PaidAmount, c.Total, c.DepositPercentage })
+                .FirstOrDefaultAsync();
 
+            if (contract == null)
+            {
+                return false;
+            }
+
+            if (contract.PaidAmount == null || contract.Total == null || contract.DepositPercentage == null)
+            {
+                return false;
+            }
+
+            var expectedDeposit = contract.Total * contract.DepositPercentage / 100;
+            return Math.Abs(contract.PaidAmount.Value - expectedDeposit.Value) < 0.01; 
+        }
     }
 }
 
