@@ -2,6 +2,7 @@
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.ViewModels.ContractViewModels;
 using FranchiseProject.Application.ViewModels.PaymentViewModel;
 using FranchiseProject.Application.ViewModels.PaymentViewModel.PaymentContractViewModels;
 using FranchiseProject.Domain.Enums;
@@ -73,6 +74,13 @@ namespace FranchiseProject.API.Controllers
             {
                 return ResponseHandler.Failure<string>("Đã xảy ra lỗi khi xử lý yêu cầu của bạn.");
             }
+        }
+     //   [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin)]
+        [SwaggerOperation(Summary = "Lọc thanh toán hợp đồng")]
+        [HttpGet("contract/filter")]
+        public async Task<ApiResponse<Pagination<PaymentContractViewModel>>> FilterPaymentContractAsync([FromQuery] FilterContractPaymentViewModel filterModel)
+        {
+            return await _paymentService.FilterPaymentContractAsync(filterModel);
         }
     }
 }

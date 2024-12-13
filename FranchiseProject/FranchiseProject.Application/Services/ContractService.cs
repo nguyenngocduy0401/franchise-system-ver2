@@ -500,29 +500,46 @@ namespace FranchiseProject.Application.Services
             {
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
                 var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
+
                 if (contract == null)
                 {
-                    throw new Exception("Không tìm thấy hợp đồng cho đối tác này.");
+                    return ResponseHandler.Success<string>(null, "Không tìm thấy hợp đồng cho đối tác này.");
                 }
-                 int totalMonths = (int)((contract.EndTime?.Year - contract.StartTime?.Year) * 12
-                  + (contract.EndTime?.Month - contract.StartTime?.Month));
-                var address = agency.Address + ", " + agency.Ward + ", " + agency.District + ", " + agency.City;
+
+                if (agency == null)
+                {
+                    return ResponseHandler.Success<string>(null, "Không tìm thấy thông tin .");
+                }
+
+                int totalMonths = (int)((contract.EndTime?.Year - contract.StartTime?.Year) * 12
+                    + (contract.EndTime?.Month - contract.StartTime?.Month));
+              if(contract.DepositPercentage==null)
+                {
+                    return ResponseHandler.Success<string>(null, "Không tìm thấy thông tin .");
+                }
+                var address = $"{agency.Address}, {agency.Ward}, {agency.District}, {agency.City}";
                 var deposit = contract.Total * (contract.DepositPercentage / 100);
+
                 var inputInfo = new InputContractViewModel
                 {
-                    EquipmentFee=contract.EquipmentFee,
+                    EquipmentFee = contract.EquipmentFee,
                     DesignFee = contract.DesignFee,
                     FranchiseFee = contract.FrachiseFee,
                     TotalMoney = contract.Total,
                     Deposit = deposit,
                     ContractCode = contract.ContractCode,
-                    Druration= totalMonths,
-                    Percent=contract.RevenueSharePercentage,
-                    Address= address
+                    Druration = totalMonths,
+                    Percent = contract.RevenueSharePercentage,
+                    Address = address
                 };
-              //  contract.ContractCode = inputInfo.ContractCode;
+
                 using (var pdfStream = await _pdfService.FillDocumentTemplate(inputInfo))
                 {
+                    if (pdfStream == null)
+                    {
+                        return ResponseHandler.Success<string>(null, "Không thể tạo file PDF từ template.");
+                    }
+
                     using (var memoryStream = new MemoryStream())
                     {
                         await pdfStream.CopyToAsync(memoryStream);
@@ -538,7 +555,13 @@ namespace FranchiseProject.Application.Services
                         string fileName = $"Contract_{contract.ContractCode}.doc";
                         using (var uploadStream = new MemoryStream(pdfBytes))
                         {
-                            string firebaseUrl = await _firebaseService.UploadFileAsync(uploadStream, fileName);                  
+                            string firebaseUrl = await _firebaseService.UploadFileAsync(uploadStream, fileName);
+
+                            if (string.IsNullOrEmpty(firebaseUrl))
+                            {
+                                return ResponseHandler.Success<string>(null, "Không thể tải file lên Firebase.");
+                            }
+
                             return ResponseHandler.Success(firebaseUrl, "File hợp đồng đã được tải lên thành công.");
                         }
                     }
@@ -546,7 +569,7 @@ namespace FranchiseProject.Application.Services
             }
             catch (Exception ex)
             {
-                return ResponseHandler.Failure<string>($"Lỗi khi tạo và tải lên file hợp đồng: {ex.Message}");
+                return ResponseHandler.Success<string>(null, $"Lỗi khi tạo và tải lên file hợp đồng: {ex.Message}");
             }
         }
         public async Task<ApiResponse<bool>> AddDesignFee(Guid agencyId,double designFee)
