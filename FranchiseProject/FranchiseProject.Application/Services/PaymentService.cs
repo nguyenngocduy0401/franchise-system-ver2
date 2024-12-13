@@ -132,7 +132,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> CreatePaymentContractDirectStudent(CreateContractDirect create )
+        public async Task<ApiResponse<bool>> CreatePaymentContractDirect(CreateContractDirect create )
         {
             var response = new ApiResponse<bool>();
             try
@@ -143,7 +143,7 @@ namespace FranchiseProject.Application.Services
                 var isPay = await _unitOfWork.ContractRepository.IsDepositPaidCorrectlyAsync(contract.Id);
                 if (isPay)
                 {
-                    //da thanh toan
+                   
                     return ResponseHandler.Success<bool>(false, "Hợp đồng đã được thanh toán lần 1!");
 
                 }
@@ -159,8 +159,11 @@ namespace FranchiseProject.Application.Services
                         Status=PaymentStatus.Completed,
                         ImageURL=create.ImageUrl,
                         ContractId=contract.Id,
-                        UserId=
+                        UserId= userId.ToString()
                     };
+                    await _unitOfWork.PaymentRepository.AddAsync(payment);
+                    contract.PaidAmount = payment.Amount;
+                    _unitOfWork.ContractRepository.Update(contract);
                     var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
 
                     return ResponseHandler.Success<bool>(true, "Tạo thanh toán thành công !");

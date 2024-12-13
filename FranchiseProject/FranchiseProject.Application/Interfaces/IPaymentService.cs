@@ -1,5 +1,6 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.ViewModels.PaymentViewModel;
+using FranchiseProject.Application.ViewModels.PaymentViewModel.PaymentContractViewModels;
 using FranchiseProject.Application.ViewModels.StudentViewModel;
 using FranchiseProject.Domain.Enums;
 using System;
@@ -18,5 +19,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<PaymentStudentViewModel>> GetPaymentByIdAsync(string paymentId);
         Task<ApiResponse<Pagination<PaymentStudentViewModel>>> GetPaymentByLoginAsync(int pageIndex = 1, int pageSize = 10);
         Task<ApiResponse<bool>> UpdateStudentPaymentStatusAsync(Guid registerCourseId, StudentPaymentStatusEnum newStatus);
+        Task<ApiResponse<bool>> CreatePaymentContractDirect(CreateContractDirect create);
     }
 }

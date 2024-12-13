@@ -7,11 +7,13 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.PaymentViewModel.PaymentContractViewModels;
 using FranchiseProject.Application.ViewModels.VnPayViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -37,7 +39,9 @@ namespace FranchiseProject.Application.Services
 
         public async Task<string> CreatePaymentUrlFromContractPayment(PaymentContractViewModel paymentContract)
         {
+            
 
+           
             var contract =await _unitOfWork.ContractRepository.GetExistByIdAsync(paymentContract.ContractId.Value);
             var amount = contract.Total *( contract.DepositPercentage/100);
             var paidAmount = contract.Total - amount;
