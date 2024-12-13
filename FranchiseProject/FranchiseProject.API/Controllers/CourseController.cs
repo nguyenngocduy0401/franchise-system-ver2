@@ -135,5 +135,12 @@ namespace FranchiseProject.API.Controllers
         {
             return await _classService.GetAllClassByCourseId(id);
         }
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff + "," + AppRole.Instructor + "," + AppRole.Student)]
+        [SwaggerOperation(Summary = "lấy danh sách lớp bằng course Id{Authorize = AgencyManager ,AgencyStaff , Instructor,Student}")]
+        [HttpGet("courses/{id}/designfee")]
+        public async Task<ApiResponse<bool>> AddDesignFee(Guid id, double designFee)
+        {
+            return await _classService.GetAllClassByCourseId(id);
+        }
     }
 }
