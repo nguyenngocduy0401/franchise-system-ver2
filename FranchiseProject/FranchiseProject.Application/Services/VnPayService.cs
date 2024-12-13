@@ -144,7 +144,7 @@ namespace FranchiseProject.Application.Services
                 Description = "Thanh toán " + contract.Title + DateTime.Now,
                 Type = PaymentTypeEnum.Contract,
                 Method = PaymentMethodEnum.BankTransfer,
-                Amount = amount,
+                Amount = paidAmount,
                 ContractId = paymentContract.ContractId,
                 Status = PaymentStatus.NotCompleted,
                 CreationDate = DateTime.UtcNow

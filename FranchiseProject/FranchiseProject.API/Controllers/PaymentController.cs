@@ -2,6 +2,7 @@
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.ViewModels.ContractViewModels;
 using FranchiseProject.Application.ViewModels.PaymentViewModel;
 using FranchiseProject.Application.ViewModels.PaymentViewModel.PaymentContractViewModels;
 using FranchiseProject.Domain.Enums;
@@ -49,7 +50,7 @@ namespace FranchiseProject.API.Controllers
         //---------------------VNPay----------------------------------
 
         [HttpPost("create-vnpay-url")]
-        [SwaggerOperation(Summary = "Tạo URL thanh toán VnPay")]
+        [SwaggerOperation(Summary = "Tạo URL thanh toán hợp đồng lần 1 VnPay")]
         public async Task<ApiResponse<string>> CreateVnPayUrl([FromBody] PaymentContractViewModel paymentContract)
         {
 
@@ -73,6 +74,39 @@ namespace FranchiseProject.API.Controllers
             {
                 return ResponseHandler.Failure<string>("Đã xảy ra lỗi khi xử lý yêu cầu của bạn.");
             }
+        }
+        [HttpPost("create-vnpay-url-2")]
+        [SwaggerOperation(Summary = "Tạo URL thanh toán hợp đồng lần 2 VnPay")]
+        public async Task<ApiResponse<string>> CreateContractSecondVnPayUrl([FromBody] PaymentContractViewModel paymentContract)
+        {
+
+            try
+            {
+                var isPay = await _unitOfwork.ContractRepository.IsCompletedPaidCorrectlyAsync(paymentContract.ContractId.Value);
+                if (isPay)
+                {
+
+                    return ResponseHandler.Success<string>(null, "Hợp đồng đã được thanh toán lần 2!");
+
+                }
+                var paymentUrl = await _vnPayService.CreatePaymentUrlFromContractSeacondPayment(paymentContract);
+                return ResponseHandler.Success(paymentUrl, "URL thanh toán VnPay đã được tạo thành công.");
+            }
+            catch (ArgumentException ex)
+            {
+                return ResponseHandler.Failure<string>(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<string>("Đã xảy ra lỗi khi xử lý yêu cầu của bạn.");
+            }
+        }
+        //   [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin)]
+        [SwaggerOperation(Summary = "Lọc thanh toán hợp đồng")]
+        [HttpGet("contract/filter")]
+        public async Task<ApiResponse<Pagination<PaymentContractAgencyViewModel>>> FilterPaymentContractAsync([FromQuery] FilterContractPaymentViewModel filterModel)
+        {
+            return await _paymentService.FilterPaymentContractAsync(filterModel);
         }
     }
 }

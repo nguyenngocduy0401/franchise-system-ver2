@@ -70,6 +70,26 @@ namespace FranchiseProject.Infrastructures.Repositories
             var expectedDeposit = contract.Total * contract.DepositPercentage / 100;
             return Math.Abs(contract.PaidAmount.Value - expectedDeposit.Value) < 0.01; 
         }
+        public async Task<bool> IsCompletedPaidCorrectlyAsync(Guid contractId)
+        {
+            var contract = await _dbContext.Contracts
+         .Where(c => c.Id == contractId)
+         .Select(c => new { c.PaidAmount, c.Total })
+         .FirstOrDefaultAsync();
+
+            if (contract == null)
+            {
+                return false;
+            }
+
+            if (contract.PaidAmount == null || contract.Total == null)
+            {
+                return false;
+            }
+
+            return Math.Abs(contract.PaidAmount.Value - contract.Total.Value) < 0.01;
+        }
+    
     }
 }
 

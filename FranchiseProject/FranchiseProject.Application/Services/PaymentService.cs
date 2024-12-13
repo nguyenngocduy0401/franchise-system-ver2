@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Office2010.PowerPoint;
 using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation;
@@ -8,6 +9,7 @@ using FranchiseProject.Application.Hubs;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Utils;
 using FranchiseProject.Application.ViewModels.ConsultationViewModels;
+using FranchiseProject.Application.ViewModels.ContractViewModels;
 using FranchiseProject.Application.ViewModels.PaymentViewModel;
 using FranchiseProject.Application.ViewModels.PaymentViewModel.PaymentContractViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
@@ -300,6 +302,54 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
+        public async Task<ApiResponse<Pagination<PaymentContractAgencyViewModel>>> FilterPaymentContractAsync(FilterContractPaymentViewModel filterModel)
+        {
+            var response = new ApiResponse<Pagination<PaymentContractAgencyViewModel>>();
+            try
+            {
+                var userCurrentId = _claimsService.GetCurrentUserId;
+                var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
 
+
+                Expression<Func<Payment, bool>> filter = p =>
+                    p.Type == PaymentTypeEnum.Contract &&
+                    (filterModel.AgencyId == null || p.Contract.AgencyId == filterModel.AgencyId) &&
+                    (filterModel.StartDate == null || p.CreationDate >= filterModel.StartDate) &&
+                    (filterModel.EndDate == null || p.CreationDate <= filterModel.EndDate);
+                 
+
+                var payments = await _unitOfWork.PaymentRepository.GetFilterAsync(
+                    filter: filter,
+                    includeProperties: "Contract,Contract.Agency",
+                    pageIndex: filterModel.PageIndex,
+                    pageSize: filterModel.PageSize
+                );
+
+                var paymentViewModels = new Pagination<PaymentContractAgencyViewModel>
+                {
+                    Items = payments.Items.Select(p => new PaymentContractAgencyViewModel
+                    {
+                        Id = p.Id,
+                        ContractId = p.ContractId,
+                        ContractCode = p.Contract.ContractCode,
+                        AgencyName = p.Contract.Agency.Name,
+                        Amount = p.Amount,
+                        Status = p.Status,
+                        CreationDate = p.CreationDate,
+                        CreateBy = p.UserId != null ? _userManager.FindByIdAsync(p.UserId).Result?.UserName : null
+                    }).ToList(),
+                    TotalItemsCount = payments.TotalItemsCount,
+                    PageIndex = payments.PageIndex,
+                    PageSize = payments.PageSize
+                };
+
+                response = ResponseHandler.Success(paymentViewModels, "Lọc thanh toán hợp đồng thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<Pagination<PaymentContractAgencyViewModel>>(ex.Message);
+            }
+            return response;
+        }
     }
 }

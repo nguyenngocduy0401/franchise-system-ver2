@@ -14,6 +14,7 @@ namespace FranchiseProject.Application.Repositories
         Task<Contract> GetMostRecentContractByAgencyIdAsync(Guid agencyId);
         Task<Contract> GetAllContractsByAgencyIdAsync(Guid agencyId);
         Task<bool> IsDepositPaidCorrectlyAsync(Guid contractId);
+        Task<bool> IsCompletedPaidCorrectlyAsync(Guid contractId);
 
     }
 }

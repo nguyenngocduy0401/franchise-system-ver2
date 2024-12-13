@@ -12,6 +12,7 @@ namespace FranchiseProject.Domain.Enums
         BusinessLicense,
         EducationalOperationLicense,
         CompletionHandoverAgreement,
+        Handover,
         OtherDocument,
     }
 }
