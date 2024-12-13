@@ -98,7 +98,7 @@ namespace FranchiseProject.API.Controllers
         }
 
         [SwaggerOperation(Summary = "thêm phí thiết kê{Authorize = Manager,Admin,SystemTechnician}")]
-        [HttpGet("agency/{id}/designfee")]
+        [HttpPut("agency/{id}/designfee")]
         [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager +","+AppRole.SystemTechnician)]
         public async Task<ApiResponse<bool>> AddDesignFee(Guid id, double designFee)
         {
