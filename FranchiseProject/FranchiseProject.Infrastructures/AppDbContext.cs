@@ -81,9 +81,12 @@ namespace FranchiseProject.Infrastructures
                      new Agency
                      {
                          Id = Guid.Parse("BE37023D-6A58-4B4B-92E5-39DCECE45473"),
-                         Status = AgencyStatusEnum.Approved
+                         Status = AgencyStatusEnum.Approved,
+                         Name = "Nguyễn Hồng"
+                         
                      }
                      );
+            #region template 
             modelBuilder.Entity<WorkTemplate>().HasData(
             new WorkTemplate
                 {
@@ -238,6 +241,20 @@ namespace FranchiseProject.Infrastructures
                 DurationDays = 2,
                 
             },
+            new WorkTemplate
+            {
+                Id = Guid.Parse("5e7d1c3f-2b43-4f3d-b4e8-7e9b43dbd1c9"),
+                Title = "Chuẩn bị hợp đồng - ",
+                Description = "<p>Thực hiện các công việc cần thiết để chuẩn bị hợp đồng trước khi ký kết.</p>\r\n<ul>\r\n" +
+                "    <li><strong>Thu thập thông tin:</strong> Tổng hợp thông tin từ các phòng ban liên quan để xây dựng hợp đồng.</li>\r\n" +
+                "    <li><strong>Soạn thảo hợp đồng:</strong> Soạn thảo dự thảo hợp đồng theo các thỏa thuận đã được thống nhất.</li>\r\n" +
+                "    <li><strong>Kiểm tra và chỉnh sửa:</strong> Rà soát nội dung hợp đồng để đảm bảo không có lỗi sai sót và phù hợp với quy định pháp luật.</li>\r\n" +
+                "    <li><strong>Gửi phê duyệt:</strong> Gửi bản dự thảo hợp đồng cho các bên liên quan phê duyệt.</li>\r\n</ul>\r\n",
+                Type = WorkTypeEnum.SignedContract,
+                Level = WorkLevelEnum.Optional,
+                StartDaysOffset = 3,
+                DurationDays = 6,
+            },
             // SignedContract - Ký hợp đồng 
             new WorkTemplate
             {
@@ -249,9 +266,10 @@ namespace FranchiseProject.Infrastructures
                 "    <li><strong>Thông báo kết quả:</strong> Thông báo chính thức việc ký kết và khởi động dự án.</li>\r\n</ul>\r\n<p><em>Thời gian thực hiện:</em> 1 ngày.</p>",
                 Type = WorkTypeEnum.SignedContract,
                 Level = WorkLevelEnum.Compulsory,
-                StartDaysOffset = 5,
+                StartDaysOffset = 8,
                 DurationDays = 2,
             },
+            
             // ConstructionAndTraining - Đào tạo và thi công
             new WorkTemplate
             {
@@ -391,7 +409,7 @@ namespace FranchiseProject.Infrastructures
                     StartDaysOffset = 1,
                     DurationHours = 3,
                     Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Cơ quan đăng ký hoặc trực tuyến]</li>\r\n</ul>",
-                    Type = AppointmentTypeEnum.Internal,
+                    Type = AppointmentTypeEnum.WithAgency,
                     WorkId = Guid.Parse("afbdf461-51f9-45cf-b559-e622fe8df67f"),
                 },
                 new AppointmentTemplate
@@ -423,6 +441,17 @@ namespace FranchiseProject.Infrastructures
                     Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Trực tuyến hoặc văn phòng]</li>\r\n</ul>",
                     Type = AppointmentTypeEnum.WithAgency,
                     WorkId = Guid.Parse("b87ed201-95f9-4518-bb34-dc4fd76dba5f"),
+                },
+                new AppointmentTemplate
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Chuẩn bị hợp đồng để kí với đối tác - ",
+                    StartDaysOffset = 1,
+                    DurationHours = 3,
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Địa chỉ công ty hoặc cuộc họp trực tuyến]</li>\r\n</ul>\r\n" +
+                    "<p><strong>Hướng dẫn:</strong> Hãy chuẩn bị đầy đủ tài liệu thỏa thuận trước khi tham dự.</p>",
+                    Type = AppointmentTypeEnum.WithAgency,
+                    WorkId = Guid.Parse("5e7d1c3f-2b43-4f3d-b4e8-7e9b43dbd1c9"),
                 },
                 new AppointmentTemplate
                 {
@@ -497,6 +526,7 @@ namespace FranchiseProject.Infrastructures
                     WorkId = Guid.Parse("67794a20-9e8b-49d3-a0ff-de4b5366e4af"),
                 }
             );
+            #endregion
             #region HomePage
             modelBuilder.Entity<HomePage>().HasData(
             new HomePage
