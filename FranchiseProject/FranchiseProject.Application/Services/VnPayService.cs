@@ -39,9 +39,6 @@ namespace FranchiseProject.Application.Services
 
         public async Task<string> CreatePaymentUrlFromContractPayment(PaymentContractViewModel paymentContract)
         {
-            
-
-           
             var contract =await _unitOfWork.ContractRepository.GetExistByIdAsync(paymentContract.ContractId.Value);
             var amount = contract.Total *( contract.DepositPercentage/100);
             var paidAmount = contract.Total - amount;

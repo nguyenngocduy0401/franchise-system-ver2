@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.Repositories;
 using FranchiseProject.Application.ViewModels.DashBoard;
 using FranchiseProject.Domain.Enums;
 using System;
@@ -106,6 +107,52 @@ namespace FranchiseProject.Application.Services
             {
                 return ResponseHandler.Failure<Pagination<AgencyStatisticsViewModel>>($"Error retrieving agency statistics: {ex.Message}");
             }
+        }
+        public async Task<ApiResponse<List<MonthlyRevenueViewModel>>> AnalyzeMonthlyRevenueAsync(int year)
+        {
+            var response = new ApiResponse<List<MonthlyRevenueViewModel>>();
+            try
+            {
+                var revenueData = await _unitOfWork.RevenueRepository.GetRevenueByMonthAsync(year);
+
+                var monthlyRevenue = revenueData
+                    .GroupBy(r => new { r.Date.Year, r.Date.Month })
+                    .Select(g => new MonthlyRevenueViewModel
+                    {
+                        Year = g.Key.Year,
+                        Month = g.Key.Month,
+                        TotalRevenue = g.Sum(r => r.Amount)
+                    })
+                    .ToList();
+
+                response = ResponseHandler.Success(monthlyRevenue, "Phân tích doanh thu theo tháng thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<List<MonthlyRevenueViewModel>>(ex.Message);
+            }
+            return response;
+        }
+        public async Task<ApiResponse<List<PartnerRevenueShare>>> CalculateRevenueSharePercentageAsync()
+        {
+            var response = new ApiResponse<List<PartnerRevenueShare>>();
+            try
+            {
+                var partnerRevenues = await _unitOfWork.RevenueRepository.GetMonthlyRevenueShareAsync();
+                var totalRevenue = partnerRevenues.Sum(pr => pr.TotalAmount);
+
+                foreach (var partnerRevenue in partnerRevenues)
+                {
+                    partnerRevenue.RevenuePercentage = totalRevenue > 0 ? (partnerRevenue.TotalAmount / totalRevenue) * 100 : 0;
+                }
+
+                response = ResponseHandler.Success(partnerRevenues, "Calculated revenue share percentages successfully.");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<List<PartnerRevenueShare>>($"Error calculating revenue share percentages: {ex.Message}");
+            }
+            return response;
         }
     }
 }
