@@ -480,7 +480,7 @@ namespace FranchiseProject.Application.Services
                                             }
                                             contract.Status = ContractStatusEnum.Active;
                                             contract.ContractDocumentImageURL = work.ReportImageURL;
-                                            _unitOfWork.WorkRepository.Update(work);
+                                        //    _unitOfWork.WorkRepository.Update(work);
                                             _unitOfWork.ContractRepository.Update(contract);
                                             
                                         }
@@ -535,11 +535,14 @@ namespace FranchiseProject.Application.Services
                                     case WorkTypeEnum.SignedContract:
                                         {
                                             var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
-                                            contract.EquipmentFee = await _unitOfWork.EquipmentRepository.GetTotalEquipmentAmountByContractIdAsync(contract.Id);
-
-                                            contract.Total = contract.DesignFee + contract.FrachiseFee + contract.EquipmentFee;
+                                            if (string.IsNullOrEmpty(contract.ContractDocumentImageURL))
+                                            {
+                                                return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng!");
+                                            }
+                                          //  contract.Status = ContractStatusEnum.Active;
+                                            contract.ContractDocumentImageURL = work.ReportImageURL;
+                                         //   _unitOfWork.WorkRepository.Update(work);
                                             _unitOfWork.ContractRepository.Update(contract);
-
                                         }
                                         break;
                                 }

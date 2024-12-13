@@ -513,7 +513,7 @@ namespace FranchiseProject.Application.Services
 
                 int totalMonths = (int)((contract.EndTime?.Year - contract.StartTime?.Year) * 12
                     + (contract.EndTime?.Month - contract.StartTime?.Month));
-              if(contract.DepositPercentage==null)
+              if(contract.DepositPercentage==null&& contract.RevenueSharePercentage==null)
                 {
                     return ResponseHandler.Success<string>(null, "Không tìm thấy thông tin .");
                 }
