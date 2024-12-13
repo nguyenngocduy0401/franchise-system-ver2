@@ -96,5 +96,13 @@ namespace FranchiseProject.API.Controllers
 
             return await _contractService.UploadContractTemplateAsync(file);
         }
+
+        [SwaggerOperation(Summary = "thêm phí thiết kê{Authorize = Manager,Admin,SystemTechnician}")]
+        [HttpGet("agency/{id}/designfee")]
+        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager +","+AppRole.SystemTechnician)]
+        public async Task<ApiResponse<bool>> AddDesignFee(Guid id, double designFee)
+        {
+            return await _contractService.AddDesignFee(id,designFee);
+        }
     }
 }
