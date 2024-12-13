@@ -65,9 +65,9 @@ namespace FranchiseProject.API.Controllers
 
             return await _equipmentService.GetSerialNumberHistoryByEquipmentIdAsync(id);
         }
-        [HttpGet("~/manager/api/v1/equipments/agency/{id}")]
-        [SwaggerOperation(Summary = "Lấy danh sách thiết bị theo AgencyId {Authorize = Manager, SystemTechnician, AgencyManager}")]
-        //[Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
+        [HttpPut("~/manager/api/v1/equipments/agency/{id}")]
+        [SwaggerOperation(Summary = "Thêm trang thiết theo AgencyId {Authorize = Manager, SystemTechnician}")]
+        //[Authorize(Roles = AppRole.Manager + "," + AppRole.SystemTechnician )]
         public async Task<ApiResponse<object>> ImportEquipmentsAfterFranchiseFromExcelAsync(IFormFile file, Guid id)
         {
 
