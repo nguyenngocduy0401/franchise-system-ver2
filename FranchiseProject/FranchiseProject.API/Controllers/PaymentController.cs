@@ -104,7 +104,7 @@ namespace FranchiseProject.API.Controllers
         //   [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin)]
         [SwaggerOperation(Summary = "Lọc thanh toán hợp đồng")]
         [HttpGet("contract/filter")]
-        public async Task<ApiResponse<Pagination<PaymentContractViewModel>>> FilterPaymentContractAsync([FromQuery] FilterContractPaymentViewModel filterModel)
+        public async Task<ApiResponse<Pagination<PaymentContractAgencyViewModel>>> FilterPaymentContractAsync([FromQuery] FilterContractPaymentViewModel filterModel)
         {
             return await _paymentService.FilterPaymentContractAsync(filterModel);
         }

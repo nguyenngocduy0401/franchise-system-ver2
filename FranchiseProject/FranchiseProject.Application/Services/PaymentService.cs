@@ -302,9 +302,9 @@ namespace FranchiseProject.Application.Services
             return response;
         }
 
-        public async Task<ApiResponse<Pagination<PaymentContractViewModel>>> FilterPaymentContractAsync(FilterContractPaymentViewModel filterModel)
+        public async Task<ApiResponse<Pagination<PaymentContractAgencyViewModel>>> FilterPaymentContractAsync(FilterContractPaymentViewModel filterModel)
         {
-            var response = new ApiResponse<Pagination<PaymentContractViewModel>>();
+            var response = new ApiResponse<Pagination<PaymentContractAgencyViewModel>>();
             try
             {
                 var userCurrentId = _claimsService.GetCurrentUserId;
@@ -325,9 +325,9 @@ namespace FranchiseProject.Application.Services
                     pageSize: filterModel.PageSize
                 );
 
-                var paymentViewModels = new Pagination<PaymentContractViewModel>
+                var paymentViewModels = new Pagination<PaymentContractAgencyViewModel>
                 {
-                    Items = payments.Items.Select(p => new PaymentContractViewModel
+                    Items = payments.Items.Select(p => new PaymentContractAgencyViewModel
                     {
                         Id = p.Id,
                         ContractId = p.ContractId,
@@ -347,7 +347,7 @@ namespace FranchiseProject.Application.Services
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<Pagination<PaymentContractViewModel>>(ex.Message);
+                response = ResponseHandler.Failure<Pagination<PaymentContractAgencyViewModel>>(ex.Message);
             }
             return response;
         }
