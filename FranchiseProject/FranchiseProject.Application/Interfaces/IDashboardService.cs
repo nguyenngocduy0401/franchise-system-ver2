@@ -14,5 +14,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<Pagination<AgencyStatisticsViewModel>>> GetAgencyStatistics(DateTime startDate, DateTime endDate, int pageNumber, int pageSize);
         Task<ApiResponse<RevenueStatisticsViewModel>> GetRevenueStatistics();
         Task<ApiResponse<List<PartnerRevenueShare>>> CalculateRevenueSharePercentageAsync();
+        Task<ApiResponse<string>> GenerateAgencyPaymentReportAsync(int month, int year);
     }
 }

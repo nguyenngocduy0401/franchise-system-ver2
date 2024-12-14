@@ -3,7 +3,9 @@ using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Application.ViewModels.DashBoard;
+using FranchiseProject.Application.ViewModels.DashBoardViewModels;
 using FranchiseProject.Domain.Enums;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +14,15 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Services
 {
-    public class DashboardService :IDashboardService
+    public class DashboardService : IDashboardService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IFirebaseService _firebaseService;
 
-        public DashboardService(IUnitOfWork unitOfWork)
+        public DashboardService(IUnitOfWork unitOfWork    ,    IFirebaseService firebaseService)
         {
             _unitOfWork = unitOfWork;
+            _firebaseService = firebaseService;
         }
         public async Task<ApiResponse<RevenueStatisticsViewModel>> GetRevenueStatistics()
         {
@@ -27,7 +31,7 @@ namespace FranchiseProject.Application.Services
                 var contracts = await _unitOfWork.ContractRepository.GetAllAsync();
                 if (contracts == null)
                 {
-                    return ResponseHandler.Success< RevenueStatisticsViewModel>(null,"không có dữ liệu truy xuất !");
+                    return ResponseHandler.Success<RevenueStatisticsViewModel>(null, "không có dữ liệu truy xuất !");
                 }
                 var payments = await _unitOfWork.PaymentRepository.GetAllAsync();
 
@@ -45,9 +49,9 @@ namespace FranchiseProject.Application.Services
 
                 var revenueStatistics = new RevenueStatisticsViewModel
                 {
-                    TotalRevenue = (double) totalRevenue,
-                    CollectedRevenue = (double) collectedRevenue,
-                    UnpaidRevenue = (double) unpaidRevenue
+                    TotalRevenue = (double)totalRevenue,
+                    CollectedRevenue = (double)collectedRevenue,
+                    UnpaidRevenue = (double)unpaidRevenue
                 };
 
                 return ResponseHandler.Success(revenueStatistics, "Revenue statistics retrieved successfully.");
@@ -70,7 +74,7 @@ namespace FranchiseProject.Application.Services
 
                     if (latestContract == null)
                     {
-                        continue; 
+                        continue;
                     }
 
                     var registerCourses = await _unitOfWork.RegisterCourseRepository.GetRegisterCoursesByAgencyIdAndDateRange(agency.Id, startDate, endDate);
@@ -154,5 +158,91 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+
+
+        public async Task<ApiResponse<string>> GenerateAgencyPaymentReportAsync(int month, int year)
+        {
+            try
+            {
+                var startDate = new DateTime(year, month, 1);
+                var endDate = startDate.AddMonths(1).AddDays(-1);
+
+                var agencies = await _unitOfWork.AgencyRepository.GetAllAsync();
+                var reportData = new List<AgencyPaymentReportViewModel>();
+
+                int rowNumber = 1;
+                foreach (var agency in agencies)
+                {
+                    var payments = await _unitOfWork.PaymentRepository.GetPaymentsByAgencyIdAndDateRange(agency.Id, startDate, endDate);
+
+                    var monthlyRevenue = payments.Sum(p => p.Amount ?? 0);
+
+                    var activeContract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agency.Id);
+
+                    if (activeContract == null)
+                    {
+                        continue;
+                    }
+
+                    var franchiseFee = activeContract.FrachiseFee ?? 0;
+                    var revenuePercentage = activeContract.RevenueSharePercentage ?? 0;
+                    var sharedAmount = monthlyRevenue * (revenuePercentage / 100);
+
+                    reportData.Add(new AgencyPaymentReportViewModel
+                    {
+                        RowNumber = rowNumber++,
+                        AgencyName = agency.Name,
+                        MonthYear = $"{month}/{year}",
+                        FranchiseFee = (decimal)franchiseFee,
+                        MonthlyRevenue = (decimal)monthlyRevenue,
+                        RevenuePercentage = (decimal)revenuePercentage,
+                        SharedAmount = (decimal)sharedAmount
+                    });
+                }
+
+                var excelData = GenerateExcelFile(reportData);
+
+                // Tạo tên file
+                string fileName = $"AgencyPaymentReport_{month}_{year}_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+
+                // Upload file lên Firebase và lấy URL
+                string firebaseUrl = await _firebaseService.UploadFileAsync(new MemoryStream(excelData), fileName);
+
+                return ResponseHandler.Success(firebaseUrl, "Báo cáo đã được tạo và tải lên thành công.");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<string>($"Lỗi khi tạo báo cáo: {ex.Message}");
+            }
+        }
+
+        private byte[] GenerateExcelFile(List<AgencyPaymentReportViewModel> data)
+        {
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Báo cáo thanh toán đại lý");
+                worksheet.Cells[1, 1].Value = "STT";
+                worksheet.Cells[1, 2].Value = "Tên đối tác";
+                worksheet.Cells[1, 3].Value = "Tháng/Năm";
+                worksheet.Cells[1, 4].Value = "Phí nhượng quyền";
+                worksheet.Cells[1, 5].Value = "Doanh thu tháng";
+                worksheet.Cells[1, 6].Value = "Phần trăm doanh thu";
+                worksheet.Cells[1, 7].Value = "Số tiền chia sẻ";
+                for (int i = 0; i < data.Count; i++)
+                {
+                    worksheet.Cells[i + 2, 1].Value = data[i].RowNumber;
+                    worksheet.Cells[i + 2, 2].Value = data[i].AgencyName;
+                    worksheet.Cells[i + 2, 3].Value = data[i].MonthYear;
+                    worksheet.Cells[i + 2, 4].Value = data[i].FranchiseFee;
+                    worksheet.Cells[i + 2, 5].Value = data[i].MonthlyRevenue;
+                    worksheet.Cells[i + 2, 6].Value = data[i].RevenuePercentage;
+                    worksheet.Cells[i + 2, 7].Value = data[i].SharedAmount;
+                }
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                return package.GetAsByteArray();
+            }
+        }
     }
 }
+

@@ -1,5 +1,6 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.Services;
 using FranchiseProject.Application.ViewModels.DashBoard;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,11 +12,13 @@ namespace FranchiseProject.API.Controllers
     public class DashboardController : ControllerBase
     {
         private readonly IDashboardService _dashboardService;
+     
         public DashboardController(IDashboardService dashboardService)
         {
             _dashboardService = dashboardService;
+         
         }
-      //  [Authorize(Roles = AppRole.Admin)]
+        //  [Authorize(Roles = AppRole.Admin)]
         [SwaggerOperation(Summary = "Phân tích doanh thu hàng tháng cho một năm cụ thể")]
         [HttpGet("monthly-revenue")]
         public async Task<ApiResponse<List<MonthlyRevenueViewModel>>> AnalyzeMonthlyRevenueAsync(int year)
@@ -41,6 +44,12 @@ namespace FranchiseProject.API.Controllers
         public async Task<ApiResponse<List<PartnerRevenueShare>>> GetRevenueSharePercentageAsync()
         {
             return await _dashboardService.CalculateRevenueSharePercentageAsync();
+        }
+        [HttpGet("agency-payment-report")]
+        public async Task<ApiResponse<string>> GenerateAgencyPaymentReportAsync(int month, int year)
+        {
+            return  await _dashboardService.GenerateAgencyPaymentReportAsync(month, year);
+           
         }
     }
 }
