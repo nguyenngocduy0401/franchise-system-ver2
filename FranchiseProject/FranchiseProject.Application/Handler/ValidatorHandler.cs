@@ -15,7 +15,7 @@ namespace FranchiseProject.Application.Handler
             var response = new ApiResponse<T>();
 
                 response.Data = default(T);
-                response.isSuccess = false;
+                response.isSuccess = true;
                 response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
             
             return response;
