@@ -24,17 +24,19 @@ namespace FranchiseProject.Application.Services
         private readonly VnPayConfig _vnPayConfig;
         private readonly ILogger<VnPayService> _logger;
         private readonly IUnitOfWork _unitOfWork;
-
+        private readonly ICurrentTime _currentTime;
         public VnPayService(
         IOptions<VnPayConfig> vnPayConfig,
         ILogger<VnPayService> logger,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ICurrentTime currentTime)
         {
             _vnPayConfig = vnPayConfig.Value ?? throw new ArgumentNullException(nameof(vnPayConfig));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
 
             _logger.LogInformation($"VnPayConfig: {System.Text.Json.JsonSerializer.Serialize(_vnPayConfig)}");
+            _currentTime = currentTime;
         }
 
         public async Task<string> CreatePaymentUrlFromContractPayment(PaymentContractViewModel paymentContract)
@@ -50,8 +52,8 @@ namespace FranchiseProject.Application.Services
             var vnpayOrderInfo = $"Thanh toan hop dong {paymentContract.ContractId}";
             var vnpayAmount = Convert.ToInt64(amount * 100);
             var vnpayLocale = "vn";
-            var vnpayCreateDate = DateTime.Now.ToString("yyyyMMddHHmmss");
-            var vnpayExpireDate = DateTime.Now.AddMinutes(15).ToString("yyyyMMddHHmmss");
+            var vnpayCreateDate = _currentTime.GetCurrentTime().ToString("yyyyMMddHHmmss");
+            var vnpayExpireDate = _currentTime.GetCurrentTime().AddMinutes(15).ToString("yyyyMMddHHmmss");
 
             var vnpayData = new Dictionary<string, string>
             {
