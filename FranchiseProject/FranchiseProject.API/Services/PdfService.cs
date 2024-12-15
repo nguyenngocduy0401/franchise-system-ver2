@@ -72,7 +72,7 @@ namespace FranchiseProject.API.Services
 
             using (var doc = DocX.Load(templatePath))
             {
-                var Deposit = contract.TotalMoney *contract.Deposit;
+                var Deposit =contract.Deposit;
                 var totalMoneyParse = contract.TotalMoney.HasValue ? NumberToWordsConverter.ConvertToWords(contract.TotalMoney.Value) : "";
                 var depositParse = Deposit.HasValue ? NumberToWordsConverter.ConvertToWords(Deposit.Value) : "";
                 var designFeeParse = contract.DesignFee.HasValue ? NumberToWordsConverter.ConvertToWords(contract.DesignFee.Value) : "";

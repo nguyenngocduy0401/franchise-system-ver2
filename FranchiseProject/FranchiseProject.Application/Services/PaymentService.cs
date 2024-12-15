@@ -155,7 +155,7 @@ namespace FranchiseProject.Application.Services
                     {
                         Title = "Thanh toán hợp đồng nhượn quyền" + " lần 1 " + contract.ContractCode,
                         Description = create.Description,
-                        Amount = contract.Total + (contract.DepositPercentage / 100),
+                        Amount = contract.Total * (contract.DepositPercentage / 100),
                         Type=PaymentTypeEnum.Contract,
                         Method=PaymentMethodEnum.Direct,
                         Status=PaymentStatus.Completed,
