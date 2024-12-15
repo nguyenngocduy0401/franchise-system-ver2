@@ -6,6 +6,7 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AppointmentViewModels;
+using FranchiseProject.Application.ViewModels.NotificationViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Application.ViewModels.WorkViewModels;
 using FranchiseProject.Domain.Entity;
@@ -34,10 +35,12 @@ namespace FranchiseProject.Application.Services
         private readonly IValidator<CreateWorkModel> _createWorkValidator;
         private readonly IValidator<UpdateWorkModel> _updateWorkValidator;
         private readonly IValidator<UpdateWorkByStaffModel> _updateWorkByStaffValidator;
+        private readonly INotificationService _notificationService;
         public WorkService(IUnitOfWork unitOfWork, UserManager<User> userManager,
             IValidator<CreateWorkModel> createWorkValidator, IMapper mapper,
             IValidator<UpdateWorkModel> updateWorkValidator, IClaimsService claimsService,
-            IValidator<UpdateWorkByStaffModel> updateWorkByStaffValidator)
+            IValidator<UpdateWorkByStaffModel> updateWorkByStaffValidator,
+            INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
@@ -46,6 +49,7 @@ namespace FranchiseProject.Application.Services
             _updateWorkValidator = updateWorkValidator;
             _claimsService = claimsService;
             _updateWorkByStaffValidator = updateWorkByStaffValidator;
+            _notificationService = notificationService;
         }
 
         public async Task<ApiResponse<Pagination<WorkViewModel>>> GetWorksAgencyAsync(FilterWorkByLoginModel filterWorkByLoginModel)
@@ -639,6 +643,20 @@ namespace FranchiseProject.Application.Services
                 var work =await _unitOfWork.WorkRepository.GetExistByIdAsync(id);
                 work.CustomerSubmit = fileURL;
                 _unitOfWork.WorkRepository.Update(work);
+                var agencyManagerUserIds = await _unitOfWork.WorkRepository.GetListUserByWorkId(id);
+                foreach (var agencyManagerUserId in agencyManagerUserIds)
+                {
+                    if (agencyManagerUserId != string.Empty)
+                    {
+                        var noti = new SendNotificationViewModel
+                        {
+                            message = "Báo cáo của bạn đã được phản hồi!",
+                            userIds = new List<string> { agencyManagerUserId }
+                        };
+                        await _notificationService.CreateAndSendNotificationNoReponseAsync(noti);
+
+                    }
+                }
                 await _unitOfWork.SaveChangeAsync();
                 return ResponseHandler.Success(true, "Cập nhật thành công !");
             }
