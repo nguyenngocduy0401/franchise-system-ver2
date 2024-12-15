@@ -14,10 +14,10 @@ namespace FranchiseProject.API.Validator.UserValidator
                 .WithMessage("Tên đầy đủ là bắt buộc.");
 
             RuleFor(x => x.Role)
-                .NotEmpty()
-                .WithMessage("Vai trò không được để trống.")
-                .Must(role => role == RolesEnum.Student.ToString() || role == RolesEnum.Instructor.ToString())
-                .WithMessage("Vai trò phải là học sinh hoặc giáo viên hướng dẫn.");
+               .NotEmpty()
+               .WithMessage("Vai trò không được để trống.")
+               .Must(role => role == RolesEnum.Student.ToString() || role == RolesEnum.Instructor.ToString() || role == RolesEnum.AgencyStaff.ToString())
+               .WithMessage("Vai trò phải là học sinh, giáo viên hướng dẫn, hoặc nhân viên trung tâm.");
 
             RuleFor(x => x.Email)
                 .NotEmpty()
