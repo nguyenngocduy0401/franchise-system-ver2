@@ -178,12 +178,9 @@ namespace FranchiseProject.Application.Services
                 if (work == null) return ResponseHandler.Success(new WorkDetailViewModel(), "Nhiệm vụ không khả dụng!");
                 var approvedBy = await _userManager.FindByIdAsync((work.ApproveBy).ToString());
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.Id);
-                if(contract==null)
-                {
-                    return ResponseHandler.Success<WorkDetailViewModel>(null, "Cần phải hoàn thành công việc ký thỏa thuận!");
-                }
+              
                 var workModel = _mapper.Map<WorkDetailViewModel>(work);
-                workModel.DesignFee = contract.DesignFee;
+                workModel.DesignFee = contract?.DesignFee ?? 0;
                 if (approvedBy != null)
                 {
                     workModel.ApprovedBy = new AppointmentUserViewModel
