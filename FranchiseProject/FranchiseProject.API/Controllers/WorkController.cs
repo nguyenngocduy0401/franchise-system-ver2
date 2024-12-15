@@ -79,7 +79,7 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.AgencyManager)]
         [SwaggerOperation(Summary = "Lấy công việc cho agency {Authorize = AgencyManager}")]
         [HttpGet("~/agency/api/v1/works")]
-        public async Task<ApiResponse<Pagination<WorkViewModel>>> UpdateWorkByStaffAsync([FromQuery] FilterWorkByLoginModel filterWorkByLoginModel)
+        public async Task<ApiResponse<Pagination<WorkViewModel>>> GetWorksAgencyAsync([FromQuery] FilterWorkByLoginModel filterWorkByLoginModel)
         {
             return await _workService.GetWorksAgencyAsync(filterWorkByLoginModel);
         }
