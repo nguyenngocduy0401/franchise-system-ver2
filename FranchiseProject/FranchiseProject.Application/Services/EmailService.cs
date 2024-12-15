@@ -141,7 +141,7 @@ namespace FranchiseProject.Application.Services
             emailMessage.Subject = "No-reply: Registration Successful";
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
             {
-                Text = "<p>Congratulations! You have successfully registered for consultation.</p><p>Thank you for choosing us!</p>"
+                Text = "<p>Chúc mừng! Bạn đã đăng ký tư vấn thành công.</p><p>Cảm ơn bạn đã lựa chọn chúng tôi!</p>"
             };
 
             using var client = new SmtpClient();
@@ -153,7 +153,7 @@ namespace FranchiseProject.Application.Services
                 await client.SendAsync(emailMessage);
                 response.Data = true;
                 response.isSuccess = true;
-                response.Message = "Registration success email sent.";
+                response.Message = "Gửi mail thành công!.";
             }
             catch (Exception ex)
             {
@@ -178,13 +178,13 @@ namespace FranchiseProject.Application.Services
             {
                 response.Data = false;
                 response.isSuccess = true;
-                response.Message = "Email address cannot be null or empty.";
+                response.Message = "Email và địa chỉ không thể trống!";
                 return response;
             }
             // Create email body with a link to the contract document
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
             {
-                Text = $"<p>Your contract has been created successfully. You can download it <a href='{contractUrl}'>here</a>.</p>"
+                Text = $"<p>Hợp đồng của bạn đã được tạo thành công. Bạn có thể tải xuống <a href='{contractUrl}'>tại đây</a>.</p>"
             };
 
             using var client = new SmtpClient();
