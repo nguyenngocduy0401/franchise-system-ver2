@@ -340,9 +340,40 @@ namespace FranchiseProject.Application.Services
                 {
                     return ResponseHandler.Failure<bool>("Báo cáo không tồn tại.");
                 }
-                
+
                 report.Status = newStatus;
                 _unitOfWork.ReportRepository.Update(report);
+
+                if (report.Type == ReportTypeEnum.Equipment)
+                {
+                    var equipments = await _unitOfWork.ReportRepository.GetEquipmentsByReportIdAsync(reportId);
+
+                    switch (newStatus)
+                    {
+                        case ReportStatusEnum.Processing:
+                            foreach (var equipment in equipments)
+                            {
+                                equipment.Status = EquipmentStatusEnum.Repair;
+                                _unitOfWork.EquipmentRepository.Update(equipment);
+                            }
+                            break;
+
+                        case ReportStatusEnum.Completed:
+                            foreach (var equipment in equipments)
+                            {
+                                equipment.Status = EquipmentStatusEnum.Available;
+                                _unitOfWork.EquipmentRepository.Update(equipment);
+                            }
+                            break;
+
+                       
+
+                        default:
+                    
+                            break;
+                    }
+                }
+
                 var result = await _unitOfWork.SaveChangeAsync() > 0;
 
                 if (result)
@@ -351,7 +382,7 @@ namespace FranchiseProject.Application.Services
                 }
                 else
                 {
-                    return ResponseHandler.Success<bool>(false,"Không thể cập nhật trạng thái báo cáo.");
+                    return ResponseHandler.Success<bool>(false, "Không thể cập nhật trạng thái báo cáo.");
                 }
             }
             catch (Exception ex)
@@ -359,7 +390,6 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<bool>($"Lỗi khi cập nhật trạng thái báo cáo: {ex.Message}");
             }
         }
-      
 
         public async Task<ApiResponse<bool>> RespondToReportAsync(Guid reportId, string response)
         {
