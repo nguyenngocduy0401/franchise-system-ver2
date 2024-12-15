@@ -162,7 +162,17 @@ namespace FranchiseProject.Infrastructures.Repositories
                                        .FirstOrDefaultAsync();
             return work;
         }
-        
+        public async Task<List<string>> GetListUserByWorkId(Guid workId)
+        {
+            var userId = await _dbContext.Works.Where(e => e.Id == workId && e.IsDeleted != true)
+                                       .SelectMany(e => e.Appointments)
+                                       .Where(e => e.IsDeleted != true)
+                                       .SelectMany(e => e.UserAppointments)
+                                       .Select(e => e.UserId)
+                                       .Distinct()
+                                       .ToListAsync();
+            return userId;
+        }
     }
 }
 

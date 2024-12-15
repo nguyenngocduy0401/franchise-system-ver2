@@ -32,5 +32,6 @@ namespace FranchiseProject.Application.Repositories
             int? pageIndex = null,
             int? pageSize = null);
         Task<Work> GetPreviousWorkByAgencyId(Guid agencyId, Expression<Func<Work, bool>>? filter = null);
+        Task<List<string>> GetListUserByWorkId(Guid workId);
     }
 }
