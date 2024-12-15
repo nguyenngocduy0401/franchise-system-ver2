@@ -49,6 +49,7 @@ namespace FranchiseProject.Application.Services
                 var courseRevenueList = new List<CourseRevenueViewModel>();
                 var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(agencyId.Value);
                 var courseList = await _unitOfWork.CourseRepository.GetAllAsync();
+                var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId.Value);
                 foreach (var course in courseList)
                 {
                     var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id);
@@ -76,6 +77,7 @@ namespace FranchiseProject.Application.Services
                         CourseCode=course.Code,
                         CourseName=course.Name,
                         TotalRevenue=TotalMoney,
+                        MonthlyFee=TotalMoney*contract.RevenueSharePercentage
                     });
                 }
                 response = ResponseHandler.Success(courseRevenueList, "Tính doanh thu khóa học thành công!");
@@ -96,6 +98,7 @@ namespace FranchiseProject.Application.Services
                 var courseRevenueList = new List<CourseRevenueViewModel>();
                 var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(agencyId);
                 var courseList = await _unitOfWork.CourseRepository.GetAllAsync();
+                var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
                 foreach (var course in courseList)
                 {
                     var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id);
@@ -123,6 +126,7 @@ namespace FranchiseProject.Application.Services
                         CourseCode = course.Code,
                         CourseName = course.Name,
                         TotalRevenue = TotalMoney,
+                        MonthlyFee=TotalMoney*contract.RevenueSharePercentage
                     });
                 }
                 response = ResponseHandler.Success(courseRevenueList, "Tính doanh thu khóa học thành công!");
