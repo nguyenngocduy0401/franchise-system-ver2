@@ -177,7 +177,7 @@ namespace FranchiseProject.Application.Services
                 var work = await _unitOfWork.WorkRepository.GetWorkDetailById(id);
                 if (work == null) return ResponseHandler.Success(new WorkDetailViewModel(), "Nhiệm vụ không khả dụng!");
                 var approvedBy = await _userManager.FindByIdAsync((work.ApproveBy).ToString());
-                var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.Id);
+                var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
 
                 var workModel = _mapper.Map<WorkDetailViewModel>(work);
                 workModel.DesignFee = contract?.DesignFee ?? 0;
