@@ -52,6 +52,7 @@ namespace FranchiseProject.Application
         public IHomePageRepository HomePageRepository { get; }
         public IWorkTemplateRepository WorkTemplateRepository { get; }
         public IAppointmentTemplateRepository AppointmentTemplateRepository { get; }
+        public IRevenueRepository RevenueRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

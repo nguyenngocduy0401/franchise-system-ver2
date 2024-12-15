@@ -13,9 +13,10 @@ using FranchiseProject.Domain.Entity;
 using Microsoft.Extensions.Configuration;
 using Quartzmin;
 using FranchiseProject.Application.Services;
+using OfficeOpenXml;
 
 var builder = WebApplication.CreateBuilder(args);
-
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 // Add services to the container.
 var configuration = builder.Configuration.Get<AppConfiguration>();
 builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);

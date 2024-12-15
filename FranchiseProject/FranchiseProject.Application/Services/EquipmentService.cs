@@ -59,7 +59,7 @@ namespace FranchiseProject.Application.Services
 
                     if (contract == null)
                     {
-                        return ResponseHandler.Failure<object>("Không tìm thấy hợp đồng hoạt động cho đại lý này.");
+                        return ResponseHandler.Success<object>("Không thể thực hiện vì khách hàng chưa kí hợp đồng thỏa thuận!");
                     }
                     var existingEquipments = await _unitOfWork.EquipmentRepository
                         .GetTableAsTracking()

@@ -12,7 +12,9 @@ namespace FranchiseProject.Application.ViewModels.PaymentViewModel
       
         public string RegisterCourseId {  get; set; }
         public string Title { get; set; }
-  //      public string StudentName { get; set; }
+        public PaymentMethodEnum? Method { get; set; }
+        public string? ImageURL { get; set; }
+        //      public string StudentName { get; set; }
         public string Description { get; set; }
         public int Amount { get; set; }
         

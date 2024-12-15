@@ -442,15 +442,6 @@ namespace FranchiseProject.Application.Services
                                             {
                                                 return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có giấy đăng kí doanh nghiệp hoạt động!");
                                             }
-                                            var fee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
-                                            var contract = new Contract
-                                            {
-                                                AgencyId = work.AgencyId.Value,
-                                                Status = ContractStatusEnum.None,
-                                                FrachiseFee = fee.Sum(f => f.FeeAmount),
-
-                                            };
-                                            await _unitOfWork.ContractRepository.AddAsync(contract);
                                             var doc = await _unitOfWork.DocumentRepository.GetMostRecentAgreeSignByAgencyIdAsync(work.AgencyId.Value, DocumentType.BusinessLicense);
                                             doc.Appoved = true;
                                             _unitOfWork.DocumentRepository.Update(doc);
@@ -463,7 +454,16 @@ namespace FranchiseProject.Application.Services
                                             var doc = await _unitOfWork.DocumentRepository.GetMostRecentAgreeSignByAgencyIdAsync(work.AgencyId.Value,DocumentType.AgreementContract);
                                             doc.URLFile = work.CustomerSubmit;
                                             doc.Appoved = true;
-                                             _unitOfWork.DocumentRepository.Update(doc);
+                                            var fee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
+                                            var contract = new Contract
+                                            {
+                                                AgencyId = work.AgencyId.Value,
+                                                Status = ContractStatusEnum.None,
+                                                FrachiseFee = fee.Sum(f => f.FeeAmount),
+
+                                            };
+                                            await _unitOfWork.ContractRepository.AddAsync(contract);
+                                            _unitOfWork.DocumentRepository.Update(doc);
                                             if (!hasActiveAgreementContract)
                                             {
                                                 return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng thỏa thuận!");
