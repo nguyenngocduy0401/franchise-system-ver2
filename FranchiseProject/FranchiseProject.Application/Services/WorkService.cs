@@ -178,7 +178,7 @@ namespace FranchiseProject.Application.Services
                 if (work == null) return ResponseHandler.Success(new WorkDetailViewModel(), "Nhiệm vụ không khả dụng!");
                 var approvedBy = await _userManager.FindByIdAsync((work.ApproveBy).ToString());
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.Id);
-              
+
                 var workModel = _mapper.Map<WorkDetailViewModel>(work);
                 workModel.DesignFee = contract?.DesignFee ?? 0;
                 if (approvedBy != null)
@@ -440,7 +440,7 @@ namespace FranchiseProject.Application.Services
                             work.Status = status;
                             if (work.Level == WorkLevelEnum.Compulsory)
                             {
-                                if(work.Submit != WorkStatusSubmitEnum.Submited)
+                                if (work.Submit != WorkStatusSubmitEnum.Submited)
                                     return ResponseHandler.Success(false, "Nhiệm vụ bắt buộc chưa được xử lí. Không thể duyệt lúc này!");
                                 switch (work.Type)
                                 {
@@ -460,7 +460,7 @@ namespace FranchiseProject.Application.Services
                                         {
                                             var work1 = _unitOfWork.WorkRepository.GetExistByIdAsync(workId);
                                             var hasActiveAgreementContract = await _unitOfWork.DocumentRepository.HasActiveAgreementContractAsync(work.AgencyId.Value);
-                                            var doc = await _unitOfWork.DocumentRepository.GetMostRecentAgreeSignByAgencyIdAsync(work.AgencyId.Value,DocumentType.AgreementContract);
+                                            var doc = await _unitOfWork.DocumentRepository.GetMostRecentAgreeSignByAgencyIdAsync(work.AgencyId.Value, DocumentType.AgreementContract);
                                             doc.URLFile = work.CustomerSubmit;
                                             doc.Appoved = true;
                                             var fee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
@@ -479,7 +479,7 @@ namespace FranchiseProject.Application.Services
                                             }
                                         }
                                         break;
-                                
+
                                     case WorkTypeEnum.SignedContract:
                                         {
                                             var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
@@ -489,9 +489,9 @@ namespace FranchiseProject.Application.Services
                                             }
                                             contract.Status = ContractStatusEnum.Active;
                                             contract.ContractDocumentImageURL = work.CustomerSubmit;
-                                        //    _unitOfWork.WorkRepository.Update(work);
+                                            //    _unitOfWork.WorkRepository.Update(work);
                                             _unitOfWork.ContractRepository.Update(contract);
-                                            
+
                                         }
                                         break;
                                     case WorkTypeEnum.Handover:
@@ -538,8 +538,8 @@ namespace FranchiseProject.Application.Services
                                         {
                                             var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
                                             contract.EquipmentFee = await _unitOfWork.EquipmentRepository.GetTotalEquipmentAmountByContractIdAsync(contract.Id);
-                                            
-                                            contract.Total = contract.DesignFee + contract.FrachiseFee+ contract.EquipmentFee;
+
+                                            contract.Total = contract.DesignFee + contract.FrachiseFee + contract.EquipmentFee;
                                             _unitOfWork.ContractRepository.Update(contract);
 
                                         }
@@ -547,9 +547,9 @@ namespace FranchiseProject.Application.Services
                                     case WorkTypeEnum.SignedContract:
                                         {
                                             var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(work.AgencyId.Value);
-                                          //  contract.Status = ContractStatusEnum.Active;
+                                            //  contract.Status = ContractStatusEnum.Active;
                                             contract.ContractDocumentImageURL = work.ReportImageURL;
-                                         //   _unitOfWork.WorkRepository.Update(work);
+                                            //   _unitOfWork.WorkRepository.Update(work);
                                             _unitOfWork.ContractRepository.Update(contract);
                                         }
                                         break;
@@ -651,17 +651,20 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-                var work =await _unitOfWork.WorkRepository.GetExistByIdAsync(id);
+                var work = await _unitOfWork.WorkRepository.GetExistByIdAsync(id);
                 work.CustomerSubmit = fileURL;
                 _unitOfWork.WorkRepository.Update(work);
                 var agencyManagerUserIds = await _unitOfWork.WorkRepository.GetListUserByWorkId(id);
+                var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(work.AgencyId.Value);
+          
+                string actionMessage = GetActionMessageByWorkType(work.Type.Value);
                 foreach (var agencyManagerUserId in agencyManagerUserIds)
                 {
                     if (agencyManagerUserId != string.Empty)
                     {
                         var noti = new SendNotificationViewModel
                         {
-                            message = "Báo cáo của bạn đã được phản hồi!",
+                            message = $"Đối tác {agency.Name} đã tải {actionMessage} !",
                             userIds = new List<string> { agencyManagerUserId }
                         };
                         await _notificationService.CreateAndSendNotificationNoReponseAsync(noti);
@@ -677,5 +680,27 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-    }
+
+        private string GetActionMessageByWorkType(WorkTypeEnum workType)
+        {
+            switch (workType)
+            {
+                case WorkTypeEnum.AgreementSigned:
+                    return "tải lên biên bản thỏa thuận.";
+                case WorkTypeEnum.BusinessRegistered:
+                    return "tải lên giấy đăng kí doanh nghiệp.";
+                case WorkTypeEnum.SignedContract:
+                    return "tải lên hợp đồng đã ký";
+                case WorkTypeEnum.Handover:
+                    return "tải lên biên bản bàn giao";
+                case WorkTypeEnum.EducationLicenseRegistered:
+                    return "tải lên giấy phép đăng ký giáo dục";
+            
+           
+                default:
+                    return "tải lên tài liệu";
+            }
+        } 
+    } 
 }
+

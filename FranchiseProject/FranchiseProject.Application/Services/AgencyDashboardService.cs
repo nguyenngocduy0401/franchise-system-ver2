@@ -50,6 +50,10 @@ namespace FranchiseProject.Application.Services
                 var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(agencyId.Value);
                 var courseList = await _unitOfWork.CourseRepository.GetAllAsync();
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId.Value);
+                if (contract == null)
+                {
+                    return ResponseHandler.Success<List<CourseRevenueViewModel>>(null, "Không tìm thấy hợp đồng !");
+                }
                 foreach (var course in courseList)
                 {
                     var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id);
@@ -99,6 +103,10 @@ namespace FranchiseProject.Application.Services
                 var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(agencyId);
                 var courseList = await _unitOfWork.CourseRepository.GetAllAsync();
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
+                if (contract == null)
+                {
+                    return ResponseHandler.Success<List<CourseRevenueViewModel>>(null, "Không tìm thấy hợp đồng !");
+                }
                 foreach (var course in courseList)
                 {
                     var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id);
