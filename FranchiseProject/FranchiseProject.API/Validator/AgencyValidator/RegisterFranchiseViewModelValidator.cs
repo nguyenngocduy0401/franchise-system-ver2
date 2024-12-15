@@ -15,6 +15,7 @@ namespace FranchiseProject.API.Validator.AgencyValidation
 
             RuleFor(x => x.PhoneNumber)
                 .NotEmpty()
+                .WithMessage("Số điện thoại là bắt buộc.")
                 .Matches(@"^0[0-9]{9}$")
                 .WithMessage("Số điện thoại phải có 10 chữ số và bắt đầu bằng 0.");
 

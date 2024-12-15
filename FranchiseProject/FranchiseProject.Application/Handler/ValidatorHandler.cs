@@ -16,8 +16,9 @@ namespace FranchiseProject.Application.Handler
 
                 response.Data = default(T);
                 response.isSuccess = true;
-                response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
-            
+                response.Message = validationResult.Errors.FirstOrDefault()?.ErrorMessage;
+                //response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
+
             return response;
         }
     }

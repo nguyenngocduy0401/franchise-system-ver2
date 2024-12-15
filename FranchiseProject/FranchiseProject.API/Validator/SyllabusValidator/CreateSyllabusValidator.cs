@@ -10,18 +10,21 @@ namespace FranchiseProject.API.Validator.SyllabusValidator
         {
             RuleFor(x => x.Description)
                 .NotEmpty()
+                .WithMessage("Mô tả là bắt buộc.")
                 .MaximumLength(500)
-                .WithMessage("Mô tả không được để trống và phải ít hơn 500 ký tự.");
+                .WithMessage("Mô tả phải ít hơn 500 ký tự.");
 
             RuleFor(x => x.TimeAllocation)
                 .NotEmpty()
+                .WithMessage("Phân bổ thời gian không được để trống.")
                 .MaximumLength(500)
-                .WithMessage("Phân bổ thời gian không được để trống và phải ít hơn 500 ký tự.");
+                .WithMessage("Phân bổ thời gian phải ít hơn 500 ký tự.");
 
             RuleFor(x => x.ToolsRequire)
                 .NotEmpty()
+                .WithMessage("Công cụ yêu cầu không được để trống.")
                 .MaximumLength(500)
-                .WithMessage("Công cụ yêu cầu không được để trống và phải ít hơn 500 ký tự.");
+                .WithMessage("Công cụ yêu cầu phải ít hơn 500 ký tự.");
 
             RuleFor(x => x.MinAvgMarkToPass)
                 .GreaterThanOrEqualTo(0)
