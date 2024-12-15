@@ -9,9 +9,10 @@ namespace FranchiseProject.Application.ViewModels.AgencyDashboardViewModels
     public class CourseRevenueViewModel
     {
         public Guid CourseId { get; set; }
-        public string CourseCode { get; set; }
-        public string CourseName { get; set; }
+        public string? CourseCode { get; set; }
+        public string? CourseName { get; set; }
         public int StudentCount { get; set; }
         public double? TotalRevenue { get; set; }
+        public double MonthlyFee { get; set; }
     }
 }

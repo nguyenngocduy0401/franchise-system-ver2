@@ -118,6 +118,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IHomePageRepository, HomePageRepository>();
             services.AddScoped<IAppointmentTemplateRepository, AppointmentTemplateRepository>();
             services.AddScoped<IWorkTemplateRepository, WorkTemplateRepository>();
+            services.AddScoped<IRevenueRepository, RevenueRepository>();
             #endregion
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>

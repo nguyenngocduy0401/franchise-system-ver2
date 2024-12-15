@@ -22,5 +22,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> UpdateStudentPaymentStatusAsync(Guid registerCourseId, StudentPaymentStatusEnum newStatus);
         Task<ApiResponse<bool>> CreatePaymentContractDirect(CreateContractDirect create);
         Task<ApiResponse<Pagination<PaymentContractAgencyViewModel>>> FilterPaymentContractAsync(FilterContractPaymentViewModel filterModel);
+
     }
 }

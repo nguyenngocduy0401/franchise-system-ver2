@@ -56,6 +56,7 @@ namespace FranchiseProject.Infrastructures
         private readonly IHomePageRepository _homePageRepository;
         private readonly IWorkTemplateRepository _workTemplateRepository;
         private readonly IAppointmentTemplateRepository _appointmentTemplateRepository;
+        private readonly IRevenueRepository _revenueRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -73,7 +74,8 @@ namespace FranchiseProject.Infrastructures
             IEquipmentRepository equipmentRepository,IFranchiseFeesRepository franchiseFeesRepository,
             IEquipmentSerialNumberHistoryRepository equipmentSerialNumberHistoryRepository,
             IHomePageRepository homePageRepository, IWorkTemplateRepository workTemplateRepository,
-            IAppointmentTemplateRepository appointmentTemplateRepository)
+            IAppointmentTemplateRepository appointmentTemplateRepository, IRevenueRepository revenueRepository)
+
 
            
         {
@@ -122,6 +124,7 @@ namespace FranchiseProject.Infrastructures
             _homePageRepository = homePageRepository;
             _workTemplateRepository = workTemplateRepository;
             _appointmentTemplateRepository = appointmentTemplateRepository;
+            _revenueRepository = revenueRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -206,6 +209,7 @@ namespace FranchiseProject.Infrastructures
         public IHomePageRepository HomePageRepository => _homePageRepository;
         public IWorkTemplateRepository WorkTemplateRepository => _workTemplateRepository;
         public IAppointmentTemplateRepository AppointmentTemplateRepository => _appointmentTemplateRepository;
+        public IRevenueRepository RevenueRepository => _revenueRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();
