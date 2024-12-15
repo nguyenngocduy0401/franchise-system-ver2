@@ -168,7 +168,16 @@ namespace FranchiseProject.Application.Services
                 }
                 ValidationResult validationResult = await _slotValidator.ValidateAsync(createSlotModel);
                 if (!validationResult.IsValid) if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+                bool isOverlapping = await _unitOfWork.SlotRepository.IsOverlappingAsync(
+           userCurrent.AgencyId.Value,
+           createSlotModel.StartTime.Value,
+           createSlotModel.EndTime.Value
+       );
 
+                if (isOverlapping)
+                {
+                    return ResponseHandler.Success<bool>(false,"Khoảng thời gian này đã bị trùng với slot hiện có. Vui lòng chọn khoảng thời gian khác.");
+                }
                 var slot = _mapper.Map<Slot>(createSlotModel);
                 slot.AgencyId = userCurrent.AgencyId;
                 await _unitOfWork.SlotRepository.AddAsync(slot);

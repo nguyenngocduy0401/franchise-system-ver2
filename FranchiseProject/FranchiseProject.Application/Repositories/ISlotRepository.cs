@@ -12,5 +12,6 @@ namespace FranchiseProject.Application.Repositories
     {
         Task<Slot?> GetFirstOrDefaultAsync(Expression<Func<Slot, bool>> filter);
         Task<IEnumerable<ClassSchedule>> GetAllSlotAsync(Expression<Func<ClassSchedule, bool>> predicate);
+        Task<bool> IsOverlappingAsync(Guid agencyId, TimeSpan startTime, TimeSpan endTime, Guid? excludeSlotId = null);  
     }
 }

@@ -34,5 +34,14 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.ClassSchedules.Where(predicate).ToListAsync();
         }
+        public async Task<bool> IsOverlappingAsync(Guid agencyId, TimeSpan  startTime, TimeSpan endTime, Guid? excludeSlotId = null)
+        {
+            return await _dbContext.Slots
+                .AnyAsync(s => s.AgencyId == agencyId &&
+                               s.Id != excludeSlotId &&
+                               ((s.StartTime <= startTime && startTime < s.EndTime) ||
+                                (s.StartTime < endTime && endTime <= s.EndTime) ||
+                                (startTime <= s.StartTime && s.EndTime <= endTime)));
+        }
     }
 }
