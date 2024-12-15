@@ -77,7 +77,7 @@ namespace FranchiseProject.Application.Services
                         CourseCode=course.Code,
                         CourseName=course.Name,
                         TotalRevenue=TotalMoney,
-                        MonthlyFee=TotalMoney*contract.RevenueSharePercentage
+                        MonthlyFee= (double)(TotalMoney *contract.RevenueSharePercentage)
                     });
                 }
                 response = ResponseHandler.Success(courseRevenueList, "Tính doanh thu khóa học thành công!");
@@ -126,7 +126,7 @@ namespace FranchiseProject.Application.Services
                         CourseCode = course.Code,
                         CourseName = course.Name,
                         TotalRevenue = TotalMoney,
-                        MonthlyFee=TotalMoney*contract.RevenueSharePercentage
+                        MonthlyFee= (double)(TotalMoney *contract.RevenueSharePercentage)
                     });
                 }
                 response = ResponseHandler.Success(courseRevenueList, "Tính doanh thu khóa học thành công!");
