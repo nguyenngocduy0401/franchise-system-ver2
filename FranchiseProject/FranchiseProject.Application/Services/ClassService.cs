@@ -669,7 +669,8 @@ namespace FranchiseProject.Application.Services
                 var instructorViewModels = instructors.Select(i => new InstructorViewModel
                 {
                     Id = i.Id,
-                    UserName = i.UserName
+                    UserName = i.UserName,
+                    FullName=i.FullName
                 }).ToList();
 
                 response = ResponseHandler.Success(instructorViewModels, "Lấy danh sách Instructor thành công.");

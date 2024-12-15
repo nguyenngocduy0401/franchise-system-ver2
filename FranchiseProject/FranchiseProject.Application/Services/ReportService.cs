@@ -118,7 +118,7 @@ namespace FranchiseProject.Application.Services
                     {
                         return ResponseHandler.Success<bool>(false,$"Thiết bị với ID {equipmentId} không tồn tại.");
                     }
-                    equipment.Status = EquipmentStatusEnum.Repair;
+                   // equipment.Status = EquipmentStatusEnum.Repair;
                     equipments.Add(equipment);
                 }
 

@@ -10,5 +10,6 @@ namespace FranchiseProject.Application.ViewModels.ClassViewModels
     {
         public string? Id {  get; set; }
         public string? UserName {  get; set; }
+        public string ? FullName { get; set; }
     }
 }
