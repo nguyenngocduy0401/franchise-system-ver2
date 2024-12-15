@@ -488,7 +488,7 @@ namespace FranchiseProject.Application.Services
                                                 return ResponseHandler.Success(false, "Không thể phê duyệt khi chưa có hợp đồng!");
                                             }
                                             contract.Status = ContractStatusEnum.Active;
-                                            contract.ContractDocumentImageURL = work.ReportImageURL;
+                                            contract.ContractDocumentImageURL = work.CustomerSubmit;
                                         //    _unitOfWork.WorkRepository.Update(work);
                                             _unitOfWork.ContractRepository.Update(contract);
                                             
@@ -510,6 +510,9 @@ namespace FranchiseProject.Application.Services
                                                     _unitOfWork.EquipmentSerialNumberHistoryRepository.Update(history);
                                                 }
                                             }
+                                            var doc = await _unitOfWork.DocumentRepository.GetMostRecentAgreeSignByAgencyIdAsync(work.AgencyId.Value, DocumentType.Handover);
+                                            doc.URLFile = work.CustomerSubmit;
+                                            _unitOfWork.DocumentRepository.Update(doc);
                                         }
                                         break;
                                     case WorkTypeEnum.EducationLicenseRegistered:

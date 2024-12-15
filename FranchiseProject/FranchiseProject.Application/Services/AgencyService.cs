@@ -85,6 +85,7 @@ namespace FranchiseProject.Application.Services
                     var newUser = new User
                     {
                         UserName = userCredentials.UserName,
+                        FullName=create.Name,
                         PasswordHash = userCredentials.Password,
                         AgencyId = agency.Id,
                         Status = UserStatusEnum.inactive,
