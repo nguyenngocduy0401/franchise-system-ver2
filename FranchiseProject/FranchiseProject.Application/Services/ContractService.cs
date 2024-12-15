@@ -14,6 +14,7 @@ using FranchiseProject.Domain.Entity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
+using Org.BouncyCastle.Pqc.Crypto.Falcon;
 
 namespace FranchiseProject.Application.Services
 {
@@ -578,6 +579,11 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
+
+                if (contract == null)
+                {
+                    return ResponseHandler.Success<bool>(false, "Không thể thực hiện vì khách hàng chưa kí hợp đồng thỏa thuận!");
+                }
                 contract.DesignFee = designFee;
                 _unitOfWork.ContractRepository.Update(contract);
                await _unitOfWork.SaveChangeAsync();
