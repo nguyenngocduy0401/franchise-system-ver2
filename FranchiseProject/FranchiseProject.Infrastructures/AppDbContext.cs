@@ -365,16 +365,27 @@ namespace FranchiseProject.Infrastructures
                     Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Địa chỉ công ty hoặc cuộc họp trực tuyến]</li>\r\n</ul>",
                     Type = AppointmentTypeEnum.WithAgency,
                     WorkId = Guid.Parse("0d55bc46-31f4-4022-9133-aaab78416a50"),
+                    
+                }, new AppointmentTemplate
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Chuẩn bị tài liệu thỏa thuận với đối tác - ",
+                    StartDaysOffset = 1, 
+                    DurationHours = 2, 
+                    Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Địa chỉ công ty hoặc cuộc họp trực tuyến]</li>\r\n</ul>\r\n" +
+                    "<p><strong>Hướng dẫn:</strong> Hãy chuẩn bị đầy đủ tài liệu thỏa thuận trước khi tham dự.</p>",
+                    Type = AppointmentTypeEnum.WithAgency,
+                    WorkId = Guid.Parse("94d839a2-6474-45d3-a00b-40e73fd41c0e"), 
                 },
                 new AppointmentTemplate
                 {
                     Id = Guid.NewGuid(),
-                    Title = "Chuẩn bị tài liệu thỏa thuận với đối tác - ",
+                    Title = "Chuẩn bị tài liệu phỏng vấn với đối tác - ",
                     StartDaysOffset = 1, // 1 ngày sau khi công việc bắt đầu
                     DurationHours = 2, // Thời lượng 2 giờ
                     Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Địa chỉ công ty hoặc cuộc họp trực tuyến]</li>\r\n</ul>\r\n" +
-                    "<p><strong>Hướng dẫn:</strong> Hãy chuẩn bị đầy đủ tài liệu thỏa thuận trước khi tham dự.</p>",
-                    Type = AppointmentTypeEnum.WithAgency,
+                    "<p><strong>Hướng dẫn:</strong> Hãy chuẩn bị đầy đủ tài liệu phỏng vấn trước khi tham dự.</p>",
+                    Type = AppointmentTypeEnum.Internal,
                     WorkId = Guid.Parse("84d281ba-8036-45b3-818e-f7b6b465fd21"), // Liên kết với công việc "Chuẩn bị tài liệu thỏa thuận với đối tác"
                 },
                 new AppointmentTemplate
