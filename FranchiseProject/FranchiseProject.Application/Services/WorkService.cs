@@ -437,6 +437,8 @@ namespace FranchiseProject.Application.Services
                             work.Status = status;
                             if (work.Level == WorkLevelEnum.Compulsory)
                             {
+                                if(work.Submit != WorkStatusSubmitEnum.Submited)
+                                    return ResponseHandler.Success(false, "Nhiệm vụ bắt buộc chưa được xử lí. Không thể duyệt lúc này!");
                                 switch (work.Type)
                                 {
                                     case WorkTypeEnum.BusinessRegistered:
@@ -553,6 +555,9 @@ namespace FranchiseProject.Application.Services
                         work.Status = status;
                         if (work.Level == WorkLevelEnum.Compulsory)
                         {
+                            if (work.Submit != WorkStatusSubmitEnum.Submited)
+                                return ResponseHandler.Success(false, "Nhiệm vụ bắt buộc chưa được xử lí. Không thể duyệt lúc này!");
+
                             var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync((Guid)work.AgencyId);
                             if (agency == null)
                             {
