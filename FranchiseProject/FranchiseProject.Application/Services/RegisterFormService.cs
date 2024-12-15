@@ -183,7 +183,7 @@ namespace FranchiseProject.Application.Services
                     .Where(u => consultantIds.Contains(u.Id))
                     .ToDictionaryAsync(u => u.Id, u => u.UserName);
 
-                var consultationViewModels = paginationResult.Items.OrderByDescending(item => item.ModificationDate).Select(item => new ConsultationViewModel
+                var consultationViewModels = paginationResult.Items.OrderByDescending(item => item.CreationDate).Select(item => new ConsultationViewModel
                 {
                     Id = item.Id,
                     CusomterName = item.CustomerName,
