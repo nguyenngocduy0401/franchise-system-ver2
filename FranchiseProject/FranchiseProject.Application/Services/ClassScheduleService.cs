@@ -141,7 +141,7 @@ namespace FranchiseProject.Application.Services
                 int numberOfLessons = courseEntity.NumberOfLession.Value;
                 var selectedDaysOfWeek = new List<DayOfWeekEnum>();
 
-                var inputDaysOfWeek = createClassScheduleDateRangeViewModel.dayOfWeeks; // Là danh sách các string
+                var inputDaysOfWeek = createClassScheduleDateRangeViewModel.dayOfWeeks; 
 
                 foreach (var day in inputDaysOfWeek)
                 {
@@ -158,7 +158,7 @@ namespace FranchiseProject.Application.Services
                     }
                 }
 
-                var startDate = DateTime.Now;
+                var startDate = createClassScheduleDateRangeViewModel.startDate;
                 var createdSchedules = new List<DateTime>();
                 var classSchedules = new List<ClassSchedule>();
                 int createdLessons = 0;
@@ -168,7 +168,7 @@ namespace FranchiseProject.Application.Services
                     if (selectedDaysOfWeek.Contains((DayOfWeekEnum)startDate.DayOfWeek))
                     {
                         var existingSchedule = await _unitOfWork.ClassScheduleRepository
-                            .GetExistingScheduleAsync(startDate, createClassScheduleDateRangeViewModel.Room, Guid.Parse(createClassScheduleDateRangeViewModel.SlotId));
+                            .GetExistingScheduleAsync(startDate.ToDateTime(TimeOnly.MinValue), createClassScheduleDateRangeViewModel.Room, Guid.Parse(createClassScheduleDateRangeViewModel.SlotId));
 
                         if (existingSchedule != null)
                         {
@@ -182,13 +182,13 @@ namespace FranchiseProject.Application.Services
                         {
                             ClassId = Guid.Parse(createClassScheduleDateRangeViewModel.ClassId),
                             SlotId = Guid.Parse(createClassScheduleDateRangeViewModel.SlotId),
-                            Date = startDate,
+                            Date = startDate.ToDateTime(TimeOnly.MinValue),
                             Room = createClassScheduleDateRangeViewModel.Room
                         };
 
                         await _unitOfWork.ClassScheduleRepository.AddAsync(classSchedule);
                         classSchedules.Add(classSchedule);
-                        createdSchedules.Add(startDate);
+                        createdSchedules.Add(startDate.ToDateTime(TimeOnly.MinValue));
                         createdLessons++;
                     }
 
