@@ -471,7 +471,7 @@ namespace FranchiseProject.Infrastructures
                     DurationHours = 6,
                     Description = "<ul>\r\n    <li><strong>Thời gian:</strong> [Ngày, Giờ]</li>\r\n    <li><strong>Địa điểm:</strong> [Trung tâm chính]</li>\r\n</ul>",
                     Type = AppointmentTypeEnum.WithAgency,
-                    WorkId = Guid.Parse("6f4c22b7-4656-46fc-90b8-dd0722853ba9"),
+                    WorkId = Guid.Parse("e82ec599-fade-43fc-8030-ef643643e9e1"),
                 },
                 new AppointmentTemplate
                 {
