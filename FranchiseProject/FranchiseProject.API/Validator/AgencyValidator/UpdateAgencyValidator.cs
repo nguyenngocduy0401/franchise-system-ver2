@@ -40,9 +40,6 @@ namespace FranchiseProject.API.Validator.AgencyValidator
                 .EmailAddress()
                 .WithMessage("Email không hợp lệ.");
 
-            RuleFor(x => x.NumberOfRoom)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("Số phòng phải lớn hơn hoặc bằng 0.");
         }
     }
 }
