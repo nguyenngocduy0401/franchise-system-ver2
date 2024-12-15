@@ -52,12 +52,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 FluentValidation.Results.ValidationResult validationResult = await _validator.ValidateAsync(create);
-                if (!validationResult.IsValid)
-                {
-                    response.isSuccess = false;
-                    response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
-                    return response;
-                }
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 var agency = _mapper.Map<Agency>(create);
                 agency.Status = AgencyStatusEnum.Processing;
@@ -200,12 +195,7 @@ namespace FranchiseProject.Application.Services
             {
                 var agenyId = Guid.Parse(id);
                 FluentValidation.Results.ValidationResult validationResult = await _validatorUpdate.ValidateAsync(update);
-                if (!validationResult.IsValid)
-                {
-                    response.isSuccess = false;
-                    response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
-                    return response;
-                }
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
                 var existingAgency = await _unitOfWork.AgencyRepository.GetByIdAsync(agenyId);
                 if (existingAgency == null)
                 {
@@ -218,13 +208,6 @@ namespace FranchiseProject.Application.Services
 
 
                 _unitOfWork.AgencyRepository.Update(existingAgency);
-                var notification = new Notification
-                {
-                    CreatedBy = _claimsService.GetCurrentUserId,
-                    CreationDate = DateTime.Now,
-                    IsRead = false,
-                    ReceiverId = _claimsService.GetCurrentUserId.ToString(),
-                };
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                 if (isSuccess > 0)
                 {
