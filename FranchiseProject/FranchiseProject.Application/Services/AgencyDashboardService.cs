@@ -56,7 +56,7 @@ namespace FranchiseProject.Application.Services
                 }
                 foreach (var course in courseList)
                 {
-                    var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id);
+                    var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id, contract.AgencyId.Value);
                     var TotalMoney = (double)0;
                     var studentCount = 0; 
                     var validRegistrations = filteredRegisterCourses
@@ -109,7 +109,7 @@ namespace FranchiseProject.Application.Services
                 }
                 foreach (var course in courseList)
                 {
-                    var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id);
+                    var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id, contract.AgencyId.Value);
                     var TotalMoney = (double)0;
                     var studentCount = 0;
                     var validRegistrations = filteredRegisterCourses

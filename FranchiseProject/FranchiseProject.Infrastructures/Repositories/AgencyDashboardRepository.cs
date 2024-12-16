@@ -77,9 +77,9 @@ namespace FranchiseProject.Infrastructures.Repositories
             }
         }
        
-        public async Task<List<RegisterCourse >> GetRegisterCourseByCourseIdAsync (Guid courseId)
+        public async Task<List<RegisterCourse >> GetRegisterCourseByCourseIdAsync (Guid courseId, Guid agencyId)
         {
-            var registerCourse= await _dbContext.RegisterCourses.Where (rc=>rc.CourseId == courseId).ToListAsync();
+            var registerCourse= await _dbContext.RegisterCourses.Where (rc=>rc.CourseId == courseId && rc.User.AgencyId == agencyId).ToListAsync();
             return registerCourse;
         }
     }

@@ -12,6 +12,6 @@ namespace FranchiseProject.Application.Repositories
     {
         Task<List<RegisterCourse>> GetRegisterCoursesByAgencyIdAsync(Guid agencyId);
         Task<List<Payment>> GetPaymentsByRegisterCourseIdAsync(Guid registerCourseId);
-        Task<List<RegisterCourse>> GetRegisterCourseByCourseIdAsync(Guid courseId);
+        Task<List<RegisterCourse>> GetRegisterCourseByCourseIdAsync(Guid courseId, Guid agencyId);
     }
 }
