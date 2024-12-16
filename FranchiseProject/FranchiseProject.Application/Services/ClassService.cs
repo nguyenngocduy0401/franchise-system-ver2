@@ -489,7 +489,7 @@ namespace FranchiseProject.Application.Services
                     }
                     else
                     {
-                        return ResponseHandler.Success<bool>(true,"thêm học sinh không thành công!");
+                        return ResponseHandler.Success<bool>(false,"thêm học sinh không thành công!");
                     }
                 }
                 await _unitOfWork.SaveChangeAsync();

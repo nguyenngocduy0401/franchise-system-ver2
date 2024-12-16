@@ -321,7 +321,7 @@ namespace FranchiseProject.Application.Services
                     .ToDictionaryAsync(u => u.Id, u => u.UserName);
 
 
-                var studentRegisterViewModels = registerCourses.Items.OrderByDescending(item => item.ModificationDate).Select(rc => new StudentRegisterViewModel
+                var studentRegisterViewModels = registerCourses.Items.OrderByDescending(item => item.CreationDate).Select(rc => new StudentRegisterViewModel
                 {
                     Id = rc.Id,
                     UserId=rc.UserId,

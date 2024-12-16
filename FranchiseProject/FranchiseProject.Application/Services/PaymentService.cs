@@ -336,6 +336,10 @@ namespace FranchiseProject.Application.Services
                         Amount = p.Amount,
                         Status = p.Status,
                         CreationDate = p.CreationDate,
+                        ImageURL=p.ImageURL,
+                        Description=p.Description,
+                        Method=p.Method,
+                        Title=p.Title,
                         CreateBy = p.UserId != null ? _userManager.FindByIdAsync(p.UserId).Result?.UserName : null
                     }).ToList(),
                     TotalItemsCount = payments.TotalItemsCount,
