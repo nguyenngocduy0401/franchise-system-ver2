@@ -131,57 +131,7 @@ namespace FranchiseProject.Infrastructures.Repositories
 
             return result;
         }
-        public async Task<IEnumerable<User>> GetUserWorkAsync(
-         Expression<Func<User, bool>>? filter = null,
-         Func<IQueryable<User>, IOrderedQueryable<User>>? orderBy = null,
-         string? role = null,
-         DateTime? StartTime = null,
-         DateTime? EndTime = null)
-        {
-            IQueryable<User> query = _dbContext.Users
-                .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role)
-                .Include(U => U.UserAppointments)
-                .ThenInclude(ua => ua.Appointment)
-                .ThenInclude(a => a.Work);
-
-            query = query.Where(u =>
-                          (u.LockoutEnd <= DateTimeOffset.UtcNow || u.LockoutEnd == null)
-                          );
-            if (StartTime.HasValue && StartTime != null && EndTime.HasValue && EndTime != null)
-            {
-                var user = _dbContext.Appointments.Where(e => (StartTime <= e.StartTime && e.StartTime <= EndTime) || 
-                                                              (StartTime <= e.EndTime && e.EndTime <= EndTime) || 
-                                                              (e.StartTime <= StartTime && EndTime <= e.EndTime))
-                                                  .SelectMany(e => e.UserAppointments)
-                                                  .Select(e => e.User)
-                                                  .Distinct();
-                if (!user.IsNullOrEmpty() || user.Any()) 
-                {
-                    query = query.Where(u => !user.Contains(u));
-                }
-            }
-
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-            if (!string.IsNullOrEmpty(role))
-            {
-                var usersInRole = await _userManager.GetUsersInRoleAsync(role);
-                var userIdsInRole = usersInRole.Select(u => u.Id);
-                query = query.Where(u => userIdsInRole.Contains(u.Id));
-            }
-            if (orderBy != null)
-            {
-                query = orderBy(query);
-            }
-            else
-            {
-                query = query.OrderByDescending(e => EF.Property<DateTime>(e, "CreateAt"));
-            }
-            return query;
-        }
+        
         public async Task<User> GetUserByUserName(string username)
         {
             var user = await _dbContext.Users
@@ -257,14 +207,6 @@ namespace FranchiseProject.Infrastructures.Repositories
                                  .Where(u => u.AgencyId == agencyId&&u.Status==UserStatusEnum.active && u.UserRoles.Any(ur => ur.RoleId == instructorRoleId))
                                  .ToListAsync();
         }
-        public async Task<List<string>> GetUserIdInAppoinmentAsync(Guid appointmentId) 
-        {
-            var userAppointments = await _dbContext.UserAppointments
-           .Where(e => e.AppointmentId == appointmentId)
-           .Select(e => e.UserId)
-           .ToListAsync();
-
-            return userAppointments;
-        }
+       
     }
 }

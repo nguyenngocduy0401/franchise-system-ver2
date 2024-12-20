@@ -13,7 +13,6 @@ namespace FranchiseProject.Application.Interfaces
     {
 
         Task<ApiResponse<bool>> UpdateUserByLoginAsync(UpdateUserByLoginModel updateUserByLoginModel);
-        Task<ApiResponse<IEnumerable<UserWorkViewModel>>> FilterUserWorkAsync(FilterUserWorkModel filterUserWorkModel);
         Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAgencyManagerAsync(FilterUserByAgencyModel filterUserByAgencyModel);
         Task<ApiResponse<List<CreateUserByAgencyModel>>> CreateListUserByAgencyAsync(IFormFile file);
         Task<ApiResponse<UserViewModel>> GetInfoByLoginAsync();

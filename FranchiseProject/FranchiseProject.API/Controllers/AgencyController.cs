@@ -3,7 +3,6 @@ using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Services;
 using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.ViewModels.ConsultationViewModels;
-using FranchiseProject.Application.ViewModels.WorkViewModels;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,19 +16,9 @@ namespace FranchiseProject.API.Controllers
     public class AgencyController : ControllerBase
     {
         private readonly IAgencyService _agencyService;
-        private readonly IWorkService _workService;
-        public AgencyController(IAgencyService agencyService, IWorkService workService)
+        public AgencyController(IAgencyService agencyService)
         {
             _agencyService = agencyService;
-            _workService = workService;
-        }
-
-        [Authorize(Roles = AppRole.Manager)]
-        [SwaggerOperation(Summary = "Lấy công việc bằng agencyId{Authorize = Manager}")]
-        [HttpGet("{id}/works")]
-        public async Task<ApiResponse<WorkAgencyViewModel>> GetAllWorkByAgencyId(Guid id)
-        {
-            return await _workService.GetAllWorkByAgencyId(id);
         }
         [SwaggerOperation(Summary = "Đăng kí đối tác  ")]
         [HttpPost("")]

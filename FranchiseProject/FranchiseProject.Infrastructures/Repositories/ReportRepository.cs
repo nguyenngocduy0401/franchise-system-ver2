@@ -27,16 +27,6 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
-        public async Task<List<Equipment>> GetEquipmentsByReportIdAsync(Guid reportId)
-        {
-            var equipmentIds = await _dbContext.Reports
-                .Where(r => r.Id == reportId)
-                .SelectMany(r => r.Equipments.Select(e => e.Id))
-                .ToListAsync();
-
-            return await _dbContext.Equipments
-                .Where(e => equipmentIds.Contains(e.Id))
-                .ToListAsync();
-        }
+       
     }
 }

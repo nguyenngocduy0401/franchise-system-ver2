@@ -13,7 +13,6 @@ namespace FranchiseProject.Application.Interfaces
     public interface IReportService
     {
         Task<ApiResponse<bool>> CreateCourseReport(CreateReportCourseViewModel model);
-        Task<ApiResponse<bool>> CreateEquipmentReport(CreateReportEquipmentViewModel model);
         Task<ApiResponse<bool>> UpdateCourseReport(Guid reportId, UpdateReportCourseViewModel model);
         Task<ApiResponse<bool>> UpdateEquipmentReport(Guid reportId, UpdateReportEquipmentViewModel model);
         Task<ApiResponse<Pagination<ReportViewModel>>> FilterReportAsync(FilterReportModel filterReportModel);

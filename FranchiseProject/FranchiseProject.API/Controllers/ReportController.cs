@@ -28,13 +28,7 @@ namespace FranchiseProject.API.Controllers
             return await _reportService.CreateCourseReport(model);
         }
 
-      //  [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager)]
-        [SwaggerOperation(Summary = "Tạo báo cáo thiết bị {Authorize = AgencyStaff, AgencyManager}")]
-        [HttpPost("equipment")]
-        public async Task<ApiResponse<bool>> CreateEquipmentReportAsync(CreateReportEquipmentViewModel model)
-        {
-            return await _reportService.CreateEquipmentReport(model);
-        }
+      
 
        // [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager)]
         [SwaggerOperation(Summary = "Cập nhật báo cáo khóa học {Authorize = AgencyStaff, AgencyManager}")]

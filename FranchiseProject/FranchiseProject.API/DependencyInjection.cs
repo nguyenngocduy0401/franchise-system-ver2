@@ -51,19 +51,10 @@ using FranchiseProject.Application.ViewModels.FeedBackViewModels;
 using FranchiseProject.API.Validator.FeedBackValidator;
 using FranchiseProject.Application.ViewModels.QuizViewModels;
 using FranchiseProject.API.Validator.QuizValidator;
-using Microsoft.Extensions.Hosting;
-using FranchiseProject.Application.ViewModels.WorkViewModels;
-using FranchiseProject.API.Validator.WorkValidator;
-using FranchiseProject.Application.ViewModels.AppointmentViewModels;
-using FranchiseProject.API.Validator.AppointmentValidator;
 using FranchiseProject.Application.ViewModels.DocumentViewModels;
 using FranchiseProject.API.Validator.DocumentValidator;
 using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.API.Validator.AgencyValidator;
-using FranchiseProject.Application.ViewModels.WorkTemplateViewModels;
-using FranchiseProject.API.Validator.WorkTemplateValidator;
-using FranchiseProject.Application.ViewModels.AppointmentTemplateViewModels;
-using FranchiseProject.API.Validator.AppointmentTemplateValidator;
 
 
 namespace FranchiseProject.API
@@ -206,21 +197,7 @@ namespace FranchiseProject.API
 
             services.AddTransient<IValidator<CreateQuizModel>, CreateQuizValidator>();
             services.AddTransient<IValidator<UpdateQuizModel>, UpdateQuizValidator>();
-
-            services.AddTransient<IValidator<UpdateWorkModel>, UpdateWorkValidator>();
-            services.AddTransient<IValidator<CreateWorkModel>, CreateWorkValidator>();
-            services.AddTransient<IValidator<UpdateWorkByStaffModel>, UpdateWorkByStaffValidator>();
-
-            services.AddTransient<IValidator<SubmitAppointmentModel>, UpdateAppointmentReportValidator>();
-            services.AddTransient<IValidator<UpdateAppointmentModel>, UpdateAppointmentValidator>();
-            services.AddTransient<IValidator<CreateAppointmentModel>, CreateAppointmentValidator>();
             services.AddTransient<IValidator<UploadDocumentViewModel>, UploadDocumentValidator>();
-
-            services.AddTransient<IValidator<CreateWorkTemplateModel>, CreateWorkTemplateValidator>();
-            services.AddTransient<IValidator<UpdateWorkTemplateModel>, UpdateWorkTemplateValidator>();
-
-            services.AddTransient<IValidator<CreateAppointmentTemplateModel>, CreateAppointmentTemplateValidator>();
-            services.AddTransient<IValidator<UpdateAppointmentTemplateModel>, UpdateAppointmentTemplateValidator>();
 
             services.AddTransient<IValidator<UpdateUserByLoginModel>, UpdateUserByLoginValidator>();
             #endregion

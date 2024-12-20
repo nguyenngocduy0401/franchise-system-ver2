@@ -33,14 +33,10 @@ using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.ViewModels.AssignmentViewModels;
 using FranchiseProject.Application.ViewModels.QuizViewModels;
 using FranchiseProject.Application.ViewModels.ScoreViewModels;
-using FranchiseProject.Application.ViewModels.WorkViewModels;
-using FranchiseProject.Application.ViewModels.AppointmentViewModels;
 using FranchiseProject.Application.ViewModels.DocumentViewModels;
 using FranchiseProject.Application.ViewModels.DocumentViewModel;
 using FranchiseProject.Application.ViewModels.EquipmentViewModels;
 using FranchiseProject.Application.ViewModels.HomePageViewModels;
-using FranchiseProject.Application.ViewModels.WorkTemplateViewModels;
-using FranchiseProject.Application.ViewModels.AppointmentTemplateViewModels;
 using FranchiseProject.Application.ViewModels.ReportViewModels;
 
 
@@ -311,48 +307,10 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<AsmSubmitViewModel, AssignmentSubmit>();
             #endregion
 
-            #region Work
-            CreateMap<CreateWorkModel, Work>();
-            CreateMap<UpdateWorkModel, Work>();
-            CreateMap<Work, WorkViewModel>()
-                .ForMember(dest => dest.AgencyViewModel, opt => opt.MapFrom(src => src.Agency));
-            CreateMap<Work, WorkDetailViewModel>();
-            CreateMap<UpdateWorkByStaffModel, Work>();
-            #endregion
-            #region Appointment
-            CreateMap<Appointment, AppointmentViewModel>();
-            CreateMap<CreateAppointmentModel, Appointment>()
-                .ForMember(dest => dest.UserAppointments, opt => opt.MapFrom(src =>
-                    src.UserId));
-            #region replace
-            /*.ForMember(dest => dest.UserAppointments, opt => opt.MapFrom(src =>
-                src.UserId != null
-                ? src.UserId.Select(userId => new UserAppointment { UserId = userId }).ToList()
-                : new List<UserAppointment>()*/
-            //
-            #endregion
-            CreateMap<string, UserAppointment>()
-                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src));
-            CreateMap<UpdateAppointmentModel, Appointment>();
-            CreateMap<User, AppointmentUserViewModel>();
-            CreateMap<Appointment, AppointmentDetailViewModel>()
-                    .ForMember(dest => dest.User, opt => opt
-                    .MapFrom(src => src.UserAppointments
-                    .Select(up => up.User)));
-            CreateMap<SubmitAppointmentModel, Appointment>();
-            #endregion
-
             #region Document
             CreateMap<Document, DocumentViewModel>();
             CreateMap<UploadDocumentViewModel, Document>();
-            CreateMap<Pagination<Document>, Pagination<DocumentViewModel>>()
-                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
-            CreateMap<EquipmentSerialNumberHistory, EquipmentSerialNumberHistoryViewModel>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-            .ForMember(dest => dest.EquipmentId, opt => opt.MapFrom(src => src.EquipmentId))
-            .ForMember(dest => dest.SerialNumber, opt => opt.MapFrom(src => src.SerialNumber))
-            .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate))
-            .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndDate));
+            CreateMap<Pagination<Document>, Pagination<DocumentViewModel>>();
             #endregion
 
             #region HomePage
@@ -360,30 +318,14 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<UpdatePageModel, HomePage>();
             #endregion
 
-            #region AppointmentTemplate
-            CreateMap<AppointmentTemplate, AppointmentTemViewModel>();
-            CreateMap<UpdateAppointmentTemplateModel, AppointmentTemplate>();
-            CreateMap<CreateAppointmentTemplateModel, AppointmentTemplate>();
-
-            #endregion
-
-            #region WorkTemplate
-            CreateMap<WorkTemplate, WorkTemplateViewModel>();
-            CreateMap<UpdateWorkTemplateModel, WorkTemplate>();
-            CreateMap<CreateWorkTemplateModel, WorkTemplate>();
-            CreateMap<WorkTemplate, WorkTemplateDetailViewModel>()
-                .ForMember(dest => dest.Appointments, opt => opt.MapFrom(src => src.Appointments));
-            #endregion
             #region Report
             CreateMap<Report, ReportViewModel>();
             CreateMap<Pagination<Report>, Pagination<ReportViewModel>>()
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
             CreateMap<Report, ReportViewModel>()
-       .ForMember(dest => dest.Equipments, opt => opt.MapFrom(src => src.Equipments))
         .ForMember(dest => dest.RespondedById, opt => opt.MapFrom(src => src.Response));
             CreateMap<Pagination<Report>, Pagination<ReportViewModel>>()
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
-            CreateMap<Equipment, EquipmentViewModel>();
             #endregion
         }
     }

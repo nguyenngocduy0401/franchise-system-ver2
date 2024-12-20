@@ -42,16 +42,9 @@ namespace FranchiseProject.Application
         public ICourseMaterialRepository CourseMaterialRepository { get; }
         public IChapterMaterialRepository ChapterMaterialRepository { get; }
         public IAgencyDashboardRepository AgencyDashboardRepository { get; }
-        public IUserAppointmentRepository UserAppointmentRepository { get; }
-        public IWorkRepository WorkRepository { get; }  
-        public IAppointmentRepository AppointmentRepository { get; }
         public IDocumentRepository DocumentRepository { get; }
-        public IEquipmentRepository EquipmentRepository { get; }
         public IFranchiseFeesRepository FranchiseFeesRepository { get; }
-        public IEquipmentSerialNumberHistoryRepository EquipmentSerialNumberHistoryRepository { get; }
         public IHomePageRepository HomePageRepository { get; }
-        public IWorkTemplateRepository WorkTemplateRepository { get; }
-        public IAppointmentTemplateRepository AppointmentTemplateRepository { get; }
         public IRevenueRepository RevenueRepository { get; }
         public Task<int> SaveChangeAsync();
     }

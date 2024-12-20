@@ -46,16 +46,9 @@ namespace FranchiseProject.Infrastructures
         private readonly IRegisterCourseRepository _registerCourseRepository;
         private readonly IChapterMaterialRepository _chapterMaterialRepository;
         private readonly IAgencyDashboardRepository _agencyDashboardRepository;
-        private readonly IWorkRepository _workRepository;
-        private readonly IUserAppointmentRepository _userAppointmentRepository; 
-        private readonly IAppointmentRepository _appointmentRepository;
         private readonly IDocumentRepository _documentRepository;
-        private readonly IEquipmentRepository _equipmentRepository;
         private readonly IFranchiseFeesRepository _franchiseFeesRepository;
-        private readonly IEquipmentSerialNumberHistoryRepository _equipmentSerialNumberHistoryRepository;
         private readonly IHomePageRepository _homePageRepository;
-        private readonly IWorkTemplateRepository _workTemplateRepository;
-        private readonly IAppointmentTemplateRepository _appointmentTemplateRepository;
         private readonly IRevenueRepository _revenueRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
@@ -69,12 +62,7 @@ namespace FranchiseProject.Infrastructures
             IPaymentRepository paymentRepository,IStudentRepository studentRepository,
             ICourseMaterialRepository courseMaterialRepository,IRegisterCourseRepository registerCourseRepository,
             IChapterMaterialRepository chapterMaterialRepository,IAgencyDashboardRepository agencyDashboardRepository,
-            IAppointmentRepository appointmentRepository, IWorkRepository workRepository,
-            IUserAppointmentRepository userAppointmentRepository, IDocumentRepository documentRepository,
-            IEquipmentRepository equipmentRepository,IFranchiseFeesRepository franchiseFeesRepository,
-            IEquipmentSerialNumberHistoryRepository equipmentSerialNumberHistoryRepository,
-            IHomePageRepository homePageRepository, IWorkTemplateRepository workTemplateRepository,
-            IAppointmentTemplateRepository appointmentTemplateRepository, IRevenueRepository revenueRepository)
+            IHomePageRepository homePageRepository)
 
 
            
@@ -114,17 +102,7 @@ namespace FranchiseProject.Infrastructures
             _chapterMaterialRepository= chapterMaterialRepository;
             _courseMaterialRepository = courseMaterialRepository;
             _agencyDashboardRepository = agencyDashboardRepository;
-            _appointmentRepository = appointmentRepository;
-            _userAppointmentRepository = userAppointmentRepository;
-            _workRepository = workRepository;
-            _documentRepository = documentRepository;
-            _equipmentRepository = equipmentRepository;
-            _franchiseFeesRepository = franchiseFeesRepository;
-            _equipmentSerialNumberHistoryRepository = equipmentSerialNumberHistoryRepository;
             _homePageRepository = homePageRepository;
-            _workTemplateRepository = workTemplateRepository;
-            _appointmentTemplateRepository = appointmentTemplateRepository;
-            _revenueRepository = revenueRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -194,21 +172,10 @@ namespace FranchiseProject.Infrastructures
 
         public IAgencyDashboardRepository AgencyDashboardRepository => _agencyDashboardRepository;
 
-        public IUserAppointmentRepository UserAppointmentRepository => _userAppointmentRepository;
-
-        public IWorkRepository WorkRepository => _workRepository;   
-        public IAppointmentRepository AppointmentRepository => _appointmentRepository;
-
         public IDocumentRepository DocumentRepository => _documentRepository;
 
-        public IEquipmentRepository EquipmentRepository => _equipmentRepository;
-
         public IFranchiseFeesRepository FranchiseFeesRepository => _franchiseFeesRepository;
-
-        public IEquipmentSerialNumberHistoryRepository EquipmentSerialNumberHistoryRepository => _equipmentSerialNumberHistoryRepository;
         public IHomePageRepository HomePageRepository => _homePageRepository;
-        public IWorkTemplateRepository WorkTemplateRepository => _workTemplateRepository;
-        public IAppointmentTemplateRepository AppointmentTemplateRepository => _appointmentTemplateRepository;
         public IRevenueRepository RevenueRepository => _revenueRepository;
         public async Task<int> SaveChangeAsync()
         {

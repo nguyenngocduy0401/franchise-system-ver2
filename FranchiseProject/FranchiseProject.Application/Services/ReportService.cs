@@ -99,56 +99,7 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<bool>($"Lỗi khi tạo báo cáo khóa học: {ex.Message}");
             }
         }
-        public async Task<ApiResponse<bool>> CreateEquipmentReport(CreateReportEquipmentViewModel model)
-        {
-            try
-            {
-                var userCurrentId = _claimsService.GetCurrentUserId;
-                var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
-
-                if (userCurrent == null || !userCurrent.AgencyId.HasValue)
-                {
-                    return ResponseHandler.Success<bool>(false,"User không tồn tại hoặc không thuộc về Agency nào.");
-                }
-                var equipments = new List<Equipment>();
-                foreach (var equipmentId in model.EquipmentIds)
-                {
-                    var equipment = await _unitOfWork.EquipmentRepository.GetByIdAsync(equipmentId);
-                    if (equipment == null)
-                    {
-                        return ResponseHandler.Success<bool>(false,$"Thiết bị với ID {equipmentId} không tồn tại.");
-                    }
-                   // equipment.Status = EquipmentStatusEnum.Repair;
-                    equipments.Add(equipment);
-                }
-
-                var report = new Report
-                {
-                    Description = model.Description,
-                    Status = ReportStatusEnum.Pending,
-                    Type=ReportTypeEnum.Equipment,
-                    AgencyId = userCurrent.AgencyId,
-                    CreationDate = _currentTime.GetCurrentTime(),
-                    Equipments = equipments
-                };
-
-                await _unitOfWork.ReportRepository.AddAsync(report);
-                var result = await _unitOfWork.SaveChangeAsync() > 0;
-
-                if (result)
-                {
-                    return ResponseHandler.Success(true, "Tạo báo cáo thiết bị thành công.");
-                }
-                else
-                {
-                    return ResponseHandler.Failure<bool>("Không thể lưu báo cáo thiết bị.");
-                }
-            }
-            catch (Exception ex)
-            {
-                return ResponseHandler.Failure<bool>($"Lỗi khi tạo báo cáo thiết bị: {ex.Message}");
-            }
-        }
+       
         public async Task<ApiResponse<bool>> UpdateCourseReport(Guid reportId, UpdateReportCourseViewModel model)
         {
             try
@@ -236,20 +187,10 @@ namespace FranchiseProject.Application.Services
                     return ResponseHandler.Success<bool>(false,"Báo cáo này không phải là báo cáo thiết bị.");
                 }
 
-                var equipments = new List<Equipment>();
-                foreach (var equipmentId in model.EquipmentIds)
-                {
-                    var equipment = await _unitOfWork.EquipmentRepository.GetByIdAsync(equipmentId);
-                    if (equipment == null)
-                    {
-                        return ResponseHandler.Success<bool>(false,$"Thiết bị với ID {equipmentId} không tồn tại.");
-                    }
-                    equipments.Add(equipment);
-                }
+                
 
                 report.Description = model.Description;
                 report.ModificationDate = _currentTime.GetCurrentTime();
-                report.Equipments = equipments;
 
                 _unitOfWork.ReportRepository.Update(report);
                 var result = await _unitOfWork.SaveChangeAsync() > 0;
@@ -311,11 +252,7 @@ namespace FranchiseProject.Application.Services
                         reportViewModel.CourseName = course?.Name;
                     }
 
-                    if (reportViewModel.Equipments != null)
-                    {
-                        var equipments = await _unitOfWork.ReportRepository.GetEquipmentsByReportIdAsync(reportViewModel.Id);
-                        reportViewModel.Equipments = _mapper.Map<List<EquipmentViewModel>>(equipments);
-                    }
+                  
                 }
 
                 if (reportViewModels.Items.IsNullOrEmpty())
@@ -345,35 +282,7 @@ namespace FranchiseProject.Application.Services
                 report.Status = newStatus;
                 _unitOfWork.ReportRepository.Update(report);
 
-                if (report.Type == ReportTypeEnum.Equipment)
-                {
-                    var equipments = await _unitOfWork.ReportRepository.GetEquipmentsByReportIdAsync(reportId);
 
-                    switch (newStatus)
-                    {
-                        case ReportStatusEnum.Processing:
-                            foreach (var equipment in equipments)
-                            {
-                                equipment.Status = EquipmentStatusEnum.Repair;
-                                _unitOfWork.EquipmentRepository.Update(equipment);
-                            }
-                            break;
-
-                        case ReportStatusEnum.Completed:
-                            foreach (var equipment in equipments)
-                            {
-                                equipment.Status = EquipmentStatusEnum.Available;
-                                _unitOfWork.EquipmentRepository.Update(equipment);
-                            }
-                            break;
-
-                       
-
-                        default:
-                    
-                            break;
-                    }
-                }
 
                 var result = await _unitOfWork.SaveChangeAsync() > 0;
 

@@ -19,8 +19,6 @@ namespace FranchiseProject.Domain.Entity
         public Guid? CourseId { get; set; }
         [ForeignKey("CourseId")]
         public Course? Course { get; set; }
-        public ICollection<Equipment>? Equipments { get; set; }
-
         public string? Response { get; set; }
     }
 }

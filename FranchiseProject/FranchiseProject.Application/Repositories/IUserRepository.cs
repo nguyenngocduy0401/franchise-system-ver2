@@ -22,12 +22,6 @@ namespace FranchiseProject.Application.Repositories
            IsActiveEnum? isActive = null,
            string? foreignKey = null,
            object? foreignKeyId = null);
-        Task<IEnumerable<User>> GetUserWorkAsync(
-         Expression<Func<User, bool>>? filter = null,
-         Func<IQueryable<User>, IOrderedQueryable<User>>? orderBy = null,
-         string? role = null,
-         DateTime? StartTime = null,
-         DateTime? EndTime = null);
         Task<User> GetUserByUserName(string username);
         Task<User> GetUserByLogin(string username, string password);
         Task CreateUserAndAssignRoleAsync(User user, string role);
@@ -37,6 +31,5 @@ namespace FranchiseProject.Application.Repositories
         Task<User> GetStudentByIdAsync(string id);
         Task<List<User>> GetAllAsync(Expression<Func<User, bool>> filter);
         Task<List<User>> GetInstructorsByAgencyIdAsync(Guid agencyId);
-        Task<List<string>> GetUserIdInAppoinmentAsync(Guid appointmentId);
     }
 }
