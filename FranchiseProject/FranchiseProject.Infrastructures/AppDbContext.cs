@@ -35,7 +35,6 @@ namespace FranchiseProject.Infrastructures
         public DbSet<QuizDetail> QuizDetails { get; set; }
         public DbSet<Report> Reports { get; set; }
         public DbSet<Score> Scores { get; set; }
-        public DbSet<Session> Sessions { get; set; }
         public DbSet<Slot> Slots { get; set; }
         public DbSet<StudentAnswer> StudentAnswers { get; set; }
         public DbSet<ClassRoom> ClassRooms { get; set; }

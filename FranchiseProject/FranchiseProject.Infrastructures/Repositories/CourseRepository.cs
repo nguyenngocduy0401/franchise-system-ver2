@@ -30,8 +30,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbSet
                 .Where(e => e.Id == courseId)
-                .Include(e => e.CourseMaterials) 
-                .Include(e => e.Sessions.OrderBy(s => s.Number)) 
+                .Include(e => e.CourseMaterials)
                 .Include(e => e.Syllabus) 
                 .Include(e => e.Assessments.OrderBy(a => a.Number)) 
                 .Include(e => e.Chapters
@@ -46,7 +45,6 @@ namespace FranchiseProject.Infrastructures.Repositories
             return await _dbSet
                 .Where(e => e.Id == courseId)
                 .Include(e => e.CourseMaterials.Where(cm => !cm.IsDeleted != true))
-                .Include(e => e.Sessions.Where(cm => cm.IsDeleted != true))
                 .Include(e => e.Syllabus)
                 .Include(e => e.Assessments.Where(a => a.IsDeleted != true))
                 .Include(e => e.Chapters

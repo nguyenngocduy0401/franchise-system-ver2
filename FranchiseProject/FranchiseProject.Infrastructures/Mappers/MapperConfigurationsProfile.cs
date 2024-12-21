@@ -18,7 +18,6 @@ using System.Text;
 using System.Threading.Tasks;
 using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
-using FranchiseProject.Application.ViewModels.SessionViewModels;
 using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
 using FranchiseProject.Application.ViewModels.SyllabusViewModels;
@@ -160,11 +159,7 @@ namespace FranchiseProject.Infrastructures.Mappers
                 .ForMember(dest => dest.ChapterMaterials, opt => opt.MapFrom(src => src.ChapterMaterials))                    
                 .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions));
             #endregion
-            #region Session
-            CreateMap<Session, SessionViewModel>();
-            CreateMap<CreateSessionModel, Session>();
-            CreateMap<UpdateSessionModel, Session>();
-            #endregion
+           
             #region Assessment
             CreateMap<Assessment, AssessmentViewModel>();
             CreateMap<CreateAssessmentModel, Assessment>();
@@ -176,7 +171,6 @@ namespace FranchiseProject.Infrastructures.Mappers
                 .MapFrom(src => src.CourseCategory.Name));
             CreateMap<Course, CourseDetailViewModel>()
                 .ForMember(dest => dest.CourseMaterials, opt => opt.MapFrom(src => src.CourseMaterials.Where(m => m.IsDeleted != true)))
-                .ForMember(dest => dest.Sessions, opt => opt.MapFrom(src => src.Sessions.Where(m => m.IsDeleted != true)))
                 .ForMember(dest => dest.Assessments, opt => opt.MapFrom(src => src.Assessments.Where(m => m.IsDeleted != true)))
                 .ForMember(dest => dest.Chapters, opt => opt.MapFrom(src => src.Chapters.Where(m => m.IsDeleted != true)))
                 .ForMember(dest => dest.Syllabus, opt => opt.MapFrom(src => src.Syllabus))
@@ -191,14 +185,10 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<UpdateCourseModel, Course>();
             CreateMap<CreateCourseMaterialArrangeModel, CourseMaterial>();
             CreateMap<CreateAssessmentArrangeModel, Assessment>();
-            CreateMap<CreateSessionArrangeModel, Session>();
             CreateMap<CourseMaterial, CourseMaterial>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore()) 
                 .ForMember(dest => dest.CourseId, opt => opt.Ignore()); 
 
-            CreateMap<Session, Session>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore()) 
-                .ForMember(dest => dest.CourseId, opt => opt.Ignore()); 
 
             CreateMap<Assessment, Assessment>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore()) 

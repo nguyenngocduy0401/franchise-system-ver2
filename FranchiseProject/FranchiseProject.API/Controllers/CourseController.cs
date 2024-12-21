@@ -5,7 +5,6 @@ using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
 using FranchiseProject.Application.ViewModels.CourseMaterialViewModels;
-using FranchiseProject.Application.ViewModels.SessionViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -25,19 +24,17 @@ namespace FranchiseProject.API.Controllers
         private readonly ICourseService _courseService;
         private readonly ICourseMaterialService _materialService;
         private readonly IAssessmentService _assessmentService;
-        private readonly ISessionService _sessionService;
         private readonly IChapterService _chapterService;
         private readonly IQuestionService _questionService;
         private readonly IClassService _classService;
         public CourseController(ICourseService courseService, ICourseMaterialService materialService,
-            IAssessmentService assessmentService, ISessionService sessionService,
+            IAssessmentService assessmentService, 
             IChapterService chapterService, IQuestionService questionService,
             IClassService classService)
         {
             _courseService = courseService;
             _materialService = materialService;
             _assessmentService = assessmentService;
-            _sessionService = sessionService;
             _chapterService = chapterService;
             _questionService = questionService;
             _classService = classService;
@@ -91,13 +88,8 @@ namespace FranchiseProject.API.Controllers
         {
             return await _assessmentService.CreateAssessmentArangeAsync(id, createAssessmentArrangeModel);
         }
-        [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
-        [SwaggerOperation(Summary = "cập nhật phiên của khoá học {Authorize = SystemInstructor, Manager}")]
-        [HttpPost("{id}/sessions")]
-        public async Task<ApiResponse<bool>> CreateSessionByCourseIdAsync(Guid id, List<CreateSessionArrangeModel> createSessionArrangeModel)
-        {
-            return await _sessionService.CreateSessionArrangeAsync(id, createSessionArrangeModel);
-        }
+        
+        
         [SwaggerOperation(Summary = "tìm khoá học bằng id")]
         [HttpGet("{id}")]
         public async Task<ApiResponse<CourseDetailViewModel>> GetCourseByIdAsync(Guid id)

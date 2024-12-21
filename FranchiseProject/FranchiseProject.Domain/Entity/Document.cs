@@ -9,7 +9,7 @@ namespace FranchiseProject.Domain.Entity
         public string? URLFile { get; set; }
         public DateOnly? ExpirationDate { get; set; }
         public DocumentType? Type { get; set; }
-        public DocumentStatus Status{ get; set;}
+        public DocumentStatus? Status{ get; set;}
         public bool Appoved { get; set; }
         public Guid? AgencyId { get; set; }
         [ForeignKey("AgencyId")]

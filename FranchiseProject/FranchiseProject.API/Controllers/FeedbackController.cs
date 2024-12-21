@@ -2,7 +2,6 @@
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Services;
 using FranchiseProject.Application.ViewModels.FeedBackViewModels;
-using FranchiseProject.Application.ViewModels.SessionViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;

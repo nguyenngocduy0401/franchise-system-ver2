@@ -13,7 +13,6 @@ using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
 using FranchiseProject.Application.ViewModels.QuestionOptionViewModels;
 using FranchiseProject.Application.ViewModels.QuestionViewModels;
-using FranchiseProject.Application.ViewModels.SessionViewModels;
 using FranchiseProject.Application.ViewModels.SyllabusViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
@@ -36,7 +35,6 @@ namespace FranchiseProject.Application.Services
         private readonly IValidator<UpdateCourseModel> _updateCourseValidator;
         private readonly IValidator<CreateSyllabusModel> _createSyllabusValidator;
         private readonly IValidator<List<CreateChapterModel>> _createChapterValidator;
-        private readonly IValidator<List<CreateSessionArrangeModel>> _createSessionArrangeValidator;
         private readonly IValidator<List<CreateAssessmentArrangeModel>> _createAssessmentArrangeValidator;
         private readonly IValidator<List<CreateCourseMaterialArrangeModel>> _createCourseMaterialArrangeValidator;
         private readonly IValidator<List<CreateChapterFileModel>> _createChapterFileValidator;
@@ -44,7 +42,7 @@ namespace FranchiseProject.Application.Services
             IValidator<UpdateCourseModel> updateCourseValidator, IValidator<CreateCourseModel> createCourseValidator,
             IClaimsService claimsService, UserManager<User> userManager, RoleManager<Role> roleManager,
             IValidator<CreateSyllabusModel> createSyllabusValidator, IValidator<List<CreateChapterModel>> createChapterValidator,
-            IValidator<List<CreateSessionArrangeModel>> createSessionArrangeValidator, IValidator<List<CreateAssessmentArrangeModel>> createAssessmentArrangeValidator,
+            IValidator<List<CreateAssessmentArrangeModel>> createAssessmentArrangeValidator,
             IValidator<List<CreateCourseMaterialArrangeModel>> createCourseMaterialArrangeModel, IValidator<List<CreateChapterFileModel>> createChapterFileValidator)
         {
             _createCourseValidator = createCourseValidator;
@@ -56,7 +54,6 @@ namespace FranchiseProject.Application.Services
             _roleManager = roleManager;
             _createSyllabusValidator = createSyllabusValidator;
             _createChapterValidator = createChapterValidator;
-            _createSessionArrangeValidator = createSessionArrangeValidator;
             _createAssessmentArrangeValidator = createAssessmentArrangeValidator;
             _createCourseMaterialArrangeValidator = createCourseMaterialArrangeModel;
             _createChapterFileValidator = createChapterFileValidator;
@@ -349,9 +346,8 @@ namespace FranchiseProject.Application.Services
                         if (!courseCheck.isSuccess && courseCheck.Message != null) 
                             return ResponseHandler.Success(false, courseCheck.Message);
                         course = courseCheck.Data;
-                        course = await ExtractSessionFromWorksheetAsync(workbook.Worksheets.Skip(3).First(), course);
-                        course = await ExtractAssessmentFromWorksheetAsync(workbook.Worksheets.Skip(4).First(), course);
-                        course = await ExtractMaterialFromWorksheetAsync(workbook.Worksheets.Skip(5).First(), course);
+                        course = await ExtractAssessmentFromWorksheetAsync(workbook.Worksheets.Skip(3).First(), course);
+                        course = await ExtractMaterialFromWorksheetAsync(workbook.Worksheets.Skip(4).First(), course);
                         course = _mapper.Map<Course>(course);
                         await _unitOfWork.CourseRepository.AddAsync(course);
                          
@@ -597,41 +593,7 @@ namespace FranchiseProject.Application.Services
             response.Data = course;
             return response;
         }
-        private async Task<Course> ExtractSessionFromWorksheetAsync(IXLWorksheet worksheet, Course course)
-        {
-            var rows = worksheet.RangeUsed().RowsUsed();
-            var headerRow = rows.First();
-            var sessionModels = new List<CreateSessionArrangeModel>();
-            foreach (var row in rows.Skip(1))
-            {
-                var session = new CreateSessionArrangeModel();
-                foreach (var cell in row.Cells())
-                {
-                    var columnIndex = cell.Address.ColumnNumber - 1;
-                    switch (columnIndex)
-                    {
-                        case 0:
-                            session.Number = (int)cell.Value;
-                            break;
-                        case 1:
-                            session.Topic = cell.Value.ToString();
-                            break;
-                        case 2:
-                            session.Chapter = cell.Value.ToString();
-                            break;
-                        case 3:
-                            session.Description = cell.Value.ToString();
-                            break;
-                    }
-                }
-                sessionModels.Add(session);
-            }
-            ValidationResult validationResult = await _createSessionArrangeValidator.ValidateAsync(sessionModels);
-            if (!validationResult.IsValid) throw new Exception(ValidatorHandler.HandleValidation<bool>(validationResult).Message);
-            var sessions = _mapper.Map<List<Session>>(sessionModels);
-            course.Sessions = sessions;
-            return course;
-        }
+       
         private async Task<Course> ExtractAssessmentFromWorksheetAsync(IXLWorksheet worksheet, Course course)
         {
             var rows = worksheet.RangeUsed().RowsUsed();

@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using FranchiseProject.Application.ViewModels.SessionViewModels;
 using FranchiseProject.Application.ViewModels.SyllabusViewModels;
 
 namespace FranchiseProject.API.Validator.SyllabusValidator

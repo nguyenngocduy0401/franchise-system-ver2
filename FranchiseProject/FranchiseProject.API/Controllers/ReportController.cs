@@ -20,7 +20,7 @@ namespace FranchiseProject.API.Controllers
             _reportService = reportService;
         }
 
-       // [Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager)]
+       //[Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager)]
         [SwaggerOperation(Summary = "Tạo báo cáo khóa học {Authorize = AgencyStaff, AgencyManager}")]
         [HttpPost("course")]
         public async Task<ApiResponse<bool>> CreateCourseReportAsync(CreateReportCourseViewModel model)

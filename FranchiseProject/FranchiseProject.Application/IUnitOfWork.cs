@@ -26,7 +26,6 @@ namespace FranchiseProject.Application
         public IQuizRepository QuizRepository { get; }
         public IReportRepository ReportRepository { get; }
         public IScoreRepository ScoreRepository { get; }
-        public ISessionRepository SessionRepository { get; }
         public ISlotRepository SlotRepository { get; }
         public IStudentAnswerRepository StudentAnswerRepository { get; }
         public IClassRoomRepository ClassRoomRepository { get; }
