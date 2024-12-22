@@ -102,7 +102,6 @@ namespace FranchiseProject.API.Controllers
         {
             return await _courseService.FilterCourseAsync(filterCourseModel);
         }
-        //[Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo chương trình học bằng file {Authorize = SystemIntructor, Manager}")]
         [HttpPost("files")]
         public async Task<ApiResponse<bool>> CreateCourseByFileAsync(CourseFilesModel file)

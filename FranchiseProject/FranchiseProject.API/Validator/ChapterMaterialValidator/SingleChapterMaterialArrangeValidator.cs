@@ -13,7 +13,11 @@ namespace FranchiseProject.API.Validator.ChapterMaterialValidator
                 .WithMessage("Số không được để trống.")
                 .GreaterThan(0)
                 .WithMessage("Số phải lớn hơn 0.");
-
+            RuleFor(e => e.Title)
+                .NotEmpty()
+                .WithMessage("Tiêu đề không được để trống.")
+                .MaximumLength(250)
+                .WithMessage("Tiêu đề không được dài quá 250 ký tự.");
             RuleFor(x => x.URL)
                 .NotEmpty()
                 .WithMessage("URL không được để trống.")
@@ -23,8 +27,8 @@ namespace FranchiseProject.API.Validator.ChapterMaterialValidator
             RuleFor(x => x.Description)
                 .NotEmpty()
                 .WithMessage("Mô tả không được để trống.")
-                .MaximumLength(500)
-                .WithMessage("Mô tả không được dài quá 500 ký tự.");
+                .MaximumLength(5000)
+                .WithMessage("Mô tả không được dài quá 5000 ký tự.");
         }
     }
 }

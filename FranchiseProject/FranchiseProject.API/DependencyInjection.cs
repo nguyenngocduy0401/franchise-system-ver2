@@ -53,6 +53,7 @@ using FranchiseProject.Application.ViewModels.DocumentViewModels;
 using FranchiseProject.API.Validator.DocumentValidator;
 using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.API.Validator.AgencyValidator;
+using FranchiseProject.Infrastructures.Services;
 
 
 namespace FranchiseProject.API

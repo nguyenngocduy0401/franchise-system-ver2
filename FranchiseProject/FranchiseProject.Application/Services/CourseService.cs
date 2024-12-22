@@ -334,9 +334,9 @@ namespace FranchiseProject.Application.Services
                     using (var workbook = new XLWorkbook(stream))
                     {
                         int sheetCount = workbook.Worksheets.Count();
-                        if (sheetCount != 6)
+                        if (sheetCount != 5)
                             return ResponseHandler.Success(false,
-                                sheetCount < 6 ? "Số lượng bảng tính ít hơn số lượng thành phần trong khoá học." :
+                                sheetCount < 5 ? "Số lượng bảng tính ít hơn số lượng thành phần trong khoá học." :
                                                               "Số lượng bảng tính nhiều hơn số lượng thành phần trong khoá học."
                             );
                         course = await ExtractCourseFromWorksheetAsync(workbook.Worksheets.First(), course);
@@ -574,8 +574,9 @@ namespace FranchiseProject.Application.Services
                             var materialModel = new CreateChapterMaterialArrangeModel
                             {
                                 Number = materialIndex + 1,
-                                URL = materialRow.Cell(1).Value.ToString(),
-                                Description = materialRow.Cell(2).Value.ToString(),
+                                Title = materialRow.Cell(1).Value.ToString(),
+                                URL = materialRow.Cell(2).Value.ToString(),
+                                Description = materialRow.Cell(3).Value.ToString(),
                             };
                             materialIndex++;
                             chapterModel.ChapterMaterials.Add(materialModel);

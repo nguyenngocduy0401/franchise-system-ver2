@@ -51,6 +51,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<Document> Documents { get; set; }
         public DbSet<FranchiseFees> FranchiseFees { get; set; }
         public DbSet<HomePage> HomePages { get; set; }
+        public DbSet<UserChapterMaterial> UserChapterMaterials { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -60,6 +61,7 @@ namespace FranchiseProject.Infrastructures
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentAnswerConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentClassConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AssignmentSubmitConfiguration).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserChapterMaterialConfiguration).Assembly);
             modelBuilder.Entity<Contract>().HasData(
                      new Contract
                      {

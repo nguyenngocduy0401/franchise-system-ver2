@@ -2,6 +2,7 @@
 using FranchiseProject.Application.ViewModels.ContractViewModels;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using Microsoft.Extensions.Configuration;
 using System.IO;
 using System.Net.Http;
 using Xceed.Words.NET;
@@ -10,65 +11,16 @@ namespace FranchiseProject.API.Services
 {
     public class PdfService : IPdfService
     {
-        private readonly HttpClient _httpClient; private readonly IConfiguration _configuration;
+        private readonly HttpClient _httpClient;
+        private readonly IConfiguration _configuration;
         public PdfService(IConfiguration configuration)
         {
             _httpClient = new HttpClient(); _configuration = configuration;
         }
-        //public async Task<Stream> FillPdfTemplate(InputContractViewModel contract)
-        //{
-        //    string firebaseUrl = "https://firebasestorage.googleapis.com/v0/b/franchise-project-1ea45.firebasestorage.app/o/Contract%2Fhop-dong-nhuong-quyen-thuong-mai_1010092534%20(3).pdf?alt=media&token=367beaa1-68f5-4734-9a0f-841d7d17fe99";
-        //    Stream pdfTemplateStream = await DownloadFileFromFirebaseAsync(firebaseUrl);
-
-        //    var Deposit = contract.TotalMoney * 0.2; // 20% of TotalMoney
-        //    var totalMoneyParse = contract.TotalMoney.HasValue ? NumberToWordsConverter.ConvertToWords(contract.TotalMoney.Value) : "";
-        //    var depositParse = Deposit.HasValue ? NumberToWordsConverter.ConvertToWords(Deposit.Value) : "";
-        //    var designFeeParse = contract.DesignFee.HasValue ? NumberToWordsConverter.ConvertToWords(contract.DesignFee.Value) : "";
-        //    var FranchiseFeeParse = contract.FranchiseFee.HasValue ? NumberToWordsConverter.ConvertToWords(contract.FranchiseFee.Value) : "";
-
-        //    var outputStream = new MemoryStream();
-        //    using (var reader = new PdfReader(pdfTemplateStream))
-        //    {
-        //        using (var stamper = new PdfStamper(reader, outputStream))
-        //        {
-
-        //            string fontPath  = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "ARIAL.ttf");
-        //            //Font NormalFont = new iTextSharp.text.Font(bf, 12, Font.NORMAL, Color.BLACK);
-        //            //string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "seguisym.ttf");
-        //            BaseFont bf = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-        //            float fontSize = 12.50f;
-        //            var form = stamper.AcroFields;
-
-        //            void SetFieldWithFontSize(string fieldName, string value)
-        //            {
-        //                form.SetFieldProperty(fieldName, "textfont", bf, null);
-        //                form.SetFieldProperty(fieldName, "textsize", fontSize, null);
-        //                form.SetFieldProperty(fieldName, "alignment", PdfFormField.Q_CENTER, null);
-        //                form.SetField(fieldName, value);
-        //            }
-
-        //            SetFieldWithFontSize("TotalMoney", contract.TotalMoney?.ToString("#,##0") ?? "");
-        //            SetFieldWithFontSize("Deposit", Deposit?.ToString("#,##0") ?? "");
-        //            SetFieldWithFontSize("DesignFee", contract.DesignFee?.ToString("#,##0") ?? "");
-        //            SetFieldWithFontSize("FranchiseFee", contract.FranchiseFee?.ToString("#,##0") ?? "");
-        //            SetFieldWithFontSize("TotalMoneyParse", totalMoneyParse);
-        //            SetFieldWithFontSize("DepositParse", depositParse);
-        //            SetFieldWithFontSize("DesignFeeParse", designFeeParse);
-        //            SetFieldWithFontSize("FranchiseFeeParse", FranchiseFeeParse);
-        //            SetFieldWithFontSize("ContractCode", contract.ContractCode ?? "");
-
-        //            stamper.FormFlattening = true;
-        //        }
-        //    }
-
-        //    var finalOutputStream = new MemoryStream(outputStream.ToArray());
-        //    finalOutputStream.Position = 0;
-        //    return finalOutputStream;
-        //}
+        
         public async Task<Stream> FillDocumentTemplate(InputContractViewModel contract)
         {
             string templatePath = _configuration["ContractTemplateUrl"];
-            // string templatePath = @"../../FranchiseProject.Infrastructures/FireBase/Resouces/Hợp đồng chuyển nhượng.docx";
 
             using (var doc = DocX.Load(templatePath))
             {

@@ -1,7 +1,7 @@
 ﻿using Firebase.Storage;
 using FranchiseProject.Application.Interfaces;
 
-namespace FranchiseProject.API.Services
+namespace FranchiseProject.Infrastructures.Services
 {
     public class FirebaseService : IFirebaseService
     {
