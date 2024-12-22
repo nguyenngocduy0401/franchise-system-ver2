@@ -1,13 +1,13 @@
 ﻿using Firebase.Storage;
-using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.Repositories;
 
-namespace FranchiseProject.Infrastructures.Services
+namespace FranchiseProject.Infrastructures.Repositories
 {
-    public class FirebaseService : IFirebaseService
+    public class FirebaseRepository : IFirebaseRepository
     {
         private readonly FirebaseStorage _firebaseStorage;
 
-        public FirebaseService()
+        public FirebaseRepository()
         {
             _firebaseStorage = new FirebaseStorage("futuretech-b367a.appspot.com");
         }
@@ -15,7 +15,7 @@ namespace FranchiseProject.Infrastructures.Services
         public async Task<string> UploadFileAsync(Stream fileStream, string fileName)
         {
             var task = await _firebaseStorage
-                .Child("contracts") 
+                .Child("contracts")
                 .Child(fileName)
                 .PutAsync(fileStream);
 

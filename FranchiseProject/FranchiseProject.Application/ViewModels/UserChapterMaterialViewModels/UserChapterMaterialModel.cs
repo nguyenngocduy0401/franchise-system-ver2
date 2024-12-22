@@ -8,5 +8,8 @@ namespace FranchiseProject.Application.ViewModels.UserChapterMaterialViewModels
 {
     public class UserChapterMaterialModel
     {
+        public int UserId { get; set; }
+        public int ChapterMaterialId { get; set; }
+        public DateTime? CompletedDate { get; set; }
     }
 }

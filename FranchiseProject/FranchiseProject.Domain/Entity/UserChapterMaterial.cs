@@ -17,5 +17,6 @@ namespace FranchiseProject.Domain.Entity
 
         [ForeignKey("ChapterMaterialId")]
         public ChapterMaterial? ChapterMaterial { get; set; }
+        public DateTime? CompletedDate { get; set; }
     }
 }

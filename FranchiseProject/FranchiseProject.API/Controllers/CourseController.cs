@@ -88,8 +88,6 @@ namespace FranchiseProject.API.Controllers
         {
             return await _assessmentService.CreateAssessmentArangeAsync(id, createAssessmentArrangeModel);
         }
-        
-        
         [SwaggerOperation(Summary = "tìm khoá học bằng id")]
         [HttpGet("{id}")]
         public async Task<ApiResponse<CourseDetailViewModel>> GetCourseByIdAsync(Guid id)

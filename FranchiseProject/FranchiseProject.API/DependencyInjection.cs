@@ -53,7 +53,8 @@ using FranchiseProject.Application.ViewModels.DocumentViewModels;
 using FranchiseProject.API.Validator.DocumentValidator;
 using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.API.Validator.AgencyValidator;
-using FranchiseProject.Infrastructures.Services;
+using FranchiseProject.Application.Repositories;
+using FranchiseProject.Infrastructures.Repositories;
 
 
 namespace FranchiseProject.API
@@ -119,8 +120,6 @@ namespace FranchiseProject.API
             });
 
             services.AddScoped<IClaimsService, ClaimsService>();
-            services.AddScoped<IPdfService, PdfService>();
-            services.AddSingleton<IFirebaseService, FirebaseService>();
           
       
             services.AddHttpContextAccessor();

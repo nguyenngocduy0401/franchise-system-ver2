@@ -573,10 +573,11 @@ namespace FranchiseProject.Application.Services
                         {
                             var materialModel = new CreateChapterMaterialArrangeModel
                             {
-                                Number = materialIndex + 1,
-                                Title = materialRow.Cell(1).Value.ToString(),
-                                URL = materialRow.Cell(2).Value.ToString(),
+                                Number = (int)materialRow.Cell(1).Value,
+                                Title = materialRow.Cell(2).Value.ToString(),
                                 Description = materialRow.Cell(3).Value.ToString(),
+                                URLFile = materialRow.Cell(4).Value.ToString(),
+                                URLVideo = materialRow.Cell(5).Value.ToString(),
                             };
                             materialIndex++;
                             chapterModel.ChapterMaterials.Add(materialModel);

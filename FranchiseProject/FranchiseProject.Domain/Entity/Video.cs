@@ -9,6 +9,7 @@ namespace FranchiseProject.Domain.Entity
     public class Video : BaseEntity
     {
         public string? Name { get; set; }
+        public string? VideoId { get; set; }
         public string? URL { get; set; }
     }
 }

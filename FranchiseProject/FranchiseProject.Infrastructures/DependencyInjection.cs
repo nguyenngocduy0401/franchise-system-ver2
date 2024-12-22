@@ -1,4 +1,5 @@
-﻿using FranchiseProject.Application;
+﻿using FranchiseProject.API.Services;
+using FranchiseProject.Application;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Jobs;
 using FranchiseProject.Application.Repositories;
@@ -60,10 +61,9 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IAgencyDashboardService, AgencyDashboardService>();
             services.AddScoped<IDocumentService, DocumentService>();
             services.AddScoped<IVnPayService, VnPayService>();
-
             services.AddScoped<IDashboardService, DashboardService>();
-
             services.AddScoped<IHomePageService, HomePageService>();
+            services.AddScoped<IPdfService, PdfService>();
             #endregion
             #region Repository DI
             services.AddScoped<IAgencyRepository, AgencyRepository>();
@@ -103,6 +103,8 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IFranchiseFeesRepository, FranchiseFeeRepository>();
             services.AddScoped<IHomePageRepository, HomePageRepository>();
             services.AddScoped<IRevenueRepository, RevenueRepository>();
+            services.AddScoped<IFirebaseRepository, FirebaseRepository>();
+            services.AddScoped<IVimeoService, VimeoRepository>();
             #endregion
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>

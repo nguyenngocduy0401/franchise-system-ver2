@@ -17,9 +17,9 @@ namespace FranchiseProject.Application.Services
     public class DashboardService : IDashboardService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IFirebaseService _firebaseService;
+        private readonly IFirebaseRepository _firebaseService;
 
-        public DashboardService(IUnitOfWork unitOfWork    ,    IFirebaseService firebaseService)
+        public DashboardService(IUnitOfWork unitOfWork    ,    IFirebaseRepository firebaseService)
         {
             _unitOfWork = unitOfWork;
             _firebaseService = firebaseService;

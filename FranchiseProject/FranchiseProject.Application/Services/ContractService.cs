@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
 using Org.BouncyCastle.Pqc.Crypto.Falcon;
+using FranchiseProject.Application.Repositories;
 
 namespace FranchiseProject.Application.Services
 {
@@ -26,17 +27,15 @@ namespace FranchiseProject.Application.Services
         private readonly IValidator<CreateContractViewModel> _validator;
         private readonly IValidator<UpdateContractViewModel> _validatorUpdate;
         private readonly IPdfService _pdfService;
-        private readonly IFirebaseService _firebaseService;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
-        public ContractService(IConfiguration configuration,IValidator<UpdateContractViewModel> validatorUpdate, IEmailService emailService, IPdfService pdfService, IFirebaseService firebaseService, IMapper mapper, IUnitOfWork unitOfWork, IValidator<CreateContractViewModel> validator, IClaimsService claimsService)
+        public ContractService(IConfiguration configuration,IValidator<UpdateContractViewModel> validatorUpdate, IEmailService emailService, IPdfService pdfService, IMapper mapper, IUnitOfWork unitOfWork, IValidator<CreateContractViewModel> validator, IClaimsService claimsService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _validator = validator;
             _clamsService = claimsService;
             _pdfService = pdfService;
-            _firebaseService = firebaseService;
             _emailService = emailService;
             _validatorUpdate = validatorUpdate;
             _configuration = configuration;
@@ -478,7 +477,7 @@ namespace FranchiseProject.Application.Services
                 using (var stream = file.OpenReadStream())
                 {
                     string fileName = $"ContractTemplate_{DateTime.Now:yyyyMMddHHmmss}.docx";
-                    string firebaseUrl = await _firebaseService.UploadFileAsync(stream, fileName);
+                    string firebaseUrl = await _unitOfWork.FirebaseRepository.UploadFileAsync(stream, fileName);
                     var configuration = (IConfigurationRoot)_configuration;
                     configuration["ContractTemplateUrl"] = firebaseUrl;
 
@@ -556,7 +555,7 @@ namespace FranchiseProject.Application.Services
                         string fileName = $"Contract_{contract.ContractCode}.doc";
                         using (var uploadStream = new MemoryStream(pdfBytes))
                         {
-                            string firebaseUrl = await _firebaseService.UploadFileAsync(uploadStream, fileName);
+                            string firebaseUrl = await _unitOfWork.FirebaseRepository.UploadFileAsync(uploadStream, fileName);
 
                             if (string.IsNullOrEmpty(firebaseUrl))
                             {

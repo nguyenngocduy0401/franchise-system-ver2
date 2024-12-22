@@ -11,8 +11,9 @@ namespace FranchiseProject.Domain.Entity
     {
         public int Number { get; set; }
         public string? Title { get; set; }
-        public string? URL { get; set; }
         public string? Description { get; set; }
+        public string? URLFile { get; set; }
+        public string? URLVideo { get; set; }
         public Guid? ChapterId { get; set; }
         [ForeignKey("ChapterId")]
         public Chapter? Chapter { get; set; }

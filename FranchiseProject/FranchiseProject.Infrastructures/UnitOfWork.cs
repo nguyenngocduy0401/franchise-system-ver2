@@ -49,6 +49,7 @@ namespace FranchiseProject.Infrastructures
         private readonly IFranchiseFeesRepository _franchiseFeesRepository;
         private readonly IHomePageRepository _homePageRepository;
         private readonly IRevenueRepository _revenueRepository;
+        private readonly IFirebaseRepository _firebaseRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -61,7 +62,8 @@ namespace FranchiseProject.Infrastructures
             IPaymentRepository paymentRepository,IStudentRepository studentRepository,
             ICourseMaterialRepository courseMaterialRepository,IRegisterCourseRepository registerCourseRepository,
             IChapterMaterialRepository chapterMaterialRepository,IAgencyDashboardRepository agencyDashboardRepository,
-            IHomePageRepository homePageRepository)
+            IHomePageRepository homePageRepository,IRevenueRepository revenueRepository,
+            IFirebaseRepository firebaseRepository)
 
 
            
@@ -101,6 +103,8 @@ namespace FranchiseProject.Infrastructures
             _courseMaterialRepository = courseMaterialRepository;
             _agencyDashboardRepository = agencyDashboardRepository;
             _homePageRepository = homePageRepository;
+            _revenueRepository = revenueRepository;
+            _firebaseRepository = firebaseRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -173,6 +177,7 @@ namespace FranchiseProject.Infrastructures
         public IFranchiseFeesRepository FranchiseFeesRepository => _franchiseFeesRepository;
         public IHomePageRepository HomePageRepository => _homePageRepository;
         public IRevenueRepository RevenueRepository => _revenueRepository;
+        public IFirebaseRepository FirebaseRepository => _firebaseRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

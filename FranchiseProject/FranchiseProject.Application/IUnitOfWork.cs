@@ -45,6 +45,7 @@ namespace FranchiseProject.Application
         public IFranchiseFeesRepository FranchiseFeesRepository { get; }
         public IHomePageRepository HomePageRepository { get; }
         public IRevenueRepository RevenueRepository { get; }
+        public IFirebaseRepository FirebaseRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

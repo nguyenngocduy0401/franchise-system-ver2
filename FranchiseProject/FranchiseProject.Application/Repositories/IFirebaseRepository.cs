@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.Interfaces
+namespace FranchiseProject.Application.Repositories
 {
-    public interface IFirebaseService
+    public interface IFirebaseRepository
     {
         Task<string> UploadFileAsync(Stream fileStream, string fileName);
     }
