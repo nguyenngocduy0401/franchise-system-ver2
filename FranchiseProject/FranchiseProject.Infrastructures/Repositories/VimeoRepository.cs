@@ -13,15 +13,15 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Infrastructures.Services
+namespace FranchiseProject.Infrastructures.Repositories
 {
-    public class VimeoService : IVimeoService
+    public class VimeoRepository : IVimeoService
     {
         private readonly AppConfiguration _appConfiguration;
 
-        public VimeoService(AppConfiguration appConfiguration) 
+        public VimeoRepository(AppConfiguration appConfiguration)
         {
-            _appConfiguration = appConfiguration; 
+            _appConfiguration = appConfiguration;
         }
 
         public async Task<ApiResponse<string>> UploadVideo(IFormFile videoFile)

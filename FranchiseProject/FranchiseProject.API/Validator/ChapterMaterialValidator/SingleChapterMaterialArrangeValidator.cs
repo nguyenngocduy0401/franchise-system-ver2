@@ -18,11 +18,11 @@ namespace FranchiseProject.API.Validator.ChapterMaterialValidator
                 .WithMessage("Tiêu đề không được để trống.")
                 .MaximumLength(250)
                 .WithMessage("Tiêu đề không được dài quá 250 ký tự.");
-            RuleFor(x => x.URL)
+            /*RuleFor(x => x.URLFile)
                 .NotEmpty()
                 .WithMessage("URL không được để trống.")
                 .MaximumLength(200)
-                .WithMessage("URL không được dài quá 200 ký tự.");
+                .WithMessage("URL không được dài quá 200 ký tự.");*/
 
             RuleFor(x => x.Description)
                 .NotEmpty()

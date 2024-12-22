@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using FranchiseProject.Infrastructures.Services;
 using System.Threading.Tasks;
 using FranchiseProject.Application.Interfaces;
 

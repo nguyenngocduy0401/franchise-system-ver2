@@ -10,12 +10,6 @@ namespace FranchiseProject.API.Validator.ChapterMaterialValidator
             RuleFor(e => e.Number)
                 .GreaterThanOrEqualTo(0)
                 .WithMessage("Số không được nhỏ hơn 0.");
-
-            RuleFor(e => e.URL)
-                .NotEmpty()
-                .WithMessage("URL không được để trống.")
-                .MaximumLength(250)
-                .WithMessage("URL không được dài quá 250 ký tự.");
             RuleFor(e => e.Title)
                 .NotEmpty()
                 .WithMessage("Tiêu đề không được để trống.")
