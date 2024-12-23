@@ -32,7 +32,6 @@ namespace FranchiseProject.Infrastructures
         private readonly ISlotRepository _slotRepository;
         private readonly IStudentAnswerRepository _studentAnswerRepository;
         private readonly IClassRoomRepository _classRoomRepository;
-        private readonly IRegisterCourseRepository _registerFormRepository;
         private readonly ISyllabusRepository _syllabusRepository;
         private readonly IUserRepository _userRepository;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
@@ -50,20 +49,22 @@ namespace FranchiseProject.Infrastructures
         private readonly IHomePageRepository _homePageRepository;
         private readonly IRevenueRepository _revenueRepository;
         private readonly IFirebaseRepository _firebaseRepository;
+        private readonly IUserChapterMaterialRepository _userChapterMaterialRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
             ICourseRepository courseRepository, IFeedbackRepository feedbackRepository, IQuestionOptionRepository questionOptionRepository,
             IQuestionRepository questionRepository, IQuizDetailRepository quizDetailRepository, IQuizRepository  quizRepository, IReportRepository reportRepository,
             IScoreRepository scoreRepository, ISlotRepository slotRepository, IStudentAnswerRepository studentAnswerRepository,
-            IClassRoomRepository classRoomRepository, IRegisterCourseRepository registerFormRepository, ISyllabusRepository syllabusRepository,
+            IClassRoomRepository classRoomRepository, ISyllabusRepository syllabusRepository,
             IUserRepository userRepository, IAssignmentSubmitRepository assignmentSubmitRepository, IRefreshTokenRepository refreshTokenRepository,
             IRegisterFormRepository franchiseRegistrationRequestRepository, IAssessmentRepository assessmentRepository,INotificationRepository notificationRepository,
             IPaymentRepository paymentRepository,IStudentRepository studentRepository,
             ICourseMaterialRepository courseMaterialRepository,IRegisterCourseRepository registerCourseRepository,
             IChapterMaterialRepository chapterMaterialRepository,IAgencyDashboardRepository agencyDashboardRepository,
             IHomePageRepository homePageRepository,IRevenueRepository revenueRepository,
-            IFirebaseRepository firebaseRepository)
+            IFirebaseRepository firebaseRepository, IDocumentRepository documentRepository,
+            IFranchiseFeesRepository franchiseFeesRepository, IUserChapterMaterialRepository userChapterMaterialRepository)
 
 
            
@@ -89,7 +90,6 @@ namespace FranchiseProject.Infrastructures
             _slotRepository = slotRepository;
             _studentAnswerRepository = studentAnswerRepository;
             _classRoomRepository = classRoomRepository;
-            _registerFormRepository = registerFormRepository;
             _syllabusRepository = syllabusRepository;
             _userRepository = userRepository;
             _refreshTokenRepository = refreshTokenRepository;
@@ -105,6 +105,9 @@ namespace FranchiseProject.Infrastructures
             _homePageRepository = homePageRepository;
             _revenueRepository = revenueRepository;
             _firebaseRepository = firebaseRepository;
+            _documentRepository = documentRepository;
+            _franchiseFeesRepository = franchiseFeesRepository;
+            _userChapterMaterialRepository = userChapterMaterialRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -146,8 +149,6 @@ namespace FranchiseProject.Infrastructures
 
         public IClassRoomRepository ClassRoomRepository => _classRoomRepository;
 
-        public IRegisterCourseRepository RegisterFormRepository => _registerFormRepository;
-
         public ISyllabusRepository SyllabusRepository => _syllabusRepository;
 
         public IUserRepository UserRepository => _userRepository;
@@ -178,6 +179,7 @@ namespace FranchiseProject.Infrastructures
         public IHomePageRepository HomePageRepository => _homePageRepository;
         public IRevenueRepository RevenueRepository => _revenueRepository;
         public IFirebaseRepository FirebaseRepository => _firebaseRepository;
+        public IUserChapterMaterialRepository UserChapterMaterialRepository => _userChapterMaterialRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

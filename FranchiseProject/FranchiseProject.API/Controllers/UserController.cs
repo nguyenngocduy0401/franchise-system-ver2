@@ -4,6 +4,7 @@ using FranchiseProject.Application.ViewModels.AssignmentViewModels;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
 using FranchiseProject.Application.ViewModels.StudentViewModels;
+using FranchiseProject.Application.ViewModels.UserChapterMaterialViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,14 +21,28 @@ namespace FranchiseProject.API.Controllers
 		private readonly IClassService _classService;
 		private readonly IRegisterCourseService _registerCourseService;
 		private readonly IAssignmentService _assignmentService;
+		private readonly IUserChapterMaterialService _userChapterMaterialService;
 		public UserController(IUserService userService, IClassService classService,
-			IRegisterCourseService registerCourseService, IAssignmentService assignmentService)
+			IRegisterCourseService registerCourseService, IAssignmentService assignmentService,
+			IUserChapterMaterialService userChapterMaterialService)
 		{
 			_userService = userService;
 			_classService = classService;
 			_registerCourseService = registerCourseService;
 			_assignmentService = assignmentService;
+			_userChapterMaterialService = userChapterMaterialService;
 		}
+        [Authorize()]
+        [SwaggerOperation(Summary = "đánh dấu học sinh đã xem bài học {Authorize}")]
+        [HttpPost("chapter-materials")]
+        public async Task<ApiResponse<UserChapterMaterialModel>> CreateUserChapterMaterialByLoginAsync(CreateUserChapterMaterialModel createUserChapterMaterialModel)
+            => await _userChapterMaterialService.CreateUserChapterMaterialByLoginAsync(createUserChapterMaterialModel);
+        [Authorize()]
+        [SwaggerOperation(Summary = "lấy đánh dấu bài học của học sinh {Authorize}")]
+        [HttpPut("mine/chapter-materials")]
+        public async Task<ApiResponse<UserChapterMaterialModel>> GetUserChapterMaterialByLoginAsync(Guid userChapterMaterialId)
+            => await _userChapterMaterialService.GetUserChapterMaterialByLoginAsync(userChapterMaterialId);
+
         [Authorize()]
         [SwaggerOperation(Summary = "cập nhật người dùng bằng login")]
         [HttpPut()]

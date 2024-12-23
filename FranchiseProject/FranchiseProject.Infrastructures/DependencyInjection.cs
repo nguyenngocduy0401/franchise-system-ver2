@@ -64,6 +64,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<IHomePageService, HomePageService>();
             services.AddScoped<IPdfService, PdfService>();
+            services.AddScoped<IUserChapterMaterialService, UserChapterMaterialService>();
             #endregion
             #region Repository DI
             services.AddScoped<IAgencyRepository, AgencyRepository>();
@@ -105,6 +106,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IRevenueRepository, RevenueRepository>();
             services.AddScoped<IFirebaseRepository, FirebaseRepository>();
             services.AddScoped<IVimeoService, VimeoRepository>();
+            services.AddScoped<IUserChapterMaterialRepository, UserChapterMaterialRepository>();
             #endregion
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>
