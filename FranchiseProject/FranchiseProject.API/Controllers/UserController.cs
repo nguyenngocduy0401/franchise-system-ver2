@@ -48,7 +48,7 @@ namespace FranchiseProject.API.Controllers
             => await _userChapterMaterialService.CreateUserChapterMaterialByLoginAsync(createUserChapterMaterialModel);
         [Authorize()]
         [SwaggerOperation(Summary = "lấy đánh dấu bài học của học sinh {Authorize}")]
-        [HttpPut("mine/chapter-materials")]
+        [HttpGet("mine/chapter-materials")]
         public async Task<ApiResponse<UserChapterMaterialModel>> GetUserChapterMaterialByLoginAsync(Guid userChapterMaterialId)
             => await _userChapterMaterialService.GetUserChapterMaterialByLoginAsync(userChapterMaterialId);
 
