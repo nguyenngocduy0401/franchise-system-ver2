@@ -123,7 +123,9 @@ namespace FranchiseProject.Infrastructures.Mappers
             .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.Message)).ReverseMap();
             #endregion
             #region UserChapterMaterial
+            CreateMap<UserChapterMaterial, ChapterMaterialStudentViewModel>();
             CreateMap<UserChapterMaterial, UserChapterMaterialModel>();
+            CreateMap<CreateUserChapterMaterialModel, UserChapterMaterial>();
             #endregion
             #region Class
             CreateMap<CreateClassViewModel, Class>();
@@ -331,10 +333,7 @@ namespace FranchiseProject.Infrastructures.Mappers
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
             #endregion
 
-            #region UserChapterMaterial
-            CreateMap<UserChapterMaterial, UserChapterMaterialModel>();
-            CreateMap<CreateUserChapterMaterialModel, UserChapterMaterial>();
-            #endregion
+           
         }
     }
 }
