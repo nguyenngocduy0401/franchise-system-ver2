@@ -11,5 +11,7 @@ namespace FranchiseProject.Application.Repositories
     {
         Task<Course> GetCourseDetailAsync(Guid courseId);
         Task<Course> GetCourseDetailForDuplicateAsync(Guid courseId);
+        Task<bool> CheckUserInCourseAsync(string userId, Guid courseId);
+        Task<Course> GetCourseStudentAsync(Guid courseId);
     }
 }

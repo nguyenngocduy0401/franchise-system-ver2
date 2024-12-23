@@ -3,9 +3,11 @@ using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AssignmentViewModels;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
+using FranchiseProject.Application.ViewModels.CourseViewModels;
 using FranchiseProject.Application.ViewModels.StudentViewModels;
 using FranchiseProject.Application.ViewModels.UserChapterMaterialViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
+using FranchiseProject.Domain.Entity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,16 +24,23 @@ namespace FranchiseProject.API.Controllers
 		private readonly IRegisterCourseService _registerCourseService;
 		private readonly IAssignmentService _assignmentService;
 		private readonly IUserChapterMaterialService _userChapterMaterialService;
-		public UserController(IUserService userService, IClassService classService,
+		private readonly ICourseService _courseService;
+        public UserController(IUserService userService, IClassService classService,
 			IRegisterCourseService registerCourseService, IAssignmentService assignmentService,
-			IUserChapterMaterialService userChapterMaterialService)
+			IUserChapterMaterialService userChapterMaterialService, ICourseService courseService)
 		{
 			_userService = userService;
 			_classService = classService;
 			_registerCourseService = registerCourseService;
 			_assignmentService = assignmentService;
 			_userChapterMaterialService = userChapterMaterialService;
+			_courseService = courseService;
 		}
+        [Authorize()]
+        [SwaggerOperation(Summary = "Lấy khóa học của học sinh {Authorize}")]
+        [HttpGet("mine/courses/{id}")]
+        public async Task<ApiResponse<CourseStudentViewModel>> GetCourseByLoginAsync(Guid id)
+            => await _courseService.GetCourseByLoginAsync(id);
         [Authorize()]
         [SwaggerOperation(Summary = "đánh dấu học sinh đã xem bài học {Authorize}")]
         [HttpPost("chapter-materials")]

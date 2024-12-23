@@ -24,5 +24,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> CreateCourseAsync(CreateCourseModel createCourseModel);
         Task<ApiResponse<bool>> CheckCourseAvailableAsync(Guid? courseId, CourseStatusEnum courseStatus);
         Task<ApiResponse<bool>> CreateCourseByFileAsync(CourseFilesModel courseFilesModel);
+        Task<ApiResponse<CourseStudentViewModel>> GetCourseByLoginAsync(Guid courseId);
     }
 }

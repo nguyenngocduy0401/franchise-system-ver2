@@ -122,7 +122,9 @@ namespace FranchiseProject.Infrastructures.Mappers
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Message, opt => opt.MapFrom(src => src.Message)).ReverseMap();
             #endregion
-
+            #region UserChapterMaterial
+            CreateMap<UserChapterMaterial, UserChapterMaterialModel>();
+            #endregion
             #region Class
             CreateMap<CreateClassViewModel, Class>();
             CreateMap<Class, ClassViewModel>();
@@ -141,6 +143,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             #endregion
             #region ChapterMaterial
             CreateMap<ChapterMaterial, ChapterMaterialViewModel>();
+            CreateMap<ChapterMaterial, ChapterMaterialStudentViewModel>()
+                .ForMember(dest => dest.UserChapterMaterials, opt => opt.MapFrom(src => src.UserChapterMaterials.FirstOrDefault()));
             CreateMap<CreateChapterMaterialArrangeModel, ChapterMaterial>();
             CreateMap<ChapterMaterial, ChapterMaterial>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -150,6 +154,8 @@ namespace FranchiseProject.Infrastructures.Mappers
             #endregion
             #region Chapter
             CreateMap<Chapter, ChapterDetailViewModel>()
+                .ForMember(dest => dest.ChapterMaterials, opt => opt.MapFrom(src => src.ChapterMaterials.Where(m => m.IsDeleted != true)));
+            CreateMap<Chapter, ChapterStudentViewModel>()
                 .ForMember(dest => dest.ChapterMaterials, opt => opt.MapFrom(src => src.ChapterMaterials.Where(m => m.IsDeleted != true)));
             CreateMap<Chapter, ChapterViewModel>();
             CreateMap<CreateChapterModel, Chapter>();
@@ -171,6 +177,12 @@ namespace FranchiseProject.Infrastructures.Mappers
                 .ForMember(dest => dest.CourseCategoryName, opt => opt
                 .MapFrom(src => src.CourseCategory.Name));
             CreateMap<Course, CourseDetailViewModel>()
+                .ForMember(dest => dest.CourseMaterials, opt => opt.MapFrom(src => src.CourseMaterials.Where(m => m.IsDeleted != true)))
+                .ForMember(dest => dest.Assessments, opt => opt.MapFrom(src => src.Assessments.Where(m => m.IsDeleted != true)))
+                .ForMember(dest => dest.Chapters, opt => opt.MapFrom(src => src.Chapters.Where(m => m.IsDeleted != true)))
+                .ForMember(dest => dest.Syllabus, opt => opt.MapFrom(src => src.Syllabus))
+                .ForMember(dest => dest.CourseCategory, opt => opt.MapFrom(src => src.CourseCategory));
+            CreateMap<Course, CourseStudentViewModel>()
                 .ForMember(dest => dest.CourseMaterials, opt => opt.MapFrom(src => src.CourseMaterials.Where(m => m.IsDeleted != true)))
                 .ForMember(dest => dest.Assessments, opt => opt.MapFrom(src => src.Assessments.Where(m => m.IsDeleted != true)))
                 .ForMember(dest => dest.Chapters, opt => opt.MapFrom(src => src.Chapters.Where(m => m.IsDeleted != true)))

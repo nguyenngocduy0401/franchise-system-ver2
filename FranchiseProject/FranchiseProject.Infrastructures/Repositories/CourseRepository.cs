@@ -1,4 +1,5 @@
-﻿using FranchiseProject.Application.Interfaces;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using VimeoDotNet.Models;
 
 namespace FranchiseProject.Infrastructures.Repositories
 {
@@ -25,6 +27,28 @@ namespace FranchiseProject.Infrastructures.Repositories
             _dbContext = context;
             _timeService = timeService;
             _claimsService = claimsService;
+        }
+        public async Task<bool> CheckUserInCourseAsync(string userId, Guid courseId)
+        {
+            return await _dbContext.ClassRooms
+                .Where(cr => cr.UserId == userId)
+                .Select(cr => cr.Class)
+                .AnyAsync(c => c.CourseId == courseId);
+        }
+        public async Task<Course> GetCourseStudentAsync(Guid courseId)
+        {
+            return await _dbSet
+                .Where(e => e.Id == courseId)
+                .Include(e => e.CourseMaterials)
+                .Include(e => e.Syllabus)
+                .Include(e => e.Assessments.OrderBy(a => a.Number))
+                .Include(e => e.Chapters
+                    .OrderBy(ch => ch.Number))
+                    .ThenInclude(c => c.ChapterMaterials
+                    .OrderBy(cm => cm.Number))
+                    .ThenInclude(c => c.UserChapterMaterials.Where(cm => cm.UserId == _claimsService.GetCurrentUserId.ToString()))
+                .Include(e => e.CourseCategory)
+                .FirstOrDefaultAsync();
         }
         public async Task<Course> GetCourseDetailAsync(Guid courseId)
         {

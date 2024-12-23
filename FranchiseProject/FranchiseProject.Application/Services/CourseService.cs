@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
+using FranchiseProject.Application.ViewModels.UserChapterMaterialViewModels;
 
 namespace FranchiseProject.Application.Services
 {
@@ -59,6 +60,29 @@ namespace FranchiseProject.Application.Services
             _createChapterFileValidator = createChapterFileValidator;
         }
         #endregion
+        public async Task<ApiResponse<CourseStudentViewModel>> GetCourseByLoginAsync(Guid courseId)
+        {
+            var response = new ApiResponse<CourseStudentViewModel>();
+            try
+            {
+                var userId = _claimsService.GetCurrentUserId.ToString();
+                if (userId == null) return ResponseHandler.Failure<CourseStudentViewModel>("User not found");
+                
+                var courseRegistered = await _unitOfWork.CourseRepository.CheckUserInCourseAsync(userId, courseId);
+                if (courseRegistered == false) return ResponseHandler.Success(new CourseStudentViewModel(), "Không tồn tại trong khóa học!");
+                
+                var course = await _unitOfWork.CourseRepository.GetCourseStudentAsync(courseId);
+                if (course == null) return ResponseHandler.Success(new CourseStudentViewModel(), "Không tồn tại trong khóa học!");
+                var courseModel = _mapper.Map<CourseStudentViewModel>(course);
+                response = ResponseHandler.Success(courseModel);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<CourseStudentViewModel>(ex.Message);
+            }
+            return response;
+        }
+       
         public async Task<ApiResponse<CourseDetailViewModel>> CreateCourseVersionAsync(Guid courseId)
         {
             var response = new ApiResponse<CourseDetailViewModel>();
