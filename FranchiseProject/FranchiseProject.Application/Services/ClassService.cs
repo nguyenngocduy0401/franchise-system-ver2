@@ -266,6 +266,7 @@ namespace FranchiseProject.Application.Services
                             DayOfWeek = c.DayOfWeek,
                             CourseName = c.Course.Name,
                             Status = c.Status.Value,
+                            CourseId = c.CourseId,
                             InstructorName = instructorName
                         }).ToList(),
                         TotalItemsCount = classes.TotalItemsCount,
@@ -385,6 +386,7 @@ namespace FranchiseProject.Application.Services
                                 StudentName = user.FullName,
                                 DateOfBirth = user.DateOfBirth,
                                 URLImage = user.URLImage
+                                
                             });
 
                             studentIdsAdded.Add(cr.UserId);
@@ -824,7 +826,8 @@ namespace FranchiseProject.Application.Services
                         CourseName = c.Course?.Name,
                         DayOfWeek = c.DayOfWeek + "-" + slot?.StartTime + "-" + slot?.EndTime,
                         StartDate = startDate?.ToString(),
-                        DaysElapsed = daysElapsed
+                        DaysElapsed = daysElapsed,
+                        CourseId = c.CourseId
                     };
 
                     classViewModels.Add(classViewModel);
@@ -850,7 +853,8 @@ namespace FranchiseProject.Application.Services
                 var classViewModels = classes.Select(c => new ClassByLoginViewModel
                 {
                     ClassId = c.Id,
-                    ClassName = c.Name
+                    ClassName = c.Name,
+                    CourseId = c.CourseId,
                 }).ToList();
 
                 return ResponseHandler.Success<List<ClassByLoginViewModel>>(classViewModels, "Successfully retrieved classes");
