@@ -10,7 +10,9 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IUserChapterMaterialRepository
     {
+        Task<double> CompletedPercentUserChapterMaterialAsync(Guid courseId, string userId);
         Task AddAsync(UserChapterMaterial userChapterMaterial);
         Task<IEnumerable<UserChapterMaterial>> FindAsync(Expression<Func<UserChapterMaterial, bool>> expression, string includeProperties = "");
+        Task<bool> AnyAsync(Expression<Func<UserChapterMaterial, bool>> predicate);
     }
 }

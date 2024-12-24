@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.ViewModels.UserChapterMaterialViewModels
 {
-    public class CreateUserChapterMaterialModel
+    public class UserChapterPercentModel
     {
         public string? UserId { get; set; }
-        public Guid ChapterMaterialId { get; set; }
+        public Guid CourseId { get; set; }
     }
 }

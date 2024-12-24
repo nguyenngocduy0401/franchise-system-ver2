@@ -8,6 +8,7 @@ using Org.BouncyCastle.Bcpg;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,6 +28,22 @@ namespace FranchiseProject.Application.Services
             _mappers = mapper;
             _currentTime = currentTime;
         }
+        public async Task<ApiResponse<double>> GetCompletedPercentCourseAsync(string userId, Guid courseId)
+        {
+            var response = new ApiResponse<double>();
+            try
+            {
+                if(userId == null) return ResponseHandler.Success((double)0);
+                var completedPercent = await _unitOfWork.UserChapterMaterialRepository.CompletedPercentUserChapterMaterialAsync(courseId, userId);
+
+                response = ResponseHandler.Success(completedPercent);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<double>(ex.Message);
+            }
+            return response;
+        }
         public async Task<ApiResponse<UserChapterMaterialModel>> CreateUserChapterMaterialByLoginAsync(CreateUserChapterMaterialModel createUserChapterMaterial)
         { 
             var response = new ApiResponse<UserChapterMaterialModel>();
@@ -34,9 +51,15 @@ namespace FranchiseProject.Application.Services
             {
                 string userId = _claimsService.GetCurrentUserId.ToString();
                 if (userId == null) return ResponseHandler.Failure<UserChapterMaterialModel>("User not found");
-                
+                var filter = (Expression<Func<UserChapterMaterial, bool>>)
+                    (e => e.ChapterMaterialId == createUserChapterMaterial.ChapterMaterialId && e.UserId == userId);
+
                 var userChapterMaterial = _mappers.Map<UserChapterMaterial>(createUserChapterMaterial);
                 userChapterMaterial.UserId = userId;
+
+                var checkExist = await _unitOfWork.UserChapterMaterialRepository.AnyAsync(filter);
+                if (checkExist == true) return ResponseHandler.Success(_mappers.Map<UserChapterMaterialModel>(userChapterMaterial), "Đánh dấu đã đọc thành công!");
+
                 await _unitOfWork.UserChapterMaterialRepository.AddAsync(userChapterMaterial);
                 userChapterMaterial.CompletedDate = _currentTime.GetCurrentTime();
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;

@@ -10,6 +10,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IUserChapterMaterialService
     {
+        Task<ApiResponse<double>> GetCompletedPercentCourseAsync(string userId, Guid courseId);
         Task<ApiResponse<UserChapterMaterialModel>> CreateUserChapterMaterialByLoginAsync(CreateUserChapterMaterialModel createUserChapterMaterial);
         Task<ApiResponse<UserChapterMaterialModel>> GetUserChapterMaterialByLoginAsync(Guid userChapterMaterialId);
     }

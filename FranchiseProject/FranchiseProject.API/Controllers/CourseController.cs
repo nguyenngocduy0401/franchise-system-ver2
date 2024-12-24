@@ -27,10 +27,11 @@ namespace FranchiseProject.API.Controllers
         private readonly IChapterService _chapterService;
         private readonly IQuestionService _questionService;
         private readonly IClassService _classService;
+        private readonly IUserChapterMaterialService _userChapterMaterialService;
         public CourseController(ICourseService courseService, ICourseMaterialService materialService,
             IAssessmentService assessmentService, 
             IChapterService chapterService, IQuestionService questionService,
-            IClassService classService)
+            IClassService classService, IUserChapterMaterialService userChapterMaterialService)
         {
             _courseService = courseService;
             _materialService = materialService;
@@ -38,6 +39,14 @@ namespace FranchiseProject.API.Controllers
             _chapterService = chapterService;
             _questionService = questionService;
             _classService = classService;
+            _userChapterMaterialService = userChapterMaterialService;
+        }
+        [Authorize()]
+        [SwaggerOperation(Summary = "Lấy tỉ lệ hoàn thành khóa học  {Authorize}")]
+        [HttpGet("{courseId}/users/{userId}/percents")]
+        public async Task<ApiResponse<double>> GetCompletedPercentCourseAsync(string userId, Guid courseId)
+        {
+            return await _userChapterMaterialService.GetCompletedPercentCourseAsync(userId, courseId);
         }
         [Authorize(Roles = AppRole.SystemInstructor + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "cập nhật trạng thái của học bằng id {Authorize = SystemInstructor, Manager}")]

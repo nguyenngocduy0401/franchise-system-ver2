@@ -28,6 +28,20 @@ namespace FranchiseProject.Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
+        public async Task<double> CompletedPercentUserChapterMaterialAsync(Guid courseId, string userId)
+        {
+            var userChapterMaterials =  _dbContext.Courses
+                .Where(c => c.Id == courseId)
+                .SelectMany(c => c.Chapters)
+                .SelectMany(ct => ct.ChapterMaterials)
+                .SelectMany(cm => cm.UserChapterMaterials)
+                .Distinct();
+            var totalChapterMaterial = await userChapterMaterials.CountAsync();
+            var totalUserChapterMaterial = await userChapterMaterials
+                .Where(uc => uc.UserId == userId)
+                .CountAsync();
+            return (double)(totalUserChapterMaterial / totalChapterMaterial) * 100;
+        }
         public async Task AddAsync(UserChapterMaterial userChapterMaterial)
         {
             userChapterMaterial.CompletedDate = _timeService.GetCurrentTime();
@@ -41,6 +55,10 @@ namespace FranchiseProject.Infrastructures.Repositories
                 query = query.Include(includeProperty);
             }
             return await query.ToListAsync();
+        }
+        public async Task<bool> AnyAsync(Expression<Func<UserChapterMaterial, bool>> predicate)
+        {
+            return await _dbContext.UserChapterMaterials.AnyAsync(predicate);
         }
     }
 }
