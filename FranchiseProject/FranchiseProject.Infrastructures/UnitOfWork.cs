@@ -50,6 +50,7 @@ namespace FranchiseProject.Infrastructures
         private readonly IRevenueRepository _revenueRepository;
         private readonly IFirebaseRepository _firebaseRepository;
         private readonly IUserChapterMaterialRepository _userChapterMaterialRepository;
+        private readonly IAgencyVnPayInfoRepository _agencyVnPayInfoRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -64,7 +65,7 @@ namespace FranchiseProject.Infrastructures
             IChapterMaterialRepository chapterMaterialRepository,IAgencyDashboardRepository agencyDashboardRepository,
             IHomePageRepository homePageRepository,IRevenueRepository revenueRepository,
             IFirebaseRepository firebaseRepository, IDocumentRepository documentRepository,
-            IFranchiseFeesRepository franchiseFeesRepository, IUserChapterMaterialRepository userChapterMaterialRepository)
+            IFranchiseFeesRepository franchiseFeesRepository, IUserChapterMaterialRepository userChapterMaterialRepository,IAgencyVnPayInfoRepository agencyVnPayInfoRepository)
 
 
            
@@ -108,6 +109,7 @@ namespace FranchiseProject.Infrastructures
             _documentRepository = documentRepository;
             _franchiseFeesRepository = franchiseFeesRepository;
             _userChapterMaterialRepository = userChapterMaterialRepository;
+            _agencyVnPayInfoRepository = agencyVnPayInfoRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -180,6 +182,7 @@ namespace FranchiseProject.Infrastructures
         public IRevenueRepository RevenueRepository => _revenueRepository;
         public IFirebaseRepository FirebaseRepository => _firebaseRepository;
         public IUserChapterMaterialRepository UserChapterMaterialRepository => _userChapterMaterialRepository;
+        public IAgencyVnPayInfoRepository AgencyVnPayInfoRepository => _agencyVnPayInfoRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

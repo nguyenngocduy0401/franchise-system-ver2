@@ -5,6 +5,7 @@ using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ContractViewModels;
 using FranchiseProject.Application.ViewModels.PaymentViewModel;
 using FranchiseProject.Application.ViewModels.PaymentViewModel.PaymentContractViewModels;
+using FranchiseProject.Application.ViewModels.VnPayViewModels;
 using FranchiseProject.Domain.Enums;
 using FranchiseProject.Infrastructures;
 using Microsoft.AspNetCore.Authorization;
@@ -107,6 +108,27 @@ namespace FranchiseProject.API.Controllers
         public async Task<ApiResponse<Pagination<PaymentContractAgencyViewModel>>> FilterPaymentContractAsync([FromQuery] FilterContractPaymentViewModel filterModel)
         {
             return await _paymentService.FilterPaymentContractAsync(filterModel);
+        }
+        //--------------VNpayCourse----------------
+        [HttpPost("create-vnpay-url-agency-course")]
+        [SwaggerOperation(Summary = "Tạo URL thanh toán khóa học cho đại lý qua VnPay")]
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
+        public async Task<ApiResponse<string>> CreateVnPayUrlForAgencyCourse([FromBody] AgencyCoursePaymentViewModel model)
+        {
+            try
+            {
+              
+                var paymentUrl = await _vnPayService.CreatePaymentUrlForAgencyCourse(model.AgencyId, model.CourseId);
+                return ResponseHandler.Success(paymentUrl, "URL thanh toán VnPay cho khóa học đại lý đã được tạo thành công.");
+            }
+            catch (ArgumentException ex)
+            {
+                return ResponseHandler.Failure<string>(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<string>("Đã xảy ra lỗi khi xử lý yêu cầu của bạn.");
+            }
         }
     }
 }

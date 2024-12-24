@@ -238,5 +238,69 @@ namespace FranchiseProject.Application.Services
                 return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
             }
         }
+
+        public async Task<string> CreatePaymentUrlForAgencyCourse(AgencyCoursePaymentViewModel model)
+        {
+            var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(model.AgencyId);
+            var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(model.CourseId);
+            var agencyVnPayInfo = await _unitOfWork.AgencyVnPayInfoRepository.GetByAgencyIdAsync(model.AgencyId);
+
+            if (agency == null || course == null || agencyVnPayInfo == null)
+            {
+                throw new ArgumentException("Agency, Course, or Agency VNPay info not found");
+            }
+
+            var amount = course.Price;
+            var paymentId = Guid.NewGuid();
+            var vnpayTxnRef = paymentId.ToString();
+            var vnpayOrderInfo = $"Thanh toan khoa hoc {course.Name} cho dai ly {agency.Name}";
+            var vnpayAmount = Convert.ToInt64(amount * 100);
+            var vnpayLocale = "vn";
+            var vnpayCreateDate = _currentTime.GetCurrentTime().ToString("yyyyMMddHHmmss");
+            var vnpayExpireDate = _currentTime.GetCurrentTime().AddMinutes(15).ToString("yyyyMMddHHmmss");
+
+            var vnpayData = new Dictionary<string, string>
+    {
+        {"vnp_Version", "2.1.0"},
+        {"vnp_Command", "pay"},
+        {"vnp_TmnCode", agencyVnPayInfo.TmnCode}, // Use agency-specific TmnCode
+        {"vnp_Amount", vnpayAmount.ToString()},
+        {"vnp_CreateDate", vnpayCreateDate},
+        {"vnp_CurrCode", "VND"},
+        {"vnp_IpAddr", "127.0.0.1"},
+        {"vnp_Locale", vnpayLocale},
+        {"vnp_OrderInfo", vnpayOrderInfo},
+        {"vnp_OrderType", "other"},
+        {"vnp_ReturnUrl", _vnPayConfig.ReturnUrl},
+        {"vnp_TxnRef", vnpayTxnRef},
+        {"vnp_ExpireDate", vnpayExpireDate}
+    };
+
+            var orderedData = new SortedList<string, string>(vnpayData);
+            var hashData = string.Join("&", orderedData.Select(kv => $"{WebUtility.UrlEncode(kv.Key)}={WebUtility.UrlEncode(kv.Value)}"));
+
+            var secureHash = ComputeHmacSha512(agencyVnPayInfo.HashSecret, hashData); // Use agency-specific HashSecret
+            vnpayData.Add("vnp_SecureHash", secureHash);
+
+            var paymentUrl = _vnPayConfig.PaymentUrl + "?" + string.Join("&", vnpayData.Select(kv => $"{kv.Key}={WebUtility.UrlEncode(kv.Value)}"));
+
+            var payment = new Payment
+            {
+                Id = paymentId,
+                Title = $"Thanh toán khóa học {course.Name}",
+                Description = $"Thanh toán khóa học {course.Name} cho đại lý {agency.Name} - {DateTime.Now}",
+                Type = PaymentTypeEnum.Course,
+                Method = PaymentMethodEnum.BankTransfer,
+                Amount = amount,
+                Status = PaymentStatus.NotCompleted,
+                CreationDate = DateTime.UtcNow,
+                AgencyId=model.AgencyId
+            };
+
+            await _unitOfWork.PaymentRepository.AddAsync(payment);
+            await _unitOfWork.SaveChangeAsync();
+
+            return paymentUrl;
+        }
     }
 }

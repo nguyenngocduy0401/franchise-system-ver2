@@ -23,5 +23,8 @@ namespace FranchiseProject.Domain.Entity
         public AgencyActivitiesStatusEnum ActivityStatus { get; set; }
         public virtual ICollection<Contract>? Contracts { get; set; }
         public virtual ICollection<Slot>? Slots { get; set; }
+        public AgencyVnPayInfo? VnPayInfo { get; set; }
+        public List<Payment>? Payments { get; set; }
+
     }
 }

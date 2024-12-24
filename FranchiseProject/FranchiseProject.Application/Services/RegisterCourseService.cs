@@ -101,7 +101,9 @@ namespace FranchiseProject.Application.Services
 
                 var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(Guid.Parse(model.AgencyId));
                 if (agency == null) return ResponseHandler.Success<bool>(false, "Trung tâm không khả dụng!");
+               
 
+                //tạo tài khoản 
                 var newUser = new User
                 {
                     UserName = finalUserName, 
@@ -112,6 +114,17 @@ namespace FranchiseProject.Application.Services
                   //  StudentStatus = StudentStatusEnum.NotConsult,
                     Status = UserStatusEnum.active,
                     CreateAt = _currentTime.GetCurrentTime(),
+                };
+                //thêm vào lớp 
+                var classScheduleEarliest = await _unitOfWork.ClassScheduleRepository.GetEarliestClassScheduleByClassIdAsync(model.ClassId.Value);
+                var classScheduleLastest = await _unitOfWork.ClassScheduleRepository.GetLatestClassScheduleByClassIdAsync(model.ClassId.Value);
+                var classRoom = new ClassRoom
+                {
+                    ClassId = model.ClassId,
+                    UserId = newUser.Id,
+                    FromDate=(DateOnly)classScheduleEarliest.Date,
+                    ToDate=classScheduleLastest.Date,
+
                 };
 
                 var result = await _userManager.CreateAsync(newUser);

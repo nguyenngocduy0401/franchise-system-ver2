@@ -26,6 +26,8 @@ namespace FranchiseProject.Domain.Entity
         public Guid? RegisterCourseId { get; set; }
         [ForeignKey("RegisterCourseId")]
         public RegisterCourse? RegisterCourse { get; set; }
-
+        public Guid? AgencyId { get; set; }
+        [ForeignKey("AgencyId")]
+        public Agency? Agency { get; set; }
     }
 }
