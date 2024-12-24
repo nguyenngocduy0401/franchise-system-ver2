@@ -118,7 +118,7 @@ namespace FranchiseProject.API.Controllers
             try
             {
               
-                var paymentUrl = await _vnPayService.CreatePaymentUrlForAgencyCourse(model.AgencyId, model.CourseId);
+                var paymentUrl = await _vnPayService.CreatePaymentUrlForAgencyCourse(model);
                 return ResponseHandler.Success(paymentUrl, "URL thanh toán VnPay cho khóa học đại lý đã được tạo thành công.");
             }
             catch (ArgumentException ex)

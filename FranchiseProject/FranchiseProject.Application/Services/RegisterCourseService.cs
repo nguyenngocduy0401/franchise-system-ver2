@@ -41,11 +41,12 @@ namespace FranchiseProject.Application.Services
         private readonly RoleManager<Role> _roleManager;
         private readonly IValidator<UpdateRegisterCourseViewModel> _updateValidator;
         private readonly ICurrentTime _currentTime;
+        private readonly IUserService _userService; 
         public RegisterCourseService(IValidator<UpdateRegisterCourseViewModel> updateValidator, RoleManager<Role> roleManager,
             IEmailService emailService, IClaimsService claimsService,
             UserManager<User> userManager, IMapper mapper, 
             IUnitOfWork unitOfWork, IValidator<RegisterCourseViewModel> validator,
-            ICurrentTime currentTime)
+            ICurrentTime currentTime,IUserService userService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -56,6 +57,7 @@ namespace FranchiseProject.Application.Services
             _roleManager = roleManager;
             _updateValidator = updateValidator;
             _currentTime = currentTime;
+            _userService = userService;
         }
 
 
@@ -69,26 +71,6 @@ namespace FranchiseProject.Application.Services
                 {
                     return ValidatorHandler.HandleValidation<bool>(validationResult);
                 }
-
-              
-                var nameParts = model.StudentName.Split(' ');
-                var lastName = nameParts.LastOrDefault()?.ToLower(); 
-                lastName = RemoveDiacritics(lastName);
-
-                if (string.IsNullOrEmpty(lastName))
-                {
-                    return ResponseHandler.Success<bool>(false,"Tên người dùng không hợp lệ!");
-                }
-           
-                string baseUserName = $"{lastName}lc";
-                string finalUserName = baseUserName;
-                int counter = 1;
-                while (await _userManager.FindByNameAsync(finalUserName) != null)
-                {
-                    counter++;
-                    finalUserName = $"{baseUserName}{counter}"; 
-                }
-
                 var twentyFourHoursAgo = DateTime.Now.AddHours(-24);
                 bool existsWithin24Hours = await _unitOfWork.RegisterCourseRepository.ExistsWithinLast24HoursAsync(model.StudentName,model.Email, model.PhoneNumber, model.CourseId);
 
@@ -106,8 +88,7 @@ namespace FranchiseProject.Application.Services
                 //tạo tài khoản 
                 var newUser = new User
                 {
-                    UserName = finalUserName, 
-                    FullName = model.StudentName,
+                   FullName = model.StudentName,
                     Email = model.Email,
                     PhoneNumber = model.PhoneNumber,
                     AgencyId = Guid.Parse(model.AgencyId),
@@ -115,6 +96,17 @@ namespace FranchiseProject.Application.Services
                     Status = UserStatusEnum.active,
                     CreateAt = _currentTime.GetCurrentTime(),
                 };
+                var generate = await _userService.GenerateUserCredentials(newUser.FullName);
+                newUser.UserName = generate.UserName;
+                await _userManager.AddToRoleAsync(newUser, AppRole.Student);
+
+                await _userManager.AddPasswordAsync(newUser, generate.Password);
+                var result = await _userManager.UpdateAsync(newUser);
+
+                if (!result.Succeeded)
+                {
+                    throw new Exception("Update User Account fail!");
+                }
                 //thêm vào lớp 
                 var classScheduleEarliest = await _unitOfWork.ClassScheduleRepository.GetEarliestClassScheduleByClassIdAsync(model.ClassId.Value);
                 var classScheduleLastest = await _unitOfWork.ClassScheduleRepository.GetLatestClassScheduleByClassIdAsync(model.ClassId.Value);
@@ -127,18 +119,7 @@ namespace FranchiseProject.Application.Services
 
                 };
                 await _unitOfWork.ClassRoomRepository.AddAsync(classRoom);
-                //
-                var result = await _userManager.CreateAsync(newUser);
-                if (!result.Succeeded)
-                {
-                    return ResponseHandler.Success<bool>(false,"Không thể tạo tài khoản người dùng!");
-                }
-
-                var roleResult = await _userManager.AddToRoleAsync(newUser, AppRole.Student);
-                if (!roleResult.Succeeded)
-                {
-                    return ResponseHandler.Success<bool>(false, "Không thể gán quyền cho người dùng!");
-                }
+                //Thanh Toan
 
                 var newRegisterCourse = new RegisterCourse
                 {

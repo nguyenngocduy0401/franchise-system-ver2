@@ -48,6 +48,7 @@ namespace FranchiseProject.Application
         public IFirebaseRepository FirebaseRepository { get; }
         public IUserChapterMaterialRepository UserChapterMaterialRepository { get; }
         public IAgencyVnPayInfoRepository AgencyVnPayInfoRepository { get; }
+        public ITempRegistrationsRepository TempRegistrationsRepository { get; } 
         public Task<int> SaveChangeAsync();
     }
 }

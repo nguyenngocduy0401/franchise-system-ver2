@@ -302,5 +302,7 @@ namespace FranchiseProject.Application.Services
 
             return paymentUrl;
         }
+
+     
     }
 }
