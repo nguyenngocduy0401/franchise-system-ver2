@@ -122,11 +122,12 @@ namespace FranchiseProject.Application.Services
                 {
                     ClassId = model.ClassId,
                     UserId = newUser.Id,
-                    FromDate=(DateOnly)classScheduleEarliest.Date,
-                    ToDate=classScheduleLastest.Date,
+                    FromDate = classScheduleEarliest.Date.HasValue ? DateOnly.FromDateTime(classScheduleEarliest.Date.Value) : null,
+                    ToDate = classScheduleLastest.Date.HasValue ? DateOnly.FromDateTime(classScheduleLastest.Date.Value) : null, 
 
                 };
-
+                await _unitOfWork.ClassRoomRepository.AddAsync(classRoom);
+                //
                 var result = await _userManager.CreateAsync(newUser);
                 if (!result.Succeeded)
                 {
