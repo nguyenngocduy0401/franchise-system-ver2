@@ -54,6 +54,7 @@ namespace FranchiseProject.Infrastructures
         public DbSet<UserChapterMaterial> UserChapterMaterials { get; set; }
         public DbSet<AgencyVnPayInfo> AgencyVnPayInfos { get; set; }
         public DbSet<TempRegistrations> TempRegistrations { get; set; }
+        public DbSet<Package> Packages { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -66,6 +66,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IPdfService, PdfService>();
             services.AddScoped<IUserChapterMaterialService, UserChapterMaterialService>();
             services.AddScoped<IAgencyVnPayInfoService, AgencyVnPayService>();
+            services.AddScoped<IPackageService, PackageService>();
             #endregion
             #region Repository DI
             services.AddScoped<IAgencyRepository, AgencyRepository>();
@@ -110,6 +111,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IAgencyVnPayInfoRepository, AgencyVnPayInfoRepository>();
             services.AddScoped<IUserChapterMaterialRepository, UserChapterMaterialRepository>();
             services.AddScoped<ITempRegistrationsRepository, TempRegistrationsRepository>();
+            services.AddScoped<IPackageRepository, PackageRepository>();
             #endregion
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>
