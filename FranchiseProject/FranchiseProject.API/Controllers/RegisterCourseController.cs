@@ -22,7 +22,7 @@ namespace FranchiseProject.API.Controllers
 
         [SwaggerOperation(Summary = "học sinh đăng kí khóa học ")]
         [HttpPost]
-        public async Task<ApiResponse<bool>> RegisterCourseAsync(RegisterCourseViewModel model)=>await _registerCourseService.RegisterCourseAsync(model);
+        public async Task<ApiResponse<string>> RegisterCourseAsync(RegisterCourseViewModel model)=>await _registerCourseService.RegisterCourseAsync(model);
         [SwaggerOperation(Summary = "Cập nhật trạng thái học sinh từ Notconsul thành Pending  {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpPut("students/{id}")]

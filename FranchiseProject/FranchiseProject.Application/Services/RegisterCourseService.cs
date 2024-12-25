@@ -10,12 +10,14 @@ using FranchiseProject.Application.Utils;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Application.ViewModels.StudentViewModel;
 using FranchiseProject.Application.ViewModels.StudentViewModels;
+using FranchiseProject.Application.ViewModels.VnPayViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -41,12 +43,14 @@ namespace FranchiseProject.Application.Services
         private readonly RoleManager<Role> _roleManager;
         private readonly IValidator<UpdateRegisterCourseViewModel> _updateValidator;
         private readonly ICurrentTime _currentTime;
-        private readonly IUserService _userService; 
+        private readonly IUserService _userService;
+        private readonly IServiceProvider _serviceProvider;
+
         public RegisterCourseService(IValidator<UpdateRegisterCourseViewModel> updateValidator, RoleManager<Role> roleManager,
             IEmailService emailService, IClaimsService claimsService,
             UserManager<User> userManager, IMapper mapper, 
             IUnitOfWork unitOfWork, IValidator<RegisterCourseViewModel> validator,
-            ICurrentTime currentTime,IUserService userService)
+            ICurrentTime currentTime,IUserService userService, IServiceProvider serviceProvider)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -58,96 +62,168 @@ namespace FranchiseProject.Application.Services
             _updateValidator = updateValidator;
             _currentTime = currentTime;
             _userService = userService;
+            _serviceProvider = serviceProvider;
         }
 
 
-        public async Task<ApiResponse<bool>> RegisterCourseAsync(RegisterCourseViewModel model)
+        public async Task<ApiResponse<string>> RegisterCourseAsync(RegisterCourseViewModel model)
         {
-            var response = new ApiResponse<bool>();
+            var response = new ApiResponse<string>();
             try
             {
                 FluentValidation.Results.ValidationResult validationResult = await _validator.ValidateAsync(model);
                 if (!validationResult.IsValid)
                 {
-                    return ValidatorHandler.HandleValidation<bool>(validationResult);
+                    return ValidatorHandler.HandleValidation<string>(validationResult);
                 }
+
                 var twentyFourHoursAgo = DateTime.Now.AddHours(-24);
-                bool existsWithin24Hours = await _unitOfWork.RegisterCourseRepository.ExistsWithinLast24HoursAsync(model.StudentName,model.Email, model.PhoneNumber, model.CourseId);
+                bool existsWithin24Hours = await _unitOfWork.RegisterCourseRepository.ExistsWithinLast24HoursAsync(model.StudentName, model.Email, model.PhoneNumber, model.CourseId);
 
                 if (existsWithin24Hours)
                 {
-                    return ResponseHandler.Success<bool>(false, "Bạn đã đăng ký khóa học này trong vòng 24 giờ qua. Vui lòng thử lại sau.");
+                    return ResponseHandler.Success<string>(null, "Bạn đã đăng ký khóa học này trong vòng 24 giờ qua. Vui lòng thử lại sau.");
                 }
+
                 var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(Guid.Parse(model.CourseId));
-                if (course == null) return ResponseHandler.Success<bool>(false, "Khóa học không khả dụng!");
+                if (course == null) return ResponseHandler.Success<string>(null, "Khóa học không khả dụng!");
 
                 var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(Guid.Parse(model.AgencyId));
-                if (agency == null) return ResponseHandler.Success<bool>(false, "Trung tâm không khả dụng!");
-               
-
-                //tạo tài khoản 
+                if (agency == null) return ResponseHandler.Success<string>(null, "Trung tâm không khả dụng!");
+              
+                // Tạo tài khoản người dùng
                 var newUser = new User
                 {
-                   FullName = model.StudentName,
+
+                  
+                    FullName = model.StudentName,
                     Email = model.Email,
                     PhoneNumber = model.PhoneNumber,
                     AgencyId = Guid.Parse(model.AgencyId),
-                  //  StudentStatus = StudentStatusEnum.NotConsult,
                     Status = UserStatusEnum.active,
                     CreateAt = _currentTime.GetCurrentTime(),
                 };
                 var generate = await _userService.GenerateUserCredentials(newUser.FullName);
                 newUser.UserName = generate.UserName;
-                await _userManager.AddToRoleAsync(newUser, AppRole.Student);
+                var result = await _userManager.CreateAsync(newUser);
+                if (!result.Succeeded)
+                {
+                    return ResponseHandler.Failure<string>("Không thể tạo tài khoản người dùng.");
+                }
 
-                await _userManager.AddPasswordAsync(newUser, generate.Password);
-                var result = await _userManager.UpdateAsync(newUser);
+                // Lưu thay đổi vào cơ sở dữ liệu
+                await _unitOfWork.SaveChangeAsync();
+                var newRegisterCourse = new RegisterCourse
+                {
+                    UserId = newUser.Id,
+                    CourseId = course.Id,
+                    StudentCourseStatus = StudentCourseStatusEnum.NotConsult,
+                    Email= newUser.Email,
+                    StudentPaymentStatus= StudentPaymentStatusEnum.Pending_Payment
+
+                };
+                await _unitOfWork.RegisterCourseRepository.AddAsync(newRegisterCourse);
+
+
+                // Tạo URL thanh toán VnPay
+                var paymentViewModel = new AgencyCoursePaymentViewModel
+                {
+                    CourseId = Guid.Parse(model.CourseId),
+                    UserId = newUser.Id,
+                    AgencyId=Guid.Parse(model.AgencyId)
+                    ,RegisterCourseId=newRegisterCourse.Id
+                };
+                var vnPayService = _serviceProvider.GetRequiredService<IVnPayService>();
+              
+
+
+                // Lưu thông tin tạm thời
+                var tempRegistration = new TempRegistrations
+                {
+                    UserId = newUser.Id,
+                    CourseId = Guid.Parse(model.CourseId),
+                    ClassId = model.ClassId.Value,
+                    CreationDate = DateTime.Now
+                };
+                await _unitOfWork.TempRegistrationsRepository.AddAsync(tempRegistration);
+                await _unitOfWork.SaveChangeAsync();
+                string paymentUrl = await vnPayService.CreatePaymentUrlForAgencyCourse(paymentViewModel);
+                return ResponseHandler.Success(paymentUrl, "Vui lòng tiến hành thanh toán để hoàn tất đăng ký.");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<string>(ex.Message);
+            }
+        }
+        public async Task<ApiResponse<bool>> CompleteRegistrationAfterPayment(string userId, Guid registerCourseId,Guid paymentId)
+        {
+            try
+            {
+                var rc = await _unitOfWork.RegisterCourseRepository.GetExistByIdAsync(registerCourseId);
+                var user = await _userManager.FindByIdAsync(userId);
+                var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(rc.CourseId.Value);
+                var tempRegistration = await _unitOfWork.TempRegistrationsRepository.GetByUserIdAndCourseIdAsync(userId, course.Id);
+
+                if (user == null || course == null || tempRegistration == null)
+                {
+                    return ResponseHandler.Failure<bool>("Không tìm thấy thông tin đăng ký.");
+                }
+
+                // Thêm vào lớp
+                var classScheduleEarliest = await _unitOfWork.ClassScheduleRepository.GetEarliestClassScheduleByClassIdAsync(tempRegistration.ClassId);
+                var classScheduleLatest = await _unitOfWork.ClassScheduleRepository.GetLatestClassScheduleByClassIdAsync(tempRegistration.ClassId);
+                var classRoom = new ClassRoom
+                {
+                    ClassId = tempRegistration.ClassId,
+                    UserId = userId,
+                    FromDate = classScheduleEarliest?.Date != null ? DateOnly.FromDateTime(classScheduleEarliest.Date.Value) : null,
+                    ToDate = classScheduleLatest?.Date != null ? DateOnly.FromDateTime(classScheduleLatest.Date.Value) : null,
+                };
+                await _unitOfWork.ClassRoomRepository.AddAsync(classRoom);
+
+             
+                var generate = await _userService.GenerateUserCredentials(user.FullName);
+                user.UserName = generate.UserName;
+                await _userManager.AddToRoleAsync(user, AppRole.Student);
+                await _userManager.AddPasswordAsync(user, generate.Password);
+                var result = await _userManager.UpdateAsync(user);
 
                 if (!result.Succeeded)
                 {
                     throw new Exception("Update User Account fail!");
                 }
-                //thêm vào lớp 
-                var classScheduleEarliest = await _unitOfWork.ClassScheduleRepository.GetEarliestClassScheduleByClassIdAsync(model.ClassId.Value);
-                var classScheduleLastest = await _unitOfWork.ClassScheduleRepository.GetLatestClassScheduleByClassIdAsync(model.ClassId.Value);
-                var classRoom = new ClassRoom
-                {
-                    ClassId = model.ClassId,
-                    UserId = newUser.Id,
-                    FromDate = classScheduleEarliest.Date.HasValue ? DateOnly.FromDateTime(classScheduleEarliest.Date.Value) : null,
-                    ToDate = classScheduleLastest.Date.HasValue ? DateOnly.FromDateTime(classScheduleLastest.Date.Value) : null, 
-
-                };
-                await _unitOfWork.ClassRoomRepository.AddAsync(classRoom);
-                //Thanh Toan
-
-                var newRegisterCourse = new RegisterCourse
-                {
-                    UserId = newUser.Id,
-                    CourseId = Guid.Parse(model.CourseId),
-                    StudentCourseStatus = StudentCourseStatusEnum.NotConsult,
-                   // ModificationDate=DateTime.Now
+                //cap nhat thanh toan
+              
+                rc.StudentPaymentStatus = StudentPaymentStatusEnum.Completed;
+                rc.UserId = user.Id;
+                var payment = await _unitOfWork.PaymentRepository.GetExistByIdAsync(paymentId);
+                payment.UserId = user.Id;
+                _unitOfWork.PaymentRepository.Update(payment);
+                _unitOfWork.RegisterCourseRepository.Update(rc);
+                // Gửi email 
                
-                };
-                 await _unitOfWork.RegisterCourseRepository.AddAsync(newRegisterCourse);
-                var emailMessage = EmailTemplate.SuccessRegisterCourseEmaill(model.Email, model.StudentName, course.Name, agency.Name);
+                var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(user.AgencyId.Value);
+                var emailMessage = EmailTemplate.SuccessRegisterCourseEmaill(user.Email, user.FullName,course.Name, generate.UserName, generate.Password, (decimal)course.Price);
                 bool emailSent = await _emailService.SendEmailAsync(emailMessage);
-                if (!emailSent)
-                {
-                    return ResponseHandler.Success<bool>(false, "Lỗi khi gửi mail");
-                }
+
+                // Xóa thông tin tạm thời
+                _unitOfWork.TempRegistrationsRepository.HardRemove(tempRegistration);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Create failed!");
+                if (!isSuccess) throw new Exception("Hoàn tất đăng ký thất bại!");
 
-                return ResponseHandler.Success(true, "Đăng kí thành công!");
+                return ResponseHandler.Success(true, "Đăng ký thành công!");
             }
             catch (Exception ex)
             {
                 return ResponseHandler.Failure<bool>(ex.Message);
             }
         }
-      
+
+
+
+
+
         public async Task<ApiResponse<bool>> UpdateStatusStudentAsync( string studentId,string courseId, StudentCourseStatusEnum status)
         {
             var response = new ApiResponse<bool>();

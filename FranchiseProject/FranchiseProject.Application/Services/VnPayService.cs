@@ -14,6 +14,7 @@ using FranchiseProject.Application.ViewModels.VnPayViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -25,11 +26,13 @@ namespace FranchiseProject.Application.Services
         private readonly ILogger<VnPayService> _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICurrentTime _currentTime;
+        private readonly IServiceProvider _serviceProvider;
         public VnPayService(
         IOptions<VnPayConfig> vnPayConfig,
         ILogger<VnPayService> logger,
         IUnitOfWork unitOfWork,
-        ICurrentTime currentTime)
+        ICurrentTime currentTime,
+         IServiceProvider serviceProvider)
         {
             _vnPayConfig = vnPayConfig.Value ?? throw new ArgumentNullException(nameof(vnPayConfig));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -37,6 +40,7 @@ namespace FranchiseProject.Application.Services
 
             _logger.LogInformation($"VnPayConfig: {System.Text.Json.JsonSerializer.Serialize(_vnPayConfig)}");
             _currentTime = currentTime;
+            _serviceProvider = serviceProvider;
         }
 
         public async Task<string> CreatePaymentUrlFromContractPayment(PaymentContractViewModel paymentContract)
@@ -172,11 +176,12 @@ namespace FranchiseProject.Application.Services
                 return new PaymentResult { IsSuccess = false, Message = "Missing secure hash" };
             }
 
-            //if (!ValidateSignature(vnpayData))
-            //{
-            //    _logger.LogWarning("Signature validation failed");
-            //    return new PaymentResult { IsSuccess = false, Message = "Invalid signature" };
-            //}
+            // Uncomment this when you're ready to validate the signature
+            // if (!ValidateSignature(vnpayData))
+            // {
+            //     _logger.LogWarning("Signature validation failed");
+            //     return new PaymentResult { IsSuccess = false, Message = "Invalid signature" };
+            // }
 
             if (callbackData.vnp_ResponseCode == "00" && callbackData.vnp_TransactionStatus == "00")
             {
@@ -187,12 +192,49 @@ namespace FranchiseProject.Application.Services
                 if (payment != null)
                 {
                     payment.Status = PaymentStatus.Completed;
-                 var  contract= await _unitOfWork.ContractRepository.GetExistByIdAsync(payment.ContractId.Value);
-                    contract.PaidAmount = payment.Amount;
-                    _unitOfWork.ContractRepository.Update(contract);
                     _unitOfWork.PaymentRepository.Update(payment);
-                    await _unitOfWork.SaveChangeAsync();
 
+                    if (payment.ContractId.HasValue)
+                    {
+                        // Xử lý thanh toán hợp đồng
+                        var contract = await _unitOfWork.ContractRepository.GetExistByIdAsync(payment.ContractId.Value);
+                        contract.PaidAmount = payment.Amount;
+                        _unitOfWork.ContractRepository.Update(contract);
+                    }
+                    else if (payment.RegisterCourseId.HasValue && payment.UserId != null)
+                    {
+                        // Xử lý thanh toán khóa học
+                        var registerCourseService = _serviceProvider.GetRequiredService<IRegisterCourseService>();
+
+                        // Check if all required values are not null
+                        if (payment.UserId == null)
+                        {
+                            _logger.LogError("UserId is null");
+                            return new PaymentResult { IsSuccess = false, OrderId = orderId, Message = "Invalid user information" };
+                        }
+
+                     
+
+                        if (!payment.RegisterCourseId.HasValue)
+                        {
+                            _logger.LogError("RegisterCourseId is null");
+                            return new PaymentResult { IsSuccess = false, OrderId = orderId, Message = "Invalid registration information" };
+                        }
+
+                        var result = await registerCourseService.CompleteRegistrationAfterPayment(
+                            payment.UserId,
+                            
+                            payment.RegisterCourseId.Value,
+                            payment.Id);
+
+                        if (!result.isSuccess)
+                        {
+                            _logger.LogError($"Failed to complete registration: {result.Message}");
+                            return new PaymentResult { IsSuccess = false, OrderId = orderId, Message = "Failed to complete registration" };
+                        }
+                    }
+
+                    await _unitOfWork.SaveChangeAsync();
                     return new PaymentResult { IsSuccess = true, OrderId = orderId, Message = "Payment successful" };
                 }
                 else
@@ -205,7 +247,6 @@ namespace FranchiseProject.Application.Services
                 return new PaymentResult { IsSuccess = false, OrderId = callbackData.vnp_TxnRef, Message = "Payment failed" };
             }
         }
-
         private bool ValidateSignature(Dictionary<string, string> vnpayData)
         {
             var vnpSecureHash = vnpayData["vnp_SecureHash"];
@@ -294,7 +335,9 @@ namespace FranchiseProject.Application.Services
                 Amount = amount,
                 Status = PaymentStatus.NotCompleted,
                 CreationDate = DateTime.UtcNow,
-                AgencyId=model.AgencyId
+                AgencyId=model.AgencyId,
+                RegisterCourseId=model.RegisterCourseId,
+               UserId= model.UserId
             };
 
             await _unitOfWork.PaymentRepository.AddAsync(payment);

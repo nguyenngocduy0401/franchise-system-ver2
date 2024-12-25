@@ -9,5 +9,6 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface ITempRegistrationsRepository : IGenericRepository<TempRegistrations>
     {
+        Task<TempRegistrations> GetByUserIdAndCourseIdAsync(string userId, Guid courseId);
     }
 }
