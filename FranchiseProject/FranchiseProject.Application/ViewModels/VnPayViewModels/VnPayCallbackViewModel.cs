@@ -18,5 +18,6 @@ namespace FranchiseProject.Application.ViewModels.VnPayViewModels
         public string vnp_TransactionStatus { get; set; }
         public string vnp_TxnRef { get; set; }
         public string vnp_SecureHash { get; set; }
+
     }
 }

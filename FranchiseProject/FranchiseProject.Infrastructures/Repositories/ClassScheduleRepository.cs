@@ -65,6 +65,13 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .OrderBy(cs => cs.Date)
                 .FirstOrDefaultAsync();
         }
+        public async Task<ClassSchedule?> GetLatestClassScheduleByClassIdAsync(Guid classId)
+        {
+            return await _dbContext.ClassSchedules
+                .Where(cs => cs.ClassId == classId && cs.Date != null)
+                .OrderByDescending(cs => cs.Date)
+                .FirstOrDefaultAsync();
+        }
         public async Task<List<ClassSchedule>> GetClassSchedulesByClassIdsAsync(List<Guid> classIds, Expression<Func<ClassSchedule, bool>> predicate = null)
         {
             if (classIds == null || !classIds.Any())

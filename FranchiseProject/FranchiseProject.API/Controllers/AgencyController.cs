@@ -3,6 +3,8 @@ using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Services;
 using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.ViewModels.ConsultationViewModels;
+using FranchiseProject.Application.ViewModels.VnPayViewModels;
+using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -41,12 +43,15 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         public async Task<ApiResponse<bool>> UpdateAgencyStatusAsync(string id, AgencyStatusEnum newStatus) => await _agencyService.UpdateAgencyStatusAsync(id, newStatus);
 
-		[SwaggerOperation(Summary = "Lấy tất cả địa chỉ các chi nhánh đang hoạt động")]
-		[HttpGet("active/addresses")]
-		public async Task<ApiResponse<IEnumerable<AgencyAddressViewModel>>> GetActiveAgencyAdresses() => await _agencyService.GetActiveAgencyAdresses();
+        [SwaggerOperation(Summary = "Lấy tất cả địa chỉ các chi nhánh đang hoạt động")]
+        [HttpGet("active/addresses")]
+        public async Task<ApiResponse<IEnumerable<AgencyAddressViewModel>>> GetActiveAgencyAdresses() => await _agencyService.GetActiveAgencyAdresses();
         [SwaggerOperation(Summary = "Lấy tất cả các chi nhánh đang hoạt động")]
         [HttpGet("active/agencies")]
         public async Task<ApiResponse<IEnumerable<AgencyNameViewModel>>> GetAllAgencyAsync() => await _agencyService.GetAllAgencyAsync();
-
+        [SwaggerOperation(Summary = "Cập nhật thông tin VNpay")]
+        [HttpPost("vnpay")]
+       // [Authorize(Roles = AppRole.AgencyManager)]
+        public async Task<ApiResponse<bool>> CreateAgencyVNPayInfoAsync(CreateAgencyVNPayInfoViewModel model) => await _agencyService.CreateAgencyVNPayInfoAsync(model);
     }
 }

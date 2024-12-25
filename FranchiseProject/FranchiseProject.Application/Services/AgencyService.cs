@@ -14,6 +14,7 @@ using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.ViewModels.CourseViewModels;
 using Microsoft.IdentityModel.Tokens;
 using FranchiseProject.Application.Utils;
+using FranchiseProject.Application.ViewModels.VnPayViewModels;
 
 namespace FranchiseProject.Application.Services
 {
@@ -508,5 +509,39 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<bool>> CreateAgencyVNPayInfoAsync(CreateAgencyVNPayInfoViewModel model)
+        {
+            try
+            {
+                var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(model.AgencyId);
+                if (agency == null)
+                {
+                    return ResponseHandler.Failure<bool>("Agency not found.");
+                }
+
+                var existingVNPayInfo = await _unitOfWork.AgencyVnPayInfoRepository.GetByAgencyIdAsync(model.AgencyId);
+                if (existingVNPayInfo != null)
+                {
+                    _unitOfWork.AgencyVnPayInfoRepository.HardRemove(existingVNPayInfo);
+                }
+
+                var vnPayInfo = new AgencyVnPayInfo
+                {
+                    AgencyId = model.AgencyId,
+                    TmnCode = model.VnpayTmnCode,
+                    HashSecret = model.VnpayHashSecret
+                };
+
+                await _unitOfWork.AgencyVnPayInfoRepository.AddAsync(vnPayInfo);
+                await _unitOfWork.SaveChangeAsync();
+
+                return ResponseHandler.Success(true, "VNPay info updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<bool>($"Error updating VNPay info: {ex.Message}");
+            }
+        }
     }
 }
+

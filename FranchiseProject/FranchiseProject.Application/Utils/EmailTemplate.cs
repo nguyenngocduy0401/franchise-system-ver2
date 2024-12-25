@@ -40,17 +40,27 @@ namespace FranchiseProject.Application.Utils
         }
         #endregion
         #region RegisterCourseEmail
-        public static MessageModel SuccessRegisterCourseEmaill(string to, string name, string courseName, string agencyName)
+        public static MessageModel SuccessRegisterCourseEmaill(string to, string name, string courseName, string username, string password, decimal amount)
         {
             return new MessageModel
             {
                 To = to,
-                Subject = "Đăng kí khóa học thành công  [futuretech-noreply]",
-                Body = $"<p>Chào bạn {name},</p>" +
-                       $"<p>Cảm ơn bạn đã đăng kí khóa học {courseName} </p>" +
-                       $"<p>Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất !</p>" +
-                       $"<p>Trân trọng,</p>" +
-                       $"<p>Đội ngũ FutureTech</p>"
+                Subject = "Đăng ký và thanh toán khóa học thành công [futuretech-noreply]",
+                Body = $@"<p>Chào bạn {name},</p>
+                  <p>Cảm ơn bạn đã đăng ký và thanh toán thành công khóa học <strong>{courseName}</strong>.</p>
+                  <p>Thông tin thanh toán:</p>
+                  <ul>
+                    <li>Số tiền đã thanh toán: {amount:N0} VNĐ</li>
+                  </ul>
+                  <p>Thông tin tài khoản của bạn:</p>
+                  <ul>
+                    <li><strong>Tên đăng nhập:</strong> {username}</li>
+                    <li><strong>Mật khẩu:</strong> {password}</li>
+                  </ul>
+                  <p>Vui lòng bảo mật thông tin đăng nhập này và đổi mật khẩu sau khi đăng nhập lần đầu.</p>
+                  <p>Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để cung cấp thêm thông tin về lớp học.</p>
+                  <p>Trân trọng,</p>
+                  <p>Đội ngũ FutureTech</p>"
             };
         }
         public static MessageModel StudentPaymentSuccsess(string to, string name, int amount, string UserName, string password)
