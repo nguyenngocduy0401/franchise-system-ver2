@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FranchiseProject.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ namespace FranchiseProject.Domain.Entity
         public string? Description { get; set; }
         public double? Price { get; set; }
         public int? NumberOfUsers { get; set; }
+        public PackageStatusEnum? Status { get; set; }
         public virtual ICollection<Contract>? Contracts { get; set; }
     }
 }
