@@ -5,6 +5,7 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Hubs;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.Repositories;
 using FranchiseProject.Application.Utils;
 using FranchiseProject.Application.ViewModels.AttendanceViewModels;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
@@ -34,8 +35,9 @@ namespace FranchiseProject.Application.Services
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
         private readonly IHubContext<NotificationHub> _hubContext;
+        private readonly IClaimsService _claimsService;
 
-        public ClassScheduleService(IEmailService emailService, IValidator<CreateClassScheduleDateRangeViewModel> validator2, IMapper mapper, IUnitOfWork unitOfWork, IValidator<CreateClassScheduleViewModel> validator1, UserManager<User> userManager, IHubContext<NotificationHub> hubContext)
+        public ClassScheduleService(IClaimsService claimsService,IEmailService emailService, IValidator<CreateClassScheduleDateRangeViewModel> validator2, IMapper mapper, IUnitOfWork unitOfWork, IValidator<CreateClassScheduleViewModel> validator1, UserManager<User> userManager, IHubContext<NotificationHub> hubContext)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -44,6 +46,7 @@ namespace FranchiseProject.Application.Services
             _userManager = userManager;
             _emailService = emailService;
             _hubContext = hubContext;
+            _claimsService = claimsService;
         }
 
         public async Task<ApiResponse<bool>> CreateClassScheduleAsync(CreateClassScheduleViewModel createClassScheduleViewModel)
@@ -80,11 +83,11 @@ namespace FranchiseProject.Application.Services
                     var user = await _userManager.FindByIdAsync(userId);
                     if (user != null && !string.IsNullOrEmpty(user.Email))
                     {
-                        var emailMessage = EmailTemplate.ClassScheduleCreated(user.Email, user.UserName,classE.Name);
+                        var emailMessage = EmailTemplate.ClassScheduleCreated(user.Email, user.UserName, classE.Name);
                         bool emailSent = await _emailService.SendEmailAsync(emailMessage);
                         var attendance = new Attendance
                         {
-                        Status=AttendanceStatusEnum.NotStarted,
+                            Status = AttendanceStatusEnum.NotStarted,
                             ClassScheduleId = classSchedule.Id,
                             UserId = userId
                         };
@@ -129,7 +132,7 @@ namespace FranchiseProject.Application.Services
                 var classEntity = await _unitOfWork.ClassRepository.GetExistByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.ClassId));
                 if (classEntity == null)
                 {
-                    return ResponseHandler.Success<bool>(false,"Lớp học không tồn tại!");
+                    return ResponseHandler.Success<bool>(false, "Lớp học không tồn tại!");
                 }
 
 
@@ -141,7 +144,7 @@ namespace FranchiseProject.Application.Services
                 int numberOfLessons = courseEntity.NumberOfLession.Value;
                 var selectedDaysOfWeek = new List<DayOfWeekEnum>();
 
-                var inputDaysOfWeek = createClassScheduleDateRangeViewModel.dayOfWeeks; 
+                var inputDaysOfWeek = createClassScheduleDateRangeViewModel.dayOfWeeks;
 
                 foreach (var day in inputDaysOfWeek)
                 {
@@ -183,7 +186,8 @@ namespace FranchiseProject.Application.Services
                             ClassId = Guid.Parse(createClassScheduleDateRangeViewModel.ClassId),
                             SlotId = Guid.Parse(createClassScheduleDateRangeViewModel.SlotId),
                             Date = startDate.ToDateTime(TimeOnly.MinValue),
-                            Room = createClassScheduleDateRangeViewModel.Room
+                            Room = createClassScheduleDateRangeViewModel.Room,
+                            Url=createClassScheduleDateRangeViewModel.Url
                         };
 
                         await _unitOfWork.ClassScheduleRepository.AddAsync(classSchedule);
@@ -207,7 +211,7 @@ namespace FranchiseProject.Application.Services
                     {
                         var attendance = new Attendance
                         {
-                            Status =AttendanceStatusEnum.NotStarted,
+                            Status = AttendanceStatusEnum.NotStarted,
                             ClassScheduleId = schedule.Id,
                             UserId = student.Id
                         };
@@ -215,7 +219,7 @@ namespace FranchiseProject.Application.Services
                         await _unitOfWork.AttendanceRepository.AddAsync(attendance);
                     }
                 }
-                var classRoom= await _unitOfWork.ClassRoomRepository.GetAllAsync(rc=>rc.ClassId==Guid.Parse(createClassScheduleDateRangeViewModel.ClassId));
+                var classRoom = await _unitOfWork.ClassRoomRepository.GetAllAsync(rc => rc.ClassId == Guid.Parse(createClassScheduleDateRangeViewModel.ClassId));
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Tạo lịch học thất bại!");
 
@@ -293,15 +297,16 @@ namespace FranchiseProject.Application.Services
                 {
                     Id = s.Id.ToString(),
                     Room = s.Room,
-                    ClassId=s.ClassId,
+                    ClassId = s.ClassId,
                     ClassName = s.Class.Name,
                     SlotName = s.Slot.Name,
                     Date = s.Date?.ToString("yyyy-MM-dd"),
                     StartTime = s.Slot.StartTime?.ToString(@"hh\:mm"),
-                    EndTime = s.Slot.EndTime?.ToString(@"hh\:mm")
+                    EndTime = s.Slot.EndTime?.ToString(@"hh\:mm"),
+                    Url=s.Url,
                 }).ToList();
 
-                response.Data = scheduleViewModels; 
+                response.Data = scheduleViewModels;
                 response.isSuccess = true;
                 response.Message = "Lấy danh sách ClassSchedule thành công!";
             }
@@ -386,9 +391,9 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-                var currentDate=DateTime.Now;
-                
-               
+                var currentDate = DateTime.Now;
+
+
                 var classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllClassScheduleAsync(cs => cs.ClassId == Guid.Parse(classId));
                 var classRooms = await _unitOfWork.ClassRoomRepository.GetAllAsync(cr => cr.ClassId == Guid.Parse(classId));
                 var userIds = classRooms.Select(cr => cr.UserId).Distinct().ToList();
@@ -398,7 +403,7 @@ namespace FranchiseProject.Application.Services
                 {
                     return ResponseHandler.Success(false, "Không thể xóa lịch học vì lớp học đã hoạt động !");
                 }
-                    if (!classSchedules.Any())
+                if (!classSchedules.Any())
                 {
                     return ResponseHandler.Success(false, "Không có lịch học nào để xóa.");
                 }
@@ -410,11 +415,11 @@ namespace FranchiseProject.Application.Services
                         _unitOfWork.AttendanceRepository.DeleteRange(attendanceRecords);
                     }
                 }
-                _unitOfWork.ClassScheduleRepository.HardRemoveRange( classSchedules);
+                _unitOfWork.ClassScheduleRepository.HardRemoveRange(classSchedules);
                 await _unitOfWork.SaveChangeAsync();
                 foreach (var userId in userIds)
                 {
-         
+
                     var user = await _userManager.FindByIdAsync(userId);
                     if (user != null && !string.IsNullOrEmpty(user.Email))
                     {
@@ -425,7 +430,7 @@ namespace FranchiseProject.Application.Services
                             return ResponseHandler.Success(false, "Lỗi khi gửi mail");
                         }
                     }
-                  
+
                     await _hubContext.Clients.User(userId.ToString()).SendAsync("ReceivedNotification", $"Lịch học của lớp {classE.Name} đã bị thay đổi");
                 }
 
@@ -437,49 +442,90 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<ClassScheduleDetailViewModel>>GetClassScheduleDetailAsync(Guid id)
+        public async Task<ApiResponse<ClassScheduleDetailViewModel>> GetClassScheduleDetailAsync(Guid id)
         {
-           
-                var response = new ApiResponse<ClassScheduleDetailViewModel>();
-                try
+
+            var response = new ApiResponse<ClassScheduleDetailViewModel>();
+            try
+            {
+                var classSchedule = await _unitOfWork.ClassScheduleRepository.GetClassScheduleWithDetailsAsync(id);
+
+                if (classSchedule == null)
                 {
-                    var classSchedule = await _unitOfWork.ClassScheduleRepository.GetClassScheduleWithDetailsAsync(id);
-
-                    if (classSchedule == null)
-                    {
-                        return ResponseHandler.Success<ClassScheduleDetailViewModel>(null,"Không tìm thấy lịch học.");
-                    }
-                    var numberOfStudents = classSchedule.Attendances?.Count ?? 0;
-                    var studentInfos = classSchedule.Attendances?
-                        .Select(a => new StudentClassScheduleViewModel
-                        {
-                            UserName = a.User.UserName,
-                            UserId = a.User.Id,
-                            StudentName = a.User.FullName,
-                            DateOfBirth = a.User.DateOfBirth,
-                            URLImage = a.User.URLImage,
-                            AttendanceStatus=a.Status
-
-                        }).ToList();
-                    var classScheduleDetail = new ClassScheduleDetailViewModel
-                    {
-                        Id = classSchedule.Id.ToString(),
-						Date = classSchedule.Date?.ToString("yyyy-MM-dd"),
-                        StartTime = classSchedule.Slot?.StartTime,
-                        EndTime = classSchedule.Slot?.EndTime,
-                        NumberOfStudent = numberOfStudents,
-                        StudentInfo = studentInfos,
-                        CourseCode = classSchedule.Class.Course.Code,
-						ClassName= classSchedule.Class.Name
-					};
-
-                    response = ResponseHandler.Success(classScheduleDetail, "Lấy chi tiết lịch học thành công!");
+                    return ResponseHandler.Success<ClassScheduleDetailViewModel>(null, "Không tìm thấy lịch học.");
                 }
-                catch (Exception ex)
+                var numberOfStudents = classSchedule.Attendances?.Count ?? 0;
+                var studentInfos = classSchedule.Attendances?
+                    .Select(a => new StudentClassScheduleViewModel
+                    {
+                        UserName = a.User.UserName,
+                        UserId = a.User.Id,
+                        StudentName = a.User.FullName,
+                        DateOfBirth = a.User.DateOfBirth,
+                        URLImage = a.User.URLImage,
+                        AttendanceStatus = a.Status
+
+                    }).ToList();
+                var classScheduleDetail = new ClassScheduleDetailViewModel
                 {
-                    response = ResponseHandler.Failure<ClassScheduleDetailViewModel>($"Lỗi khi lấy chi tiết lịch học: {ex.Message}");
-                }
-                return response;
+                    Id = classSchedule.Id.ToString(),
+                    Date = classSchedule.Date?.ToString("yyyy-MM-dd"),
+                    StartTime = classSchedule.Slot?.StartTime,
+                    EndTime = classSchedule.Slot?.EndTime,
+                    NumberOfStudent = numberOfStudents,
+                    StudentInfo = studentInfos,
+                    CourseCode = classSchedule.Class.Course.Code,
+                    ClassName = classSchedule.Class.Name,
+                    Url=classSchedule.Url,
+                };
+
+                response = ResponseHandler.Success(classScheduleDetail, "Lấy chi tiết lịch học thành công!");
             }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<ClassScheduleDetailViewModel>($"Lỗi khi lấy chi tiết lịch học: {ex.Message}");
+            }
+            return response;
+        }
+        public async Task<ApiResponse<ClassScheduleByLoginViewModel>> GetClassScheduleByLoginAsync(Guid classId)
+        {
+            try
+            {
+                var userId = _claimsService.GetCurrentUserId.ToString();
+                var classInfo = await _unitOfWork.ClassRepository.GetByIdAsync(classId);
+                if (classInfo == null)
+                {
+                    return ResponseHandler.Failure<ClassScheduleByLoginViewModel>("Class not found");
+                }
+
+                var classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllClassScheduleAsync(cs => cs.ClassId == classId, "Slot");
+                var attendances = await _unitOfWork.AttendanceRepository.GetAllAsync(a => a.ClassSchedule.ClassId == classId && a.UserId == userId);
+                var courses = await _unitOfWork.CourseRepository.GetExistByIdAsync(classInfo.CourseId.Value);
+                var now = DateTime.Now;
+                var result = new ClassScheduleByLoginViewModel
+                {
+                    Total = classSchedules.Count(),
+                    Present = attendances.Count(a => a.Status == AttendanceStatusEnum.Present),
+                    Absent = attendances.Count(a => a.Status == AttendanceStatusEnum.Absent),
+                    Future = classSchedules.Count(cs => cs.Date > now),
+                    CourseCode = courses.Code,
+                    CourseName = courses.Name,
+                    ClassName = classInfo.Name,
+                    ClassSchedules = classSchedules.Select(cs => new AttendanceClassByLoginViewModel
+                    {
+                        Date = cs.Date,
+                        StartTime = cs.Slot?.StartTime,
+                        EndTime = cs.Slot?.EndTime,
+                        Status = attendances.Any(a => a.ClassScheduleId == cs.Id && a.Status == AttendanceStatusEnum.Present)
+                    }).ToList()
+                };
+
+                return ResponseHandler.Success(result, "Class schedule retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<ClassScheduleByLoginViewModel>($"Error retrieving class schedule: {ex.Message}");
+            }
+        }
     }
 }

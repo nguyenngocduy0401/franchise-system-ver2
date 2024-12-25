@@ -17,6 +17,7 @@ namespace FranchiseProject.Application.ViewModels.ClassScheduleViewModels
         public string? Date {  get; set; }
         public string? StartTime { get; set; }
         public string? EndTime { get; set; }
+        public string? Url { get; set; }
 
     }
 }
