@@ -18,8 +18,6 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModels
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public double? DepositPercentage { get; set; }
-        public double? EquipmentFee { get; set; }
-        public double? DesignFee { get; set; }
         public double? FrachiseFee { get; set; }
         public double? Total { get; set; }
         public double? PaidAmount { get; set; }

@@ -74,25 +74,6 @@ namespace FranchiseProject.Application.Services
 
             }
         }
-        public async Task<ApiResponse<AgencyInfoViewModel>> GetAgencyInfoAsync(Guid agencyId)
-        {
-            var response = new ApiResponse<bool>();
-            try
-            {
-                var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(agencyId);
-                if (agency == null)
-                {
-                    return ResponseHandler.Success<AgencyInfoViewModel>(null, "Đối tác không khả dụng!");
-                }
-                var agencyInfo = _mapper.Map<AgencyInfoViewModel>(agency);
-                return ResponseHandler.Success<AgencyInfoViewModel>(agencyInfo, "Truy xuất thành công !");
-            }
-            catch (Exception ex)
-            {
-                return ResponseHandler.Failure<AgencyInfoViewModel>(ex.Message);
-            }
-
-        }
 
         public async Task<ApiResponse<bool>> UploadContractAsync(CreateContractViewModel create)
         {
@@ -305,10 +286,6 @@ namespace FranchiseProject.Application.Services
 
             return response;
         }
-
-
-
-
         public async Task<ApiResponse<Pagination<ContractViewModel>>> FilterContractViewModelAsync(FilterContractViewModel filterContractModel)
         {
             var response = new ApiResponse<Pagination<ContractViewModel>>();
@@ -346,9 +323,7 @@ namespace FranchiseProject.Application.Services
                         ContractDocumentImageURL = c.ContractDocumentImageURL,
                         Total = c.Total,
                         DepositPercentage = c.DepositPercentage,
-                        EquipmentFee = c.EquipmentFee,
                         PaidAmount = c.PaidAmount,
-                        DesignFee = c.DesignFee,
                         FrachiseFee = c.FrachiseFee,
                         Status = c.Status,
                         RevenueSharePercentage = c.RevenueSharePercentage,
@@ -522,8 +497,6 @@ namespace FranchiseProject.Application.Services
 
                 var inputInfo = new InputContractViewModel
                 {
-                    EquipmentFee = contract.EquipmentFee,
-                    DesignFee = contract.DesignFee,
                     FranchiseFee = contract.FrachiseFee,
                     TotalMoney = contract.Total,
                     Deposit = deposit,
@@ -570,27 +543,6 @@ namespace FranchiseProject.Application.Services
             catch (Exception ex)
             {
                 return ResponseHandler.Success<string>(null, $"Lỗi khi tạo và tải lên file hợp đồng: {ex.Message}");
-            }
-        }
-        public async Task<ApiResponse<bool>> AddDesignFee(Guid agencyId,double designFee)
-        {
-            var response = new ApiResponse<bool>();
-            try
-            {
-                var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
-
-                if (contract == null)
-                {
-                    return ResponseHandler.Success<bool>(false, "Không thể thực hiện vì khách hàng chưa kí hợp đồng thỏa thuận!");
-                }
-                contract.DesignFee = designFee;
-                _unitOfWork.ContractRepository.Update(contract);
-               await _unitOfWork.SaveChangeAsync();
-                return ResponseHandler.Success<bool>(true, "cập nhật thành công!");
-            }
-            catch (Exception ex)
-            {
-                return ResponseHandler.Failure<bool>($"Lỗi khi tạo và tải lên file hợp đồng: {ex.Message}");
             }
         }
         private async Task<string> GenerateUniqueContractCode()

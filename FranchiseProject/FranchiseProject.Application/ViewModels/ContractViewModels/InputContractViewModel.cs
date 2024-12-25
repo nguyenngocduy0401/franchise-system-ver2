@@ -12,9 +12,7 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModels
         public string? ContractCode { get; set; }
         public double? TotalMoney { get; set; }
         public double? Deposit { get; set; }
-        public double? DesignFee { get; set; }
         public double? FranchiseFee { get; set;  }
-        public double? EquipmentFee { get; set; }
         public double? Druration { get; set; }
         public double? Percent { get; set; }
         public string? Address { get; set; }

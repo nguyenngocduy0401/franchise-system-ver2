@@ -18,11 +18,9 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> UpdateContractAsync(UpdateContractViewModel update, string id);
         Task<ApiResponse<Pagination<ContractViewModel>>> FilterContractViewModelAsync(FilterContractViewModel filter);
         Task<ApiResponse<ContractViewModel>> GetContractByIdAsync(string id);
-        Task<ApiResponse<AgencyInfoViewModel>> GetAgencyInfoAsync(Guid agencyId);
         Task<ApiResponse<string>> DownloadContractAsPdfAsync(Guid agencyId);
         Task<ApiResponse<ContractViewModel>> GetContractbyAgencyId(Guid agencyId);
         Task<ApiResponse<bool>> AgencyUploadUploadContractAsync(string ContractDocumentImageURL, Guid AgencyId);
-        Task<ApiResponse<bool>> AddDesignFee(Guid agencyId, double designFee);
         Task<ApiResponse<string>> UploadContractTemplateAsync(IFormFile file);
     }
 }
