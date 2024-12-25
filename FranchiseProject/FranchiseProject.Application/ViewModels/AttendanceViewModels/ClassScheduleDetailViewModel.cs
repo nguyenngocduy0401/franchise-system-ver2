@@ -17,6 +17,7 @@ namespace FranchiseProject.Application.ViewModels.AttendanceViewModels
 		public TimeSpan? StartTime { get; set; }
 		public TimeSpan? EndTime { get; set; }
 		public int? NumberOfStudent { get; set; }
+		public	 string? Url { get; set; }
 		public List<StudentClassScheduleViewModel>? StudentInfo { get; set; }
 
 	}

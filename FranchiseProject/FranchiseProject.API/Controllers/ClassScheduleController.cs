@@ -1,10 +1,12 @@
 ﻿using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AttendanceViewModels;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Security.Claims;
 
 namespace FranchiseProject.API.Controllers
 {
@@ -38,7 +40,7 @@ namespace FranchiseProject.API.Controllers
 		}
 
 		[SwaggerOperation(Summary = "tạo mới lịch học theo khoảng thời gian  {Authorize = AgencyManager ,AgencyStaff}")]
-		[Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
+	//	[Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
 		[HttpPost("date-range")]
 		public async Task<ApiResponse<bool>> CreateClassScheduleDateRangeAsync([FromBody] CreateClassScheduleDateRangeViewModel createClassScheduleDateRangeViewModel)
 		{
@@ -79,5 +81,14 @@ namespace FranchiseProject.API.Controllers
 		[Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff + "," + AppRole.Instructor)]
 		[HttpGet("{id}")]
 		public Task<ApiResponse<ClassScheduleDetailViewModel>> GetClassScheduleDetailAsync(Guid id) => _classScheduleService.GetClassScheduleDetailAsync(id);
-	}
+        [SwaggerOperation(Summary = "lấy lịch học by login{Authorize = Student}")]
+       // [Authorize(Roles = AppRole.Student)]
+        [HttpGet("student/classes/{id}")]
+        public async Task<ApiResponse<ClassScheduleByLoginViewModel>> GetClassScheduleByLoginAsync(Guid id)
+        {
+            
+
+            return await _classScheduleService.GetClassScheduleByLoginAsync(id);
+        }
+    }
 }
