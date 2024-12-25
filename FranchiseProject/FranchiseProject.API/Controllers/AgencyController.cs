@@ -53,5 +53,8 @@ namespace FranchiseProject.API.Controllers
         [HttpPost("vnpay")]
        // [Authorize(Roles = AppRole.AgencyManager)]
         public async Task<ApiResponse<bool>> CreateAgencyVNPayInfoAsync(CreateAgencyVNPayInfoViewModel model) => await _agencyService.CreateAgencyVNPayInfoAsync(model);
+        [SwaggerOperation(Summary = "Lấy thông tin VNpay")]
+        [HttpGet("vnpay")]
+        public async Task<ApiResponse<AgencyVnpayInfoViewModel>> GetAgencyVnpayAsync() => await _agencyService.GetAgencyVnpayAsync();
     }
 }

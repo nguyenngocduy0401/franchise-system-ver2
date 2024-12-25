@@ -21,6 +21,7 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<IEnumerable<AgencyAddressViewModel>>> GetActiveAgencyAdresses();
         Task<ApiResponse<IEnumerable<AgencyNameViewModel>>> GetAllAgencyAsync();
         Task<ApiResponse<bool>> CreateAgencyVNPayInfoAsync(CreateAgencyVNPayInfoViewModel model);
+        Task<ApiResponse<AgencyVnpayInfoViewModel>> GetAgencyVnpayAsync();
 
     }
 }

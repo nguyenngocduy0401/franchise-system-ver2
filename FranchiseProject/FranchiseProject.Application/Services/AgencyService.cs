@@ -15,6 +15,7 @@ using FranchiseProject.Application.ViewModels.CourseViewModels;
 using Microsoft.IdentityModel.Tokens;
 using FranchiseProject.Application.Utils;
 using FranchiseProject.Application.ViewModels.VnPayViewModels;
+using Microsoft.AspNetCore.Identity;
 
 namespace FranchiseProject.Application.Services
 {
@@ -29,12 +30,13 @@ namespace FranchiseProject.Application.Services
         private readonly IMapper _mapper;
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly IEmailService _emailService;
+        private readonly UserManager<User> _userManager;
 
         public AgencyService(IMapper mapper, IUnitOfWork unitOfWork,
             IClaimsService claimsService, IValidator<CreateAgencyViewModel> validator,
             IUserService userService, IHubContext<NotificationHub> hubContext,
             IEmailService emailService, IValidator<UpdateAgencyViewModel> validatorUpdate,
-            ICurrentTime currentTime)
+            ICurrentTime currentTime, UserManager<User> userManager)
         {
             _unitOfWork = unitOfWork;
             _validator = validator;
@@ -45,6 +47,7 @@ namespace FranchiseProject.Application.Services
             _emailService = emailService;
             _validatorUpdate = validatorUpdate;
             _currentTime = currentTime;
+            _userManager = userManager;
         }
 
         public async Task<ApiResponse<bool>> CreateAgencyAsync(CreateAgencyViewModel create)
@@ -540,6 +543,41 @@ namespace FranchiseProject.Application.Services
             catch (Exception ex)
             {
                 return ResponseHandler.Failure<bool>($"Error updating VNPay info: {ex.Message}");
+            }
+        }
+        public async Task<ApiResponse<AgencyVnpayInfoViewModel>> GetAgencyVnpayAsync()
+        {
+            try
+            {
+                var currentUserId = _claimsService.GetCurrentUserId.ToString();
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return ResponseHandler.Failure<AgencyVnpayInfoViewModel>("User not authenticated.");
+                }
+                var user = await _userManager.FindByIdAsync(currentUserId);
+
+                if (user == null)
+                {
+                    return ResponseHandler.Failure<AgencyVnpayInfoViewModel>("Agency not found for the current user.");
+                }
+                var vnPayInfo = await _unitOfWork.AgencyVnPayInfoRepository.GetByAgencyIdAsync(user.AgencyId.Value);
+
+                if (vnPayInfo == null)
+                {
+                    return ResponseHandler.Failure<AgencyVnpayInfoViewModel>("VNPay information not found for this agency.");
+                }
+                var viewModel = new AgencyVnpayInfoViewModel
+                {
+                    TmnCode = vnPayInfo.TmnCode,
+                    HashSecret = vnPayInfo.HashSecret
+                };
+
+                return ResponseHandler.Success(viewModel, "VNPay information retrieved successfully.");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<AgencyVnpayInfoViewModel>($"Error retrieving VNPay information: {ex.Message}");
             }
         }
     }
