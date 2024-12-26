@@ -1,4 +1,5 @@
 ﻿using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace FranchiseProject.Application.ViewModels.AttendanceViewModels
         public DateTime? Date { get; set; }
         public TimeSpan? StartTime { get; set; }
         public TimeSpan? EndTime { get; set; }
-        public bool? Status { get; set; }
+        public AttendanceStatusEnum? AttendanceStatus { get; set; }
 
     }
 }

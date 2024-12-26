@@ -516,7 +516,7 @@ namespace FranchiseProject.Application.Services
                         Date = cs.Date,
                         StartTime = cs.Slot?.StartTime,
                         EndTime = cs.Slot?.EndTime,
-                        Status = attendances.Any(a => a.ClassScheduleId == cs.Id && a.Status == AttendanceStatusEnum.Present)
+                        AttendanceStatus = attendances.FirstOrDefault(a => a.ClassScheduleId == cs.Id)?.Status ?? AttendanceStatusEnum.NotStarted,
                     }).ToList()
                 };
 
