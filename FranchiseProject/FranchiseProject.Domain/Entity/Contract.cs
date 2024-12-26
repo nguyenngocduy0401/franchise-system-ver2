@@ -21,6 +21,9 @@ namespace FranchiseProject.Domain.Entity
         public double? RevenueSharePercentage { get; set; }
         public double? FrachiseFee { get; set; }
         public ContractStatusEnum? Status { get; set; }
+        public Guid? PackageId { get; set; }
+        [ForeignKey("PackageId")]
+        public Package? Package { get; set; }
         public Guid? AgencyId { get; set; }
         [ForeignKey("AgencyId")]
         public Agency? Agency { get; set; }

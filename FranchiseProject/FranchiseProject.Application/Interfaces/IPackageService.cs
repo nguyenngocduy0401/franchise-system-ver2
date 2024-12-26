@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Domain.Enums
+namespace FranchiseProject.Application.Interfaces
 {
-    public enum WorkStatusSubmitEnum
+    public interface IPackageService
     {
-        None,
-        Submited
     }
 }

@@ -9,7 +9,8 @@ namespace FranchiseProject.Domain.Enums
     public enum ContractStatusEnum
     {
         None,
+        Progress,
         Active,
-        Expired
+        InActive,
     }
 }

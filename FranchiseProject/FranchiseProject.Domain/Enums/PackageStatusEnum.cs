@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Enums
 {
-    public enum WorkStatusEnum
+    public enum PackageStatusEnum
     {
-        None,
-        Approved,   //Xác nhận 
-        Rejected   //Hủy 
+        Standard,
+        Custom
     }
 }

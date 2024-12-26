@@ -49,6 +49,7 @@ namespace FranchiseProject.Application
         public IUserChapterMaterialRepository UserChapterMaterialRepository { get; }
         public IAgencyVnPayInfoRepository AgencyVnPayInfoRepository { get; }
         public ITempRegistrationsRepository TempRegistrationsRepository { get; } 
+        public IPackageRepository PackageRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }
