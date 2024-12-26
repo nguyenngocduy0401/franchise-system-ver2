@@ -477,6 +477,7 @@ namespace FranchiseProject.Application.Services
                     CourseCode = classSchedule.Class.Course.Code,
                     ClassName = classSchedule.Class.Name,
                     Url=classSchedule.Url,
+                    Status=classSchedule.Status 
                 };
 
                 response = ResponseHandler.Success(classScheduleDetail, "Lấy chi tiết lịch học thành công!");
