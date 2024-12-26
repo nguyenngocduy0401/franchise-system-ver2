@@ -746,6 +746,7 @@ namespace FranchiseProject.Application.Services
                         EndTime = slot?.EndTime ?? TimeSpan.Zero,
                         AttendanceStatus = attendance?.Status,
                         Status = schedule.Status,
+                        Url=schedule.Url    
                     });
                 }
 

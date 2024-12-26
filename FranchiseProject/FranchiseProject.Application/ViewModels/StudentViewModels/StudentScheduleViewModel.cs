@@ -20,6 +20,7 @@ namespace FranchiseProject.Application.ViewModels.StudentViewModels
         public TimeSpan EndTime { get; set; }
         public AttendanceStatusEnum? AttendanceStatus { get; set; }
         public bool? Status { get; set; }
+        public string?  Url { get; set; }
      
     }
 }
