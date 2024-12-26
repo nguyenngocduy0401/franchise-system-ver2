@@ -24,7 +24,7 @@ namespace FranchiseProject.API.Controllers
             if (result.IsSuccess)
             {
                 // Redirect to a success page
-                return Redirect($"https://localhost:7116//agency-manager/payment-success?orderId={result.OrderId}");
+                return Redirect($"http://localhost:5173/payment-success");
             }
             else
             {
