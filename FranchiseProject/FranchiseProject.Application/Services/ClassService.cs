@@ -825,7 +825,7 @@ namespace FranchiseProject.Application.Services
                         InstructorName = instructorName,
                         CourseName = c.Course?.Name,
                         DayOfWeek = c.DayOfWeek + "-" + slot?.StartTime + "-" + slot?.EndTime,
-                        StartDate = startDate?.ToString(),
+                        StartDate = startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : null,
                         DaysElapsed = daysElapsed,
                         CourseId = c.CourseId
                     };
@@ -841,7 +841,90 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<List<ClassViewModel>>> GetAllClassByCourseIdandAgencyId(string courseId,Guid agencid)
+        {
+            var response = new ApiResponse<List<ClassViewModel>>();
+            try
+            {
+                var userCurrentId = _claimsService.GetCurrentUserId.ToString();
+                var userCurrent = await _userManager.FindByIdAsync(userCurrentId);
+                var agencyId = agencid;
+                if (!Guid.TryParse(courseId, out Guid parsedCourseId))
+                {
+                    return ResponseHandler.Success<List<ClassViewModel>>(null, "CourseId không hợp lệ.");
+                }
 
+                var classes = await _unitOfWork.ClassRepository.GetAllAsync1(c =>
+            c.CourseId == parsedCourseId &&
+            c.Status == ClassStatusEnum.Active &&
+            c.AgencyId == agencyId);
+
+                var classViewModels = new List<ClassViewModel>();
+                var now = DateTime.Now;
+                // var classViewModels = new List<ClassViewModel>();
+                foreach (var c in classes)
+                {
+                    var allSchedules = await _unitOfWork.ClassScheduleRepository.GetAllClassScheduleAsync(cs => cs.ClassId == c.Id);
+                    var sortedSchedules = allSchedules.OrderBy(cs => cs.Date).ToList();
+
+                    /*  if (!sortedSchedules.Any())
+                      {
+                          continue;
+                      }*/
+
+                    var totalSessions = sortedSchedules.Count;
+                    var completedSessions = sortedSchedules.Count(s => s.Date < DateTime.Now);
+                    var completionPercentage = (double)completedSessions / totalSessions * 100;
+
+                    if (completionPercentage > 10)
+                    {
+                        continue;
+                    }
+
+                    var earliestSchedule = sortedSchedules.FirstOrDefault();
+                    var instructorIds = await _unitOfWork.ClassRoomRepository.GetInstructorUserIdsByClassIdAsync(c.Id);
+
+                    string instructorName = null;
+                    if (instructorIds.Any())
+                    {
+                        var instructor = await _userManager.FindByIdAsync(instructorIds.First().ToString());
+                        instructorName = instructor?.FullName;
+                    }
+
+                    var startDate = earliestSchedule?.Date;
+                    var slot = earliestSchedule != null && earliestSchedule.SlotId.HasValue
+                        ? await _unitOfWork.SlotRepository.GetByIdAsync(earliestSchedule.SlotId.Value)
+                        : null;
+                    int daysElapsed = 0;
+                    if (startDate.HasValue && startDate.Value <= DateTime.Now)
+                    {
+                        daysElapsed = sortedSchedules.Count(s => s.Date <= DateTime.Now);
+                    }
+                    var classViewModel = new ClassViewModel
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        Capacity = c.Capacity,
+                        CurrentEnrollment = c.CurrentEnrollment,
+                        InstructorName = instructorName,
+                        CourseName = c.Course?.Name,
+                        DayOfWeek = c.DayOfWeek + "-" + slot?.StartTime + "-" + slot?.EndTime,
+                        StartDate = startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : null,
+                        DaysElapsed = daysElapsed,
+                        CourseId = c.CourseId
+                    };
+
+                    classViewModels.Add(classViewModel);
+                }
+
+                response = ResponseHandler.Success(classViewModels, "Lấy danh sách lớp học thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<List<ClassViewModel>>(ex.Message);
+            }
+            return response;
+        }
         public async Task<ApiResponse<List<ClassByLoginViewModel>>> GetAllClassByLogin()
         {
 

@@ -132,5 +132,12 @@ namespace FranchiseProject.API.Controllers
         {
             return await _classService.GetAllClassByCourseId(id);
         }
+     
+        [SwaggerOperation(Summary = "lấy danh sách lớp bằng courseId và AgencyId")]
+        [HttpGet("")]
+        public async Task<ApiResponse<List<ClassViewModel>>> GetAllClassByCourseIdandAgencyId(string courseId, Guid agencid)
+        {
+            return await _classService.GetAllClassByCourseIdandAgencyId(courseId, agencid);
+        }
     }
 }
