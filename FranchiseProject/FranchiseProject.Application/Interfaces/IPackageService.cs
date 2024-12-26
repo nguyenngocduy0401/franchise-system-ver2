@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.ViewModels.PackageViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +10,10 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IPackageService
     {
+        Task<ApiResponse<List<PackageViewModel>>> GetAllStandardPackageByAsync();
+        Task<ApiResponse<bool>> CreatePackageAsync(CreatePackageModel createPackageModel);
+        Task<ApiResponse<bool>> UpdatePackageAsync(Guid id, UpdatePackageModel updatePackageModel);
+        Task<ApiResponse<PackageViewModel>> GetPackageByIdAsync(Guid id);
+        Task<ApiResponse<bool>> DeletePackageByIdAsync(Guid id);
     }
 }

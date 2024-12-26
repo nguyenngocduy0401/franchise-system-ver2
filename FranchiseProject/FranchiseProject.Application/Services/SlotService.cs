@@ -57,7 +57,7 @@ namespace FranchiseProject.Application.Services
                     pageSize: filterSlotModel.PageSize
                     );
                 var slotViewModels = _mapper.Map<Pagination<SlotViewModel>>(slots);
-                if (slotViewModels.Items.IsNullOrEmpty()) return ResponseHandler.Success(slotViewModels, "Không tìm thấy slot phù hợp!");
+                if (slotViewModels.Items.IsNullOrEmpty()) return ResponseHandler.Success(slotViewModels, "Không tìm thấy tiết học phù hợp!");
 
                 response = ResponseHandler.Success(slotViewModels, "Successful!");
 
@@ -74,14 +74,14 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync(slotId);
-                if (slot == null) return ResponseHandler.Success<bool>(false,"Slot học không khả dụng!");
+                if (slot == null) return ResponseHandler.Success<bool>(false, "Tiết học không khả dụng!");
 
                 _unitOfWork.SlotRepository.SoftRemove(slot);
                   
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Delete failed!");
                 
-                response = ResponseHandler.Success(true, "Xoá slot học thành công!");
+                response = ResponseHandler.Success(true, "Xoá tiết học thành công!");
             }
             catch (Exception ex)
             {
@@ -103,13 +103,13 @@ namespace FranchiseProject.Application.Services
                         return ResponseHandler.Success<SlotViewModel>(null,"User hoặc Agency không khả dụng!");
                     }
                     var slot = await _unitOfWork.SlotRepository.GetByIdAsync(slotId);
-                    if (slot == null) throw new Exception("Slot không tồn tại!");
+                    if (slot == null) throw new Exception("Tiết học không tồn tại!");
                     if (slot.AgencyId != userCurrent.AgencyId)
                     {
-                        return ResponseHandler.Failure<SlotViewModel>("Bạn không có quyền truy cập slot này vì nó không thuộc Agency của bạn!");
+                        return ResponseHandler.Failure<SlotViewModel>("Bạn không có quyền truy cập tiết học này vì nó không thuộc Agency của bạn!");
                     }
                     var slotViewModel = _mapper.Map<SlotViewModel>(slot);
-                    response = ResponseHandler.Success(slotViewModel, "Lấy thông tin slot thành công!");
+                    response = ResponseHandler.Success(slotViewModel, "Lấy thông tin tiết học thành công!");
                 }
                 catch (Exception ex)
                 {
@@ -137,17 +137,17 @@ namespace FranchiseProject.Application.Services
                     return ValidatorHandler.HandleValidation<bool>(validationResult);
                 }
                 var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync(slotId);
-                if (slot == null) return ResponseHandler.Success<bool>(false, "Slot không tồn tại!");
+                if (slot == null) return ResponseHandler.Success<bool>(false, "Tiết học không tồn tại!");
                 if (slot.AgencyId != userCurrent.AgencyId)
                 {
-                    return ResponseHandler.Success<bool>(false, "Bạn không có quyền cập nhật slot này vì nó không thuộc Agency của bạn!");
+                    return ResponseHandler.Success<bool>(false, "Bạn không có quyền cập nhật tiết học này vì nó không thuộc Agency của bạn!");
                 }
                 slot = _mapper.Map(updateSlotModel, slot);
                 _unitOfWork.SlotRepository.Update(slot);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Update failed!");
 
-                response = ResponseHandler.Success(true, "Cập nhật slot thành công!");
+                response = ResponseHandler.Success(true, "Cập nhật tiết học thành công!");
             }
             catch (Exception ex)
             {
@@ -176,7 +176,7 @@ namespace FranchiseProject.Application.Services
 
                 if (isOverlapping)
                 {
-                    return ResponseHandler.Success<bool>(false,"Khoảng thời gian này đã bị trùng với slot hiện có. Vui lòng chọn khoảng thời gian khác.");
+                    return ResponseHandler.Success<bool>(false, "Khoảng thời gian này đã bị trùng với tiết học hiện có. Vui lòng chọn khoảng thời gian khác.");
                 }
                 var slot = _mapper.Map<Slot>(createSlotModel);
                 slot.AgencyId = userCurrent.AgencyId;
@@ -184,7 +184,7 @@ namespace FranchiseProject.Application.Services
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
 
-                response = ResponseHandler.Success(true, "Tạo slot học thành công!");
+                response = ResponseHandler.Success(true, "Tạo tiết học thành công!");
 
             }
             catch (Exception ex)
@@ -205,7 +205,7 @@ namespace FranchiseProject.Application.Services
                             .OrderBy(s => s.Name));
   
                   var slotViewModel = _mapper.Map<List<SlotViewModel>>(slots);
-                response = ResponseHandler.Success(slotViewModel, "Successful!");
+                response = ResponseHandler.Success(slotViewModel);
             }
             catch (Exception ex)
             {

@@ -38,6 +38,7 @@ using FranchiseProject.Application.ViewModels.EquipmentViewModels;
 using FranchiseProject.Application.ViewModels.HomePageViewModels;
 using FranchiseProject.Application.ViewModels.ReportViewModels;
 using FranchiseProject.Application.ViewModels.UserChapterMaterialViewModels;
+using FranchiseProject.Application.ViewModels.PackageViewModels;
 
 
 
@@ -332,8 +333,13 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<Pagination<Report>, Pagination<ReportViewModel>>()
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
             #endregion
+            #region Package
+            CreateMap<CreatePackageModel, Package>();
+            CreateMap<Package, PackageViewModel>();
+            CreateMap<UpdatePackageModel, Package>();
+            #endregion
 
-           
+
         }
     }
 }

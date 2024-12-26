@@ -358,7 +358,7 @@ namespace FranchiseProject.Application.Services
         {
             try
             {
-                var report = await _unitOfWork.ReportRepository.GetByIdAsync(reportId);
+                var report = await _unitOfWork.ReportRepository.GetExistByIdAsync(reportId);
                 if (report == null)
                 {
                     return ResponseHandler.Success<bool>(false,"Báo cáo không tồn tại.");

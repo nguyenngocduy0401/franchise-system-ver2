@@ -5,15 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Domain.Entity
+namespace FranchiseProject.Application.ViewModels.PackageViewModels
 {
-    public class Package : BaseEntity
+    public class CreatePackageModel
     {
         public string? Name { get; set; }
         public string? Description { get; set; }
         public double? Price { get; set; }
         public int? NumberOfUsers { get; set; }
         public PackageStatusEnum Status { get; set; }
-        public virtual ICollection<Contract>? Contracts { get; set; }
     }
 }

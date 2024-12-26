@@ -55,6 +55,8 @@ using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.API.Validator.AgencyValidator;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Infrastructures.Repositories;
+using FranchiseProject.Application.ViewModels.PackageViewModels;
+using FranchiseProject.API.Validator.PackageValidator;
 
 
 namespace FranchiseProject.API
@@ -194,6 +196,8 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<UploadDocumentViewModel>, UploadDocumentValidator>();
 
             services.AddTransient<IValidator<UpdateUserByLoginModel>, UpdateUserByLoginValidator>();
+            services.AddTransient<IValidator<UpdatePackageModel>, UpdatePackageValidator>();
+            services.AddTransient<IValidator<CreatePackageModel>, CreatePackageValidator>();
             #endregion
             return services;
         }
