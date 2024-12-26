@@ -191,7 +191,7 @@ namespace FranchiseProject.Application.Services
                     {
                         UserId = userId,
                         ClassScheduleId = classSchedule.Id,
-                        Status = AttendanceStatusEnum.Absent 
+                        Status = AttendanceStatusEnum.NotStarted 
                     };
                     await _unitOfWork.AttendanceRepository.AddAsync(attendance);
                 }
