@@ -46,14 +46,14 @@ namespace FranchiseProject.API.Controllers
         {
             return await _packageService.GetPackageByIdAsync(id);
         }
-        /*[SwaggerOperation(Summary = "tìm kiếm slot")]
-        [HttpGet("~/manager/api/v1/slots")]
-        public async Task<ApiResponse<Pagination<SlotViewModel>>> FilterSlotAsync([FromQuery] FilterSlotModel filterSlotModel)
-        {
-            return await _slotService.FilterSlotAsync(filterSlotModel);
-        }*/
-        [SwaggerOperation(Summary = "lấy tất cả gói nhượng quyền cho khách hàng nhìn thấy")]
+        [SwaggerOperation(Summary = "lọc gói nhượng quyền")]
         [HttpGet()]
+        public async Task<ApiResponse<Pagination<PackageViewModel>>> FilterPackageAsync(FilterPackageModel filterPackageModel)
+        {
+            return await _packageService.FilterPackageAsync(filterPackageModel);
+        }
+        [SwaggerOperation(Summary = "lấy tất cả gói nhượng quyền cho khách hàng nhìn thấy")]
+        [HttpGet("~/api/v1/standard-packages")]
         public async Task<ApiResponse<List<PackageViewModel>>> GetAllSlotAsync()
         {
             return await _packageService.GetAllStandardPackageByAsync();

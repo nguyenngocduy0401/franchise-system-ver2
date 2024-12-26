@@ -15,5 +15,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> UpdatePackageAsync(Guid id, UpdatePackageModel updatePackageModel);
         Task<ApiResponse<PackageViewModel>> GetPackageByIdAsync(Guid id);
         Task<ApiResponse<bool>> DeletePackageByIdAsync(Guid id);
+        Task<ApiResponse<Pagination<PackageViewModel>>> FilterPackageAsync(FilterPackageModel filterPackageModel);
     }
 }

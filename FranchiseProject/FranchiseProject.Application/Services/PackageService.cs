@@ -5,10 +5,16 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.PackageViewModels;
+using FranchiseProject.Application.ViewModels.SlotViewModels;
+using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,6 +33,57 @@ namespace FranchiseProject.Application.Services
             _mapper = mapper;
             _createPackageValidator = createPackageValidator;
             _updatePackageValidator = updatePackageValidator;
+        }
+        public async Task<ApiResponse<Pagination<PackageViewModel>>> FilterPackageAsync(FilterPackageModel filterPackageModel)
+        {
+            var response = new ApiResponse<Pagination<PackageViewModel>>();
+            try
+            {
+                var search = filterPackageModel.Search?.ToLower();
+                Expression<Func<Package, bool>> filter = s =>
+                            string.IsNullOrEmpty(search) ||
+                            (s.Name != null && s.Name.ToLower().Contains(search)) ||
+                            (s.Description != null && s.Description.ToLower().Contains(search));
+                Func<IQueryable<Package>, IOrderedQueryable<Package>>? orderBy = null;
+                if (filterPackageModel.SortBy.HasValue && filterPackageModel.SortDirection.HasValue)
+                {
+                    switch (filterPackageModel.SortBy)
+                    {
+                        case SortPackageStatusEnum.Name:
+                            orderBy = filterPackageModel.SortDirection == SortDirectionEnum.Descending ?
+                                query => query.OrderByDescending(p => p.Name) :
+                                query => query.OrderBy(p => p.Name);
+                            break;
+                        case SortPackageStatusEnum.Price:
+                            orderBy = filterPackageModel.SortDirection == SortDirectionEnum.Descending ?
+                                query => query.OrderByDescending(p => p.Price) :
+                                query => query.OrderBy(p => p.Price);
+                            break;
+                        case SortPackageStatusEnum.NumberOfUsers:
+                            orderBy = filterPackageModel.SortDirection == SortDirectionEnum.Descending ?
+                                query => query.OrderByDescending(p => p.NumberOfUsers) :
+                                query => query.OrderBy(p => p.NumberOfUsers);
+                            break;
+
+                    }
+                }
+                var packages = await _unitOfWork.PackageRepository.GetFilterAsync(
+                    filter: filter,
+                    orderBy: orderBy,
+                    pageIndex: filterPackageModel.PageIndex,
+                    pageSize: filterPackageModel.PageSize
+                    );
+                var packageViewModels = _mapper.Map<Pagination<PackageViewModel>>(packages);
+                if (packageViewModels.Items.IsNullOrEmpty()) return ResponseHandler.Success(packageViewModels, "Không tìm thấy tiết học phù hợp!");
+
+                response = ResponseHandler.Success(packageViewModels, "Successful!");
+
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<Pagination<PackageViewModel>>(ex.Message);
+            }
+            return response;
         }
         public async Task<ApiResponse<List<PackageViewModel>>> GetAllStandardPackageByAsync()
         {
