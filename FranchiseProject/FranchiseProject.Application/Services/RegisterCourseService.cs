@@ -163,6 +163,7 @@ namespace FranchiseProject.Application.Services
                 var user = await _userManager.FindByIdAsync(userId);
                 var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(rc.CourseId.Value);
                 var tempRegistration = await _unitOfWork.TempRegistrationsRepository.GetByUserIdAndCourseIdAsync(userId, course.Id);
+                var class1 = await _unitOfWork.ClassRepository.GetExistByIdAsync(tempRegistration.ClassId);
 
                 if (user == null || course == null || tempRegistration == null)
                 {
@@ -180,8 +181,21 @@ namespace FranchiseProject.Application.Services
                     ToDate = classScheduleLatest?.Date != null ? DateOnly.FromDateTime(classScheduleLatest.Date.Value) : null,
                 };
                 await _unitOfWork.ClassRoomRepository.AddAsync(classRoom);
+                //gắn attendance
+                var classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllClassScheduleAsync(cs => cs.ClassId == tempRegistration.ClassId);
 
-             
+               
+                foreach (var classSchedule in classSchedules)
+                {
+                    var attendance = new Attendance
+                    {
+                        UserId = userId,
+                        ClassScheduleId = classSchedule.Id,
+                        Status = AttendanceStatusEnum.Absent 
+                    };
+                    await _unitOfWork.AttendanceRepository.AddAsync(attendance);
+                }
+
                 var generate = await _userService.GenerateUserCredentials(user.FullName);
                 user.UserName = generate.UserName;
                 await _userManager.AddToRoleAsync(user, AppRole.Student);
@@ -198,8 +212,10 @@ namespace FranchiseProject.Application.Services
                 rc.UserId = user.Id;
                 var payment = await _unitOfWork.PaymentRepository.GetExistByIdAsync(paymentId);
                 payment.UserId = user.Id;
+                class1.CurrentEnrollment++;
                 _unitOfWork.PaymentRepository.Update(payment);
                 _unitOfWork.RegisterCourseRepository.Update(rc);
+                
                 // Gửi email 
                
                 var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(user.AgencyId.Value);
