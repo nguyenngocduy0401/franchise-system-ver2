@@ -67,6 +67,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IUserChapterMaterialService, UserChapterMaterialService>();
             services.AddScoped<IAgencyVnPayInfoService, AgencyVnPayService>();
             services.AddScoped<IPackageService, PackageService>();
+            services.AddScoped<IVideoService, VideoService>();
             #endregion
             #region Repository DI
             services.AddScoped<IAgencyRepository, AgencyRepository>();
@@ -107,7 +108,7 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IHomePageRepository, HomePageRepository>();
             services.AddScoped<IRevenueRepository, RevenueRepository>();
             services.AddScoped<IFirebaseRepository, FirebaseRepository>();
-            services.AddScoped<IVimeoService, VimeoRepository>();
+            services.AddScoped<IVideoRepository, VideoRepository>();
             services.AddScoped<IAgencyVnPayInfoRepository, AgencyVnPayInfoRepository>();
             services.AddScoped<IUserChapterMaterialRepository, UserChapterMaterialRepository>();
             services.AddScoped<ITempRegistrationsRepository, TempRegistrationsRepository>();

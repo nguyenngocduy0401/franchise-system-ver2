@@ -2,32 +2,43 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.Commons;
+using FranchiseProject.Application.ViewModels.VideoViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace FranchiseProject.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/videos")]
     [ApiController]
     public class VideoController : ControllerBase
     {
-        private readonly IVimeoService _vimeoService;
+        private readonly IVideoService _videoService;
 
-        public VideoController(IVimeoService vimeoService)
+        public VideoController(IVideoService videoService)
         {
-            _vimeoService = vimeoService;
+            _videoService = videoService;
         }
 
-        [HttpPost("upload")]
-        public async Task<IActionResult> UploadVideo(IFormFile videoFile)
+        //[Authorize(Roles = AppRole.Manager + "," + AppRole.SystemInstructor)]
+        [SwaggerOperation(Summary = "upload video {Authorize = SystemInstructor, Manager}")]
+        [HttpPost()]
+        public async Task<ApiResponse<VideoViewModel>> UploadVideo(string name, IFormFile videoFile)
         {
-            if (videoFile == null || videoFile.Length == 0)
-                return BadRequest("File video không hợp lệ.");
-
-            var result = await _vimeoService.UploadVideo(videoFile);
-
-            if (result.isSuccess)
-                return Ok(new { message = "Tải video thành công!", videoUrl = result.Data });
-
-            return StatusCode(500, new { message = result.Message });
+            return await _videoService.UploadVideoAsync(videoFile, name);
+        }
+        //[Authorize(Roles = AppRole.Manager + "," + AppRole.SystemInstructor)]
+        [SwaggerOperation(Summary = "upload video {Authorize = SystemInstructor, Manager}")]
+        [HttpGet()]
+        public async Task<ApiResponse<List<VideoViewModel>>> GetUploadVideo()
+        {
+            return await _videoService.GetAllVideoAsync();
+        }
+        [SwaggerOperation(Summary = "delete video {Authorize = SystemInstructor, Manager}")]
+        [HttpDelete()]
+        public async Task<ApiResponse<bool>> DeleteVideo(Guid id)
+        {
+            return await _videoService.DeleteVideoAsync(id);
         }
     }
 }

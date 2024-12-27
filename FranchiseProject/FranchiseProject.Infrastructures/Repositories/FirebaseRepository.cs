@@ -1,5 +1,6 @@
 ﻿using Firebase.Storage;
 using FranchiseProject.Application.Repositories;
+using FranchiseProject.Domain.Entity;
 
 namespace FranchiseProject.Infrastructures.Repositories
 {
@@ -18,8 +19,22 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Child("contracts")
                 .Child(fileName)
                 .PutAsync(fileStream);
-
             return task;
+        }
+        public async Task<string> UploadVideoAsync(Stream videoStream, string videoName)
+        {
+                var downloadUrl = await _firebaseStorage
+                    .Child("videos") 
+                    .Child(videoName)
+                    .PutAsync(videoStream);
+                return downloadUrl;
+        }
+        public async Task DeleteVideoAsync(string videoName)
+        {
+                await _firebaseStorage
+                    .Child("videos")
+                    .Child(videoName)
+                    .DeleteAsync();
         }
     }
 }

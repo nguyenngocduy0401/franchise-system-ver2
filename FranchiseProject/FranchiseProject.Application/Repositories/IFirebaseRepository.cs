@@ -9,5 +9,7 @@ namespace FranchiseProject.Application.Repositories
     public interface IFirebaseRepository
     {
         Task<string> UploadFileAsync(Stream fileStream, string fileName);
+        Task<string> UploadVideoAsync(Stream videoStream, string videoName);
+        Task DeleteVideoAsync(string videoName);
     }
 }

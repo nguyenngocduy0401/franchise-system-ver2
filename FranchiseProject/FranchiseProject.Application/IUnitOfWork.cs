@@ -50,6 +50,7 @@ namespace FranchiseProject.Application
         public IAgencyVnPayInfoRepository AgencyVnPayInfoRepository { get; }
         public ITempRegistrationsRepository TempRegistrationsRepository { get; } 
         public IPackageRepository PackageRepository { get; }
+        public IVideoRepository VideoRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

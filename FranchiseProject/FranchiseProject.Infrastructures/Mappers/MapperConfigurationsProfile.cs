@@ -39,6 +39,7 @@ using FranchiseProject.Application.ViewModels.HomePageViewModels;
 using FranchiseProject.Application.ViewModels.ReportViewModels;
 using FranchiseProject.Application.ViewModels.UserChapterMaterialViewModels;
 using FranchiseProject.Application.ViewModels.PackageViewModels;
+using FranchiseProject.Application.ViewModels.VideoViewModels;
 
 
 
@@ -339,7 +340,9 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<UpdatePackageModel, Package>();
             #endregion
 
-
+            #region Video
+            CreateMap<Video, VideoViewModel>();
+            #endregion
         }
     }
 }

@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.ViewModels.VideoViewModels
 {
-    public class CreateVideoModel
+    public class VideoViewModel
     {
-       
-        public string videoName { get; set; }
+        public Guid Id { get; set; }
+        public string? Name { get; set; }
+        public string? Url { get; set; }
     }
 }

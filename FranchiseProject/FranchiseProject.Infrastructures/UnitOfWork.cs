@@ -53,6 +53,7 @@ namespace FranchiseProject.Infrastructures
         private readonly IAgencyVnPayInfoRepository _agencyVnPayInfoRepository;
         private readonly ITempRegistrationsRepository _tempRegistrationsRepository;
         private readonly IPackageRepository _packageRepository;
+        private readonly IVideoRepository _videoRepository;
         public UnitOfWork(AppDbContext appDbContext, IAgencyRepository agencyRepository, IAssignmentRepository assignmentRepository,
             IAttendanceRepository attendanceRepository, IChapterRepository chapterRepository, IClassRepository classRepository,
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
@@ -68,7 +69,8 @@ namespace FranchiseProject.Infrastructures
             IHomePageRepository homePageRepository,IRevenueRepository revenueRepository,
             IFirebaseRepository firebaseRepository, IDocumentRepository documentRepository,
             IFranchiseFeesRepository franchiseFeesRepository, IUserChapterMaterialRepository userChapterMaterialRepository,IAgencyVnPayInfoRepository agencyVnPayInfoRepository,
-            ITempRegistrationsRepository tempRegistrationsRepository, IPackageRepository packageRepository)
+            ITempRegistrationsRepository tempRegistrationsRepository, IPackageRepository packageRepository,
+            IVideoRepository videoRepository)
 
 
            
@@ -115,6 +117,7 @@ namespace FranchiseProject.Infrastructures
             _agencyVnPayInfoRepository = agencyVnPayInfoRepository;
             _tempRegistrationsRepository = tempRegistrationsRepository;
             _packageRepository = packageRepository;
+            _videoRepository = videoRepository;
         }
         public IAgencyRepository AgencyRepository => _agencyRepository;
 
@@ -190,6 +193,7 @@ namespace FranchiseProject.Infrastructures
         public IAgencyVnPayInfoRepository AgencyVnPayInfoRepository => _agencyVnPayInfoRepository;
         public ITempRegistrationsRepository TempRegistrationsRepository => _tempRegistrationsRepository;
         public IPackageRepository PackageRepository => _packageRepository;
+        public IVideoRepository VideoRepository => _videoRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();
