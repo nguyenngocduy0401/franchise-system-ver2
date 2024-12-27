@@ -51,7 +51,11 @@ namespace FranchiseProject.Application.Services
                 var video = await _unitOfWork.VideoRepository.GetByIdAsync(id);
                 if (video == null) throw new Exception("Video not found!");
                 await _firebaseRepository.DeleteVideoAsync(video.URL);
+                
+                _unitOfWork.VideoRepository.HardRemove(video);
 
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Delete failed!");
                 response = ResponseHandler.Success(true);
             }
             catch (Exception ex)
