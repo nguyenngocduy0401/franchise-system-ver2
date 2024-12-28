@@ -194,5 +194,9 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Where(cr => cr.ToDate !=null && cr.Status == null)
                       .ToListAsync();
         }
+        public IQueryable<ClassRoom> GetQueryable()
+        {
+            return _dbContext.ClassRooms.AsQueryable();
+        }
     }
 }

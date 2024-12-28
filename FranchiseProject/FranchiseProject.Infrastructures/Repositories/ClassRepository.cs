@@ -75,5 +75,9 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.Set<Class>().Where(predicate).ToListAsync();
         }
+        public IQueryable<Class> GetQueryable()
+        {
+            return _dbContext.Classes.AsQueryable();
+        }
     }
 }

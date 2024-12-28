@@ -1,4 +1,5 @@
 ﻿using FranchiseProject.Domain.Enums;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,5 +26,9 @@ namespace FranchiseProject.Application.ViewModels.StudentViewModels
         public StudentPaymentStatusEnum? PaymentStatus { get; set; }
         public double? StudentAmountPaid { get; set; } 
         public string? DateTime { get; set; }
+        public string? ClassSchedule { get; set; } // lấy từ DayOfWeek trong class và Start time , end time của Slot thuộc classSchedule của lớp đó 
+        public DateOnly? StartDate { get; set; }// ngày bắt đầu khóa học (classSchedule)
+        public DateOnly? EndDate { get; set; }// ngày kết thúc khóa học (classSchedule)
+        public DateTime? PaymentDate { get; set; }
     }
 }

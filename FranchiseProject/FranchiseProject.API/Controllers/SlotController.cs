@@ -57,5 +57,11 @@ namespace FranchiseProject.API.Controllers
         {
             return await _slotService.GetAllSlotAsync();
         }
+        [SwaggerOperation(Summary = "lấy tất cả slot bằng AgencyId")]
+        [HttpGet("agency/{id}")]
+        public async Task<ApiResponse<List<SlotViewModel>>> GetAllSlotAsyncByAgencyId(Guid id)
+        {
+            return await _slotService.GetAllSlotAsyncByAgencyId(id);
+        }
     }
 }

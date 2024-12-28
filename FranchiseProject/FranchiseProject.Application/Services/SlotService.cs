@@ -213,5 +213,24 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        public async Task<ApiResponse<List<SlotViewModel>>> GetAllSlotAsyncByAgencyId(Guid agencyId)
+        {
+            var response = new ApiResponse<List<SlotViewModel>>();
+            try
+            {
+           
+                var slots = await _unitOfWork.SlotRepository.GetAllAsync(
+              query => query.Where(s => s.AgencyId == agencyId)
+                            .OrderBy(s => s.Name));
+
+                var slotViewModel = _mapper.Map<List<SlotViewModel>>(slots);
+                response = ResponseHandler.Success(slotViewModel);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<List<SlotViewModel>>(ex.Message);
+            }
+            return response;
+        }
     }
 }

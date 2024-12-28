@@ -16,6 +16,6 @@ namespace FranchiseProject.Application.Repositories
         Task<List<User>> GetStudentsByClassIdAsync(Guid classId);
         Task<List<Class>> GetClassesByUserIdAsync(string userId);
         Task<List<Class>> GetAllAsync1(Expression<Func<Class, bool>> predicate);
-
+        IQueryable<Class> GetQueryable();
     }
 }

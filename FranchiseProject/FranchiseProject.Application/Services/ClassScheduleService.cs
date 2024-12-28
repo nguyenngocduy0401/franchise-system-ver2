@@ -199,7 +199,7 @@ namespace FranchiseProject.Application.Services
                     startDate = startDate.AddDays(1);
                 }
                 var dateClass = "";
-                foreach (var date in createClassScheduleDateRangeViewModel.dayOfWeeks) { dateClass = dateClass + "  " + date.ToString(); }
+                foreach (var date in createClassScheduleDateRangeViewModel.dayOfWeeks) { dateClass = dateClass + "," + date.ToString(); }
                 var slot = await _unitOfWork.SlotRepository.GetByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.SlotId));
                 var classE = await _unitOfWork.ClassRepository.GetByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.ClassId));
                 classE.DayOfWeek = dateClass;

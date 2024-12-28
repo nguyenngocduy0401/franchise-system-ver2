@@ -207,6 +207,32 @@ namespace FranchiseProject.Infrastructures.Repositories
                                  .Where(u => u.AgencyId == agencyId&&u.Status==UserStatusEnum.active && u.UserRoles.Any(ur => ur.RoleId == instructorRoleId))
                                  .ToListAsync();
         }
-       
+        public async Task<List<string>> GetAgencyUsersAsync(Guid agencyId)
+        {
+            var agencyManagerRole = await _roleManager.FindByNameAsync(AppRole.AgencyManager);
+            var agencyStaffRole = await _roleManager.FindByNameAsync(AppRole.AgencyStaff);
+
+            if (agencyManagerRole == null || agencyStaffRole == null)
+            {
+                throw new Exception("Required roles not found.");
+            }
+
+            var users = await _userManager.Users
+                .Where(u => u.AgencyId == agencyId)
+                .ToListAsync();
+
+            var result = new List<string>();
+
+            foreach (var user in users)
+            {
+                var userRoles = await _userManager.GetRolesAsync(user);
+                if (userRoles.Contains(AppRole.AgencyManager) || userRoles.Contains(AppRole.AgencyStaff))
+                {
+                    result.Add(user.Id);
+                }
+            }
+
+            return result;
+        }
     }
 }

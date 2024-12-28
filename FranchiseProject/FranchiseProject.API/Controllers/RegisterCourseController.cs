@@ -24,7 +24,7 @@ namespace FranchiseProject.API.Controllers
         [HttpPost]
         public async Task<ApiResponse<string>> RegisterCourseAsync(RegisterCourseViewModel model)=>await _registerCourseService.RegisterCourseAsync(model);
         [SwaggerOperation(Summary = "Cập nhật trạng thái học sinh từ Notconsul thành Pending  {Authorize = AgencyManager ,AgencyStaff}")]
-        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
+      //  [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
         [HttpPut("students/{id}")]
 
         public async  Task<ApiResponse<bool>> UpdateStatusStudentAsync( string id,string courseId,StudentCourseStatusEnum status) => await _registerCourseService.UpdateStatusStudentAsync(id,courseId,status);
