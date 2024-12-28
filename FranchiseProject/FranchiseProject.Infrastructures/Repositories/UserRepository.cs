@@ -207,7 +207,7 @@ namespace FranchiseProject.Infrastructures.Repositories
                                  .Where(u => u.AgencyId == agencyId&&u.Status==UserStatusEnum.active && u.UserRoles.Any(ur => ur.RoleId == instructorRoleId))
                                  .ToListAsync();
         }
-        public async Task<List<User>> GetAgencyUsersAsync(Guid agencyId)
+        public async Task<List<string>> GetAgencyUsersAsync(Guid agencyId)
         {
             var agencyManagerRole = await _roleManager.FindByNameAsync(AppRole.AgencyManager);
             var agencyStaffRole = await _roleManager.FindByNameAsync(AppRole.AgencyStaff);
@@ -221,14 +221,14 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Where(u => u.AgencyId == agencyId)
                 .ToListAsync();
 
-            var result = new List<User>();
+            var result = new List<string>();
 
             foreach (var user in users)
             {
                 var userRoles = await _userManager.GetRolesAsync(user);
                 if (userRoles.Contains(AppRole.AgencyManager) || userRoles.Contains(AppRole.AgencyStaff))
                 {
-                    result.Add(user);
+                    result.Add(user.Id);
                 }
             }
 

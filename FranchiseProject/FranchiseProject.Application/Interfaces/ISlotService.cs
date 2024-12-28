@@ -16,5 +16,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<SlotViewModel>> GetSlotByIdAsync(Guid slotId);
         Task<ApiResponse<bool>> UpdateSlotAsync(Guid slotId, CreateSlotModel updateSlotModel);
         Task<ApiResponse<bool>> CreateSlotAsync(CreateSlotModel createSlotModel);
+        Task<ApiResponse<List<SlotViewModel>>> GetAllSlotAsyncByAgencyId(Guid agencyId);
     }
 }

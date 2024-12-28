@@ -18,6 +18,7 @@ using iText.Kernel.Geom;
 using MailKit.Search;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -207,6 +208,82 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+        /*   public async Task<ApiResponse<Pagination<ClassViewModel>>> FilterClassAsync(FilterClassViewModel filterClassModel)
+           {
+               var response = new ApiResponse<Pagination<ClassViewModel>>();
+               try
+               {
+                   var userCurrentId = _claimsService.GetCurrentUserId;
+                   var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
+
+                   if (userCurrent == null || !userCurrent.AgencyId.HasValue)
+                   {
+                       return ResponseHandler.Success<Pagination<ClassViewModel>>(null, "User hoặc Agency không khả dụng!");
+                   }
+
+                   Expression<Func<Class, bool>> filter = c =>
+                       (string.IsNullOrEmpty(filterClassModel.Name) || c.Name.Contains(filterClassModel.Name)) &&
+                       (!filterClassModel.Status.HasValue || c.Status == filterClassModel.Status) &&
+                       (string.IsNullOrEmpty(filterClassModel.CourseId) || c.CourseId == Guid.Parse(filterClassModel.CourseId)) &&
+                       (c.AgencyId == userCurrent.AgencyId);
+
+                   var classes = await _unitOfWork.ClassRepository.GetFilterAsync(
+                       filter: filter,
+                       includeProperties: "Course",
+                       pageIndex: filterClassModel.PageIndex,
+                       pageSize: filterClassModel.PageSize
+                   );
+                   foreach (var c in classes.Items)
+                   {
+
+                       var classRoomInstructors = await _unitOfWork.ClassRoomRepository
+                           .GetAllAsync(cr => cr.ClassId == c.Id);
+
+                       string instructorName = null;
+
+                       foreach (var cr in classRoomInstructors)
+                       {
+
+                           var user = await _userManager.FindByIdAsync(cr.UserId);
+                           if (user != null)
+                           {
+                               var roles = await _userManager.GetRolesAsync(user);
+                               if (roles.Contains(AppRole.Instructor))
+                               {
+                                   instructorName = user.UserName;
+                                   break;
+                               }
+                           }
+                       }
+                       var classViewModels = new Pagination<ClassViewModel>
+                       {
+
+                           Items = classes.Items.Select(c => new ClassViewModel
+                           {
+                               Id = c.Id,
+                               Name = c.Name,
+                               Capacity = c.Capacity,
+                               CurrentEnrollment = c.CurrentEnrollment,
+                               DayOfWeek = c.DayOfWeek,
+                               CourseName = c.Course.Name,
+                               Status = c.Status.Value,
+                               CourseId = c.CourseId,
+                               InstructorName = instructorName
+                           }).ToList(),
+                           TotalItemsCount = classes.TotalItemsCount,
+                           PageIndex = classes.PageIndex,
+                           PageSize = classes.PageSize
+                       };
+
+                       response = ResponseHandler.Success(classViewModels, "Lọc lớp học thành công!");
+                   }
+               }
+               catch (Exception ex)
+               {
+                   response = ResponseHandler.Failure<Pagination<ClassViewModel>>(ex.Message);
+               }
+               return response;
+           }*/
         public async Task<ApiResponse<Pagination<ClassViewModel>>> FilterClassAsync(FilterClassViewModel filterClassModel)
         {
             var response = new ApiResponse<Pagination<ClassViewModel>>();
@@ -220,21 +297,48 @@ namespace FranchiseProject.Application.Services
                     return ResponseHandler.Success<Pagination<ClassViewModel>>(null, "User hoặc Agency không khả dụng!");
                 }
 
-                Expression<Func<Class, bool>> filter = c =>
-                    (string.IsNullOrEmpty(filterClassModel.Name) || c.Name.Contains(filterClassModel.Name)) &&
-                    (!filterClassModel.Status.HasValue || c.Status == filterClassModel.Status) &&
-                    (string.IsNullOrEmpty(filterClassModel.CourseId) || c.CourseId == Guid.Parse(filterClassModel.CourseId)) &&
-                    (c.AgencyId == userCurrent.AgencyId);
+                var query = _unitOfWork.ClassRepository.GetQueryable()
+                    .Include(c => c.Course)
+                    .Include(c => c.ClassSchedules)
+                    .Where(c => c.AgencyId == userCurrent.AgencyId);
 
-                var classes = await _unitOfWork.ClassRepository.GetFilterAsync(
-                    filter: filter,
-                    includeProperties: "Course",
-                    pageIndex: filterClassModel.PageIndex,
-                    pageSize: filterClassModel.PageSize
-                );
-                foreach (var c in classes.Items)
+                if (!string.IsNullOrEmpty(filterClassModel.Name))
                 {
+                    query = query.Where(c => c.Name.Contains(filterClassModel.Name));
+                }
 
+                if (filterClassModel.Status.HasValue)
+                {
+                    query = query.Where(c => c.Status == filterClassModel.Status);
+                }
+
+                if (!string.IsNullOrEmpty(filterClassModel.CourseId))
+                {
+                    var courseId = Guid.Parse(filterClassModel.CourseId);
+                    query = query.Where(c => c.CourseId == courseId);
+                }
+
+                if (!string.IsNullOrEmpty(filterClassModel.DayOfWeek))
+                {
+                    query = query.Where(c => c.DayOfWeek.Contains(filterClassModel.DayOfWeek));
+                }
+
+                if (filterClassModel.SlotId.HasValue)
+                {
+                    query = query.Where(c => c.ClassSchedules.Any(cs => cs.SlotId == filterClassModel.SlotId));
+                }
+
+                var totalCount = await query.CountAsync();
+
+                var classes = await query
+                    .Skip((filterClassModel.PageIndex - 1) * filterClassModel.PageSize)
+                    .Take(filterClassModel.PageSize)
+                    .ToListAsync();
+
+                var classViewModels = new List<ClassViewModel>();
+
+                foreach (var c in classes)
+                {
                     var classRoomInstructors = await _unitOfWork.ClassRoomRepository
                         .GetAllAsync(cr => cr.ClassId == c.Id);
 
@@ -242,7 +346,6 @@ namespace FranchiseProject.Application.Services
 
                     foreach (var cr in classRoomInstructors)
                     {
-
                         var user = await _userManager.FindByIdAsync(cr.UserId);
                         if (user != null)
                         {
@@ -254,28 +357,30 @@ namespace FranchiseProject.Application.Services
                             }
                         }
                     }
-                    var classViewModels = new Pagination<ClassViewModel>
+
+                    classViewModels.Add(new ClassViewModel
                     {
-
-                        Items = classes.Items.Select(c => new ClassViewModel
-                        {
-                            Id = c.Id,
-                            Name = c.Name,
-                            Capacity = c.Capacity,
-                            CurrentEnrollment = c.CurrentEnrollment,
-                            DayOfWeek = c.DayOfWeek,
-                            CourseName = c.Course.Name,
-                            Status = c.Status.Value,
-                            CourseId = c.CourseId,
-                            InstructorName = instructorName
-                        }).ToList(),
-                        TotalItemsCount = classes.TotalItemsCount,
-                        PageIndex = classes.PageIndex,
-                        PageSize = classes.PageSize
-                    };
-
-                    response = ResponseHandler.Success(classViewModels, "Lọc lớp học thành công!");
+                        Id = c.Id,
+                        Name = c.Name,
+                        Capacity = c.Capacity,
+                        CurrentEnrollment = c.CurrentEnrollment,
+                        DayOfWeek = c.DayOfWeek,
+                        CourseName = c.Course.Name,
+                        Status = c.Status.Value,
+                        CourseId = c.CourseId,
+                        InstructorName = instructorName
+                    });
                 }
+
+                var paginatedResult = new Pagination<ClassViewModel>
+                {
+                    Items = classViewModels,
+                    TotalItemsCount = totalCount,
+                    PageIndex = filterClassModel.PageIndex,
+                    PageSize = filterClassModel.PageSize
+                };
+
+                response = ResponseHandler.Success(paginatedResult, "Lọc lớp học thành công!");
             }
             catch (Exception ex)
             {
