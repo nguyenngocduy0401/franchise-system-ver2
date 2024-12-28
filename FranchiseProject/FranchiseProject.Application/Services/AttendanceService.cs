@@ -49,6 +49,22 @@ namespace FranchiseProject.Application.Services
                 {
                     return ResponseHandler.Success<bool>(false,"Lịch học không phải ngày hôm nay, không thể điểm danh.");
                 }
+                var currentTime = DateTime.Now.TimeOfDay;
+
+                var slot = await _unitOfWork.SlotRepository.GetByIdAsync(classSchedule.SlotId.Value);
+                if (slot == null)
+                {
+                    return ResponseHandler.Failure<bool>("Không tìm thấy thông tin về khung giờ học.");
+                }
+
+                var attendanceStartTime = slot.StartTime.Value.Add(TimeSpan.FromMinutes(-60));
+                var attendanceEndTime = slot.EndTime.Value.Add(TimeSpan.FromMinutes(60));
+
+                if (currentTime < attendanceStartTime || currentTime > attendanceEndTime)
+                {
+                    return ResponseHandler.Success<bool>(false, "Chỉ có thể điểm danh trong khoảng thời gian từ 60 phút trước giờ bắt đầu đến 60 phút sau giờ kết thúc.");
+                }
+
 
                 var currentStudentIds = attendances.Select(a => a.UserId).ToList();
 
