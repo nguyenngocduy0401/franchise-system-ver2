@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -7,6 +8,7 @@ using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Utils;
+using FranchiseProject.Application.ViewModels.NotificationViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Application.ViewModels.StudentViewModel;
 using FranchiseProject.Application.ViewModels.StudentViewModels;
@@ -46,11 +48,13 @@ namespace FranchiseProject.Application.Services
         private readonly IUserService _userService;
         private readonly IServiceProvider _serviceProvider;
         private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly INotificationService _notificationService;
         public RegisterCourseService(IValidator<UpdateRegisterCourseViewModel> updateValidator, RoleManager<Role> roleManager,
             IEmailService emailService, IClaimsService claimsService,
             UserManager<User> userManager, IMapper mapper,
             IUnitOfWork unitOfWork, IValidator<RegisterCourseViewModel> validator,
-            ICurrentTime currentTime, IUserService userService, IServiceProvider serviceProvider, IServiceScopeFactory serviceScopeFactory)
+            ICurrentTime currentTime, IUserService userService, IServiceProvider serviceProvider, IServiceScopeFactory serviceScopeFactory,
+            INotificationService notificationService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -64,6 +68,7 @@ namespace FranchiseProject.Application.Services
             _userService = userService;
             _serviceProvider = serviceProvider;
             _serviceScopeFactory = serviceScopeFactory;
+            _notificationService = notificationService;
         }
 
 
@@ -230,7 +235,19 @@ namespace FranchiseProject.Application.Services
                 var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(user.AgencyId.Value);
                 var emailMessage = EmailTemplate.SuccessRegisterCourseEmaill(user.Email, user.FullName, course.Name, generate.UserName, generate.Password, (decimal)course.Price, studentDayOfWeek, startDate, endDate);
                 bool emailSent = await _emailService.SendEmailAsync(emailMessage);
+                //Gui noti 
+                var agencyUserIds = await _unitOfWork.UserRepository.GetAgencyUsersAsync(user.AgencyId.Value);
 
+                if (agencyUserIds != null && agencyUserIds.Any())
+                {
+                    var noti = new SendNotificationViewModel
+                    {
+                        message = $@"Một học viên mới đã đăng ký khóa học {course.Name} thành công!",
+                        userIds = agencyUserIds
+                    };
+                    await _notificationService.CreateAndSendNotificationNoReponseAsync(noti);
+                    await _unitOfWork.SaveChangeAsync();
+                }
                 // Xóa thông tin tạm thời
                 _unitOfWork.TempRegistrationsRepository.HardRemove(tempRegistration);
 
