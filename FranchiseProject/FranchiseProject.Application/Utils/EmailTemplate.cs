@@ -40,7 +40,7 @@ namespace FranchiseProject.Application.Utils
         }
         #endregion
         #region RegisterCourseEmail
-        public static MessageModel SuccessRegisterCourseEmaill(string to, string name, string courseName, string username, string password, decimal amount)
+        public static MessageModel SuccessRegisterCourseEmaill(string to, string name, string courseName, string username, string password, decimal amount, string studentDayOfWeek, string startDate, string endDate)
         {
             return new MessageModel
             {
@@ -58,6 +58,12 @@ namespace FranchiseProject.Application.Utils
                     <li><strong>Mật khẩu:</strong> {password}</li>
                   </ul>
                   <p>Vui lòng bảo mật thông tin đăng nhập này và đổi mật khẩu sau khi đăng nhập lần đầu.</p>
+                  <p><strong>Thông tin lớp học:</strong></p>
+                  <ul>
+                    <li><strong>Ngày học trong tuần:</strong> {studentDayOfWeek}</li>
+                    <li><strong>Ngày bắt đầu:</strong> {startDate}</li>
+                    <li><strong>Ngày kết thúc:</strong> {endDate}</li>
+                  </ul>
                   <p>Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để cung cấp thêm thông tin về lớp học.</p>
                   <p>Trân trọng,</p>
                   <p>Đội ngũ FutureTech</p>"

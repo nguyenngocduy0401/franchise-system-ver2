@@ -14,6 +14,5 @@ namespace FranchiseProject.Application.Commons
         public JwtOptions JwtOptions { get; set; }
         public string RedisConfiguration { get; set; }
         public EmailConfiguration EmailConfiguration { get; set; }
-        public VimeoConfiguration VimeoConfiguration { get; set; }
     }
 }

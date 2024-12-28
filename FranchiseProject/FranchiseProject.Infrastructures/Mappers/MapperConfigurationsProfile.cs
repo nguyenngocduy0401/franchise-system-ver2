@@ -39,6 +39,7 @@ using FranchiseProject.Application.ViewModels.HomePageViewModels;
 using FranchiseProject.Application.ViewModels.ReportViewModels;
 using FranchiseProject.Application.ViewModels.UserChapterMaterialViewModels;
 using FranchiseProject.Application.ViewModels.PackageViewModels;
+using FranchiseProject.Application.ViewModels.VideoViewModels;
 
 
 
@@ -93,8 +94,6 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<UpdateUserByAgencyModel, User>();
             CreateMap<CreateUserByAgencyModel, User>();
             CreateMap<User, CreateUserViewModel>();
-            CreateMap<User, UserWorkViewModel>().ForMember(dest => dest.Role, opt => opt.MapFrom(src =>
-            src.UserRoles == null ? null : src.UserRoles.Select(ur => ur.Role.Name).FirstOrDefault())); ;
             CreateMap<UpdateUserByLoginModel, User>();
             #endregion
             #region Slot
@@ -339,7 +338,9 @@ namespace FranchiseProject.Infrastructures.Mappers
             CreateMap<UpdatePackageModel, Package>();
             #endregion
 
-
+            #region Video
+            CreateMap<Video, VideoViewModel>();
+            #endregion
         }
     }
 }

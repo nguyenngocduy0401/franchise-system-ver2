@@ -223,7 +223,6 @@ namespace FranchiseProject.Application.Services
 
                         var result = await registerCourseService.CompleteRegistrationAfterPayment(
                             payment.UserId,
-                            
                             payment.RegisterCourseId.Value,
                             payment.Id);
 

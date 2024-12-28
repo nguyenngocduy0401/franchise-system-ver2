@@ -28,6 +28,7 @@
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.13.1" />
     <PackageReference Include="Quartzmin" Version="1.0.3" />
     <PackageReference Include="Spire.PDF" Version="10.11.1" />
+    <PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>
