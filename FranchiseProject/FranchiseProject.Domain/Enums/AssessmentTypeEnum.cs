@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Domain.Enums
 {
-    public enum AssessmentMethodEnum
+    public enum AssessmentTypeEnum
     {
-        Offline,
-        Online
+        Attendance,
+        Quiz,
+        Assignment,
+        FinalExam
     }
 }

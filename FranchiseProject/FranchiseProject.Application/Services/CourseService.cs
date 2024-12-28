@@ -412,15 +412,12 @@ namespace FranchiseProject.Application.Services
                             courseModel.URLImage = cell.Value.ToString();
                             break;
                         case 3:
-                            courseModel.NumberOfLession = (int)cell.Value;
-                            break;
-                        case 4:
                             courseModel.Price = (int)cell.Value;
                             break;
-                        case 5:
+                        case 4:
                             courseModel.Code = cell.Value.ToString();
                             break;
-                        case 6:
+                        case 5:
                             categoryName = cell.Value.ToString();
                             break;
                     }
@@ -524,6 +521,7 @@ namespace FranchiseProject.Application.Services
                 using (var materialWorkbook = new XLWorkbook(materialsStream))
                 {
                     int sheetQuestionCount = questionWorkbook.Worksheets.Count();
+                    course.NumberOfLession = sheetQuestionCount;
                     int sheetMaterialCount = materialWorkbook.Worksheets.Count();
                     int rowCount = rows.Skip(1).Count();
                     if (sheetQuestionCount != rowCount)
@@ -625,6 +623,13 @@ namespace FranchiseProject.Application.Services
             var rows = worksheet.RangeUsed().RowsUsed();
             var headerRow = rows.First();
             var assessmentModels = new List<CreateAssessmentArrangeModel>();
+            var typeMapping = new Dictionary<string, AssessmentTypeEnum>
+            {
+                { "Attendance", AssessmentTypeEnum.Attendance },
+                { "Quiz", AssessmentTypeEnum.Quiz },
+                { "Assignment", AssessmentTypeEnum.Assignment },
+                { "FinalExam", AssessmentTypeEnum.FinalExam }
+            };
             foreach (var row in rows.Skip(1))
             {
                 var assessment = new CreateAssessmentArrangeModel();
@@ -637,7 +642,11 @@ namespace FranchiseProject.Application.Services
                             assessment.Number = (int)cell.Value;
                             break;
                         case 1:
-                            assessment.Type = cell.Value.ToString();
+                            var typeValue = cell.Value.ToString(); 
+                            if (typeMapping.TryGetValue(typeValue, out var typeEnumValue))
+                            {
+                                assessment.Type = typeEnumValue;
+                            }
                             break;
                         case 2:
                             assessment.Content = cell.Value.ToString();
@@ -656,19 +665,6 @@ namespace FranchiseProject.Application.Services
                             {
                                 assessment.CompletionCriteria = completionCriteriaValue;
                             }
-                            break;
-                        case 6:
-                            if (int.TryParse(cell.Value.ToString(), out int enumValue) &&
-                                Enum.IsDefined(typeof(AssessmentMethodEnum), enumValue))
-                            {
-                                assessment.Method = (AssessmentMethodEnum)enumValue;
-                            }
-                            break;
-                        case 7:
-                            assessment.Duration = cell.Value.ToString();
-                            break;
-                        case 8:
-                            assessment.QuestionType = cell.Value.ToString();
                             break;
                     }
                 }

@@ -1,4 +1,5 @@
 ﻿using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -12,14 +13,12 @@ namespace FranchiseProject.Application.ViewModels.AssessmentViewModels
     {
         public Guid? Id { get; set; }
         public int Number { get; set; }
-        public string? Type { get; set; }
+        public AssessmentTypeEnum Type { get; set; }
         public string? Content { get; set; }
         public int Quatity { get; set; }
         public double Weight { get; set; }
         public double CompletionCriteria { get; set; }
-        public string? Method { get; set; }
-        public string? Duration { get; set; }
-        public string? QuestionType { get; set; }
+        //public string? Duration { get; set; }
         public Guid? CourseId { get; set; }
     }
 }

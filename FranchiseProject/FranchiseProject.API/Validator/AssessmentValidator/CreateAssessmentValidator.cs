@@ -11,11 +11,11 @@ namespace FranchiseProject.API.Validator.AssessmentValidator
                 .GreaterThanOrEqualTo(0)
                 .WithMessage("Số không được nhỏ hơn 0.");
 
-            RuleFor(x => x.Type)
+           /* RuleFor(x => x.Type)
                 .NotEmpty()
                 .WithMessage("Loại không được để trống.")
                 .MaximumLength(100)
-                .WithMessage("Loại không được dài quá 100 ký tự.");
+                .WithMessage("Loại không được dài quá 100 ký tự.");*/
 
             RuleFor(x => x.Content)
                 .NotEmpty()

@@ -10,13 +10,11 @@ namespace FranchiseProject.Application.ViewModels.AssessmentViewModels
     public class CreateAssessmentArrangeModel
     {
         public int Number { get; set; }
-        public string? Type { get; set; }
+        public AssessmentTypeEnum Type { get; set; }
         public string? Content { get; set; }
         public int Quantity { get; set; }
         public double Weight { get; set; }
         public double CompletionCriteria { get; set; }
-        public AssessmentMethodEnum Method { get; set; }
-        public string? Duration { get; set; }
-        public string? QuestionType { get; set; }
+       // public string? Duration { get; set; }
     }
 }
