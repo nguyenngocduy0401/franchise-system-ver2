@@ -50,7 +50,7 @@ namespace FranchiseProject.Application.Services
                     return ResponseHandler.Success<bool>(false,"Lịch học không phải ngày hôm nay, không thể điểm danh.");
                 }
                 var currentTime = DateTime.Now.TimeOfDay;
-
+                
                 var slot = await _unitOfWork.SlotRepository.GetByIdAsync(classSchedule.SlotId.Value);
                 if (slot == null)
                 {
