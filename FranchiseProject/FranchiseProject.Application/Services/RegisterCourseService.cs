@@ -218,8 +218,15 @@ namespace FranchiseProject.Application.Services
                 
                 // Gửi email 
                
+
+                var startDate = classScheduleEarliest.Date.Value.ToString("dd/MM/yyyy");
+                var endDate = classScheduleLatest.Date.Value.ToString("dd/MM/yyyy");
+                var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync((Guid)classSchedules.FirstOrDefault().SlotId);
+                var studentDayOfWeek = class1.DayOfWeek + "-" + slot?.StartTime + "-" + slot?.EndTime;
+
+
                 var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(user.AgencyId.Value);
-                var emailMessage = EmailTemplate.SuccessRegisterCourseEmaill(user.Email, user.FullName,course.Name, generate.UserName, generate.Password, (decimal)course.Price);
+                var emailMessage = EmailTemplate.SuccessRegisterCourseEmaill(user.Email, user.FullName,course.Name, generate.UserName, generate.Password, (decimal)course.Price, studentDayOfWeek , startDate, endDate);
                 bool emailSent = await _emailService.SendEmailAsync(emailMessage);
 
                 // Xóa thông tin tạm thời
@@ -235,10 +242,6 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<bool>(ex.Message);
             }
         }
-
-
-
-
 
         public async Task<ApiResponse<bool>> UpdateStatusStudentAsync( string studentId,string courseId, StudentCourseStatusEnum status)
         {
