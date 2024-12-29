@@ -48,7 +48,7 @@ namespace FranchiseProject.API.Controllers
         }
         [SwaggerOperation(Summary = "lọc gói nhượng quyền")]
         [HttpGet()]
-        public async Task<ApiResponse<Pagination<PackageViewModel>>> FilterPackageAsync(FilterPackageModel filterPackageModel)
+        public async Task<ApiResponse<Pagination<PackageViewModel>>> FilterPackageAsync([FromQuery]FilterPackageModel filterPackageModel)
         {
             return await _packageService.FilterPackageAsync(filterPackageModel);
         }
