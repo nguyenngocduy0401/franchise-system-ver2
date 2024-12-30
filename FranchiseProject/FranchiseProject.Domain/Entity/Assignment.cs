@@ -15,10 +15,14 @@ namespace FranchiseProject.Domain.Entity
         public string? FileURL {get; set;}
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
+        public AssigmentTypeEnum Type { get; set; }
         public AssigmentStatusEnum Status { get; set; }
         public Guid? ClassId { get; set; }
         [ForeignKey("ClassId")]
         public Class? Class { get; set; }
+        public Guid? AssessmentId { get; set; }
+        [ForeignKey("AssessmentId")]
+        public Assessment? Assessment { get; set; }
         public virtual ICollection<AssignmentSubmit>? AssignmentSubmits { get; set; }
     }
 }

@@ -34,7 +34,6 @@ namespace FranchiseProject.Domain.Entity
         public virtual ICollection<Feedback>? Feedbacks { get; set; }
         public virtual ICollection<AssignmentSubmit>? AssignmentSubmits { get; set; }
         public virtual ICollection<Attendance>? Attendances { get; set; }
-        public virtual ICollection<StudentAnswer>? StudentAnswers { get; set; }
         public virtual ICollection<UserRole>? UserRoles { get; set; }
         public virtual ICollection<UserChapterMaterial>? UserChapterMaterials { get; set; }
     }
