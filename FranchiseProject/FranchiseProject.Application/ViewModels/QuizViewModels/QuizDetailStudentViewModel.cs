@@ -1,5 +1,6 @@
 ﻿using FranchiseProject.Application.ViewModels.QuestionViewModels;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace FranchiseProject.Application.ViewModels.QuizViewModels
         public int? Duration { get; set; }
         public string? Title { get; set; }
         public string? Description { get; set; }
+        public QuizTypeEnum Type { get; set; }
         public DateTime? StartTime { get; set; }
         public Guid? ClassId { get; set; }
         public virtual ICollection<QuestionStudentViewModel>? Questions { get; set; }

@@ -15,6 +15,7 @@ namespace FranchiseProject.Application.ViewModels.QuizViewModels
         public int? Duration { get; set; }
         public string? Title { get; set; }
         public string? Description { get; set; }
+        public QuizTypeEnum Type { get; set; }
         public DateTime? StartTime { get; set; }
         public Guid? ClassId { get; set; }
         public ScoreViewModel? Scores { get; set; }
