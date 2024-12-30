@@ -101,7 +101,7 @@ namespace FranchiseProject.Application.Services
             {
                 var quiz = await _unitOfWork.QuizRepository.GetExistByIdAsync(quizId);
                 if (quiz == null) throw new Exception("Quiz does not exist!");
-
+                if(quiz.Type != QuizTypeEnum.Optional) throw new Exception("Can not delete this quiz with compulsory type!");
                 _unitOfWork.QuizRepository.SoftRemove(quiz);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;

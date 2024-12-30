@@ -54,25 +54,26 @@ namespace FranchiseProject.Application.Services
 
         }
         #endregion
-        public async Task<ApiResponse<bool>> CreateAssignmentAsync(CreateAssignmentViewModel assignment)
+        public async Task<ApiResponse<bool>> CreateAssignmentAsync(CreateAssignmentViewModel assignmentModel)
         {
             var response = new ApiResponse<bool>();
             try
             {
-                FluentValidation.Results.ValidationResult validationResult = await _validator.ValidateAsync(assignment);
+                FluentValidation.Results.ValidationResult validationResult = await _validator.ValidateAsync(assignmentModel);
                 if (!validationResult.IsValid)
                 {
                     return ValidatorHandler.HandleValidation<bool>(validationResult);
 
                 }
-                var ass = _mapper.Map<Assignment>(assignment);
-                await _unitOfWork.AssignmentRepository.AddAsync(ass);
-                var students = await _unitOfWork.ClassRepository.GetStudentsByClassIdAsync(Guid.Parse(assignment.ClassId));
+                var assigment = _mapper.Map<Assignment>(assignmentModel);
+                assigment.Type = AssigmentTypeEnum.Optional;
+                await _unitOfWork.AssignmentRepository.AddAsync(assigment);
+                var students = await _unitOfWork.ClassRepository.GetStudentsByClassIdAsync(Guid.Parse(assignmentModel.ClassId));
                 foreach (var student in students)
                 {
 
                 await    _hubContext.Clients.User(student.Id.ToString())
-                        .SendAsync("ReceivedNotification", $"Bạn có bài tập mới bắt đầu lúc {assignment.StartTime.ToString()}.");
+                        .SendAsync("ReceivedNotification", $"Bạn có bài tập mới bắt đầu lúc {assignmentModel.StartTime.ToString()}.");
                 }
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                 if (!isSuccess) throw new Exception("Create failed!");
@@ -146,7 +147,7 @@ namespace FranchiseProject.Application.Services
             {
                 var ass = await _unitOfWork.AssignmentRepository.GetExistByIdAsync(Guid.Parse(assId));
                 if (ass == null) return ResponseHandler.Success(false, "Bài tập  không khả dụng!");
-
+                if (ass.Type != AssigmentTypeEnum.Optional) throw new Exception("Can not delete this assignment with compulsory type!");
                 _unitOfWork.AssignmentRepository.SoftRemove(ass);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;

@@ -36,7 +36,6 @@ namespace FranchiseProject.Infrastructures
         public DbSet<Report> Reports { get; set; }
         public DbSet<Score> Scores { get; set; }
         public DbSet<Slot> Slots { get; set; }
-        public DbSet<StudentAnswer> StudentAnswers { get; set; }
         public DbSet<ClassRoom> ClassRooms { get; set; }
         public DbSet<RegisterForm> RegisterForms { get; set; }
         public DbSet<Syllabus> Syllabuses { get; set; }
@@ -62,7 +61,6 @@ namespace FranchiseProject.Infrastructures
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AttendanceConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(QuizDetailConfiguration).Assembly);
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentAnswerConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentClassConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AssignmentSubmitConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserChapterMaterialConfiguration).Assembly);
