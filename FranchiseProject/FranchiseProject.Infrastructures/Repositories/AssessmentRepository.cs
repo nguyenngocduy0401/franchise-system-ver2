@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,13 @@ namespace FranchiseProject.Infrastructures.Repositories
             _dbContext = context;
             _timeService = timeService;
             _claimsService = claimsService;
+        }
+        public async Task<List<Assessment>> GetAssessmentsByCourseIdAsync(Guid courseId) 
+        {
+            return await _dbContext.Courses
+                .Where(c => c.Id == courseId && c.IsDeleted != true)
+                .SelectMany(c => c.Assessments)
+                .ToListAsync();
         }
     }
 }

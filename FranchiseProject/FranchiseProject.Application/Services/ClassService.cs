@@ -18,6 +18,7 @@ using iText.Kernel.Geom;
 using MailKit.Search;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -25,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.Intrinsics.X86;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -98,6 +100,13 @@ namespace FranchiseProject.Application.Services
                   ,
                     CurrentEnrollment = model.StudentId.Count
                 };
+
+                var quizAndAssignmentModel = await CreateQuizAndAssignmentForClass(courseId);
+
+                newClass.Quizzes = quizAndAssignmentModel.Quizzes;
+                newClass.Assignments = quizAndAssignmentModel.Assignments;
+
+
                 await _unitOfWork.ClassRepository.AddAsync(newClass);
                 // Kiểm tra trạng thái của từng học sinh
                 // var students = await _unitOfWork.UserRepository.GetAllAsync(u => model.StudentId.Contains(u.Id));
@@ -208,82 +217,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        /*   public async Task<ApiResponse<Pagination<ClassViewModel>>> FilterClassAsync(FilterClassViewModel filterClassModel)
-           {
-               var response = new ApiResponse<Pagination<ClassViewModel>>();
-               try
-               {
-                   var userCurrentId = _claimsService.GetCurrentUserId;
-                   var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
-
-                   if (userCurrent == null || !userCurrent.AgencyId.HasValue)
-                   {
-                       return ResponseHandler.Success<Pagination<ClassViewModel>>(null, "User hoặc Agency không khả dụng!");
-                   }
-
-                   Expression<Func<Class, bool>> filter = c =>
-                       (string.IsNullOrEmpty(filterClassModel.Name) || c.Name.Contains(filterClassModel.Name)) &&
-                       (!filterClassModel.Status.HasValue || c.Status == filterClassModel.Status) &&
-                       (string.IsNullOrEmpty(filterClassModel.CourseId) || c.CourseId == Guid.Parse(filterClassModel.CourseId)) &&
-                       (c.AgencyId == userCurrent.AgencyId);
-
-                   var classes = await _unitOfWork.ClassRepository.GetFilterAsync(
-                       filter: filter,
-                       includeProperties: "Course",
-                       pageIndex: filterClassModel.PageIndex,
-                       pageSize: filterClassModel.PageSize
-                   );
-                   foreach (var c in classes.Items)
-                   {
-
-                       var classRoomInstructors = await _unitOfWork.ClassRoomRepository
-                           .GetAllAsync(cr => cr.ClassId == c.Id);
-
-                       string instructorName = null;
-
-                       foreach (var cr in classRoomInstructors)
-                       {
-
-                           var user = await _userManager.FindByIdAsync(cr.UserId);
-                           if (user != null)
-                           {
-                               var roles = await _userManager.GetRolesAsync(user);
-                               if (roles.Contains(AppRole.Instructor))
-                               {
-                                   instructorName = user.UserName;
-                                   break;
-                               }
-                           }
-                       }
-                       var classViewModels = new Pagination<ClassViewModel>
-                       {
-
-                           Items = classes.Items.Select(c => new ClassViewModel
-                           {
-                               Id = c.Id,
-                               Name = c.Name,
-                               Capacity = c.Capacity,
-                               CurrentEnrollment = c.CurrentEnrollment,
-                               DayOfWeek = c.DayOfWeek,
-                               CourseName = c.Course.Name,
-                               Status = c.Status.Value,
-                               CourseId = c.CourseId,
-                               InstructorName = instructorName
-                           }).ToList(),
-                           TotalItemsCount = classes.TotalItemsCount,
-                           PageIndex = classes.PageIndex,
-                           PageSize = classes.PageSize
-                       };
-
-                       response = ResponseHandler.Success(classViewModels, "Lọc lớp học thành công!");
-                   }
-               }
-               catch (Exception ex)
-               {
-                   response = ResponseHandler.Failure<Pagination<ClassViewModel>>(ex.Message);
-               }
-               return response;
-           }*/
         public async Task<ApiResponse<Pagination<ClassViewModel>>> FilterClassAsync(FilterClassViewModel filterClassModel)
         {
             var response = new ApiResponse<Pagination<ClassViewModel>>();
@@ -388,7 +321,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
         public async Task<ApiResponse<ClassViewModel>> GetClassByIdAsync(string id)
         {
             var response = new ApiResponse<ClassViewModel>();
@@ -491,7 +423,7 @@ namespace FranchiseProject.Application.Services
                                 StudentName = user.FullName,
                                 DateOfBirth = user.DateOfBirth,
                                 URLImage = user.URLImage
-                                
+
                             });
 
                             studentIdsAdded.Add(cr.UserId);
@@ -548,8 +480,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
-
         public async Task<ApiResponse<bool>> AddStudentAsync(string classId, AddStudentViewModel model)
         {
             var response = new ApiResponse<bool>();
@@ -596,7 +526,7 @@ namespace FranchiseProject.Application.Services
                     }
                     else
                     {
-                        return ResponseHandler.Success<bool>(false,"thêm học sinh không thành công!");
+                        return ResponseHandler.Success<bool>(false, "thêm học sinh không thành công!");
                     }
                 }
                 await _unitOfWork.SaveChangeAsync();
@@ -609,7 +539,6 @@ namespace FranchiseProject.Application.Services
 
             return response;
         }
-
         public async Task<ApiResponse<bool>> RemoveStudentAsync(string studentId, string classId)
         {
             var response = new ApiResponse<bool>();
@@ -654,8 +583,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
-
         public async Task<ApiResponse<bool>> DeleteClassAsync(string classId)
         {
             var response = new ApiResponse<bool>();
@@ -765,7 +692,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
         public async Task<ApiResponse<List<InstructorViewModel>>> GetInstructorsByAgencyAsync()
         {
             var response = new ApiResponse<List<InstructorViewModel>>();
@@ -851,7 +777,7 @@ namespace FranchiseProject.Application.Services
                         EndTime = slot?.EndTime ?? TimeSpan.Zero,
                         AttendanceStatus = attendance?.Status,
                         Status = schedule.Status,
-                        Url=schedule.Url    
+                        Url = schedule.Url
                     });
                 }
 
@@ -883,16 +809,16 @@ namespace FranchiseProject.Application.Services
 
                 var classViewModels = new List<ClassViewModel>();
                 var now = DateTime.Now;
-               // var classViewModels = new List<ClassViewModel>();
+                // var classViewModels = new List<ClassViewModel>();
                 foreach (var c in classes)
                 {
                     var allSchedules = await _unitOfWork.ClassScheduleRepository.GetAllClassScheduleAsync(cs => cs.ClassId == c.Id);
                     var sortedSchedules = allSchedules.OrderBy(cs => cs.Date).ToList();
 
-                  /*  if (!sortedSchedules.Any())
-                    {
-                        continue;
-                    }*/
+                    /*  if (!sortedSchedules.Any())
+                      {
+                          continue;
+                      }*/
 
                     var totalSessions = sortedSchedules.Count;
                     var completedSessions = sortedSchedules.Count(s => s.Date < DateTime.Now);
@@ -947,7 +873,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<List<ClassViewModel>>> GetAllClassByCourseIdandAgencyId(string courseId,Guid agencid)
+        public async Task<ApiResponse<List<ClassViewModel>>> GetAllClassByCourseIdandAgencyId(string courseId, Guid agencid)
         {
             var response = new ApiResponse<List<ClassViewModel>>();
             try
@@ -1053,9 +979,79 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<List<ClassByLoginViewModel>>(ex.Message);
             }
         }
+        public async Task<AddQuizAndAssignmentModel> CreateQuizAndAssignmentForClass(Guid courseId)
+        {
+            var listQuiz = new List<Quiz>();
+            var listAssignment = new List<Assignment>();
+            var assessments = await _unitOfWork.AssessmentRepository.GetAssessmentsByCourseIdAsync(courseId);
 
+            foreach (var assessment in assessments)
+            {
+                switch (assessment.Type)
+                {
+                    case AssessmentTypeEnum.Quiz:
+                        {
+                            for (int i = 0; i < assessment.Number; i++)
+                            {
+                                Quiz quiz = new Quiz()
+                                {
+                                    StartTime = DateTime.Now.AddYears(1),
+                                    Quantity = 0,
+                                    Title = "Bài kiểm tra định kì số " + (i + 1),
+                                    Description = "Bài kiểm tra định kì số " + (i + 1),
+                                    Type = QuizTypeEnum.Compulsory,
+                                    AssessmentId = assessment.Id
+                                };
+                                listQuiz.Add(quiz);
+                            }
+                            break;
+                        }
+                    case AssessmentTypeEnum.Assignment:
+                        {
+                            for (int i = 0; i < assessment.Number; i++)
+                            {
+                                Assignment assignment = new Assignment()
+                                {
+                                    StartTime = DateTime.Now.AddYears(1),
+                                    EndTime = DateTime.Now.AddYears(1).AddHours(20),
+                                    Title = "Bài tập định kì số " + (i + 1),
+                                    Description = "Bài tập định kì số " + (i + 1),
+                                    Type = AssigmentTypeEnum.Compulsory,
+                                    Status = AssigmentStatusEnum.Close,
+                                    AssessmentId = assessment.Id
+                                };
+                                listAssignment.Add(assignment);
+                            }
+                            break;
+                        }
+                    case AssessmentTypeEnum.FinalExam:
+                        {
+                            for (int i = 0; i < assessment.Number; i++)
+                            {
+                                Quiz quiz = new Quiz()
+                                {
+                                    StartTime = DateTime.Now.AddYears(1),
+                                    Quantity = 0,
+                                    Title = "Bài kiểm cuối khóa số " + (i + 1),
+                                    Description = "Bài kiểm cuối khóa số " + (i + 1),
+                                    Type = QuizTypeEnum.Compulsory,
+                                    AssessmentId = assessment.Id
+                                };
+                                listQuiz.Add(quiz);
+                            }
+                            break;
+                        }
+                }
 
+            }
 
+            var result = new AddQuizAndAssignmentModel() 
+            {
+                Assignments = listAssignment,
+                Quizzes = listQuiz,
+            };
+            return result;
+        }
 
     }
 }

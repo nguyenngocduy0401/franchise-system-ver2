@@ -19,6 +19,8 @@ namespace FranchiseProject.Domain.Entity
         public Guid? CourseId { get; set; }
         [ForeignKey("CourseId")]
         public Course? Course { get; set; }
+        public virtual ICollection<Assignment>? Assignments { get; set; }
+        public virtual ICollection<Quiz>? Quizzes { get; set; }
     }
 }
 

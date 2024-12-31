@@ -9,5 +9,6 @@ namespace FranchiseProject.Application.Repositories
 {
     public interface IAssessmentRepository : IGenericRepository<Assessment>
     {
+        Task<List<Assessment>> GetAssessmentsByCourseIdAsync(Guid courseId);
     }
 }
