@@ -14,6 +14,7 @@ using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.IdentityModel.Tokens;
 using MimeKit.Cryptography;
 using System;
 using System.Collections.Generic;
@@ -316,6 +317,62 @@ namespace FranchiseProject.Application.Services
                     await _hubContext.Clients.User(student.Id.ToString())
                         .SendAsync("ReceivedNotification", $"Bạn có bài kiểm tra mới bắt đầu lúc {createQuizModel.StartTime.ToString()}.");
                 }
+                response = ResponseHandler.Success(true);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<bool>(ex.Message);
+            }
+            return response;
+        }
+        public async Task<ApiResponse<bool>> UpdateChapterQuizById(Guid id, UpdateChapterQuizModel updateChapterQuizModel)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var quiz = await _unitOfWork.QuizRepository.GetExistByIdAsync(id);
+                if (quiz == null) throw new Exception("Quiz does not exist!");
+
+
+                var currentTime = _currentTime.GetCurrentTime();  
+
+                if (quiz.StartTime != null && quiz.Duration != null &&
+                    quiz.StartTime <= currentTime &&
+                    currentTime <= quiz.StartTime.Value.AddMinutes((double)quiz.Duration))
+                {
+                    return ResponseHandler.Failure<bool>("Đang trong thời gian diễn ra bài kiểm tra không thể sửa đổi câu hỏi!");
+                }
+
+
+                if (updateChapterQuizModel.ChapterIds == null) throw new Exception("ChapterId is null!");
+                var quizDetails = await _unitOfWork.QuizDetailRepository.GetByQuizId(quiz.Id);
+
+                if (!quizDetails.IsNullOrEmpty()) _unitOfWork.QuizDetailRepository.HardRemoveRange(quizDetails);
+
+                var questions = await _unitOfWork.QuestionRepository
+                .FindAsync(e => updateChapterQuizModel.ChapterIds.Contains((Guid)e.ChapterId), "QuestionOptions");
+                var randomQuestions = questions.OrderBy(x => Guid.NewGuid())
+                .Take(updateChapterQuizModel.Quantity);
+
+                if (randomQuestions.Count() < updateChapterQuizModel.Quantity)
+                    return ResponseHandler.Success(false,
+                        "Số lượng trong ngân hàng câu hỏi không đủ! "
+                        + "Số lượng câu hỏi trong ngân hàng: " + randomQuestions.Count());
+
+                var quizdetails = _mapper.Map<List<QuizDetail>>(randomQuestions);
+                foreach (var quizDetail in quizdetails)
+                {
+                    quizDetail.QuizId = quiz.Id;  
+                }
+                await _unitOfWork.QuizDetailRepository.AddRangeAsync(quizdetails);
+
+                quiz.Quantity = updateChapterQuizModel.Quantity;
+                _unitOfWork.QuizRepository.Update(quiz);
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Create failed!");
+
+
                 response = ResponseHandler.Success(true);
             }
             catch (Exception ex)

@@ -20,5 +20,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> CreateQuizForClass(CreateQuizModel createQuizModel);
         Task<ApiResponse<QuizDetailStudentViewModel>> GetQuizDetailForStudentByQuizId(Guid id);
         Task<ApiResponse<IEnumerable<QuizStudentViewModel>>> GetAllQuizForStudentByClassId(Guid id);
+        Task<ApiResponse<bool>> UpdateChapterQuizById(Guid id, UpdateChapterQuizModel updateChapterQuizModel);
     }
 }

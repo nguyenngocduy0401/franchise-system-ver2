@@ -60,5 +60,12 @@ namespace FranchiseProject.API.Controllers
         {
             return await _quizService.GetAllQuizForStudentByQuizId(id);
         }
+        [Authorize(Roles = AppRole.Instructor)]
+        [SwaggerOperation(Summary = "cập nhật câu hỏi cho bài kiểm tra {Authorize = Instructor}")]
+        [HttpPut("{id}/details")]
+        public async Task<ApiResponse<bool>> UpdateChapterQuizById(Guid id, UpdateChapterQuizModel updateChapterQuizModel)
+        {
+            return await _quizService.UpdateChapterQuizById(id, updateChapterQuizModel);
+        }
     }
 }
