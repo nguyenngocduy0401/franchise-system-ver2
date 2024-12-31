@@ -387,18 +387,6 @@ namespace FranchiseProject.Application.Services
 
                 var studentInfo = new List<StudentClassViewModel>();
 
-
-                /*foreach (var cr in classRooms)
-                {
-                    var user = await _userManager.FindByIdAsync(cr.UserId);
-                    studentInfo.Add(new StudentClassViewModel
-                    {
-                        UserId = cr.UserId,
-                        StudentName = user?.FullName,
-                        DateOfBirth = user?.DateOfBirth,
-                        URLImage = user?.URLImage
-                    });
-                }*/
                 var classSchedules = await _unitOfWork.SlotRepository
                      .GetAllSlotAsync(cs => cs.ClassId == classEntity.Id);
 
@@ -757,6 +745,24 @@ namespace FranchiseProject.Application.Services
 
                 var scheduleViewModels = new List<StudentScheduleViewModel>();
 
+                string insId = string.Empty;
+                string instructorName = string.Empty;
+                foreach (var cr in classRooms)
+                {
+                    var user = await _userManager.FindByIdAsync(cr.UserId);
+                    if (user != null)
+                    {
+                        var roles = await _userManager.GetRolesAsync(user);
+
+                        if (roles.Contains(AppRole.Instructor))
+                        {
+                            instructorName = user.UserName;
+                            insId = user.Id;
+                        }
+                    }
+                }
+
+
                 foreach (var schedule in schedules)
                 {
                     var slot = schedule.SlotId.HasValue
@@ -777,7 +783,9 @@ namespace FranchiseProject.Application.Services
                         EndTime = slot?.EndTime ?? TimeSpan.Zero,
                         AttendanceStatus = attendance?.Status,
                         Status = schedule.Status,
-                        Url = schedule.Url
+                        Url = schedule.Url,
+                        TeacherId = insId,
+                        TeacherName = instructorName
                     });
                 }
 
@@ -979,7 +987,7 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<List<ClassByLoginViewModel>>(ex.Message);
             }
         }
-        public async Task<AddQuizAndAssignmentModel> CreateQuizAndAssignmentForClass(Guid courseId)
+        private async Task<AddQuizAndAssignmentModel> CreateQuizAndAssignmentForClass(Guid courseId)
         {
             var listQuiz = new List<Quiz>();
             var listAssignment = new List<Assignment>();

@@ -21,6 +21,10 @@ namespace FranchiseProject.Application.ViewModels.StudentViewModels
         public AttendanceStatusEnum? AttendanceStatus { get; set; }
         public bool? Status { get; set; }
         public string?  Url { get; set; }
+        public string? TeacherName { get; set; }
+        public string? TeacherId { get; set; }
+        public string? LessionName  { get; set; }
+        public Guid? ChapterId { get; set; }
      
     }
 }
