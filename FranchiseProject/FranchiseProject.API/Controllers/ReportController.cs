@@ -1,6 +1,5 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
-using FranchiseProject.Application.ViewModels.EquipmentViewModels;
 using FranchiseProject.Application.ViewModels.ReportViewModels;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -36,14 +35,6 @@ namespace FranchiseProject.API.Controllers
         public async Task<ApiResponse<bool>> UpdateCourseReportAsync(Guid id, UpdateReportCourseViewModel model)
         {
             return await _reportService.UpdateCourseReport(id, model);
-        }
-
-//[Authorize(Roles = AppRole.AgencyStaff + "," + AppRole.AgencyManager)]
-        [SwaggerOperation(Summary = "Cập nhật báo cáo thiết bị {Authorize = AgencyStaff, AgencyManager}")]
-        [HttpPut("equipment/{id}")]
-        public async Task<ApiResponse<bool>> UpdateEquipmentReportAsync(Guid id, UpdateReportEquipmentViewModel model)
-        {
-            return await _reportService.UpdateEquipmentReport(id, model);
         }
 //[Authorize]
         [SwaggerOperation(Summary = "Tìm kiếm báo cáo")]

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.ViewModels.ReportViewModels
 {
-    public class CreateReportEquipmentViewModel
+    public class UpdateReportCourseViewModel
     {
+        public Guid? CourseId { get; set; }
         public string? Description { get; set; }
-        public List<Guid>? EquipmentIds { get; set; }
     }
 }

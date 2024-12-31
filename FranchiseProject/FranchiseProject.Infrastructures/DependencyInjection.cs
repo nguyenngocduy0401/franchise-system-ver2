@@ -43,7 +43,6 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IScoreService, ScoreService>();
             services.AddScoped<ISlotService, SlotService>();
-            services.AddScoped<IStudentAnswerService, StudentAnswerService>();
             services.AddScoped<IClassRoomService, ClassRoomService>();
             services.AddScoped<IRegisterCourseService, RegisterCourseService>();
             services.AddScoped<ISyllabusService, SyllabusService>();
@@ -88,7 +87,6 @@ namespace FranchiseProject.Infrastructures
             services.AddScoped<IReportRepository, ReportRepository>();
             services.AddScoped<IScoreRepository, ScoreRepository>();
             services.AddScoped<ISlotRepository, SlotRepository>();
-            services.AddScoped<IStudentAnswerRepository, StudentAnswerRepository>();
             services.AddScoped<IClassRoomRepository, ClassRoomRepository>();
             services.AddScoped<IRegisterCourseRepository, RegisterCourseRepository>();
             services.AddScoped<ISyllabusRepository, SyllabusRepository>();

@@ -30,7 +30,6 @@ namespace FranchiseProject.Infrastructures
         private readonly IReportRepository _reportRepository;
         private readonly IScoreRepository _scoreRepository;
         private readonly ISlotRepository _slotRepository;
-        private readonly IStudentAnswerRepository _studentAnswerRepository;
         private readonly IClassRoomRepository _classRoomRepository;
         private readonly ISyllabusRepository _syllabusRepository;
         private readonly IUserRepository _userRepository;
@@ -59,7 +58,7 @@ namespace FranchiseProject.Infrastructures
             IClassScheduleRepository classScheduleRepository, IContractRepository contractRepository, ICourseCategoryRepository courseCategoryRepository,
             ICourseRepository courseRepository, IFeedbackRepository feedbackRepository, IQuestionOptionRepository questionOptionRepository,
             IQuestionRepository questionRepository, IQuizDetailRepository quizDetailRepository, IQuizRepository  quizRepository, IReportRepository reportRepository,
-            IScoreRepository scoreRepository, ISlotRepository slotRepository, IStudentAnswerRepository studentAnswerRepository,
+            IScoreRepository scoreRepository, ISlotRepository slotRepository,
             IClassRoomRepository classRoomRepository, ISyllabusRepository syllabusRepository,
             IUserRepository userRepository, IAssignmentSubmitRepository assignmentSubmitRepository, IRefreshTokenRepository refreshTokenRepository,
             IRegisterFormRepository franchiseRegistrationRequestRepository, IAssessmentRepository assessmentRepository,INotificationRepository notificationRepository,
@@ -94,7 +93,6 @@ namespace FranchiseProject.Infrastructures
             _reportRepository = reportRepository;
             _scoreRepository = scoreRepository;
             _slotRepository = slotRepository;
-            _studentAnswerRepository = studentAnswerRepository;
             _classRoomRepository = classRoomRepository;
             _syllabusRepository = syllabusRepository;
             _userRepository = userRepository;
@@ -154,8 +152,6 @@ namespace FranchiseProject.Infrastructures
         public IScoreRepository ScoreRepository => _scoreRepository;
 
         public ISlotRepository SlotRepository => _slotRepository;
-
-        public IStudentAnswerRepository StudentAnswerRepository => _studentAnswerRepository;
 
         public IClassRoomRepository ClassRoomRepository => _classRoomRepository;
 

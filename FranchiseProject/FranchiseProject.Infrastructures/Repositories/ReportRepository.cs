@@ -1,7 +1,6 @@
 ﻿using FranchiseProject.Application;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
-using FranchiseProject.Application.ViewModels.EquipmentViewModels;
 using FranchiseProject.Domain.Entity;
 using Microsoft.EntityFrameworkCore;
 using System;

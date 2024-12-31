@@ -34,7 +34,6 @@ using FranchiseProject.Application.ViewModels.QuizViewModels;
 using FranchiseProject.Application.ViewModels.ScoreViewModels;
 using FranchiseProject.Application.ViewModels.DocumentViewModels;
 using FranchiseProject.Application.ViewModels.DocumentViewModel;
-using FranchiseProject.Application.ViewModels.EquipmentViewModels;
 using FranchiseProject.Application.ViewModels.HomePageViewModels;
 using FranchiseProject.Application.ViewModels.ReportViewModels;
 using FranchiseProject.Application.ViewModels.UserChapterMaterialViewModels;

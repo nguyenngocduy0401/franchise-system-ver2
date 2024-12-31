@@ -6,7 +6,6 @@ using FranchiseProject.Application.Hubs;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.ViewModels.ConsultationViewModels;
-using FranchiseProject.Application.ViewModels.EquipmentViewModels;
 using FranchiseProject.Application.ViewModels.ReportViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
@@ -159,56 +158,7 @@ namespace FranchiseProject.Application.Services
             }
         }
 
-        public async Task<ApiResponse<bool>> UpdateEquipmentReport(Guid reportId, UpdateReportEquipmentViewModel model)
-        {
-            try
-            {
-                var userCurrentId = _claimsService.GetCurrentUserId;
-                var userCurrent = await _userManager.FindByIdAsync(userCurrentId.ToString());
-
-                if (userCurrent == null || !userCurrent.AgencyId.HasValue)
-                {
-                    return ResponseHandler.Success<bool>(false,"User không tồn tại hoặc không thuộc về Agency nào.");
-                }
-
-                var report = await _unitOfWork.ReportRepository.GetByIdAsync(reportId);
-                if (report == null)
-                {
-                    return ResponseHandler.Success<bool>(false,"Báo cáo không tồn tại.");
-                }
-
-                if (report.AgencyId != userCurrent.AgencyId)
-                {
-                    return ResponseHandler.Success<bool>(false,"Bạn không có quyền cập nhật báo cáo này.");
-                }
-
-                if (report.Type != ReportTypeEnum.Equipment)
-                {
-                    return ResponseHandler.Success<bool>(false,"Báo cáo này không phải là báo cáo thiết bị.");
-                }
-
-                
-
-                report.Description = model.Description;
-                report.ModificationDate = _currentTime.GetCurrentTime();
-
-                _unitOfWork.ReportRepository.Update(report);
-                var result = await _unitOfWork.SaveChangeAsync() > 0;
-
-                if (result)
-                {
-                    return ResponseHandler.Success(true, "Cập nhật báo cáo thiết bị thành công.");
-                }
-                else
-                {
-                    return ResponseHandler.Failure<bool>("Không thể cập nhật báo cáo thiết bị.");
-                }
-            }
-            catch (Exception ex)
-            {
-                return ResponseHandler.Failure<bool>($"Lỗi khi cập nhật báo cáo thiết bị: {ex.Message}");
-            }
-        }
+        
         public async Task<ApiResponse<Pagination<ReportViewModel>>> FilterReportAsync(FilterReportModel filterReportModel)
         {
             var response = new ApiResponse<Pagination<ReportViewModel>>();
