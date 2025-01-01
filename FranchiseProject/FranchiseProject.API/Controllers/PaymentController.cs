@@ -130,6 +130,13 @@ namespace FranchiseProject.API.Controllers
                 return ResponseHandler.Failure<string>("Đã xảy ra lỗi khi xử lý yêu cầu của bạn.");
             }
         }
+        [SwaggerOperation(Summary = "Tạo yêu cầu hoàn tiền {Authorize = AgencyManager, AgencyStaff}")]
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
+        [HttpPost("refund")]
+        public async Task<ApiResponse<bool>> CreateRefundPayment([FromBody] CreateRefundPaymentViewModel model)
+        {
+            return await _paymentService.CreateRefundPayment(model);
+        }
     }
 }
 

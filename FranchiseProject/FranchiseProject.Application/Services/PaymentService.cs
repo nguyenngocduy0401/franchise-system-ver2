@@ -33,16 +33,16 @@ namespace FranchiseProject.Application.Services
     {
         #region Contructor
         private readonly IUnitOfWork _unitOfWork;
-        private readonly  IMapper _mapper;
-        private readonly  IValidator<CreateStudentPaymentViewModel> _validator;
-        private readonly  IEmailService _emailService;
+        private readonly IMapper _mapper;
+        private readonly IValidator<CreateStudentPaymentViewModel> _validator;
+        private readonly IEmailService _emailService;
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly IClaimsService _claimsService;
         private readonly UserManager<User> _userManager;
         private readonly IUserService _userService;
-       
-        public PaymentService(IUserService userService,UserManager<User> userManager,IUnitOfWork unitOfWork,IMapper mapper,IValidator<CreateStudentPaymentViewModel>validator
-            ,IEmailService emailService,IHubContext<NotificationHub>hubContext,IClaimsService claimsService)
+
+        public PaymentService(IUserService userService, UserManager<User> userManager, IUnitOfWork unitOfWork, IMapper mapper, IValidator<CreateStudentPaymentViewModel> validator
+            , IEmailService emailService, IHubContext<NotificationHub> hubContext, IClaimsService claimsService)
         {
             _claimsService = claimsService;
             _unitOfWork = unitOfWork;
@@ -134,18 +134,18 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> CreatePaymentContractDirect(CreateContractDirect create )
+        public async Task<ApiResponse<bool>> CreatePaymentContractDirect(CreateContractDirect create)
         {
             var response = new ApiResponse<bool>();
             try
             {
                 var userId = _claimsService.GetCurrentUserId;
-                var contract =await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(create.AgencyId);
-                
+                var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(create.AgencyId);
+
                 var isPay = await _unitOfWork.ContractRepository.IsDepositPaidCorrectlyAsync(contract.Id);
                 if (isPay)
                 {
-                   
+
                     return ResponseHandler.Success<bool>(false, "Hợp đồng đã được thanh toán lần 1!");
 
                 }
@@ -156,12 +156,12 @@ namespace FranchiseProject.Application.Services
                         Title = "Thanh toán hợp đồng nhượn quyền" + " lần 1 " + contract.ContractCode,
                         Description = create.Description,
                         Amount = contract.Total * (contract.DepositPercentage / 100),
-                        Type=PaymentTypeEnum.Contract,
-                        Method=PaymentMethodEnum.Direct,
-                        Status=PaymentStatus.Completed,
-                        ImageURL=create.ImageUrl,
-                        ContractId=contract.Id,
-                        UserId= userId.ToString()
+                        Type = PaymentTypeEnum.Contract,
+                        Method = PaymentMethodEnum.Direct,
+                        Status = PaymentStatus.Completed,
+                        ImageURL = create.ImageUrl,
+                        ContractId = contract.Id,
+                        UserId = userId.ToString()
                     };
                     await _unitOfWork.PaymentRepository.AddAsync(payment);
                     contract.PaidAmount = payment.Amount;
@@ -223,7 +223,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<PaymentStudentViewModel>();
             try
             {
-                var payment = await _unitOfWork.PaymentRepository.GetByIdAsync(Guid.Parse (paymentId));
+                var payment = await _unitOfWork.PaymentRepository.GetByIdAsync(Guid.Parse(paymentId));
                 if (payment == null)
                 {
                     return ResponseHandler.Failure<PaymentStudentViewModel>("Không tìm thấy thanh toán với ID này!");
@@ -244,15 +244,15 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<Pagination<PaymentStudentViewModel>>();
             try
             {
-              
+
                 var userCurrentId = _claimsService.GetCurrentUserId.ToString();
 
                 var payments = await _unitOfWork.PaymentRepository.GetAllAsync(p => p.UserId == userCurrentId);
 
-            
+
                 var paymentViewModels = _mapper.Map<List<PaymentStudentViewModel>>(payments);
 
-          
+
                 var pagedResult = new Pagination<PaymentStudentViewModel>
                 {
                     TotalItemsCount = paymentViewModels.Count,
@@ -278,21 +278,21 @@ namespace FranchiseProject.Application.Services
                 var registerCourse = await _unitOfWork.RegisterCourseRepository.GetByIdAsync(registerCourseId);
                 if (registerCourse == null)
                 {
-                    return ResponseHandler.Success<bool>(false,"Không tìm thấy thông tin khóa học.");
+                    return ResponseHandler.Success<bool>(false, "Không tìm thấy thông tin khóa học.");
                 }
                 var currentDate = DateTime.UtcNow;
                 if (registerCourse.PaymentDeadline.HasValue && currentDate <= registerCourse.PaymentDeadline)
                 {
                     return ResponseHandler.Success<bool>(false, "Chưa đến hạn thanh toán!");
                 }
-                if (registerCourse.StudentPaymentStatus==StudentPaymentStatusEnum.Completed)
+                if (registerCourse.StudentPaymentStatus == StudentPaymentStatusEnum.Completed)
                 {
                     return ResponseHandler.Success<bool>(false, "Học sinh đã hoàn thành thanh toán!");
                 }
                 registerCourse.StudentPaymentStatus = newStatus;
                 await _unitOfWork.RegisterCourseRepository.UpdateAsync(registerCourse);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-             //   if (!isSuccess) throw new Exception("Cập nhật thất bại!");
+                //   if (!isSuccess) throw new Exception("Cập nhật thất bại!");
                 response = ResponseHandler.Success(true, "Cập nhật trạng thái thanh toán thành công!");
             }
             catch (Exception ex)
@@ -316,7 +316,7 @@ namespace FranchiseProject.Application.Services
                     (filterModel.AgencyId == null || p.Contract.AgencyId == filterModel.AgencyId) &&
                     (filterModel.StartDate == null || p.CreationDate >= filterModel.StartDate) &&
                     (filterModel.EndDate == null || p.CreationDate <= filterModel.EndDate);
-                 
+
 
                 var payments = await _unitOfWork.PaymentRepository.GetFilterAsync(
                     filter: filter,
@@ -336,10 +336,10 @@ namespace FranchiseProject.Application.Services
                         Amount = p.Amount,
                         Status = p.Status,
                         CreationDate = p.CreationDate,
-                        ImageURL=p.ImageURL,
-                        Description=p.Description,
-                        Method=p.Method,
-                        Title=p.Title,
+                        ImageURL = p.ImageURL,
+                        Description = p.Description,
+                        Method = p.Method,
+                        Title = p.Title,
                         CreateBy = p.UserId != null ? _userManager.FindByIdAsync(p.UserId).Result?.UserName : null
                     }).ToList(),
                     TotalItemsCount = payments.TotalItemsCount,
@@ -354,6 +354,112 @@ namespace FranchiseProject.Application.Services
                 response = ResponseHandler.Failure<Pagination<PaymentContractAgencyViewModel>>(ex.Message);
             }
             return response;
+        }
+        public async Task<ApiResponse<bool>> CreateRefundPayment(CreateRefundPaymentViewModel model)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var userId = _claimsService.GetCurrentUserId.ToString();
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return ResponseHandler.Failure<bool>("User not found.");
+                }
+
+                var registerCourse = await _unitOfWork.RegisterCourseRepository.GetByIdAsync(model.RegisterCourseId);
+                if (registerCourse == null)
+                {
+                    return ResponseHandler.Failure<bool>("Register Course payment not found.");
+                }
+
+                decimal refundAmount = 0;
+                var classRoom = await _unitOfWork.ClassRoomRepository.GetFirstOrDefaultAsync(x => x.UserId == registerCourse.UserId && x.Class.CourseId == registerCourse.CourseId);
+                if (classRoom == null)
+                {
+                    return ResponseHandler.Failure<bool>("Class room not found for the student.");
+                }
+
+                var classE = await _unitOfWork.ClassRepository.GetExistByIdAsync(classRoom.ClassId.Value);
+                var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(registerCourse.CourseId.Value);
+                if (course == null)
+                {
+                    return ResponseHandler.Failure<bool>("Course not found.");
+                }
+
+                if (classE != null)
+                {
+                    var classStartDate = await _unitOfWork.ClassScheduleRepository.GetFirstOrDefaultAsync(cs => cs.ClassId == classRoom.ClassId);
+                    if (classStartDate != null && classStartDate.Date.HasValue)
+                    {
+                        var currentDate = DateTime.Now;
+                        if (currentDate >= classStartDate.Date.Value)
+                        {
+                            return ResponseHandler.Success<bool>(false,"Lớp học đã bắt đầu không thể hoàn tiền!");
+                        }
+                        var daysUntilStart = (classStartDate.Date.Value - DateTime.Now).TotalDays;
+
+                        if (daysUntilStart > 10)
+                        {
+                            refundAmount = course.Price.GetValueOrDefault() * 0.8m; // 80% refund
+                        }
+                        else if (daysUntilStart > 5)
+                        {
+                            refundAmount = course.Price.GetValueOrDefault() * 0.5m; // 50% refund
+                        }
+                        else
+                        {
+                            return ResponseHandler.Failure<bool>("Refund is not possible within 5 days of class start.");
+                        }
+                    }
+                    else
+                    {
+                        return ResponseHandler.Failure<bool>("Class start date not found.");
+                    }
+                }
+                else
+                {
+      
+                    refundAmount = course.Price.GetValueOrDefault();
+                }
+
+
+                var refundPayment = new Payment
+                {
+                    Title = $"Hoàn tiền khóa học {registerCourse.Course.Name}",
+                    Description = model.RefundReason,
+                    Amount = (double)refundAmount, 
+                    Type = PaymentTypeEnum.Refund,
+                    Method = PaymentMethodEnum.Direct,
+                    Status = PaymentStatus.Completed,
+                    CreationDate = DateTime.UtcNow,
+                    UserId = userId,
+                    RegisterCourseId = model.RegisterCourseId,
+                    AgencyId = user.AgencyId,
+                    ImageURL=model.ImageUrl
+                };
+
+                await _unitOfWork.PaymentRepository.AddAsync(refundPayment);
+
+                //  RegisterCourse 
+                registerCourse.StudentPaymentStatus = StudentPaymentStatusEnum.Refund;
+                registerCourse.StudentCourseStatus = StudentCourseStatusEnum.Cancel;
+                await _unitOfWork.RegisterCourseRepository.UpdateAsync(registerCourse);
+
+                //  ClassRoom
+                await _unitOfWork.ClassRoomRepository.DeleteAsync(classRoom);
+
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+
+
+                return ResponseHandler.Success(true, "Hoàn tiền thành công.");
+                
+             
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<bool>($"An error occurred while creating the refund payment: {ex.Message}");
+            }
         }
     }
 }

@@ -11,6 +11,6 @@ namespace FranchiseProject.Domain.Enums
         Contract,
         Course,
         MonthlyDue,
-
+        Refund
     }
 }
