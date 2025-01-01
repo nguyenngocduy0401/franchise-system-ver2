@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,18 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Where(c => c.Id == courseId && c.IsDeleted != true)
                 .SelectMany(c => c.Assessments)
                 .ToListAsync();
+        }
+        public async Task<List<Assessment>> GetAssessmentsByClassIdAsync(Guid classId, string userId)
+        {
+            return await _dbContext.Classes
+            .Where(c => c.Id == classId && c.IsDeleted != true)
+            .SelectMany(c => c.Course.Assessments)
+            .Where(a => !a.IsDeleted)
+            .Include(a => a.Assignments.Where(assign => assign.ClassId == classId && assign.Type == AssigmentTypeEnum.Compulsory && assign.IsDeleted != true))
+                .ThenInclude(assign => assign.AssignmentSubmits.Where(submit => submit.UserId == userId))
+            .Include(a => a.Quizzes.Where(quiz => quiz.ClassId == classId && quiz.Type == QuizTypeEnum.Compulsory && quiz.IsDeleted != true))
+                .ThenInclude(quiz => quiz.Scores.Where(score => score.UserId == userId))
+            .ToListAsync();
         }
     }
 }

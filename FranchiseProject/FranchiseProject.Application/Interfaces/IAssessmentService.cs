@@ -16,5 +16,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> UpdateAssessmentAsync(Guid assessmentId, UpdateAssessmentModel updateAssessmentModel);
         Task<ApiResponse<bool>> CreateAssessmentAsync(CreateAssessmentModel createAssessmentModel);
         Task<ApiResponse<bool>> CreateAssessmentArangeAsync(Guid courseId, List<CreateAssessmentArrangeModel> createAssessmentArrangeModel);
+        Task<ApiResponse<AssessmentStudentViewModel>> GetStudentAssessmentByLoginAsync(Guid classId);
     }
 }

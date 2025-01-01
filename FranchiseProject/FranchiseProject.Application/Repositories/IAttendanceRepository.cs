@@ -15,5 +15,6 @@ namespace FranchiseProject.Application.Repositories
         Task<List<Attendance>> GetAllAsync(Expression<Func<Attendance, bool>> predicate);
         Task UpdateAsync(Attendance attendance);
         Task<Attendance> GetFirstOrDefaultAsync(Expression<Func<Attendance, bool>> predicate);
+        Task<List<Attendance>> GetStudentPresentAttendanceByClassIdAsync(Guid classId, string studentId);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -69,5 +70,13 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.Set<Attendance>().FirstOrDefaultAsync(predicate);
         }
+        public async Task<List<Attendance>> GetStudentPresentAttendanceByClassIdAsync(Guid classId, string studentId) 
+        {
+            return await _dbContext.ClassSchedules
+                .Where(c => c.ClassId == classId && c.IsDeleted != true)
+                .SelectMany(cs => cs.Attendances.Where(cs => cs.UserId == studentId && cs.Status == AttendanceStatusEnum.Present))
+                .ToListAsync();
+        }
+
     }
 }

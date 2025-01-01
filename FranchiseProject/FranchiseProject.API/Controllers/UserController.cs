@@ -1,5 +1,6 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.ViewModels.AssessmentViewModels;
 using FranchiseProject.Application.ViewModels.AssignmentViewModels;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModel;
 using FranchiseProject.Application.ViewModels.ClassViewModels;
@@ -25,9 +26,11 @@ namespace FranchiseProject.API.Controllers
 		private readonly IAssignmentService _assignmentService;
 		private readonly IUserChapterMaterialService _userChapterMaterialService;
 		private readonly ICourseService _courseService;
+		private readonly IAssessmentService _assessmentService;
         public UserController(IUserService userService, IClassService classService,
 			IRegisterCourseService registerCourseService, IAssignmentService assignmentService,
-			IUserChapterMaterialService userChapterMaterialService, ICourseService courseService)
+			IUserChapterMaterialService userChapterMaterialService, ICourseService courseService,
+			IAssessmentService assessmentService)
 		{
 			_userService = userService;
 			_classService = classService;
@@ -35,6 +38,7 @@ namespace FranchiseProject.API.Controllers
 			_assignmentService = assignmentService;
 			_userChapterMaterialService = userChapterMaterialService;
 			_courseService = courseService;
+			_assessmentService = assessmentService;
 		}
         [Authorize()]
         [SwaggerOperation(Summary = "Lấy khóa học của học sinh {Authorize}")]
@@ -144,5 +148,10 @@ namespace FranchiseProject.API.Controllers
 		[HttpGet("~/agency-manager/api/v1/users")]
 		public async Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAgencyManagerAsync([FromQuery] FilterUserByAgencyModel filterUserByAgencyModel)
 			=> await _userService.FilterUserByAgencyManagerAsync(filterUserByAgencyModel);
-	}
+        [Authorize()]
+        [SwaggerOperation(Summary = "học sinh lấy thống kê điểm{Authorize}")]
+        [HttpGet("mine/classes/{id}/assessments")]
+        public async Task<ApiResponse<AssessmentStudentViewModel>> GetStudentAssessmentByLoginAsync(Guid id)
+            => await _assessmentService.GetStudentAssessmentByLoginAsync(id);
+    }
 }
