@@ -3,6 +3,7 @@ using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.AttendanceViewModels;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
+using FranchiseProject.Application.ViewModels.ClassViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -81,14 +82,23 @@ namespace FranchiseProject.API.Controllers
 		[Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff + "," + AppRole.Instructor)]
 		[HttpGet("{id}")]
 		public Task<ApiResponse<ClassScheduleDetailViewModel>> GetClassScheduleDetailAsync(Guid id) => _classScheduleService.GetClassScheduleDetailAsync(id);
-        [SwaggerOperation(Summary = "lấy lịch học by login{Authorize = Student}")]
-       // [Authorize(Roles = AppRole.Student)]
-        [HttpGet("student/classes/{id}")]
-        public async Task<ApiResponse<ClassScheduleByLoginViewModel>> GetClassScheduleByLoginAsync(Guid id)
-        {
-            
+		[SwaggerOperation(Summary = "lấy lịch học by login{Authorize = Student}")]
+		// [Authorize(Roles = AppRole.Student)]
+		[HttpGet("student/classes/{id}")]
+		public async Task<ApiResponse<ClassScheduleByLoginViewModel>> GetClassScheduleByLoginAsync(Guid id)
+		{
 
-            return await _classScheduleService.GetClassScheduleByLoginAsync(id);
+
+			return await _classScheduleService.GetClassScheduleByLoginAsync(id);
+		}
+		[SwaggerOperation(Summary = "giảng viên  lấy dạy by login{Authorize = Instructor}")]
+		 [Authorize(Roles = AppRole.Instructor)]
+		[HttpGet("~/api/v1/instructor/classes/{id}/classShedules")]
+		public async Task<ApiResponse<ClassScheduleByInstructorViewModel>> GetClassScheduleByInstructorAsync(Guid id)
+        {
+
+
+            return await _classScheduleService.GetClassScheduleByInstructorAsync(id);
         }
     }
 }

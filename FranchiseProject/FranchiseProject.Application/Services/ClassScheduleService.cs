@@ -10,6 +10,7 @@ using FranchiseProject.Application.Utils;
 using FranchiseProject.Application.ViewModels.AttendanceViewModels;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
+using FranchiseProject.Application.ViewModels.ClassViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
@@ -546,6 +547,44 @@ namespace FranchiseProject.Application.Services
             catch (Exception ex)
             {
                 return ResponseHandler.Failure<ClassScheduleByLoginViewModel>($"Error retrieving class schedule: {ex.Message}");
+            }
+        }
+        public async Task<ApiResponse<ClassScheduleByInstructorViewModel>> GetClassScheduleByInstructorAsync(Guid classId)
+        {
+            try
+            {
+                var userId = _claimsService.GetCurrentUserId.ToString();
+                var classInfo = await _unitOfWork.ClassRepository.GetByIdAsync(classId);
+                if (classInfo == null)
+                {
+                    return ResponseHandler.Failure<ClassScheduleByInstructorViewModel>("Class not found");
+                }
+
+                var classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllClassScheduleAsync(cs => cs.ClassId == classId, "Slot");
+                var attendances = await _unitOfWork.AttendanceRepository.GetAllAsync(a => a.ClassSchedule.ClassId == classId && a.UserId == userId);
+                var courses = await _unitOfWork.CourseRepository.GetExistByIdAsync(classInfo.CourseId.Value);
+                var now = DateTime.Now;
+                var result = new ClassScheduleByInstructorViewModel
+                {
+                    Total = classSchedules.Count(),
+                    Future = classSchedules.Count(cs => cs.Date > now),
+                    CourseCode = courses.Code,
+                    CourseName = courses.Name,
+                    ClassName = classInfo.Name,
+                    ClassSchedules = classSchedules.Select(cs => new AttendanceClassByInstructorViewModel
+                    {
+                        Date = cs.Date,
+                        StartTime = cs.Slot?.StartTime,
+                        EndTime = cs.Slot?.EndTime,
+                        Status=cs.Status,
+                    }).ToList()
+                };
+
+                return ResponseHandler.Success(result, "Class schedule retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<ClassScheduleByInstructorViewModel>($"Error retrieving class schedule: {ex.Message}");
             }
         }
     }
