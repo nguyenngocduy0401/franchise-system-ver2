@@ -23,6 +23,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FranchiseProject.Application.Services
 {
@@ -199,7 +200,14 @@ namespace FranchiseProject.Application.Services
                     startDate = startDate.AddDays(1);
                 }
                 var dateClass = "";
-                foreach (var date in createClassScheduleDateRangeViewModel.dayOfWeeks) { dateClass = dateClass + "," + date.ToString(); }
+                foreach (var date in createClassScheduleDateRangeViewModel.dayOfWeeks)
+                {
+                    if (!string.IsNullOrEmpty(dateClass))
+                    {
+                        dateClass += ",";
+                    }
+                    dateClass += date.ToString();
+                }
                 var slot = await _unitOfWork.SlotRepository.GetByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.SlotId));
                 var classE = await _unitOfWork.ClassRepository.GetByIdAsync(Guid.Parse(createClassScheduleDateRangeViewModel.ClassId));
                 classE.DayOfWeek = dateClass;
@@ -273,7 +281,6 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<List<ClassScheduleViewModel>>();
             try
             {
-                // Lấy ID của người dùng đang đăng nhập
                 var currentUserId = _claimsService.GetCurrentUserId.ToString();
 
                 
