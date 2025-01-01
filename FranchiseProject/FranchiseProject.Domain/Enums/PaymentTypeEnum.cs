@@ -10,6 +10,7 @@ namespace FranchiseProject.Domain.Enums
     {
         Contract,
         Course,
-        MonthlyDue
+        MonthlyDue,
+
     }
 }

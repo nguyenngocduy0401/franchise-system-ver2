@@ -245,7 +245,7 @@ namespace FranchiseProject.Application.Services
                         message = $@"Một học viên mới đã đăng ký khóa học {course.Name} thành công!",
                         userIds = agencyUserIds
                     };
-                    await _notificationService.CreateAndSendNotificationNoReponseAsync(noti);
+                    await _notificationService.CreateAndSendNotificationNoReponseForRegisterAsync(noti);
                     await _unitOfWork.SaveChangeAsync();
                 }
                 // Xóa thông tin tạm thời

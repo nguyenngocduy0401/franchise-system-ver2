@@ -15,5 +15,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> MarkNotificationAsReadAsync(string notificationId);
         Task<ApiResponse<List<NotificationViewModel>>> GetUserNotificationsAsync();
         Task CreateAndSendNotificationNoReponseAsync(SendNotificationViewModel sendNotificationViewModel);
+    Task CreateAndSendNotificationNoReponseForRegisterAsync(SendNotificationViewModel sendNotificationViewModel);
     }
 }
