@@ -273,6 +273,18 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<List<ClassScheduleViewModel>>();
             try
             {
+                // Lấy ID của người dùng đang đăng nhập
+                var currentUserId = _claimsService.GetCurrentUserId.ToString();
+
+                
+                var userAgency = await _userManager.FindByIdAsync(currentUserId);
+                if (userAgency == null || userAgency.AgencyId == null)
+                {
+                    return ResponseHandler.Failure<List<ClassScheduleViewModel>>("Không tìm thấy thông tin Agency của người dùng.");
+                }
+
+                var agencyId = userAgency.AgencyId.Value;
+
                 DateTime? start = null;
                 DateTime? end = null;
 
@@ -285,9 +297,12 @@ namespace FranchiseProject.Application.Services
                 {
                     end = DateTime.Parse(filterClassScheduleViewModel.EndDate);
                 }
+
                 Expression<Func<ClassSchedule, bool>> filter = s =>
+                    s.Class.AgencyId == agencyId &&
                     (!start.HasValue || s.Date.Value.Date >= start.Value.Date) &&
                     (!end.HasValue || s.Date.Value.Date <= end.Value.Date);
+
                 var schedules = await _unitOfWork.ClassScheduleRepository.GetFilterAsync(
                     filter: filter,
                     includeProperties: "Class,Slot"
@@ -303,7 +318,7 @@ namespace FranchiseProject.Application.Services
                     Date = s.Date?.ToString("yyyy-MM-dd"),
                     StartTime = s.Slot.StartTime?.ToString(@"hh\:mm"),
                     EndTime = s.Slot.EndTime?.ToString(@"hh\:mm"),
-                    Url=s.Url,
+                    Url = s.Url,
                 }).ToList();
 
                 response.Data = scheduleViewModels;
@@ -316,10 +331,8 @@ namespace FranchiseProject.Application.Services
                 response.isSuccess = false;
                 response.Message = ex.Message;
             }
-
             return response;
         }
-
 
         public async Task<ApiResponse<ClassScheduleViewModel>> GetClassScheduleByIdAsync(string id)
         {
