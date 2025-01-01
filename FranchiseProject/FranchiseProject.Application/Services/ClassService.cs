@@ -948,7 +948,9 @@ namespace FranchiseProject.Application.Services
                         CurrentEnrollment = c.CurrentEnrollment,
                         InstructorName = instructorName,
                         CourseName = c.Course?.Name,
-                        DayOfWeek = c.DayOfWeek + "-" + slot?.StartTime + "-" + slot?.EndTime,
+                        DayOfWeek = c.DayOfWeek,
+                        SlotStart = slot.StartTime.ToString(),
+                        SlotEnd= slot.EndTime.ToString(),
                         StartDate = startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : null,
                         DaysElapsed = daysElapsed,
                         CourseId = c.CourseId
