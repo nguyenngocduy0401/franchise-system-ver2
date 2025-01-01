@@ -999,7 +999,7 @@ namespace FranchiseProject.Application.Services
                 {
                     case AssessmentTypeEnum.Quiz:
                         {
-                            for (int i = 0; i < assessment.Number; i++)
+                            for (int i = 0; i < assessment.Quantity; i++)
                             {
                                 Quiz quiz = new Quiz()
                                 {
@@ -1016,7 +1016,7 @@ namespace FranchiseProject.Application.Services
                         }
                     case AssessmentTypeEnum.Assignment:
                         {
-                            for (int i = 0; i < assessment.Number; i++)
+                            for (int i = 0; i < assessment.Quantity; i++)
                             {
                                 Assignment assignment = new Assignment()
                                 {
@@ -1034,7 +1034,7 @@ namespace FranchiseProject.Application.Services
                         }
                     case AssessmentTypeEnum.FinalExam:
                         {
-                            for (int i = 0; i < assessment.Number; i++)
+                            for (int i = 0; i < assessment.Quantity; i++)
                             {
                                 Quiz quiz = new Quiz()
                                 {
