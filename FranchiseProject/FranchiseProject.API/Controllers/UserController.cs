@@ -153,5 +153,10 @@ namespace FranchiseProject.API.Controllers
         [HttpGet("mine/classes/{id}/assessments")]
         public async Task<ApiResponse<AssessmentStudentViewModel>> GetStudentAssessmentByLoginAsync(Guid id)
             => await _assessmentService.GetStudentAssessmentByLoginAsync(id);
+        [Authorize(Roles = AppRole.AgencyManager+ "," + AppRole.Instructor)]
+        [SwaggerOperation(Summary = "học sinh lấy thống kê điểm của học sinh {Authorize = AgencyManager, Instructor}")]
+        [HttpGet("{studentId}/classes/{classId}/assessments")]
+        public async Task<ApiResponse<AssessmentStudentViewModel>> GetStudentAssessmentByIdAsync(string studentId, Guid classId)
+            => await _assessmentService.GetStudentAssessmentByIdAsync(classId, studentId);
     }
 }
