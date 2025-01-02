@@ -32,5 +32,6 @@ namespace FranchiseProject.Application.Repositories
         Task<List<User>> GetAllAsync(Expression<Func<User, bool>> filter);
         Task<List<User>> GetInstructorsByAgencyIdAsync(Guid agencyId);
         Task<List<string>> GetAgencyUsersAsync(Guid agencyId);
+        Task<User> GetInstructorsByClassIdAsync(Guid classId);
     }
 }

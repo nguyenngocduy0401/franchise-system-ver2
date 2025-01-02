@@ -233,5 +233,13 @@ namespace FranchiseProject.Infrastructures.Repositories
 
             return result;
         }
+        public async Task<User> GetInstructorsByClassIdAsync(Guid classId)
+        {
+            return await _dbContext.ClassRooms
+                                 .Where(u => u.ClassId == classId)
+                                 .Select(u => u.User)
+                                 .Where(u => u.UserRoles.Any(ur => ur.Role.Name == "Instructor"))
+                                 .FirstOrDefaultAsync();
+        }
     }
 }

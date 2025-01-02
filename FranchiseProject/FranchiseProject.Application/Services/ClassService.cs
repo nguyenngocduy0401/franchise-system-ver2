@@ -745,23 +745,6 @@ namespace FranchiseProject.Application.Services
 
                 var scheduleViewModels = new List<StudentScheduleViewModel>();
 
-                string insId = string.Empty;
-                string instructorName = string.Empty;
-                foreach (var cr in classRooms)
-                {
-                    var user = await _userManager.FindByIdAsync(cr.UserId);
-                    if (user != null)
-                    {
-                        var roles = await _userManager.GetRolesAsync(user);
-
-                        if (roles.Contains(AppRole.Instructor))
-                        {
-                            instructorName = user.UserName;
-                            insId = user.Id;
-                        }
-                    }
-                }
-
 
                 foreach (var schedule in schedules)
                 {
@@ -770,6 +753,12 @@ namespace FranchiseProject.Application.Services
                         : null;
                     var attendance = await _unitOfWork.AttendanceRepository.GetFirstOrDefaultAsync(a =>
                                   a.ClassScheduleId == schedule.Id && a.UserId == studentId);
+
+                    var instructor = await _unitOfWork.UserRepository.GetInstructorsByClassIdAsync(schedule.ClassId.Value);
+
+                    string insId = instructor.Id;
+                    string instructorName = instructor.FullName;
+
                     scheduleViewModels.Add(new StudentScheduleViewModel
                     {
                         ScheduleId = schedule.Id,
