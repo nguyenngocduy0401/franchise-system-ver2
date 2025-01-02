@@ -72,7 +72,7 @@ namespace FranchiseProject.Application.Utils
                                 </tr>
                                 <tr>
                                     <td style='border: 1px solid #ddd; padding: 8px;'>Ngày học trong tuần</td>
-                                    <td style='border: 1px solid #ddd; padding: 8px;'>{TranslateDayOfWeek(studentDayOfWeek)}</td>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>{studentDayOfWeek}</td>
                                 </tr>
                                 <tr>
                                     <td style='border: 1px solid #ddd; padding: 8px;'>Ngày bắt đầu</td>
@@ -91,20 +91,6 @@ namespace FranchiseProject.Application.Utils
                             <p>Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để cung cấp thêm thông tin về lớp học.</p>
                             <p>Trân trọng,</p>
                             <p>Đội ngũ FutureTech</p>"
-            };
-        }
-        private static string TranslateDayOfWeek(string englishDayOfWeek)
-        {
-            return englishDayOfWeek.ToLower() switch
-            {
-                "sunday" => "Chủ Nhật",
-                "monday" => "Thứ Hai",
-                "tuesday" => "Thứ Ba",
-                "wednesday" => "Thứ Tư",
-                "thursday" => "Thứ Năm",
-                "friday" => "Thứ Sáu",
-                "saturday" => "Thứ Bảy",
-                _ => englishDayOfWeek
             };
         }
         public static MessageModel RefundConfirmationEmail(string to, string name, string courseName, decimal refundAmount, string refundReason)
