@@ -30,5 +30,6 @@ namespace FranchiseProject.Application.ViewModels.StudentViewModels
         public DateOnly? StartDate { get; set; }// ngày bắt đầu khóa học (classSchedule)
         public DateOnly? EndDate { get; set; }// ngày kết thúc khóa học (classSchedule)
         public DateTime? PaymentDate { get; set; }
+        public string ? ClassName { get; set; }
     }
 }

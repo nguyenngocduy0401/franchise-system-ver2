@@ -9,6 +9,7 @@ namespace FranchiseProject.Application.ViewModels.ClassViewModels
 {
     public class ClassScheduleByInstructorViewModel
     {
+
         public int Total { get; set; }
         public int Future { get; set; }
         public string? CourseCode { get; set; }

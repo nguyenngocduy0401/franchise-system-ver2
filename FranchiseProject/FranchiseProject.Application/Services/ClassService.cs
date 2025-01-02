@@ -953,7 +953,8 @@ namespace FranchiseProject.Application.Services
                         SlotEnd= slot.EndTime.ToString(),
                         StartDate = startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : null,
                         DaysElapsed = daysElapsed,
-                        CourseId = c.CourseId
+                        CourseId = c.CourseId,
+                        TotalLessons=c.Course.NumberOfLession
                     };
 
                     classViewModels.Add(classViewModel);

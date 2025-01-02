@@ -572,7 +572,7 @@ namespace FranchiseProject.Application.Services
                     CourseName = courses.Name,
                     ClassName = classInfo.Name,
                     ClassSchedules = classSchedules.Select(cs => new AttendanceClassByInstructorViewModel
-                    {
+                    { Id=cs.Id,
                         Date = cs.Date,
                         StartTime = cs.Slot?.StartTime,
                         EndTime = cs.Slot?.EndTime,

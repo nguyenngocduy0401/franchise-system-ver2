@@ -464,9 +464,10 @@ namespace FranchiseProject.Application.Services
                         string classScheduleString = "";
                         DateTime? startDate = null;
                         DateTime? endDate = null;
-
+                        string className = "";
                         if (classInfo != null && classInfo.ClassSchedules.Any())
                         {
+                            className = classInfo.Class.Name;
                             var firstSchedule = classInfo.ClassSchedules.FirstOrDefault();
                             if (firstSchedule != null)
                             {
@@ -504,7 +505,8 @@ namespace FranchiseProject.Application.Services
                             PaymentDate = rc.CreationDate,
                             ClassSchedule = classScheduleString.ToString(),
                             StartDate = startDate.HasValue ? DateOnly.FromDateTime(startDate.Value) : null,
-                            EndDate = endDate.HasValue ? DateOnly.FromDateTime(endDate.Value) : null
+                            EndDate = endDate.HasValue ? DateOnly.FromDateTime(endDate.Value) : null,
+                            ClassName= className
                         };
                     }
                 }).ToList();

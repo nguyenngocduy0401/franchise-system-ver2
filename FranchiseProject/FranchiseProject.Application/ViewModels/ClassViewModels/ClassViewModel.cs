@@ -24,5 +24,6 @@ namespace FranchiseProject.Application.ViewModels.ClassViewModel
         public int? DaysElapsed { get; set; }
         public ClassStatusEnum Status { get; set; }
         public Guid? CourseId { get; set; }
+        public int? TotalLessons { get; set; }
     }
 }

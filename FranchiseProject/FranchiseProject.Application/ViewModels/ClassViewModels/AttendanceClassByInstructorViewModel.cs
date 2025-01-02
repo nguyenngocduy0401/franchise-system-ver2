@@ -9,6 +9,7 @@ namespace FranchiseProject.Application.ViewModels.ClassViewModels
 {
     public class AttendanceClassByInstructorViewModel
     {
+        public Guid Id { get; set; }
         public DateTime? Date { get; set; }
         public TimeSpan? StartTime { get; set; }
         public TimeSpan? EndTime { get; set; }
