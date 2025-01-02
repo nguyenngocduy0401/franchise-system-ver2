@@ -31,5 +31,7 @@ namespace FranchiseProject.Application.ViewModels.StudentViewModels
         public DateOnly? EndDate { get; set; }// ngày kết thúc khóa học (classSchedule)
         public DateTime? PaymentDate { get; set; }
         public string ? ClassName { get; set; }
+        public double? RefundAmount { get; set; }
+        public DateTime? RefundDate { get; set; }
     }
 }
