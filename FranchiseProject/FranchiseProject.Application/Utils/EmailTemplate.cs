@@ -40,7 +40,7 @@ namespace FranchiseProject.Application.Utils
         }
         #endregion
         #region RegisterCourseEmail
-        public static MessageModel SuccessRegisterCourseEmaill(string to, string name, string courseName, string username, string password, decimal amount, string studentDayOfWeek, string startDate, string endDate)
+        public static MessageModel SuccessRegisterCourseEmaill(string to, string name, string courseName, string username, string password, decimal amount, string studentDayOfWeek, string startDate, string endDate, string address)
         {
             return new MessageModel
             {
@@ -81,6 +81,10 @@ namespace FranchiseProject.Application.Utils
                                 <tr>
                                     <td style='border: 1px solid #ddd; padding: 8px;'>Ngày kết thúc</td>
                                     <td style='border: 1px solid #ddd; padding: 8px;'>{endDate}</td>
+                                </tr>
+                                <tr>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>Địa chỉ trung tâm</td>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>{address}</td>
                                 </tr>
                             </table>
                             <p>Vui lòng bảo mật thông tin đăng nhập này và đổi mật khẩu sau khi đăng nhập lần đầu.</p>

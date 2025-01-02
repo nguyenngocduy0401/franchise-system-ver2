@@ -229,11 +229,27 @@ namespace FranchiseProject.Application.Services
                 var startDate = classScheduleEarliest.Date.Value.ToString("dd/MM/yyyy");
                 var endDate = classScheduleLatest.Date.Value.ToString("dd/MM/yyyy");
                 var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync((Guid)classSchedules.FirstOrDefault().SlotId);
-                var studentDayOfWeek = class1.DayOfWeek + "-" + slot?.StartTime + "-" + slot?.EndTime;
+
+                Dictionary<string, string> dayOfWeekMap = new Dictionary<string, string>
+                {
+                    { "Sunday", "Chủ nhật" },
+                    { "Monday", "Thứ hai" },
+                    { "Tuesday", "Thứ ba" },
+                    { "Wednesday", "Thứ tư" },
+                    { "Thursday", "Thứ năm" },
+                    { "Friday", "Thứ sáu" },
+                    { "Saturday", "Thứ bảy" }
+                };
+                string vietnameseDayOfWeek = dayOfWeekMap.ContainsKey(class1.DayOfWeek) ? dayOfWeekMap[class1.DayOfWeek] : "None";
+                var studentDayOfWeek = vietnameseDayOfWeek + "-" + slot?.StartTime + "-" + slot?.EndTime;
 
 
                 var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(user.AgencyId.Value);
-                var emailMessage = EmailTemplate.SuccessRegisterCourseEmaill(user.Email, user.FullName, course.Name, generate.UserName, generate.Password, (decimal)course.Price, studentDayOfWeek, startDate, endDate);
+
+                var address = agency.Address + ", " + agency.Ward + ", " +agency.District + ", " + agency.City;
+                var emailMessage = EmailTemplate.SuccessRegisterCourseEmaill(user.Email, user.FullName, course.Name, generate.UserName, generate.Password,
+                    (decimal)course.Price, studentDayOfWeek, startDate, endDate, address);
+
                 bool emailSent = await _emailService.SendEmailAsync(emailMessage);
                 //Gui noti 
                 var agencyUserIds = await _unitOfWork.UserRepository.GetAgencyUsersAsync(user.AgencyId.Value);
