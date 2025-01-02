@@ -439,9 +439,17 @@ namespace FranchiseProject.Application.Services
                     p => registerCourseIds.Contains((Guid)p.RegisterCourseId)
                 );
                 var paymentTotalByCourse = payments
-                    .GroupBy(p => p.RegisterCourseId)
+                        .Where(p => p.Type != PaymentTypeEnum.Refund)
+                    .GroupBy(p => p.RegisterCourseId )
                     .ToDictionary(g => g.Key, g => g.Sum(p => p.Amount));
-
+                var refundTotalByCourse = payments
+                      .Where(p => p.Type == PaymentTypeEnum.Refund)
+                  .GroupBy(p => p.RegisterCourseId)
+                  .ToDictionary(g => g.Key, g => g.Sum(p => p.Amount));
+                var refundDateByCourse = payments
+    .Where(p => p.Type == PaymentTypeEnum.Refund)
+    .GroupBy(p => p.RegisterCourseId)
+    .ToDictionary(g => g.Key, g => g.Max(p => p.CreationDate));
                 var consultantIds = registerCourses.Items
                      .Where(item => item?.ConsultanId != null)
                      .Select(item => item.ConsultanId)
@@ -522,7 +530,9 @@ namespace FranchiseProject.Application.Services
                             ClassSchedule = classScheduleString.ToString(),
                             StartDate = startDate.HasValue ? DateOnly.FromDateTime(startDate.Value) : null,
                             EndDate = endDate.HasValue ? DateOnly.FromDateTime(endDate.Value) : null,
-                            ClassName= className
+                            ClassName= className,
+                            RefundAmount= refundTotalByCourse.ContainsKey(rc.Id) ? refundTotalByCourse[rc.Id] : 0,
+                            RefundDate= refundDateByCourse.ContainsKey(rc.Id) ? refundDateByCourse[rc.Id] : null,
                         };
                     }
                 }).ToList();

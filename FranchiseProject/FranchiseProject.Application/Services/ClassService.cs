@@ -876,6 +876,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var userCurrentId = _claimsService.GetCurrentUserId.ToString();
+                var courseid = Guid.Parse(courseId);
                 var userCurrent = await _userManager.FindByIdAsync(userCurrentId);
                 var agencyId = agencid;
                 if (!Guid.TryParse(courseId, out Guid parsedCourseId))
@@ -919,7 +920,8 @@ namespace FranchiseProject.Application.Services
                         var instructor = await _userManager.FindByIdAsync(instructorIds.First().ToString());
                         instructorName = instructor?.FullName;
                     }
-
+                    var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(courseid);
+                    var courseName = course.Name;
                     var startDate = earliestSchedule?.Date;
                     var slot = earliestSchedule != null && earliestSchedule.SlotId.HasValue
                         ? await _unitOfWork.SlotRepository.GetByIdAsync(earliestSchedule.SlotId.Value)
@@ -935,15 +937,15 @@ namespace FranchiseProject.Application.Services
                         Name = c.Name,
                         Capacity = c.Capacity,
                         CurrentEnrollment = c.CurrentEnrollment,
-                        InstructorName = instructorName,
-                        CourseName = c.Course?.Name,
+                        InstructorName = instructorName ?? string.Empty,
+                        CourseName = courseName,
                         DayOfWeek = c.DayOfWeek,
-                        SlotStart = slot.StartTime.ToString(),
-                        SlotEnd= slot.EndTime.ToString(),
-                        StartDate = startDate.HasValue ? startDate.Value.ToString("yyyy-MM-dd") : null,
+                        SlotStart = slot?.StartTime.ToString() ?? string.Empty,
+                        SlotEnd = slot?.EndTime.ToString() ?? string.Empty,
+                        StartDate = startDate?.ToString("yyyy-MM-dd"),
                         DaysElapsed = daysElapsed,
                         CourseId = c.CourseId,
-                        TotalLessons=c.Course.NumberOfLession
+                        TotalLessons = c.Course?.NumberOfLession ?? 0
                     };
 
                     classViewModels.Add(classViewModel);
