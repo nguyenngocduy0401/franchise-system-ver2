@@ -306,6 +306,7 @@ namespace FranchiseProject.Application.Services
 
                 var quiz = _mapper.Map<Quiz>(createQuizModel);
                 quiz.QuizDetails = quizdetails;
+                quiz.Type = QuizTypeEnum.Optional;
                 await _unitOfWork.QuizRepository.AddAsync(quiz); 
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;

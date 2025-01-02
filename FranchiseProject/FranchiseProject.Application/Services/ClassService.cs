@@ -1028,7 +1028,6 @@ namespace FranchiseProject.Application.Services
                                     Title = "Bài tập định kì số " + (i + 1),
                                     Description = "Bài tập định kì số " + (i + 1),
                                     Type = AssigmentTypeEnum.Compulsory,
-                                    Status = AssigmentStatusEnum.Close,
                                     AssessmentId = assessment.Id
                                 };
                                 listAssignment.Add(assignment);

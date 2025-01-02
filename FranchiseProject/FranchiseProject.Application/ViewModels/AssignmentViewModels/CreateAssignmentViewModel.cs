@@ -14,7 +14,6 @@ namespace FranchiseProject.Application.ViewModels.AssignmentViewModels
         public string? FileURL { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
-        public AssigmentStatusEnum Status { get; set; }
         public string? ClassId { get; set; }
     }
 }

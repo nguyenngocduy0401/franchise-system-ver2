@@ -21,9 +21,6 @@ public class CreateAssignmentValidator : AbstractValidator<CreateAssignmentViewM
             .NotNull().WithMessage("Thời gian kết thúc không được để trống.")
             .GreaterThan(x => x.StartTime).WithMessage("Thời gian kết thúc phải lớn hơn thời gian bắt đầu.");
 
-        RuleFor(x => x.Status)
-            .IsInEnum().WithMessage("Trạng thái không hợp lệ.");
-
         RuleFor(x => x.ClassId)
             .NotEmpty().WithMessage("ID lớp không được để trống.")
             .Length(1, 50).WithMessage("ID lớp phải từ 1 đến 50 ký tự.");
