@@ -395,7 +395,7 @@ namespace FranchiseProject.Application.Services
                         var currentDate = DateTime.Now;
                         if (currentDate >= classStartDate.Date.Value)
                         {
-                            return ResponseHandler.Success<bool>(false,"Lớp học đã bắt đầu không thể hoàn tiền!");
+                            return ResponseHandler.Success<bool>(false, "Lớp học đã bắt đầu không thể hoàn tiền!");
                         }
                         var daysUntilStart = (classStartDate.Date.Value - DateTime.Now).TotalDays;
 
@@ -419,7 +419,7 @@ namespace FranchiseProject.Application.Services
                 }
                 else
                 {
-      
+
                     refundAmount = course.Price.GetValueOrDefault();
                 }
 
@@ -428,7 +428,7 @@ namespace FranchiseProject.Application.Services
                 {
                     Title = $"Hoàn tiền khóa học {registerCourse.Course.Name}",
                     Description = model.RefundReason,
-                    Amount = (double)refundAmount, 
+                    Amount = (double)refundAmount,
                     Type = PaymentTypeEnum.Refund,
                     Method = PaymentMethodEnum.Direct,
                     Status = PaymentStatus.Completed,
@@ -436,7 +436,7 @@ namespace FranchiseProject.Application.Services
                     UserId = userId,
                     RegisterCourseId = model.RegisterCourseId,
                     AgencyId = user.AgencyId,
-                    ImageURL=model.ImageUrl
+                    ImageURL = model.ImageUrl
                 };
 
                 await _unitOfWork.PaymentRepository.AddAsync(refundPayment);
@@ -451,14 +451,93 @@ namespace FranchiseProject.Application.Services
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
 
+                var student = await _userManager.FindByIdAsync(registerCourse.UserId);
+                if (student != null)
+                {
+                    var emailMessage = EmailTemplate.RefundConfirmationEmail(
+                        student.Email,
+                        student.FullName,
+                        registerCourse.Course.Name,
+                        refundAmount,
+                        model.RefundReason
+                    );
 
+                    var emailSent = await _emailService.SendEmailAsync(emailMessage);
+                }
                 return ResponseHandler.Success(true, "Hoàn tiền thành công.");
-                
-             
+
+
             }
             catch (Exception ex)
             {
                 return ResponseHandler.Failure<bool>($"An error occurred while creating the refund payment: {ex.Message}");
+            }
+        }
+        public async Task<ApiResponse<decimal>> CalculateRefundAmount(Guid registerCourseId)
+        {
+            try
+            {
+                var registerCourse = await _unitOfWork.RegisterCourseRepository.GetByIdAsync(registerCourseId);
+                if (registerCourse == null)
+                {
+                    return ResponseHandler.Failure<decimal>("Register Course not found.");
+                }
+
+                var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(registerCourse.CourseId.Value);
+                if (course == null)
+                {
+                    return ResponseHandler.Failure<decimal>("Course not found.");
+                }
+
+                var classRoom = await _unitOfWork.ClassRoomRepository.GetFirstOrDefaultAsync(x => x.UserId == registerCourse.UserId && x.Class.CourseId == registerCourse.CourseId);
+                if (classRoom == null)
+                {
+                    return ResponseHandler.Failure<decimal>("Class room not found for the student.");
+                }
+
+                decimal refundAmount = 0;
+                var classE = await _unitOfWork.ClassRepository.GetExistByIdAsync(classRoom.ClassId.Value);
+
+                if (classE != null)
+                {
+                    var classStartDate = await _unitOfWork.ClassScheduleRepository.GetFirstOrDefaultAsync(cs => cs.ClassId == classRoom.ClassId);
+                    if (classStartDate != null && classStartDate.Date.HasValue)
+                    {
+                        var currentDate = DateTime.Now;
+                        if (currentDate >= classStartDate.Date.Value)
+                        {
+                            return ResponseHandler.Success(0m, "Lớp học đã bắt đầu không thể hoàn tiền!");
+                        }
+                        var daysUntilStart = (classStartDate.Date.Value - DateTime.Now).TotalDays;
+
+                        if (daysUntilStart > 10)
+                        {
+                            refundAmount = course.Price.GetValueOrDefault() * 0.8m; // 80% refund
+                        }
+                        else if (daysUntilStart > 5)
+                        {
+                            refundAmount = course.Price.GetValueOrDefault() * 0.5m; // 50% refund
+                        }
+                        else
+                        {
+                            return ResponseHandler.Success(0m, "Refund is not possible within 5 days of class start.");
+                        }
+                    }
+                    else
+                    {
+                        return ResponseHandler.Failure<decimal>("Class start date not found.");
+                    }
+                }
+                else
+                {
+                    refundAmount = course.Price.GetValueOrDefault();
+                }
+
+                return ResponseHandler.Success(refundAmount, "Refund amount calculated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<decimal>($"An error occurred while calculating the refund amount: {ex.Message}");
             }
         }
     }

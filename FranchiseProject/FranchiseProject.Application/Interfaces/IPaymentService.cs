@@ -23,5 +23,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<bool>> CreatePaymentContractDirect(CreateContractDirect create);
         Task<ApiResponse<Pagination<PaymentContractAgencyViewModel>>> FilterPaymentContractAsync(FilterContractPaymentViewModel filterModel);
         Task<ApiResponse<bool>> CreateRefundPayment(CreateRefundPaymentViewModel model);
+        Task<ApiResponse<decimal>> CalculateRefundAmount(Guid registerCourseId);
     }
 }

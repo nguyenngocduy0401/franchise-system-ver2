@@ -47,24 +47,89 @@ namespace FranchiseProject.Application.Utils
                 To = to,
                 Subject = "Đăng ký và thanh toán khóa học thành công [futuretech-noreply]",
                 Body = $@"<p>Chào bạn {name},</p>
-                  <p>Cảm ơn bạn đã đăng ký và thanh toán thành công khóa học <strong>{courseName}</strong>.</p>
-                  <p>Thông tin thanh toán:</p>
-                  <ul>
-                    <li>Số tiền đã thanh toán: {amount:N0} VNĐ</li>
-                  </ul>
-                  <p>Thông tin tài khoản của bạn:</p>
-                  <ul>
-                    <li><strong>Tên đăng nhập:</strong> {username}</li>
-                    <li><strong>Mật khẩu:</strong> {password}</li>
-                  </ul>
-                  <p>Vui lòng bảo mật thông tin đăng nhập này và đổi mật khẩu sau khi đăng nhập lần đầu.</p>
-                  <p><strong>Thông tin lớp học:</strong></p>
-                  <ul>
-                    <li><strong>Ngày học trong tuần:</strong> {studentDayOfWeek}</li>
-                    <li><strong>Ngày bắt đầu:</strong> {startDate}</li>
-                    <li><strong>Ngày kết thúc:</strong> {endDate}</li>
-                  </ul>
-                  <p>Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để cung cấp thêm thông tin về lớp học.</p>
+                            <p>Cảm ơn bạn đã đăng ký và thanh toán thành công khóa học <strong>{courseName}</strong>.</p>
+                            <table style='border-collapse: collapse; width: 100%;'>
+                                <tr>
+                                    <th style='border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2;' colspan='2'>Thông tin thanh toán</th>
+                                </tr>
+                                <tr>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>Số tiền đã thanh toán</td>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>{amount:N0} VNĐ</td>
+                                </tr>
+                                <tr>
+                                    <th style='border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2;' colspan='2'>Thông tin tài khoản</th>
+                                </tr>
+                                <tr>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>Tên đăng nhập</td>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>{username}</td>
+                                </tr>
+                                <tr>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>Mật khẩu</td>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>{password}</td>
+                                </tr>
+                                <tr>
+                                    <th style='border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2;' colspan='2'>Thông tin lớp học</th>
+                                </tr>
+                                <tr>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>Ngày học trong tuần</td>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>{TranslateDayOfWeek(studentDayOfWeek)}</td>
+                                </tr>
+                                <tr>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>Ngày bắt đầu</td>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>{startDate}</td>
+                                </tr>
+                                <tr>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>Ngày kết thúc</td>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>{endDate}</td>
+                                </tr>
+                            </table>
+                            <p>Vui lòng bảo mật thông tin đăng nhập này và đổi mật khẩu sau khi đăng nhập lần đầu.</p>
+                            <p>Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để cung cấp thêm thông tin về lớp học.</p>
+                            <p>Trân trọng,</p>
+                            <p>Đội ngũ FutureTech</p>"
+            };
+        }
+        private static string TranslateDayOfWeek(string englishDayOfWeek)
+        {
+            return englishDayOfWeek.ToLower() switch
+            {
+                "sunday" => "Chủ Nhật",
+                "monday" => "Thứ Hai",
+                "tuesday" => "Thứ Ba",
+                "wednesday" => "Thứ Tư",
+                "thursday" => "Thứ Năm",
+                "friday" => "Thứ Sáu",
+                "saturday" => "Thứ Bảy",
+                _ => englishDayOfWeek
+            };
+        }
+        public static MessageModel RefundConfirmationEmail(string to, string name, string courseName, decimal refundAmount, string refundReason)
+        {
+            return new MessageModel
+            {
+                To = to,
+                Subject = "Xác Nhận Hoàn Tiền Khóa Học [futuretech-noreply]",
+                Body = $@"<p>Chào bạn {name},</p>
+                  <p>Chúng tôi xác nhận rằng yêu cầu hoàn tiền của bạn đã được xử lý thành công.</p>
+                  <table style='border-collapse: collapse; width: 100%;'>
+                      <tr>
+                          <th style='border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2;' colspan='2'>Thông tin hoàn tiền</th>
+                      </tr>
+                      <tr>
+                          <td style='border: 1px solid #ddd; padding: 8px;'>Khóa học</td>
+                          <td style='border: 1px solid #ddd; padding: 8px;'>{courseName}</td>
+                      </tr>
+                      <tr>
+                          <td style='border: 1px solid #ddd; padding: 8px;'>Số tiền hoàn trả</td>
+                          <td style='border: 1px solid #ddd; padding: 8px;'>{refundAmount:N0} VNĐ</td>
+                      </tr>
+                      <tr>
+                          <td style='border: 1px solid #ddd; padding: 8px;'>Lý do hoàn tiền</td>
+                          <td style='border: 1px solid #ddd; padding: 8px;'>{refundReason}</td>
+                      </tr>
+                  </table>
+                  <p>Số tiền hoàn trả sẽ được chuyển vào tài khoản của bạn trong vòng 5-7 ngày làm việc.</p>
+                  <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi.</p>
                   <p>Trân trọng,</p>
                   <p>Đội ngũ FutureTech</p>"
             };

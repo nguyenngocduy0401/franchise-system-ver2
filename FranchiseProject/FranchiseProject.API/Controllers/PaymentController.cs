@@ -137,6 +137,13 @@ namespace FranchiseProject.API.Controllers
         {
             return await _paymentService.CreateRefundPayment(model);
         }
+        [SwaggerOperation(Summary = "Calculate refund amount for a course registration {Authorize = AgencyManager, AgencyStaff}")]
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
+        [HttpGet("calculate-refund/{registerCourseId}")]
+        public async Task<ApiResponse<decimal>> CalculateRefundAmount(Guid registerCourseId)
+        {
+            return await _paymentService.CalculateRefundAmount(registerCourseId);
+        }
     }
 }
 
