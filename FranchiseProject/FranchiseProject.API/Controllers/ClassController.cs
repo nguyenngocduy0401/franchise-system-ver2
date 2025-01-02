@@ -1,5 +1,6 @@
 ﻿using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
+using FranchiseProject.Application.ViewModels.AssignmentViewModels;
 using FranchiseProject.Application.ViewModels.ChapterViewModels;
 using FranchiseProject.Application.ViewModels.ClassScheduleViewModels;
 using FranchiseProject.Application.ViewModels.ClassViewModel;
@@ -24,11 +25,20 @@ namespace FranchiseProject.API.Controllers
         private readonly IClassService _classService;
         private readonly IQuizService _quizService;
         private readonly IChapterService _chapterService;
-        public ClassController(IClassService classService, IQuizService quizService, IChapterService chapterService)
+        private readonly IAssignmentService _assignmentService;
+        public ClassController(IClassService classService, IQuizService quizService, IChapterService chapterService, IAssignmentService assignmentService)
         {
             _classService = classService;
             _quizService = quizService;
             _chapterService = chapterService;
+            _assignmentService = assignmentService;
+        }
+        [Authorize(Roles = AppRole.Instructor)]
+        [SwaggerOperation(Summary = "lấy danhh sách bài tập bằng classId {Authorize = Instructor}")]
+        [HttpGet("{id}/assignments")]
+        public async Task<ApiResponse<List<AsmSubmitDetailViewModel>>> GetAllAsmByClassId(Guid id)
+        {
+            return await _assignmentService.GetAllAsmByClassId(id);
         }
         [SwaggerOperation(Summary = "Tạo mới lớp học {Authorize = AgencyManager ,AgencyStaff}")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]

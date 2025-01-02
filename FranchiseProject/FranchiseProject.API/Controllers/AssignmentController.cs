@@ -62,13 +62,6 @@ namespace FranchiseProject.API.Controllers
         {
             return await _assignmentService.GetAssignmentSubmissionAsync(id, pageIndex, pageSize);
         }
-        [Authorize(Roles = AppRole.Instructor )]
-        [SwaggerOperation(Summary = "lấy danhh sách bài tập  bằng classId {Authorize = Instructor}")]
-        [HttpGet("classes/{id}")]
-        public async Task<ApiResponse<List<AsmSubmitDetailViewModel>>> GetAllAsmByClassId(Guid id)
-        {
-            return await _assignmentService.GetAllAsmByClassId(id);
-        }
         [Authorize(Roles = AppRole.Student)]
         [SwaggerOperation(Summary = "Học sinh lấy danhh sách bài tập  bằng classId {Authorize =Student}")]
         [HttpGet("~/student/api/v1/assignments/classes/{id}")]

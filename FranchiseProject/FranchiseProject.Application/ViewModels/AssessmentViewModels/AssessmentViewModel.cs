@@ -15,7 +15,7 @@ namespace FranchiseProject.Application.ViewModels.AssessmentViewModels
         public int Number { get; set; }
         public AssessmentTypeEnum Type { get; set; }
         public string? Content { get; set; }
-        public int Quatity { get; set; }
+        public int Quantity { get; set; }
         public double Weight { get; set; }
         public double CompletionCriteria { get; set; }
         //public string? Duration { get; set; }
