@@ -41,7 +41,10 @@ namespace FranchiseProject.Application.Services
         private readonly RoleManager<Role> _roleManager;
         private readonly IEmailService _emailService;
         private readonly IHubContext<NotificationHub> _hubContext;
-        public AssignmentService(IEmailService emailService, IHubContext<NotificationHub> hubContext, IMapper mapper, IUnitOfWork unitOfWork, IClaimsService claimsService, IValidator<CreateAssignmentViewModel> validator, UserManager<User> userManager, RoleManager<Role> roleManager)
+        private readonly ICurrentTime _currentTime;
+        public AssignmentService(IEmailService emailService, IHubContext<NotificationHub> hubContext, IMapper mapper,
+            IUnitOfWork unitOfWork, IClaimsService claimsService, IValidator<CreateAssignmentViewModel> validator,
+            UserManager<User> userManager, RoleManager<Role> roleManager, ICurrentTime currentTime)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -51,7 +54,7 @@ namespace FranchiseProject.Application.Services
             _userManager = userManager;
             _hubContext = hubContext;
             _emailService = emailService;
-
+            _currentTime = currentTime;
         }
         #endregion
         public async Task<ApiResponse<bool>> CreateAssignmentAsync(CreateAssignmentViewModel assignmentModel)
@@ -221,7 +224,7 @@ namespace FranchiseProject.Application.Services
                     UserId = currentUserId.ToString(),
                     FileSubmitURL = fileSubmitUrl,
                     FileSbumitName=fileSubmitName,
-                    SubmitDate = DateTime.UtcNow
+                    SubmitDate = _currentTime.GetCurrentTime(),
                 };
                 await _unitOfWork.AssignmentSubmitRepository.AddAsync(assignmentSubmit);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
