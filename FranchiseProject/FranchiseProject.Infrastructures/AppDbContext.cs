@@ -75,7 +75,7 @@ namespace FranchiseProject.Infrastructures
                      new Agency
                      {
                          Id = Guid.Parse("BE37023D-6A58-4B4B-92E5-39DCECE45473"),
-                         Status = AgencyStatusEnum.Approved,
+                         Status = AgencyStatusEnum.Active,
                          Name = "Nguyễn Hồng"
                          
                      }

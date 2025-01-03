@@ -152,7 +152,6 @@ namespace FranchiseProject.Application.Services
                 var paginationResult = await _unitOfWork.AgencyRepository.GetFilterAsync(
                       filter: s =>
                     (!filter.Status.HasValue || s.Status == filter.Status) &&
-                    (!filter.Activity.HasValue || s.ActivityStatus == filter.Activity) &&
                     (string.IsNullOrEmpty(filter.SearchInput) || (
                     s.Name != null && s.Name.Contains(filter.SearchInput) ||
                     s.Address != null && s.Address.Contains(filter.SearchInput) ||
@@ -331,70 +330,7 @@ namespace FranchiseProject.Application.Services
                             existingUser.Status = UserStatusEnum.active;
                         }
                         break;
-                    case AgencyStatusEnum.Approved:
-                        var existingUser1 = await _unitOfWork.UserRepository.GetByAgencyIdAsync(agencyId);
-
-                        if (existingUser1 == null)
-                        {
-                            var userCredentials = await _userService.GenerateUserCredentials(agency.Name);
-
-                            var newUser = new User
-                            {
-                                UserName = userCredentials.UserName,
-                                PasswordHash = userCredentials.Password,
-                                AgencyId = agencyId,
-                                Status = UserStatusEnum.active,
-                                Email = agency.Email,
-                                PhoneNumber = agency.PhoneNumber,
-                            };
-                            await _unitOfWork.UserRepository.CreateUserAndAssignRoleAsync(newUser, RolesEnum.AgencyManager.ToString());
-
-                            var emailMessage = new MessageModel
-                            {
-                                To = agency.Email,
-                                Subject = "[futuretech-noreply] Chào Mừng Đối Tác Chính Thức",
-                                Body = $"<p>Chào {agency.Name},</p>" +
-                                       $"<p>Chúng tôi rất vui mừng thông báo rằng bạn đã trở thành đối tác chính thức của chúng tôi!</p>" +
-                                       $"<p>Chúng tôi tin tưởng rằng sự hợp tác này sẽ mang lại lợi ích to lớn cho cả hai bên và chúng tôi mong muốn cùng nhau phát triển mạnh mẽ trong thời gian tới.</p>" +
-                                       $"<p>Đây là thông tin tài khoản để bạn có thể đăng nhập hệ thống:</p>" +
-                                       $"<ul>" +
-                                       $"<li><strong>Username:</strong> {newUser.UserName}</li>" +
-                                       $"<li><strong>Password:</strong> {userCredentials.Password}</li>" +
-                                       $"</ul>" +
-                                       $"<p>Vui lòng bảo mật thông tin đăng nhập này và không chia sẻ với bất kỳ ai.</p>" +
-                                       $"<p>Chúng tôi rất mong được hợp tác cùng bạn. Trân trọng!</p>" +
-                                       $"<p>Đội ngũ Futuretech</p>"
-                            };
-
-                            bool emailSent = await _emailService.SendEmailAsync(emailMessage);
-                            if (!emailSent)
-                            {
-                                response.Message += " (Lỗi khi gửi email)";
-                            }
-                        }
-                        else
-                        {
-                            existingUser1.Status = UserStatusEnum.active;
-                            var emailMessage = new MessageModel
-                            {
-                                To = agency.Email,
-                                Subject = "[futuretech-noreply] Chào Mừng Đối Tác Chính Thức",
-                                Body = $"<p>Chào {agency.Name},</p>" +
-                                       $"<p>Chúng tôi rất vui mừng thông báo rằng bạn đã trở thành đối tác chính thức của chúng tôi!</p>" +
-                                       $"<p>Thông tin tài khoản đã được kích hoạt với trạng thái Active.</p>" +
-                                       $"<p>Chúng tôi rất mong được hợp tác cùng bạn. Trân trọng!</p>" +
-                                       $"<p>Đội ngũ Futuretech</p>"
-                            };
-
-                            bool emailSent = await _emailService.SendEmailAsync(emailMessage);
-                            if (!emailSent)
-                            {
-                                response.Message += " (Lỗi khi gửi email)";
-                            }
-                        }
-
-                        break;
-
+                    
                     case AgencyStatusEnum.Active:
                         var agencyregister = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
                         if (agencyregister != null)

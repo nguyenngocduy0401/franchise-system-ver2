@@ -9,7 +9,6 @@ namespace FranchiseProject.Domain.Enums
     public enum AgencyStatusEnum
     {
         Processing,                  // Chờ duyệt
-        Approved,                    // Đã duyệt
         Active,                      // Đang hoạt động
         Suspended,                   // Tạm ngưng hoạt động
         Inactive                     // Không hoạt động

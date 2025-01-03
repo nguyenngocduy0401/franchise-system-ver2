@@ -587,5 +587,8 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<ClassScheduleByInstructorViewModel>($"Error retrieving class schedule: {ex.Message}");
             }
         }
+       /* public async Task<ApiResponse<ClassScheduleByInstructorViewModel>> GetClassScheduleDetailByStudentAsync(Guid classId) 
+        {
+        }*/
     }
 }
