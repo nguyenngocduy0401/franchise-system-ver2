@@ -41,6 +41,12 @@ namespace FranchiseProject.API.Controllers
             _classService = classService;
             _userChapterMaterialService = userChapterMaterialService;
         }
+        [SwaggerOperation(Summary = "Lấy version cũ của khóa học để so sánh")]
+        [HttpGet("{id}/old-versions")]
+        public async Task<ApiResponse<CourseDetailViewModel>> GetOldVersionCourseByIdAsync(Guid id)
+        {
+            return await _courseService.GetOldVersionCourseByIdAsync(id);
+        }
         [Authorize()]
         [SwaggerOperation(Summary = "Lấy tỉ lệ hoàn thành khóa học  {Authorize}")]
         [HttpGet("{courseId}/users/{userId}/percents")]

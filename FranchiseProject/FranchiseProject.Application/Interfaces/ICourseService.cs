@@ -14,6 +14,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface ICourseService
     {
+        Task<ApiResponse<CourseDetailViewModel>> GetOldVersionCourseByIdAsync(Guid courseId);
         Task<ApiResponse<bool>> UpdateCourseStatusAsync(Guid courseId, CourseStatusEnum courseStatusEnum);
         Task<ApiResponse<CourseDetailViewModel>> CreateCourseVersionAsync(Guid courseId);
         Task<ApiResponse<IEnumerable<CourseViewModel>>> GetAllCoursesAvailableAsync();

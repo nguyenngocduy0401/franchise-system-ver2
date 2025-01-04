@@ -60,6 +60,32 @@ namespace FranchiseProject.Application.Services
             _createChapterFileValidator = createChapterFileValidator;
         }
         #endregion
+        public async Task<ApiResponse<CourseDetailViewModel>> GetOldVersionCourseByIdAsync(Guid courseId)
+        {
+            var response = new ApiResponse<CourseDetailViewModel>();
+            try
+            {
+                var course = (await _unitOfWork.CourseRepository.FindAsync(c => c.Id == courseId)).FirstOrDefault();
+                if (course == null) throw new Exception("Course does not exist!");
+                var oldCourse = new Course();
+                if (course.Version <= 1)
+                {
+                    oldCourse = await _unitOfWork.CourseRepository.GetCourseDetailAsync(courseId);
+                }
+                else 
+                {
+                    var oldVersion = course.Version - 1;
+                    oldCourse = await _unitOfWork.CourseRepository.GetCourseByCodeAndVersionAsync(course.Code, (int)oldVersion);
+                }
+                var courseModel = _mapper.Map<CourseDetailViewModel>(oldCourse);
+                response = ResponseHandler.Success(courseModel);
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<CourseDetailViewModel>(ex.Message);
+            }
+            return response;
+        }
         public async Task<ApiResponse<CourseStudentViewModel>> GetCourseByLoginAsync(Guid courseId)
         {
             var response = new ApiResponse<CourseStudentViewModel>();
@@ -82,7 +108,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-       
         public async Task<ApiResponse<CourseDetailViewModel>> CreateCourseVersionAsync(Guid courseId)
         {
             var response = new ApiResponse<CourseDetailViewModel>();
@@ -107,8 +132,6 @@ namespace FranchiseProject.Application.Services
 
             return response;
         }
-            
-
         public async Task<ApiResponse<bool>> DeleteCourseByIdAsync(Guid courseId)
         {
             var response = new ApiResponse<bool>();
@@ -148,7 +171,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
         public async Task<ApiResponse<bool>> UpdateCourseAsync(Guid courseId, UpdateCourseModel updateCourseModel)
         {
             var response = new ApiResponse<bool>();
@@ -177,7 +199,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
         public async Task<ApiResponse<Pagination<CourseViewModel>>> FilterCourseAsync(FilterCourseModel filterCourseViewModel)
         {
             var response = new ApiResponse<Pagination<CourseViewModel>>();
@@ -229,7 +250,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
         public async Task<ApiResponse<bool>> CheckCourseAvailableAsync(Guid? courseId, CourseStatusEnum status)
         {
             var response = new ApiResponse<bool>();
@@ -259,7 +279,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
         public async Task<ApiResponse<bool>> UpdateCourseStatusAsync(Guid courseId, CourseStatusEnum courseStatusEnum)
         {
             var response = new ApiResponse<bool>();
@@ -616,8 +635,7 @@ namespace FranchiseProject.Application.Services
             response.isSuccess = true;
             response.Data = course;
             return response;
-        }
-       
+        }     
         private async Task<Course> ExtractAssessmentFromWorksheetAsync(IXLWorksheet worksheet, Course course)
         {
             var rows = worksheet.RangeUsed().RowsUsed();
