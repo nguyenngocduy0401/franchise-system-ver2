@@ -34,11 +34,12 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Where(c => c.Id == courseId)
                 .SelectMany(c => c.Chapters)
                 .SelectMany(ct => ct.ChapterMaterials)
-                .SelectMany(cm => cm.UserChapterMaterials)
                 .Distinct();
             var totalChapterMaterial = await userChapterMaterials.CountAsync();
             var totalUserChapterMaterial = await userChapterMaterials
+                .SelectMany(cm => cm.UserChapterMaterials)
                 .Where(uc => uc.UserId == userId)
+                .Distinct()
                 .CountAsync();
             return (double)(totalUserChapterMaterial / totalChapterMaterial) * 100;
         }
