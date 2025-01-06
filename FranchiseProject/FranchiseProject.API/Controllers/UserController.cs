@@ -148,7 +148,7 @@ namespace FranchiseProject.API.Controllers
 		[HttpGet("~/agency-manager/api/v1/users")]
 		public async Task<ApiResponse<Pagination<UserViewModel>>> FilterUserByAgencyManagerAsync([FromQuery] FilterUserByAgencyModel filterUserByAgencyModel)
 			=> await _userService.FilterUserByAgencyManagerAsync(filterUserByAgencyModel);
-        [Authorize()]
+        //[Authorize()]
         [SwaggerOperation(Summary = "học sinh lấy thống kê điểm{Authorize}")]
         [HttpGet("mine/classes/{id}/assessments")]
         public async Task<ApiResponse<AssessmentStudentViewModel>> GetStudentAssessmentByLoginAsync(Guid id)

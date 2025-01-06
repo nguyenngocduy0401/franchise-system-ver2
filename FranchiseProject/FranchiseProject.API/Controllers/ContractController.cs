@@ -32,7 +32,7 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles= AppRole.AgencyManager)]
         public async Task<ApiResponse<bool>> AgencyUploadUploadContractAsync(string ContractDocumentImageURL, Guid AgencyId)
         {
-            return await _contractService.AgencyUploadUploadContractAsync(ContractDocumentImageURL, AgencyId);
+            return await _contractService.AgencyUploadContractAsync(ContractDocumentImageURL, AgencyId);
         }
         [SwaggerOperation(Summary = "Cập nhật hợp đồng {Authorize = Manager,Admin}")]
         [HttpPut("{id}")]

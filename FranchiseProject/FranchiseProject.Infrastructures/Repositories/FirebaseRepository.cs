@@ -1,4 +1,5 @@
 ﻿using Firebase.Storage;
+using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
 
@@ -7,10 +8,12 @@ namespace FranchiseProject.Infrastructures.Repositories
     public class FirebaseRepository : IFirebaseRepository
     {
         private readonly FirebaseStorage _firebaseStorage;
-        private string bucket = "futuretech-b367a.appspot.com";
-        public FirebaseRepository()
+        private string _bucket;
+        //futuretech-b367a.appspot.com
+        public FirebaseRepository(AppConfiguration config)
         {
-            _firebaseStorage = new FirebaseStorage(bucket);
+            _firebaseStorage = new FirebaseStorage(config.Bucket);
+            _bucket = config.Bucket;
         }
 
         public async Task<string> UploadFileAsync(Stream fileStream, string fileName)
@@ -48,7 +51,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         private string ExtractFilePathFromURL(string url)
         {
             // Define the base URL part to remove from the full URL
-            var baseUrl = "https://firebasestorage.googleapis.com/v0/b/" + bucket + "/o/";
+            var baseUrl = "https://firebasestorage.googleapis.com/v0/b/" + _bucket + "/o/";
 
             // Remove the base URL part from the provided URL
             var filePath = url.Replace(baseUrl, "");

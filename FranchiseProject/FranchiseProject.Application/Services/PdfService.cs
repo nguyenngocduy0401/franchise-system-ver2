@@ -1,6 +1,8 @@
-﻿using FranchiseProject.Application.Interfaces;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ContractViewModels;
-using iTextSharp.text;
+using iText.Forms;
+using iText.IO.Font;
 using iTextSharp.text.pdf;
 using Microsoft.Extensions.Configuration;
 using System.IO;
@@ -17,14 +19,91 @@ namespace FranchiseProject.API.Services
         {
             _httpClient = new HttpClient(); _configuration = configuration;
         }
-        
+
+
+        public async Task<Stream> FillPdfTemplate(string studentName, DateTime date, string courseName)
+        {
+            string firebaseUrl = "https://firebasestorage.googleapis.com/v0/b/franchise-project-1ea45.firebasestorage.app/o/net_intern_NguyenNgocDuy_resume.pdf?alt=media&token=1dfcbc6d-6bad-4909-9ad1-322c79aef27d";
+            Stream pdfTemplateStream = await DownloadFileFromFirebaseAsync(firebaseUrl);
+
+            if (pdfTemplateStream == null)
+            {
+                throw new Exception("Không thể tải tệp PDF từ Firebase.");
+            }
+
+            var outputStream = new MemoryStream();
+            try
+            {
+                using (var reader = new PdfReader(pdfTemplateStream))
+                {
+                    if (reader == null)
+                    {
+                        throw new Exception("Không thể tạo PdfReader từ stream.");
+                    }
+                    using (var stamper = new PdfStamper(reader, outputStream))
+                    {
+                        // Kiểm tra đường dẫn font
+                        string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "ARIAL.TTF");
+                        if (!File.Exists(fontPath))
+                        {
+                            throw new FileNotFoundException($"Font ARIAL.TTF không tìm thấy tại {fontPath}");
+                        }
+
+                        BaseFont bf = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                        float fontSize = 12.50f;
+                        var form = stamper.AcroFields;
+
+                        // In ra tất cả các tên trường trong PDF để xác nhận
+                        foreach (var field in form.Fields)
+                        {
+                            Console.WriteLine($"Field name: {field.Key}");
+                        }
+
+                        // Hàm điền vào trường với cỡ chữ và font
+                        void SetFieldWithFontSize(string fieldName, string value)
+                        {
+                            if (form.Fields.ContainsKey(fieldName))
+                            {
+                                form.SetFieldProperty(fieldName, "textfont", bf, null);
+                                form.SetFieldProperty(fieldName, "textsize", fontSize, null);
+                                form.SetFieldProperty(fieldName, "alignment", PdfFormField.Q_CENTER, null);
+                                form.SetField(fieldName, value);
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Trường {fieldName} không tồn tại trong PDF.");
+                            }
+                        }
+
+                        // Điền thông tin vào các trường
+                        SetFieldWithFontSize("ContractCode", studentName ?? "");
+                        SetFieldWithFontSize("Date", date.ToString("yyyy-MM-dd"));
+                        SetFieldWithFontSize("CourseName", courseName ?? "");
+
+                        stamper.FormFlattening = true;
+                    }
+                }
+
+                // Trả về stream kết quả
+                var finalOutputStream = new MemoryStream(outputStream.ToArray());
+                finalOutputStream.Position = 0;
+                return finalOutputStream;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Có lỗi xảy ra: {ex.Message}");
+                throw;
+            }
+        }
+
+      
         public async Task<Stream> FillDocumentTemplate(InputContractViewModel contract)
         {
             string templatePath = _configuration["ContractTemplateUrl"];
 
             using (var doc = DocX.Load(templatePath))
             {
-                var Deposit =contract.Deposit;
+                var Deposit = contract.Deposit;
                 var totalMoneyParse = contract.TotalMoney.HasValue ? NumberToWordsConverter.ConvertToWords(contract.TotalMoney.Value) : "";
                 var depositParse = Deposit.HasValue ? NumberToWordsConverter.ConvertToWords(Deposit.Value) : "";
                 var FranchiseFeeParse = contract.FranchiseFee.HasValue ? NumberToWordsConverter.ConvertToWords(contract.FranchiseFee.Value) : "";
@@ -46,15 +125,23 @@ namespace FranchiseProject.API.Services
                 return memoryStream;
             }
         }
-            private async Task<Stream> DownloadFileFromFirebaseAsync(string url)
+        private async Task<Stream> DownloadFileFromFirebaseAsync(string url)
         {
-            var response = await _httpClient.GetAsync(url);
-            response.EnsureSuccessStatusCode(); 
+            try
+            {
+                var response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode(); // Kiểm tra thành công
 
-            var memoryStream = new MemoryStream();
-            await response.Content.CopyToAsync(memoryStream);
-            memoryStream.Position = 0; // Đặt lại vị trí của stream về đầu.
-            return memoryStream;
+                var memoryStream = new MemoryStream();
+                await response.Content.CopyToAsync(memoryStream);
+                memoryStream.Position = 0; // Đặt lại vị trí của stream về đầu
+                return memoryStream;
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi tải tệp, ví dụ: không tìm thấy URL, không kết nối được với Firebase
+                throw new Exception($"Lỗi khi tải tệp từ Firebase: {ex.Message}", ex);
+            }
         }
         public class NumberToWordsConverter
         {

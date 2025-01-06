@@ -12,6 +12,8 @@ namespace FranchiseProject.Application.ViewModels.AssessmentViewModels
         public AssessmentQuizViewModel? AssessmentQuizView { get; set; }
         public AssessmentAssignmentViewModel? AssessmentAssignmentView { get; set; }
         public AssessmentFinalViewModel? AssessmentFinalViewModel { get; set; }
+        public string? Certification { get; set; }
+        public double MinAvgMarkToPass { get; set; }
         public double AverageScore { get; set; }
     }
 }

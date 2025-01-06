@@ -20,7 +20,7 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<ContractViewModel>> GetContractByIdAsync(string id);
         Task<ApiResponse<string>> DownloadContractAsPdfAsync(Guid agencyId);
         Task<ApiResponse<ContractViewModel>> GetContractbyAgencyId(Guid agencyId);
-        Task<ApiResponse<bool>> AgencyUploadUploadContractAsync(string ContractDocumentImageURL, Guid AgencyId);
+        Task<ApiResponse<bool>> AgencyUploadContractAsync(string ContractDocumentImageURL, Guid AgencyId);
         Task<ApiResponse<string>> UploadContractTemplateAsync(IFormFile file);
     }
 }

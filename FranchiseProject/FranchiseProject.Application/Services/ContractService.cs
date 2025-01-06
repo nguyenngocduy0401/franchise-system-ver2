@@ -155,7 +155,7 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> AgencyUploadUploadContractAsync(string ContractDocumentImageURL,Guid AgencyId)
+        public async Task<ApiResponse<bool>> AgencyUploadContractAsync(string ContractDocumentImageURL,Guid AgencyId)
         {
             var response = new ApiResponse<bool>();
             try

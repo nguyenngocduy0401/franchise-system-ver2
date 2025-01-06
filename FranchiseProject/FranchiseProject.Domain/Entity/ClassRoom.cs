@@ -17,6 +17,7 @@ namespace FranchiseProject.Domain.Entity
         public Guid? ClassId { get; set; }
         [ForeignKey("ClassId")]
         public Class? Class { get; set; }
+        public string? Certification { get; set; }
         public ClassRoomEnumStatus? Status { get; set; }
         public DateOnly? FromDate { get; set; }
         public DateOnly? ToDate { get;set; }
