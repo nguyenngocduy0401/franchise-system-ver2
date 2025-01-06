@@ -628,16 +628,27 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<string>> StudentExistRegisterCourse(string courseId)
+        public async Task<ApiResponse<string>> StudentExistRegisterCourse(string classId)
         {
             var response = new ApiResponse<string>();
             try
             {
-                var courseGuidId = Guid.Parse(courseId);
+                var classGuidId = Guid.Parse(classId);
                 var studentId = _claimsService.GetCurrentUserId.ToString();
-                var student =await _userManager.FindByIdAsync(studentId);
+                var student = await _userManager.FindByIdAsync(studentId);
+
+                // Lấy thông tin lớp học
+                var classInfo = await _unitOfWork.ClassRepository.GetExistByIdAsync(classGuidId);
+                if (classInfo == null)
+                {
+                    return ResponseHandler.Failure<string>("Không tìm thấy lớp học");
+                }
+
+                var courseId = classInfo.CourseId;
+
+                // Kiểm tra đăng ký hiện có
                 var existingRegistration = await _unitOfWork.RegisterCourseRepository
-                    .GetFirstOrDefaultAsync(rc => rc.CourseId == courseGuidId
+                    .GetFirstOrDefaultAsync(rc => rc.CourseId == courseId
                                                 && rc.UserId == studentId
                                                 && (rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
                                                     || rc.StudentCourseStatus == StudentCourseStatusEnum.Pending
@@ -647,36 +658,42 @@ namespace FranchiseProject.Application.Services
                     return ResponseHandler.Failure<string>("Bạn đã đăng ký khóa học này");
                 }
 
-                var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(courseGuidId);
-                if (course == null)
-                {
-                    return ResponseHandler.Failure<string>("Không tìm thấy khóa học");
-                }
-                var isConflict = await CheckScheduleConflict(studentId, courseGuidId);
+                // Kiểm tra xung đột lịch học
+                var isConflict = await CheckScheduleConflict(studentId, classGuidId);
                 if (isConflict)
                 {
-                    return ResponseHandler.Failure<string>("Lịch học của khóa học này bị trùng với lịch học hiện tại của bạn");
+                    return ResponseHandler.Failure<string>("Lịch học của lớp này bị trùng với lịch học hiện tại của bạn");
                 }
+
+                // Tạo đăng ký mới
                 var registerC = new RegisterCourse
                 {
-                    CourseId = courseGuidId,
+                    CourseId = courseId,
                     UserId = studentId,
-                    StudentCourseStatus = StudentCourseStatusEnum.Pending,
+                    StudentCourseStatus = StudentCourseStatusEnum.Enrolled,
                 };
                 await _unitOfWork.RegisterCourseRepository.AddAsync(registerC);
                 await _unitOfWork.SaveChangeAsync();
 
-                // Create payment URL using VnPayService
+                // Tạo URL thanh toán
                 var paymentViewModel = new AgencyCoursePaymentViewModel
                 {
-                    CourseId = courseGuidId,
+                    CourseId = courseId.Value,
                     UserId = studentId,
                     AgencyId = student.AgencyId.Value,
                     RegisterCourseId = registerC.Id
                 };
+                var tempRegistration = new TempRegistrations
+                {
+                    UserId = studentId,
+                    CourseId = courseId.Value,
+                    ClassId = classGuidId,
+                    CreationDate = DateTime.Now
+                };
+                await _unitOfWork.TempRegistrationsRepository.AddAsync(tempRegistration);
                 var vnPayService = _serviceProvider.GetRequiredService<IVnPayService>();
                 var paymentUrl = await vnPayService.CreatePaymentUrlForAgencyCourse(paymentViewModel);
-
+                await _unitOfWork.SaveChangeAsync();
                 response = ResponseHandler.Success(paymentUrl, "Đã tạo URL thanh toán thành công");
                 return response;
             }
@@ -686,32 +703,34 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        private async Task<bool> CheckScheduleConflict(string studentId, Guid newCourseId)
+
+        // Cập nhật phương thức CheckScheduleConflict để sử dụng classId
+        private async Task<bool> CheckScheduleConflict(string studentId, Guid newClassId)
         {
-            var studentCourses = await _unitOfWork.RegisterCourseRepository
-                .GetAllAsync(rc => rc.UserId == studentId && rc.StudentCourseStatus == StudentCourseStatusEnum.Enrolled);
+            var studentClasses = await _unitOfWork.ClassRoomRepository
+                .GetAllAsync(cr => cr.UserId == studentId);
 
-            var newCourseSchedules = await _unitOfWork.ClassScheduleRepository
-                .GetAllAsync1(cs => cs.Class.CourseId == newCourseId);
+            var newClassSchedules = await _unitOfWork.ClassScheduleRepository
+                .GetAllAsync1(cs => cs.ClassId == newClassId);
 
-            foreach (var existingCourse in studentCourses)
+            foreach (var existingClass in studentClasses)
             {
                 var existingSchedules = await _unitOfWork.ClassScheduleRepository
-                    .GetAllAsync1(cs => cs.Class.CourseId == existingCourse.CourseId);
+                    .GetAllAsync1(cs => cs.ClassId == existingClass.ClassId);
 
-                foreach (var newSchedule in newCourseSchedules)
+                foreach (var newSchedule in newClassSchedules)
                 {
                     if (existingSchedules.Any(es =>
                         es.Date == newSchedule.Date &&
                         es.Slot.StartTime < newSchedule.Slot.EndTime &&
                         es.Slot.EndTime > newSchedule.Slot.StartTime))
                     {
-                        return true; 
+                        return true;
                     }
                 }
             }
 
-            return false; 
+            return false;
         }
         private async Task<string> GetDateTimeFromRegisterCourseAsync(string userId, Guid courseId)
         {

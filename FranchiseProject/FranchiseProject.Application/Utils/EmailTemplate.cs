@@ -109,9 +109,7 @@ namespace FranchiseProject.Application.Utils
                                     <td style='border: 1px solid #ddd; padding: 8px;'>Số tiền đã thanh toán</td>
                                     <td style='border: 1px solid #ddd; padding: 8px;'>{amount:N0} VNĐ</td>
                                 </tr>
-                                <tr>
-                                    <th style='border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2;' colspan='2'>Thông tin tài khoản</th>
-                                </tr>
+                       
                                 <tr>
                                     <th style='border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2;' colspan='2'>Thông tin lớp học</th>
                                 </tr>
