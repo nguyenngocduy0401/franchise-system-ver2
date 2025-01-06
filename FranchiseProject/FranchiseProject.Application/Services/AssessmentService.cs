@@ -393,7 +393,7 @@ namespace FranchiseProject.Application.Services
                             //var student = await _userManager.FindByIdAsync(studentId);
                             
                             //using (var pdfStream = await _pdfService.FillPdfTemplate(student.FullName, (DateTime)lastClassSchedule.Date, course.Name))
-                            using (var pdfStream = await _pdfService.FillPdfTemplate("duy", DateTime.Now, "course.Name"))
+                            using (var pdfStream = await _pdfService.FillPdfTemplate("Trần Lê Việt Hoàng ", DateTime.Now, "course.Name"))
                             {
                                 if (pdfStream == null)
                                 {

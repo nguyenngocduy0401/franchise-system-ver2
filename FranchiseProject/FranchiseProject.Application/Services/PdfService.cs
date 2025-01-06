@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.ViewModels.ContractViewModels;
 using iText.Forms;
@@ -23,7 +24,7 @@ namespace FranchiseProject.API.Services
 
         public async Task<Stream> FillPdfTemplate(string studentName, DateTime date, string courseName)
         {
-            string firebaseUrl = "https://firebasestorage.googleapis.com/v0/b/franchise-project-1ea45.firebasestorage.app/o/net_intern_NguyenNgocDuy_resume.pdf?alt=media&token=1dfcbc6d-6bad-4909-9ad1-322c79aef27d";
+            string firebaseUrl = "https://firebasestorage.googleapis.com/v0/b/franchise-project-1ea45.firebasestorage.app/o/certification%2FCh%E1%BB%A9ng%20ch%E1%BB%89%20c%C3%B4ng%20nh%E1%BA%ADn%20%C4%91%C6%A1n%20gi%E1%BA%A3n%20m%C3%A0u%20kem%20v%C3%A0%20m%C3%A0u%20v%C3%A0ng%20(1).pdf?alt=media&token=5c9232f2-35b0-411d-95a9-80b900bc609c";
             Stream pdfTemplateStream = await DownloadFileFromFirebaseAsync(firebaseUrl);
 
             if (pdfTemplateStream == null)
@@ -44,6 +45,8 @@ namespace FranchiseProject.API.Services
                     {
                         // Kiểm tra đường dẫn font
                         string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "ARIAL.TTF");
+                       
+                        BaseFont bfItalic = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
                         if (!File.Exists(fontPath))
                         {
                             throw new FileNotFoundException($"Font ARIAL.TTF không tìm thấy tại {fontPath}");
@@ -60,14 +63,16 @@ namespace FranchiseProject.API.Services
                         }
 
                         // Hàm điền vào trường với cỡ chữ và font
-                        void SetFieldWithFontSize(string fieldName, string value)
+                        void SetFieldWithFontStyle(string fieldName, string value, float fontSize, bool isItalic = false)
                         {
                             if (form.Fields.ContainsKey(fieldName))
                             {
-                                form.SetFieldProperty(fieldName, "textfont", bf, null);
+                                form.SetFieldProperty(fieldName, "textfont", isItalic ? bfItalic : bf, null);
                                 form.SetFieldProperty(fieldName, "textsize", fontSize, null);
                                 form.SetFieldProperty(fieldName, "alignment", PdfFormField.Q_CENTER, null);
+                                form.RegenerateField(fieldName);
                                 form.SetField(fieldName, value);
+
                             }
                             else
                             {
@@ -76,10 +81,9 @@ namespace FranchiseProject.API.Services
                         }
 
                         // Điền thông tin vào các trường
-                        SetFieldWithFontSize("ContractCode", studentName ?? "");
-                        SetFieldWithFontSize("Date", date.ToString("yyyy-MM-dd"));
-                        SetFieldWithFontSize("CourseName", courseName ?? "");
-
+               
+                        SetFieldWithFontStyle("CourseName", courseName ?? "", 15f, true);
+                        SetFieldWithFontStyle("StudentName", studentName ?? "", 45f, true);
                         stamper.FormFlattening = true;
                     }
                 }
