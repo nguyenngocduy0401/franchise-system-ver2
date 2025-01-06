@@ -2,12 +2,14 @@
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.VariantTypes;
 using DocumentFormat.OpenXml.Wordprocessing;
 using FluentValidation;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Handler;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Utils;
+using FranchiseProject.Application.ViewModels.EmailViewModels;
 using FranchiseProject.Application.ViewModels.NotificationViewModels;
 using FranchiseProject.Application.ViewModels.SlotViewModels;
 using FranchiseProject.Application.ViewModels.StudentViewModel;
@@ -27,6 +29,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Mail;
 using System.Security.Cryptography.Pkcs;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -188,10 +191,9 @@ namespace FranchiseProject.Application.Services
                     ToDate = classScheduleLatest?.Date != null ? DateOnly.FromDateTime(classScheduleLatest.Date.Value) : null,
                 };
                 await _unitOfWork.ClassRoomRepository.AddAsync(classRoom);
+
                 //gắn attendance
                 var classSchedules = await _unitOfWork.ClassScheduleRepository.GetAllClassScheduleAsync(cs => cs.ClassId == tempRegistration.ClassId);
-
-
                 foreach (var classSchedule in classSchedules)
                 {
                     var attendance = new Attendance
@@ -203,18 +205,29 @@ namespace FranchiseProject.Application.Services
                     await _unitOfWork.AttendanceRepository.AddAsync(attendance);
                 }
 
-                var generate = await _userService.GenerateUserCredentials(user.FullName);
-                user.UserName = generate.UserName;
-                await _userManager.AddToRoleAsync(user, AppRole.Student);
-                await _userManager.AddPasswordAsync(user, generate.Password);
-                var result = await _userManager.UpdateAsync(user);
+                bool isNewAccount = false;
+                string generatedPassword = null;
 
-                if (!result.Succeeded)
+                // Kiểm tra xem người dùng đã có vai trò Student chưa
+                if (!await _userManager.IsInRoleAsync(user, AppRole.Student))
                 {
-                    throw new Exception("Update User Account fail!");
-                }
-                //cap nhat thanh toan
+                    // Nếu chưa có vai trò Student, tạo thông tin đăng nhập mới
+                    var generate = await _userService.GenerateUserCredentials(user.FullName);
+                    user.UserName = generate.UserName;
+                    await _userManager.AddToRoleAsync(user, AppRole.Student);
+                    await _userManager.AddPasswordAsync(user, generate.Password);
+                    var result = await _userManager.UpdateAsync(user);
 
+                    if (!result.Succeeded)
+                    {
+                        throw new Exception("Cập nhật tài khoản người dùng thất bại!");
+                    }
+
+                    isNewAccount = true;
+                    generatedPassword = generate.Password;
+                }
+
+                //cap nhat thanh toan
                 rc.StudentPaymentStatus = StudentPaymentStatusEnum.Completed;
                 rc.UserId = user.Id;
                 var payment = await _unitOfWork.PaymentRepository.GetExistByIdAsync(paymentId);
@@ -223,37 +236,43 @@ namespace FranchiseProject.Application.Services
                 _unitOfWork.PaymentRepository.Update(payment);
                 _unitOfWork.RegisterCourseRepository.Update(rc);
 
-                // Gửi email 
-
-
+                // Gửi email
                 var startDate = classScheduleEarliest.Date.Value.ToString("dd/MM/yyyy");
                 var endDate = classScheduleLatest.Date.Value.ToString("dd/MM/yyyy");
                 var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync((Guid)classSchedules.FirstOrDefault().SlotId);
 
                 Dictionary<string, string> dayOfWeekMap = new Dictionary<string, string>
-                {
-                    { "Sunday", "Chủ nhật" },
-                    { "Monday", "Thứ hai" },
-                    { "Tuesday", "Thứ ba" },
-                    { "Wednesday", "Thứ tư" },
-                    { "Thursday", "Thứ năm" },
-                    { "Friday", "Thứ sáu" },
-                    { "Saturday", "Thứ bảy" }
-                };
+        {
+            { "Sunday", "Chủ nhật" },
+            { "Monday", "Thứ hai" },
+            { "Tuesday", "Thứ ba" },
+            { "Wednesday", "Thứ tư" },
+            { "Thursday", "Thứ năm" },
+            { "Friday", "Thứ sáu" },
+            { "Saturday", "Thứ bảy" }
+        };
                 string vietnameseDayOfWeek = dayOfWeekMap.ContainsKey(class1.DayOfWeek) ? dayOfWeekMap[class1.DayOfWeek] : "None";
                 var studentDayOfWeek = vietnameseDayOfWeek + "-" + slot?.StartTime + "-" + slot?.EndTime;
 
-
                 var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(user.AgencyId.Value);
+                var address = agency.Address + ", " + agency.Ward + ", " + agency.District + ", " + agency.City;
 
-                var address = agency.Address + ", " + agency.Ward + ", " +agency.District + ", " + agency.City;
-                var emailMessage = EmailTemplate.SuccessRegisterCourseEmaill(user.Email, user.FullName, course.Name, generate.UserName, generate.Password,
-                    (decimal)course.Price, studentDayOfWeek, startDate, endDate, address);
+               MessageModel  emailMessage;
+                if (isNewAccount)
+                {
+                     emailMessage = EmailTemplate.SuccessRegisterCourseEmaill(user.Email, user.FullName, course.Name, user.UserName, generatedPassword,
+                        (decimal)course.Price, studentDayOfWeek, startDate, endDate, address);
+                }
+                else
+                {
+                    emailMessage = EmailTemplate.SuccessRegisterCourseEmailWithoutCredentials(user.Email, user.FullName, course.Name, user.UserName, generatedPassword,
+                        (decimal)course.Price, studentDayOfWeek, startDate, endDate, address);
+                }
 
                 bool emailSent = await _emailService.SendEmailAsync(emailMessage);
+
                 //Gui noti 
                 var agencyUserIds = await _unitOfWork.UserRepository.GetAgencyUsersAsync(user.AgencyId.Value);
-
                 if (agencyUserIds != null && agencyUserIds.Any())
                 {
                     var noti = new SendNotificationViewModel
@@ -264,6 +283,7 @@ namespace FranchiseProject.Application.Services
                     await _notificationService.CreateAndSendNotificationNoReponseForRegisterAsync(noti);
                     await _unitOfWork.SaveChangeAsync();
                 }
+
                 // Xóa thông tin tạm thời
                 _unitOfWork.TempRegistrationsRepository.HardRemove(tempRegistration);
 
@@ -608,27 +628,35 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> StudentExistRegisterCourse(string courseId)
+        public async Task<ApiResponse<string>> StudentExistRegisterCourse(string courseId)
         {
-            var response = new ApiResponse<bool>();
-
+            var response = new ApiResponse<string>();
             try
             {
                 var courseGuidId = Guid.Parse(courseId);
                 var studentId = _claimsService.GetCurrentUserId.ToString();
-
+                var student =await _userManager.FindByIdAsync(studentId);
                 var existingRegistration = await _unitOfWork.RegisterCourseRepository
-             .GetFirstOrDefaultAsync(rc => rc.CourseId == courseGuidId
-                                           && rc.UserId == studentId
-                                           && (rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
-                                               || rc.StudentCourseStatus == StudentCourseStatusEnum.Pending
-                                              ));
-
+                    .GetFirstOrDefaultAsync(rc => rc.CourseId == courseGuidId
+                                                && rc.UserId == studentId
+                                                && (rc.StudentCourseStatus == StudentCourseStatusEnum.Waitlisted
+                                                    || rc.StudentCourseStatus == StudentCourseStatusEnum.Pending
+                                                   ));
                 if (existingRegistration != null)
                 {
-                    return ResponseHandler.Failure<bool>("Bạn đã đăng kí khóa học này ");
+                    return ResponseHandler.Failure<string>("Bạn đã đăng ký khóa học này");
                 }
 
+                var course = await _unitOfWork.CourseRepository.GetExistByIdAsync(courseGuidId);
+                if (course == null)
+                {
+                    return ResponseHandler.Failure<string>("Không tìm thấy khóa học");
+                }
+                var isConflict = await CheckScheduleConflict(studentId, courseGuidId);
+                if (isConflict)
+                {
+                    return ResponseHandler.Failure<string>("Lịch học của khóa học này bị trùng với lịch học hiện tại của bạn");
+                }
                 var registerC = new RegisterCourse
                 {
                     CourseId = courseGuidId,
@@ -637,18 +665,53 @@ namespace FranchiseProject.Application.Services
                 };
                 await _unitOfWork.RegisterCourseRepository.AddAsync(registerC);
                 await _unitOfWork.SaveChangeAsync();
-                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (!isSuccess) throw new Exception("Đăng kí thất bại ");
 
-                response = ResponseHandler.Success(true, "Đăng kí thành công");
+                // Create payment URL using VnPayService
+                var paymentViewModel = new AgencyCoursePaymentViewModel
+                {
+                    CourseId = courseGuidId,
+                    UserId = studentId,
+                    AgencyId = student.AgencyId.Value,
+                    RegisterCourseId = registerC.Id
+                };
+                var vnPayService = _serviceProvider.GetRequiredService<IVnPayService>();
+                var paymentUrl = await vnPayService.CreatePaymentUrlForAgencyCourse(paymentViewModel);
+
+                response = ResponseHandler.Success(paymentUrl, "Đã tạo URL thanh toán thành công");
                 return response;
             }
             catch (Exception ex)
             {
-                response = ResponseHandler.Failure<bool>(ex.Message);
+                response = ResponseHandler.Failure<string>(ex.Message);
+            }
+            return response;
+        }
+        private async Task<bool> CheckScheduleConflict(string studentId, Guid newCourseId)
+        {
+            var studentCourses = await _unitOfWork.RegisterCourseRepository
+                .GetAllAsync(rc => rc.UserId == studentId && rc.StudentCourseStatus == StudentCourseStatusEnum.Enrolled);
+
+            var newCourseSchedules = await _unitOfWork.ClassScheduleRepository
+                .GetAllAsync1(cs => cs.Class.CourseId == newCourseId);
+
+            foreach (var existingCourse in studentCourses)
+            {
+                var existingSchedules = await _unitOfWork.ClassScheduleRepository
+                    .GetAllAsync1(cs => cs.Class.CourseId == existingCourse.CourseId);
+
+                foreach (var newSchedule in newCourseSchedules)
+                {
+                    if (existingSchedules.Any(es =>
+                        es.Date == newSchedule.Date &&
+                        es.Slot.StartTime < newSchedule.Slot.EndTime &&
+                        es.Slot.EndTime > newSchedule.Slot.StartTime))
+                    {
+                        return true; 
+                    }
+                }
             }
 
-            return response;
+            return false; 
         }
         private async Task<string> GetDateTimeFromRegisterCourseAsync(string userId, Guid courseId)
         {

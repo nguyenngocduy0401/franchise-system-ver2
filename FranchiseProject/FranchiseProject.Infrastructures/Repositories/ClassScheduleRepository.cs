@@ -98,5 +98,9 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             return await _dbContext.Set<ClassSchedule>().FirstOrDefaultAsync(predicate);
         }
+        public async Task<List<ClassSchedule>> GetAllAsync1(Expression<Func<ClassSchedule, bool>> predicate)
+        {
+            return await _dbContext.Set<ClassSchedule>().Where(predicate).ToListAsync();
+        }
     }
 }
