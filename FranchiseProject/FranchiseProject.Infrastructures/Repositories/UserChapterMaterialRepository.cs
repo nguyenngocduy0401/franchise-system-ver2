@@ -41,7 +41,8 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Where(uc => uc.UserId == userId)
                 .Distinct()
                 .CountAsync();
-            return (double)(totalUserChapterMaterial / totalChapterMaterial) * 100;
+            double result = ((double)totalUserChapterMaterial / totalChapterMaterial) * 100;
+            return result;
         }
         public async Task AddAsync(UserChapterMaterial userChapterMaterial)
         {
