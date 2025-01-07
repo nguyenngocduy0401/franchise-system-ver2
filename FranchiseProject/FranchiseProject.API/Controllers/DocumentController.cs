@@ -74,10 +74,10 @@ namespace FranchiseProject.API.Controllers
 
         [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
         [SwaggerOperation(Summary = "Duyệt tài liệu {Authorize = Manager, Admin,SystemTechnician, AgencyManager}")]
-        [HttpPut("")]
-        public async Task<ApiResponse<bool>> UpdateDocument(Guid id, DocumentType type)
+        [HttpPut("{id}/approved")]
+        public async Task<ApiResponse<bool>> UpdateDocument(Guid id)
         {
-            return await _documentService.UpdateDocument(id, type);
+            return await _documentService.UpdateDocument(id);
         }
     }
 }

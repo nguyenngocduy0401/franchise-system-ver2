@@ -20,6 +20,6 @@ namespace FranchiseProject.Application.Interfaces
         Task NotifyCustomersOfExpiringDocuments();
         Task<ApiResponse<DocumentViewModel>> GetDocumentbyAgencyId(Guid agencyId, DocumentType type);
         Task<ApiResponse<List<DocumentViewModel>>> GetAllDocumentsByAgencyIdAsync(Guid agencyId);
-        Task<ApiResponse<bool>> UpdateDocument(Guid agencyId, DocumentType type);
+        Task<ApiResponse<bool>> UpdateDocument(Guid id);
     }
 }

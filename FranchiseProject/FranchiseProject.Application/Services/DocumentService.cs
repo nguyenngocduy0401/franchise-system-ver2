@@ -274,11 +274,11 @@ namespace FranchiseProject.Application.Services
             }
         }
 
-        public async Task<ApiResponse<bool>> UpdateDocument(Guid agencyId, DocumentType type)
+        public async Task<ApiResponse<bool>> UpdateDocument(Guid id)
         {
             try
             {
-                var documents = await _unitOfWork.DocumentRepository.GetMostRecentAgreeSignByAgencyIdAsync(agencyId, type);
+                var documents = await _unitOfWork.DocumentRepository.GetExistByIdAsync(id);
 
                 if (documents == null)
                 {
