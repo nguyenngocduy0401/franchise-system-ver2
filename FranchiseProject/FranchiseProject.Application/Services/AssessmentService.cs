@@ -185,7 +185,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<AssessmentStudentViewModel>();
             try
             {
-                /*var studentId = _claimsService.GetCurrentUserId.ToString();
+                var studentId = _claimsService.GetCurrentUserId.ToString();
                 var assessments = await _unitOfWork.AssessmentRepository.GetAssessmentsByClassIdAsync(classId, studentId);
                 if (assessments != null && assessments.Any()) return ResponseHandler.Success(new AssessmentStudentViewModel());
                 var course = (await _unitOfWork.CourseRepository.FindAsync(c => c.Id == assessments.FirstOrDefault().CourseId, "Syllabus")).FirstOrDefault();
@@ -366,12 +366,11 @@ namespace FranchiseProject.Application.Services
                 var minAvgMarkToPass = course?.Syllabus?.MinAvgMarkToPass ?? 0;
                 assessmentStudentViewModel.MinAvgMarkToPass = minAvgMarkToPass;
 
-                var lastClassSchedule = classSchedules.OrderByDescending(c => c.Date).FirstOrDefault();*/
+                var lastClassSchedule = classSchedules.OrderByDescending(c => c.Date).FirstOrDefault();
 
-                //if (lastClassSchedule != null && lastClassSchedule.Date <= _currentTime.GetCurrentTime())
-                if(true)
-                {
-                    /*if (assessmentStudentViewModel.AverageScore >= minAvgMarkToPass &&
+                if (lastClassSchedule != null && lastClassSchedule.Date <= _currentTime.GetCurrentTime())
+
+                    if (assessmentStudentViewModel.AverageScore >= minAvgMarkToPass &&
                         assessmentStudentViewModel.AssessmentAttendanceView != null &&
                         assessmentStudentViewModel.AssessmentAttendanceView.Score >= assessmentStudentViewModel.AssessmentAttendanceView.CompletionCriteria &&
                         assessmentStudentViewModel.AssessmentAssignmentView != null &&
@@ -379,49 +378,44 @@ namespace FranchiseProject.Application.Services
                         assessmentStudentViewModel.AssessmentQuizView != null &&
                         assessmentStudentViewModel.AssessmentQuizView.Score >= assessmentStudentViewModel.AssessmentQuizView.CompletionCriteria &&
                         assessmentStudentViewModel.AssessmentFinalViewModel != null &&
-                        assessmentStudentViewModel.AssessmentFinalViewModel.Score >= assessmentStudentViewModel.AssessmentFinalViewModel.CompletionCriteria)*/
-                    if(true)
+                        assessmentStudentViewModel.AssessmentFinalViewModel.Score >= assessmentStudentViewModel.AssessmentFinalViewModel.CompletionCriteria)
                     {
-                        //var classRoom = (await _unitOfWork.ClassRoomRepository.FindAsync(e => e.ClassId == classId)).FirstOrDefault();
-                        /*if (classRoom != null && classRoom.Certification != null)
+                    }
+                var classRoom = (await _unitOfWork.ClassRoomRepository.FindAsync(e => e.ClassId == classId)).FirstOrDefault();
+                if (classRoom != null && classRoom.Certification != null)
+                {
+                    assessmentStudentViewModel.Certification = classRoom.Certification;
+                }
+                else
+                {
+                    var student = await _userManager.FindByIdAsync(studentId);
+
+                    using (var pdfStream = await _pdfService.FillPdfTemplate(student.FullName, (DateTime)lastClassSchedule.Date, course.Name))
+                    {
+                        if (pdfStream == null)
                         {
-                            assessmentStudentViewModel.Certification = classRoom.Certification;
-                        }*/
-                        //else
-                        if(true)
+                            return ResponseHandler.Success<AssessmentStudentViewModel>(null, "Không thể tạo file PDF từ template.");
+                        }
+
+                        using (var memoryStream = new MemoryStream())
                         {
-                            //var student = await _userManager.FindByIdAsync(studentId);
-                            
-                            //using (var pdfStream = await _pdfService.FillPdfTemplate(student.FullName, (DateTime)lastClassSchedule.Date, course.Name))
-                            using (var pdfStream = await _pdfService.FillPdfTemplate("Trần Lê Việt Hoàng ", DateTime.Now, "course.Name"))
+                            await pdfStream.CopyToAsync(memoryStream);
+                            byte[] pdfBytes = memoryStream.ToArray();
+
+
+                            string fileName = $"{student.UserName}_{course.Name}_{lastClassSchedule.Date}";
+                            using (var uploadStream = new MemoryStream(pdfBytes))
                             {
-                                if (pdfStream == null)
-                                {
-                                    return ResponseHandler.Success<AssessmentStudentViewModel>(null, "Không thể tạo file PDF từ template.");
-                                }
-
-                                using (var memoryStream = new MemoryStream())
-                                {
-                                    await pdfStream.CopyToAsync(memoryStream);
-                                    byte[] pdfBytes = memoryStream.ToArray();
-
-
-                                    //string fileName = $"{student.UserName}_{course.Name}_{lastClassSchedule.Date}";
-                                    string fileName = "hahaha";
-                                    using (var uploadStream = new MemoryStream(pdfBytes))
-                                    {
-                                        string firebaseUrl = await _unitOfWork.FirebaseRepository.UploadFileAsync(uploadStream, fileName);
-                                        /*classRoom.Certification = firebaseUrl;
-                                        await _unitOfWork.ClassRoomRepository.UpdatesAsync(classRoom);
-                                        await _unitOfWork.SaveChangeAsync();*/
-                                    }
-                                }
+                                string firebaseUrl = await _unitOfWork.FirebaseRepository.UploadFileAsync(uploadStream, fileName);
+                                classRoom.Certification = firebaseUrl;
+                                assessmentStudentViewModel.Certification = firebaseUrl;
+                                await _unitOfWork.ClassRoomRepository.UpdatesAsync(classRoom);
+                                await _unitOfWork.SaveChangeAsync();
                             }
                         }
                     }
                 }
-                response = ResponseHandler.Success(new AssessmentStudentViewModel());
-
+                response = ResponseHandler.Success(assessmentStudentViewModel);
             }
 
             catch (Exception ex)
