@@ -29,5 +29,9 @@ namespace FranchiseProject.Domain.Entity
         public Guid? AgencyId { get; set; }
         [ForeignKey("AgencyId")]
         public Agency? Agency { get; set; }
+        public string? PaymentUrl { get; set; }
+        public DateTime? PaidDate { get; set; }
+        public DateTime? LastUrlGenerationTime { get; set; }
+        public DateTime? ExpirationDate { get; set; }
     }
 }

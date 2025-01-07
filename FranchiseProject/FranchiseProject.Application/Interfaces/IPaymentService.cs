@@ -3,6 +3,7 @@ using FranchiseProject.Application.ViewModels.ContractViewModels;
 using FranchiseProject.Application.ViewModels.PaymentViewModel;
 using FranchiseProject.Application.ViewModels.PaymentViewModel.PaymentContractViewModels;
 using FranchiseProject.Application.ViewModels.StudentViewModel;
+using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -24,5 +25,7 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<Pagination<PaymentContractAgencyViewModel>>> FilterPaymentContractAsync(FilterContractPaymentViewModel filterModel);
         Task<ApiResponse<bool>> CreateRefundPayment(CreateRefundPaymentViewModel model);
         Task<ApiResponse<decimal>> CalculateRefundAmount(Guid registerCourseId);
+        Task<string> CreateOrRefreshPaymentUrl(Payment payment);
+        Task<ApiResponse<string>> CreateMonthlyRevenueSharePayment(CreatePaymentMontlyViewModel model);
     }
 }
