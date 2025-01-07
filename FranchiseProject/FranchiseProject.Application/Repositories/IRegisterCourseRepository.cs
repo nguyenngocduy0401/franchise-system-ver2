@@ -22,5 +22,6 @@ namespace FranchiseProject.Application.Repositories
         Task<RegisterCourse> FindRegisterCourseByUserId(string userId, Guid courseId);
         Task<bool> ExistsWithinLast24HoursAsync(string name, string email, string phoneNumber, string courseId);
         Task<List<RegisterCourse>> GetRegisterCoursesByAgencyIdAndDateRange(Guid agencyId, DateTime startDate, DateTime endDate);
+        Task<List<AssignmentSubmit>> GetAllAsync1(Expression<Func<AssignmentSubmit, bool>> predicate);
     }
 }

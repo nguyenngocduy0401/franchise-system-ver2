@@ -124,9 +124,9 @@ namespace FranchiseProject.API.Controllers
 			=> await _userService.CreateListUserByAgencyAsync(file);
 		[Authorize(Roles = AppRole.Student)]
 		[SwaggerOperation(Summary = "học sinh đăng kí khóa học  {Authorize = Student}")]
-		[HttpPost("mine/courses")]
-		public async Task<ApiResponse<bool>> StudentExistRegisterCourse(string courseId)
-		   => await _registerCourseService.StudentExistRegisterCourse(courseId);
+		[HttpPost("mine/class")]
+		public async Task<ApiResponse<string>> StudentExistRegisterCourse(string classId)
+		   => await _registerCourseService.StudentExistRegisterCourse(classId);
 
 		[SwaggerOperation(Summary = "người dùng lấy lịch học bằng by login")]
 		[HttpGet("mine/class-schedules")]

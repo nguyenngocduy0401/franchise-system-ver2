@@ -93,6 +93,48 @@ namespace FranchiseProject.Application.Utils
                             <p>Đội ngũ FutureTech</p>"
             };
         }
+        public static MessageModel SuccessRegisterCourseEmailWithoutCredentials(string? to, string? name, string? courseName, string? username, string? password, decimal amount, string studentDayOfWeek, string startDate, string endDate, string address)
+        {
+            return new MessageModel
+            {
+                To = to,
+                Subject = "Đăng ký và thanh toán khóa học thành công [futuretech-noreply]",
+                Body = $@"<p>Chào bạn {name},</p>
+                            <p>Cảm ơn bạn đã đăng ký và thanh toán thành công khóa học <strong>{courseName}</strong>.</p>
+                            <table style='border-collapse: collapse; width: 100%;'>
+                                <tr>
+                                    <th style='border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2;' colspan='2'>Thông tin thanh toán</th>
+                                </tr>
+                                <tr>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>Số tiền đã thanh toán</td>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>{amount:N0} VNĐ</td>
+                                </tr>
+                       
+                                <tr>
+                                    <th style='border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f2f2f2;' colspan='2'>Thông tin lớp học</th>
+                                </tr>
+                                <tr>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>Ngày học trong tuần</td>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>{studentDayOfWeek}</td>
+                                </tr>
+                                <tr>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>Ngày bắt đầu</td>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>{startDate}</td>
+                                </tr>
+                                <tr>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>Ngày kết thúc</td>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>{endDate}</td>
+                                </tr>
+                                <tr>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>Địa chỉ trung tâm</td>
+                                    <td style='border: 1px solid #ddd; padding: 8px;'>{address}</td>
+                                </tr>
+                            </table>
+                            <p>Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để cung cấp thêm thông tin về lớp học.</p>
+                            <p>Trân trọng,</p>
+                            <p>Đội ngũ FutureTech</p>"
+            };
+        }
         public static MessageModel RefundConfirmationEmail(string to, string name, string courseName, decimal refundAmount, string refundReason)
         {
             return new MessageModel
@@ -118,7 +160,6 @@ namespace FranchiseProject.Application.Utils
                           <td style='border: 1px solid #ddd; padding: 8px;'>{refundReason}</td>
                       </tr>
                   </table>
-                  <p>Số tiền hoàn trả sẽ được chuyển vào tài khoản của bạn trong vòng 5-7 ngày làm việc.</p>
                   <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi.</p>
                   <p>Trân trọng,</p>
                   <p>Đội ngũ FutureTech</p>"

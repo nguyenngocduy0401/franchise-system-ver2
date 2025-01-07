@@ -18,7 +18,7 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<StudentRegisterViewModel>> GetStudentRegisterByIdAsync(string id, string courseId);
         Task<ApiResponse<Pagination<StudentRegisterViewModel>>> FilterStudentAsync(FilterRegisterCourseViewModel filterStudentModel);
         Task<ApiResponse<bool>> UpdateRegisterCourseDateTimeAsync(string id, UpdateRegisterCourseViewModel update);
-        Task<ApiResponse<bool>> StudentExistRegisterCourse(string courseId);
+        Task<ApiResponse<string>> StudentExistRegisterCourse(string courseId);
         Task<ApiResponse<bool>> CompleteRegistrationAfterPayment(string userId,Guid registerCourseId,Guid paymentId);
     }
 }
