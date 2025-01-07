@@ -108,7 +108,7 @@ namespace FranchiseProject.Application.Services
                 Expression<Func<Document, bool>> filter = d =>
                     (!filterModel.AgencyId.HasValue || d.AgencyId == filterModel.AgencyId) &&
                     (!filterModel.Type.HasValue || d.Type == filterModel.Type) &&
-                    (d.Status == filterModel.Status) &&
+                    (d.Status.HasValue ||d.Status == filterModel.Status) &&
                     (d.Appoved == true);
 
 
