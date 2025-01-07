@@ -288,7 +288,7 @@ namespace FranchiseProject.Application.Services
                  _unitOfWork.DocumentRepository.Update(documents);
                await _unitOfWork.SaveChangeAsync();
 
-                return ResponseHandler.Success(true, "Truy xuất thành công");
+                return ResponseHandler.Success(true, "Duyệt tài liệu thành công");
             }
             catch (Exception ex)
             {
