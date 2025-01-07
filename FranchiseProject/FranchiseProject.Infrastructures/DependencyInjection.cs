@@ -153,6 +153,14 @@ namespace FranchiseProject.Infrastructures
                     .StartAt(currentTime.AddDays(2))
                     .WithCronSchedule("0 4 1/21 * * ?", cron => cron.InTimeZone(vietnamTimeZone))
                 );
+                var monthlyRevenueShareJobKey = new JobKey("CreateMonthlyRevenueSharePaymentJob");
+                q.AddJob<MonthlyRevenueSharePaymentJob>(opts => opts.WithIdentity(monthlyRevenueShareJobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(monthlyRevenueShareJobKey)
+                    .WithIdentity("CreateMonthlyRevenueSharePaymentJob-trigger")
+                    .StartAt(currentTime)
+                    .WithCronSchedule("0 0 10 * * ?", cron => cron.InTimeZone(vietnamTimeZone)) 
+                );
             });
             services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
             return services;

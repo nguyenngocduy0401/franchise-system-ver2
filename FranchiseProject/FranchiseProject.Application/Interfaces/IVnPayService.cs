@@ -15,5 +15,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<PaymentResult> ProcessPaymentCallback(VnPayCallbackViewModel callbackData);
         Task<string> CreatePaymentUrlFromContractSeacondPayment(PaymentContractViewModel paymentContract);
         Task<string> CreatePaymentUrlForAgencyCourse(AgencyCoursePaymentViewModel model);
+        Task<string> CreatePaymentUrlForCourse(Guid agencyId, double amount, Guid paymnentId);
     }
 }

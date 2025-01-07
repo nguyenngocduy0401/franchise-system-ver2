@@ -40,9 +40,10 @@ namespace FranchiseProject.Application.Services
         private readonly IClaimsService _claimsService;
         private readonly UserManager<User> _userManager;
         private readonly IUserService _userService;
+        private readonly IVnPayService _vnPayService;
 
         public PaymentService(IUserService userService, UserManager<User> userManager, IUnitOfWork unitOfWork, IMapper mapper, IValidator<CreateStudentPaymentViewModel> validator
-            , IEmailService emailService, IHubContext<NotificationHub> hubContext, IClaimsService claimsService)
+            , IEmailService emailService, IHubContext<NotificationHub> hubContext, IClaimsService claimsService, IVnPayService vnPayService)
         {
             _claimsService = claimsService;
             _unitOfWork = unitOfWork;
@@ -52,6 +53,7 @@ namespace FranchiseProject.Application.Services
             _emailService = emailService;
             _userManager = userManager;
             _userService = userService;
+            _vnPayService = vnPayService;
         }
         #endregion
         public async Task<ApiResponse<bool>> CreatePaymentStudent(CreateStudentPaymentViewModel create, StudentPaymentStatusEnum status)
@@ -539,6 +541,105 @@ namespace FranchiseProject.Application.Services
             {
                 return ResponseHandler.Failure<decimal>($"An error occurred while calculating the refund amount: {ex.Message}");
             }
+        }
+        //---------------Thanh toán hàng tháng -----------------------------------
+        public async Task<ApiResponse<string>> CreateMonthlyRevenueSharePayment(CreatePaymentMontlyViewModel model)
+        {
+            try
+            {
+             
+                if (  model.AgencyId == null || model.Amount == null)
+                {
+                    return ResponseHandler.Failure<string>("ContractId, AgencyId, and Amount are required.");
+                }
+
+             
+                var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(model.AgencyId.Value);
+
+                if ( agency == null)
+                {
+                    return ResponseHandler.Failure<string>("Contract or Agency not found.");
+                }
+
+                var payment = new Payment
+                {
+                    Title = model.Title ?? $"Thanh toán phí chia sẻ doanh thu tháng - {DateTime.Now:MMMM yyyy}-{agency.Name}",
+                    Description = model.Description ?? $"Thanh toán phí chia sẻ doanh thu tháng - {DateTime.Now:MMMM yyyy}-{agency.Name}",
+                    Amount = model.Amount.Value,
+                    Type = PaymentTypeEnum.MonthlyDue,
+                    Method = PaymentMethodEnum.BankTransfer,
+                    Status = PaymentStatus.NotCompleted,
+            
+                    AgencyId = model.AgencyId,
+                    CreationDate = DateTime.Now,
+                    ExpirationDate = DateTime.Now.AddDays(5)
+                };
+
+                await _unitOfWork.PaymentRepository.AddAsync(payment);
+
+                var paymentUrl = await CreateOrRefreshPaymentUrl(payment);
+
+                await _unitOfWork.SaveChangeAsync();
+
+                return ResponseHandler.Success(paymentUrl, "Monthly revenue share payment created successfully.");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<string>($"An error occurred: {ex.Message}");
+            }
+        }
+        public async Task<ApiResponse<Pagination<PaymentMonthlydueViewModel>>> FilterPaymentMonthlyDueAsync(FilterPaymentMonthlyDueModel filterModel)
+        {
+            var response = new ApiResponse<Pagination<PaymentMonthlydueViewModel>>();
+            try
+            {
+                Expression<Func<Payment, bool>> filter = p =>
+                    p.Type == PaymentTypeEnum.MonthlyDue &&
+                    (filterModel.AgencyId == null || p.AgencyId == filterModel.AgencyId) &&
+                    (filterModel.StartDate == null || p.CreationDate >= filterModel.StartDate) &&
+                    (filterModel.EndDate == null || p.CreationDate <= filterModel.EndDate) &&
+                    (filterModel.Status == null || p.Status == filterModel.Status);
+
+                var payments = await _unitOfWork.PaymentRepository.GetFilterAsync(
+                    filter: filter,
+                    pageIndex: filterModel.PageIndex,
+                    orderBy: q => q.OrderByDescending(p => p.CreationDate),
+                    pageSize: filterModel.PageSize
+                );
+
+                var paymentViewModels = new Pagination<PaymentMonthlydueViewModel>
+                {
+                    Items = payments.Items.Select(p => new PaymentMonthlydueViewModel
+                    {
+                        Id=p.Id,
+                        Title = p.Title,
+                        Description = p.Description,
+                        Amount = p.Amount,
+                        Status = p.Status,
+                        AgencyId = p.AgencyId,
+                        PaymentUrl = p.PaymentUrl,
+                        PaidDate = p.Status == PaymentStatus.Completed ? p.PaidDate : null
+                    }).ToList(),
+                    TotalItemsCount = payments.TotalItemsCount,
+                    PageIndex = payments.PageIndex,
+                    PageSize = payments.PageSize
+                };
+
+                response = ResponseHandler.Success(paymentViewModels, "Lọc thanh toán hàng tháng thành công!");
+            }
+            catch (Exception ex)
+            {
+                response = ResponseHandler.Failure<Pagination<PaymentMonthlydueViewModel>>(ex.Message);
+            }
+            return response;
+        }
+
+        public async Task<string> CreateOrRefreshPaymentUrl(Payment payment)
+        {
+            var paymentUrl = await _vnPayService.CreatePaymentUrlForCourse(payment.AgencyId.Value, payment.Amount.Value,payment.Id );
+            payment.PaymentUrl = paymentUrl;
+            payment.LastUrlGenerationTime = DateTime.Now;
+            return paymentUrl;
         }
     }
 }

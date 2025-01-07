@@ -113,7 +113,7 @@ namespace FranchiseProject.Application.Services
             var vnpayLocale = "vn";
             var vnpayCreateDate = DateTime.Now.ToString("yyyyMMddHHmmss");
             var vnpayExpireDate = DateTime.Now.AddMinutes(15).ToString("yyyyMMddHHmmss");
-
+         //   var returnUrl = _vnPayConfig.ReturnUrl + "/course-payment-callback";
             var vnpayData = new Dictionary<string, string>
             {
                 {"vnp_Version", "2.1.0"},
@@ -213,7 +213,7 @@ namespace FranchiseProject.Application.Services
                             return new PaymentResult { IsSuccess = false, OrderId = orderId, Message = "Invalid user information" };
                         }
 
-                     
+
 
                         if (!payment.RegisterCourseId.HasValue)
                         {
@@ -232,8 +232,21 @@ namespace FranchiseProject.Application.Services
                             return new PaymentResult { IsSuccess = false, OrderId = orderId, Message = "Failed to complete registration" };
                         }
                     }
+                    else if (payment.Type == PaymentTypeEnum.MonthlyDue)
+                    {
+                        // Xử lý thanh toán MontlyDue
+                        var montlyDuePayment = await _unitOfWork.PaymentRepository.GetFirstOrDefaultAsync(
+                            filter: mdp => mdp.Id == payment.Id);
 
-                    await _unitOfWork.SaveChangeAsync();
+                        if (montlyDuePayment != null)
+                        {
+                            montlyDuePayment.Status = PaymentStatus.Completed;
+                            montlyDuePayment.PaidDate = DateTime.Now;
+                            _unitOfWork.PaymentRepository.Update(montlyDuePayment);
+
+                        }
+                    }
+                            await _unitOfWork.SaveChangeAsync();
                     return new PaymentResult { IsSuccess = true, OrderId = orderId, Message = "Payment successful" };
                 }
                 else
@@ -243,7 +256,48 @@ namespace FranchiseProject.Application.Services
             }
             else
             {
-                return new PaymentResult { IsSuccess = false, OrderId = callbackData.vnp_TxnRef, Message = "Payment failed" };
+                var orderId = callbackData.vnp_TxnRef;
+                var payment = await _unitOfWork.PaymentRepository.GetFirstOrDefaultAsync(
+                    filter: p => p.Id.ToString() == orderId);
+
+                if (payment != null && payment.Type == PaymentTypeEnum.MonthlyDue)
+                {
+                    // Thanh toán thất bại, tạo URL thanh toán mới
+                    var paymentService = _serviceProvider.GetRequiredService<IPaymentService>();
+                    var newPaymentUrl = await paymentService.CreateOrRefreshPaymentUrl(payment);
+
+                    if (!string.IsNullOrEmpty(newPaymentUrl))
+                    {
+                        payment.Status = PaymentStatus.NotCompleted;
+                        _unitOfWork.PaymentRepository.Update(payment);
+                        await _unitOfWork.SaveChangeAsync();
+
+                        return new PaymentResult
+                        {
+                            IsSuccess = false,
+                            OrderId = orderId,
+                            Message = "Payment failed. A new payment URL has been created.",
+                        };
+                    }
+                    else
+                    {
+                        return new PaymentResult
+                        {
+                            IsSuccess = false,
+                            OrderId = orderId,
+                            Message = "Payment failed and unable to create a new payment URL."
+                        };
+                    }
+                }
+                else
+                {
+                    return new PaymentResult
+                    {
+                        IsSuccess = false,
+                        OrderId = callbackData.vnp_TxnRef,
+                        Message = "Payment failed"
+                    };
+                }
             }
         }
         private bool ValidateSignature(Dictionary<string, string> vnpayData)
@@ -298,6 +352,7 @@ namespace FranchiseProject.Application.Services
             var vnpayLocale = "vn";
             var vnpayCreateDate = _currentTime.GetCurrentTime().ToString("yyyyMMddHHmmss");
             var vnpayExpireDate = _currentTime.GetCurrentTime().AddMinutes(15).ToString("yyyyMMddHHmmss");
+            //var returnUrl = _vnPayConfig.ReturnUrl + "/course-payment-callback?paymentType=AgencyCourse";
 
             var vnpayData = new Dictionary<string, string>
     {
@@ -311,7 +366,7 @@ namespace FranchiseProject.Application.Services
         {"vnp_Locale", vnpayLocale},
         {"vnp_OrderInfo", vnpayOrderInfo},
         {"vnp_OrderType", "other"},
-        {"vnp_ReturnUrl", _vnPayConfig.ReturnUrl},
+        {"vnp_ReturnUrl",_vnPayConfig.ReturnUrl},
         {"vnp_TxnRef", vnpayTxnRef},
         {"vnp_ExpireDate", vnpayExpireDate}
     };
@@ -344,7 +399,55 @@ namespace FranchiseProject.Application.Services
 
             return paymentUrl;
         }
+        //AgencyId - Amount-
+        public async Task<string> CreatePaymentUrlForCourse(Guid agencyId,double amount,Guid paymnentId)
+        {
+            var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(agencyId);
+           var agencyVnPayInfo = await _unitOfWork.AgencyVnPayInfoRepository.GetByAgencyIdAsync(agencyId);
 
-     
+            if (agency == null  || agencyVnPayInfo == null)
+            {
+                throw new ArgumentException("Agency, Course, or Agency VNPay info not found");
+            }
+
+       
+           
+            var vnpayTxnRef = paymnentId.ToString();
+            var vnpayOrderInfo = $"Thanh toán phí chia sẻ doanh thu ";
+            var vnpayAmount = Convert.ToInt64(amount * 100);
+            var vnpayLocale = "vn";
+            var vnpayCreateDate = _currentTime.GetCurrentTime().ToString("yyyyMMddHHmmss");
+            var vnpayExpireDate = _currentTime.GetCurrentTime().AddMinutes(15).ToString("yyyyMMddHHmmss");
+
+            var vnpayData = new Dictionary<string, string>
+    {
+        {"vnp_Version", "2.1.0"},
+        {"vnp_Command", "pay"},
+        {"vnp_TmnCode", agencyVnPayInfo.TmnCode}, // Use agency-specific TmnCode
+        {"vnp_Amount", vnpayAmount.ToString()},
+        {"vnp_CreateDate", vnpayCreateDate},
+        {"vnp_CurrCode", "VND"},
+        {"vnp_IpAddr", "127.0.0.1"},
+        {"vnp_Locale", vnpayLocale},
+        {"vnp_OrderInfo", vnpayOrderInfo},
+        {"vnp_OrderType", "other"},
+        {"vnp_ReturnUrl", _vnPayConfig.ReturnUrl},
+        {"vnp_TxnRef", vnpayTxnRef},
+        {"vnp_ExpireDate", vnpayExpireDate}
+    };
+
+            var orderedData = new SortedList<string, string>(vnpayData);
+            var hashData = string.Join("&", orderedData.Select(kv => $"{WebUtility.UrlEncode(kv.Key)}={WebUtility.UrlEncode(kv.Value)}"));
+
+            var secureHash = ComputeHmacSha512(agencyVnPayInfo.HashSecret, hashData); // Use agency-specific HashSecret
+            vnpayData.Add("vnp_SecureHash", secureHash);
+
+            var paymentUrl = _vnPayConfig.PaymentUrl + "?" + string.Join("&", vnpayData.Select(kv => $"{kv.Key}={WebUtility.UrlEncode(kv.Value)}"));
+
+      
+
+            return paymentUrl;
+        }
+
     }
 }

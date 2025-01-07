@@ -22,6 +22,7 @@ namespace FranchiseProject.API.Controllers
         private readonly IVnPayService _vnPayService;
         private IUnitOfWork _unitOfwork;
         private readonly IPaymentService _paymentService;
+        
         public PaymentController(IPaymentService paymentService,IVnPayService vnPayService,IUnitOfWork unitOfWork) { _paymentService = paymentService;_vnPayService = vnPayService; _unitOfwork = unitOfWork; }
         [SwaggerOperation(Summary = "tạo lịch sử thanh toán (dùng cho Agency) {Authorize = AgencyManager,AgencyStaff}  ")]
         [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.AgencyStaff)]
@@ -143,6 +144,55 @@ namespace FranchiseProject.API.Controllers
         public async Task<ApiResponse<decimal>> CalculateRefundAmount(Guid registerCourseId)
         {
             return await _paymentService.CalculateRefundAmount(registerCourseId);
+        }
+        [HttpPost("refresh-payment-url/{paymentId}")]
+        [SwaggerOperation(Summary = "Tạo lại URL thanh toán cho khoản thanh toán chưa hoàn thành")]
+        public async Task<ApiResponse<string>> RefreshPaymentUrl(Guid paymentId)
+        {
+            try
+            {
+                var payment = await _unitOfwork.PaymentRepository.GetByIdAsync(paymentId);
+                if (payment == null || payment.Status != PaymentStatus.NotCompleted)
+                {
+                    return ResponseHandler.Failure<string>("Payment not found or already completed.");
+                }
+
+                if (DateTime.Now > payment.ExpirationDate)
+                {
+                    return ResponseHandler.Failure<string>("Payment URL can no longer be refreshed. The 5-day period has expired.");
+                }
+
+                var newPaymentUrl = await _paymentService.CreateOrRefreshPaymentUrl(payment);
+                await _unitOfwork.SaveChangeAsync();
+
+                return ResponseHandler.Success(newPaymentUrl, "Payment URL refreshed successfully.");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<string>($"An error occurred: {ex.Message}");
+            }
+        }
+        [HttpPost("monthly-revenue-share")]
+      //  [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+        [SwaggerOperation(Summary = "Tạo thanh toán chia sẻ doanh thu hàng tháng")]
+        public async Task<ApiResponse<string>> CreateMonthlyRevenueSharePayment([FromBody] CreatePaymentMontlyViewModel model)
+        {
+            try
+            {
+                var result = await _paymentService.CreateMonthlyRevenueSharePayment(model);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<string>($"An error occurred: {ex.Message}");
+            }
+        }
+        [HttpGet("monthly-due")]
+        [SwaggerOperation(Summary = "Lọc thanh toán hàng tháng")]
+      //  [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
+        public async Task<ApiResponse<Pagination<PaymentMonthlydueViewModel>>> FilterPaymentMonthlyDueAsync([FromQuery] FilterPaymentMonthlyDueModel filterModel)
+        {
+            return await _paymentService.FilterPaymentMonthlyDueAsync(filterModel);
         }
     }
 }

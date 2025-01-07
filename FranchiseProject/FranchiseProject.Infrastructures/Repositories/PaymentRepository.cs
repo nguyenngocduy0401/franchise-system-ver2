@@ -1,6 +1,7 @@
 ﻿using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Repositories;
 using FranchiseProject.Domain.Entity;
+using FranchiseProject.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -44,6 +45,25 @@ namespace FranchiseProject.Infrastructures.Repositories
                             p.CreationDate >= startDate &&
                             p.CreationDate <= endDate)
                 .ToListAsync();
+        }
+        public async Task<double> CalculateAgencyRevenue(Guid agencyId, DateTime startDate, DateTime endDate)
+        {
+            var payments = await _dbContext.Payments
+                .Where(p => p.AgencyId == agencyId &&
+                            p.CreationDate >= startDate &&
+                            p.CreationDate <= endDate &&
+                            p.Status == PaymentStatus.Completed)
+                .ToListAsync();
+
+            var revenue = payments
+                .Where(p => p.Type != PaymentTypeEnum.Refund)
+                .Sum(p => p.Amount ?? 0);
+
+            var refunds = payments
+                .Where(p => p.Type == PaymentTypeEnum.Refund)
+                .Sum(p => p.Amount ?? 0);
+
+            return revenue - refunds;
         }
     }
 }

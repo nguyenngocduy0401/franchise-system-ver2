@@ -13,5 +13,6 @@ namespace FranchiseProject.Application.Repositories
         Task<List<Payment>> GetAllAsync(Expression<Func<Payment, bool>> filter);
         Task<Payment?> GetFirstOrDefaultAsync(Expression<Func<Payment, bool>> filter);
         Task<List<Payment>> GetPaymentsByAgencyIdAndDateRange(Guid agencyId, DateTime startDate, DateTime endDate);
+        Task<double> CalculateAgencyRevenue(Guid agencyId, DateTime startDate, DateTime endDate);
     }
 }

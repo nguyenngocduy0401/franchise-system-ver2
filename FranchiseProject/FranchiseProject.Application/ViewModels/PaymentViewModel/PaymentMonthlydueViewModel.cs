@@ -7,18 +7,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FranchiseProject.Application.ViewModels.DocumentViewModel
+namespace FranchiseProject.Application.ViewModels.PaymentViewModel
 {
-    public class DocumentViewModel
+    public class PaymentMonthlydueViewModel
     {
         public Guid? Id { get; set; }
         public string? Title { get; set; }
-        public string? URLFile { get; set; }
-        public DateOnly? ExpirationDate { get; set; }
-        public DocumentType? Type { get; set; }
-    
+        public string? Description { get; set; }
+        public double? Amount { get; set; }
+        public PaymentStatus? Status { get; set; }
         public Guid? AgencyId { get; set; }
-        public string ?AgencyName { get; set; }
-        
+        public string? PaymentUrl { get; set; }
+        public DateTime? PaidDate { get; set; }
+
     }
 }
