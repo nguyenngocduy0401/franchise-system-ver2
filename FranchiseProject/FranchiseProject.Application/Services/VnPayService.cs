@@ -400,7 +400,7 @@ namespace FranchiseProject.Application.Services
             return paymentUrl;
         }
         //AgencyId - Amount-
-        public async Task<string> CreatePaymentUrlForCourse(Guid agencyId,double amount)
+        public async Task<string> CreatePaymentUrlForCourse(Guid agencyId,double amount,Guid paymnentId)
         {
             var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(agencyId);
            var agencyVnPayInfo = await _unitOfWork.AgencyVnPayInfoRepository.GetByAgencyIdAsync(agencyId);
@@ -411,8 +411,8 @@ namespace FranchiseProject.Application.Services
             }
 
        
-            var paymentId = Guid.NewGuid();
-            var vnpayTxnRef = paymentId.ToString();
+           
+            var vnpayTxnRef = paymnentId.ToString();
             var vnpayOrderInfo = $"Thanh toán phí chia sẻ doanh thu ";
             var vnpayAmount = Convert.ToInt64(amount * 100);
             var vnpayLocale = "vn";

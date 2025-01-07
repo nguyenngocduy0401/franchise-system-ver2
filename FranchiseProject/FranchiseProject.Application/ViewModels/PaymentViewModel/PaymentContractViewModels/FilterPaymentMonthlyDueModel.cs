@@ -12,6 +12,7 @@ namespace FranchiseProject.Application.ViewModels.PaymentViewModel.PaymentContra
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public PaymentStatus? Status { get; set; }
+        public Guid? AgencyId { get; set; }
         public int PageIndex { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }

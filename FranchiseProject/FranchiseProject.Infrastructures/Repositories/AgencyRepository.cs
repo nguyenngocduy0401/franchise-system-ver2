@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -69,6 +70,10 @@ namespace FranchiseProject.Infrastructures.Repositories
             }
 
             return null;
+        }
+        public async Task<List<Agency>> GetAllAsync1(Expression<Func<Agency, bool>> predicate)
+        {
+            return await _dbContext.Set<Agency>().Where(predicate).ToListAsync();
         }
     }
 }

@@ -12,11 +12,7 @@ namespace FranchiseProject.Application.ViewModels.PaymentViewModel
         public string? Title { get; set; }
         public string? Description { get; set; }
         public double? Amount { get; set; }
-        public PaymentTypeEnum? Type { get; set; }
-        public PaymentMethodEnum? Method { get; set; }
-        public PaymentStatus? Status { get; set; }
-        public Guid? ContractId { get; set; }
         public Guid? AgencyId { get; set; }
-        public string? PaymentUrl { get; set; }
+      
     }
 }

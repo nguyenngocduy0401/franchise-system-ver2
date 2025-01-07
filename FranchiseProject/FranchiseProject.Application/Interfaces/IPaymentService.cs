@@ -27,5 +27,6 @@ namespace FranchiseProject.Application.Interfaces
         Task<ApiResponse<decimal>> CalculateRefundAmount(Guid registerCourseId);
         Task<string> CreateOrRefreshPaymentUrl(Payment payment);
         Task<ApiResponse<string>> CreateMonthlyRevenueSharePayment(CreatePaymentMontlyViewModel model);
+        Task<ApiResponse<Pagination<PaymentMonthlydueViewModel>>> FilterPaymentMonthlyDueAsync(FilterPaymentMonthlyDueModel filterModel);
     }
 }

@@ -547,22 +547,20 @@ namespace FranchiseProject.Application.Services
         {
             try
             {
-                // Validate input
-                if (model.ContractId == null || model.AgencyId == null || model.Amount == null)
+             
+                if (  model.AgencyId == null || model.Amount == null)
                 {
                     return ResponseHandler.Failure<string>("ContractId, AgencyId, and Amount are required.");
                 }
 
-                // Get the contract and agency
-                var contract = await _unitOfWork.ContractRepository.GetByIdAsync(model.ContractId.Value);
+             
                 var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(model.AgencyId.Value);
 
-                if (contract == null || agency == null)
+                if ( agency == null)
                 {
                     return ResponseHandler.Failure<string>("Contract or Agency not found.");
                 }
 
-                // Create the payment
                 var payment = new Payment
                 {
                     Title = model.Title ?? $"Thanh toán phí chia sẻ doanh thu tháng - {DateTime.Now:MMMM yyyy}-{agency.Name}",
@@ -571,7 +569,7 @@ namespace FranchiseProject.Application.Services
                     Type = PaymentTypeEnum.MonthlyDue,
                     Method = PaymentMethodEnum.BankTransfer,
                     Status = PaymentStatus.NotCompleted,
-                    ContractId = model.ContractId,
+            
                     AgencyId = model.AgencyId,
                     CreationDate = DateTime.Now,
                     ExpirationDate = DateTime.Now.AddDays(5)
@@ -579,7 +577,6 @@ namespace FranchiseProject.Application.Services
 
                 await _unitOfWork.PaymentRepository.AddAsync(payment);
 
-                // Create VnPay URL
                 var paymentUrl = await CreateOrRefreshPaymentUrl(payment);
 
                 await _unitOfWork.SaveChangeAsync();
@@ -591,14 +588,14 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<string>($"An error occurred: {ex.Message}");
             }
         }
-        public async Task<ApiResponse<Pagination<PaymentMonthlydueViewModel>>> FilterPaymentMonthlyDueAsync(FilterPaymentMonthlyDueModel filterModel, Guid agencyId)
+        public async Task<ApiResponse<Pagination<PaymentMonthlydueViewModel>>> FilterPaymentMonthlyDueAsync(FilterPaymentMonthlyDueModel filterModel)
         {
             var response = new ApiResponse<Pagination<PaymentMonthlydueViewModel>>();
             try
             {
                 Expression<Func<Payment, bool>> filter = p =>
                     p.Type == PaymentTypeEnum.MonthlyDue &&
-                    p.AgencyId == agencyId &&
+                    (filterModel.AgencyId == null || p.AgencyId == filterModel.AgencyId) &&
                     (filterModel.StartDate == null || p.CreationDate >= filterModel.StartDate) &&
                     (filterModel.EndDate == null || p.CreationDate <= filterModel.EndDate) &&
                     (filterModel.Status == null || p.Status == filterModel.Status);
@@ -606,6 +603,7 @@ namespace FranchiseProject.Application.Services
                 var payments = await _unitOfWork.PaymentRepository.GetFilterAsync(
                     filter: filter,
                     pageIndex: filterModel.PageIndex,
+                    orderBy: q => q.OrderByDescending(p => p.CreationDate),
                     pageSize: filterModel.PageSize
                 );
 
@@ -613,6 +611,7 @@ namespace FranchiseProject.Application.Services
                 {
                     Items = payments.Items.Select(p => new PaymentMonthlydueViewModel
                     {
+                        Id=p.Id,
                         Title = p.Title,
                         Description = p.Description,
                         Amount = p.Amount,
@@ -637,7 +636,7 @@ namespace FranchiseProject.Application.Services
 
         public async Task<string> CreateOrRefreshPaymentUrl(Payment payment)
         {
-            var paymentUrl = await _vnPayService.CreatePaymentUrlForCourse(payment.AgencyId.Value, payment.Amount.Value);
+            var paymentUrl = await _vnPayService.CreatePaymentUrlForCourse(payment.AgencyId.Value, payment.Amount.Value,payment.Id );
             payment.PaymentUrl = paymentUrl;
             payment.LastUrlGenerationTime = DateTime.Now;
             return paymentUrl;

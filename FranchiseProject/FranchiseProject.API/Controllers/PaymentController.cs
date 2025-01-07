@@ -173,7 +173,7 @@ namespace FranchiseProject.API.Controllers
             }
         }
         [HttpPost("monthly-revenue-share")]
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
+      //  [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "Tạo thanh toán chia sẻ doanh thu hàng tháng")]
         public async Task<ApiResponse<string>> CreateMonthlyRevenueSharePayment([FromBody] CreatePaymentMontlyViewModel model)
         {
@@ -186,6 +186,13 @@ namespace FranchiseProject.API.Controllers
             {
                 return ResponseHandler.Failure<string>($"An error occurred: {ex.Message}");
             }
+        }
+        [HttpGet("monthly-due")]
+        [SwaggerOperation(Summary = "Lọc thanh toán hàng tháng")]
+      //  [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
+        public async Task<ApiResponse<Pagination<PaymentMonthlydueViewModel>>> FilterPaymentMonthlyDueAsync([FromQuery] FilterPaymentMonthlyDueModel filterModel)
+        {
+            return await _paymentService.FilterPaymentMonthlyDueAsync(filterModel);
         }
     }
 }

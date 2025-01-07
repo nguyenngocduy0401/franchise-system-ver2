@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,5 +13,6 @@ namespace FranchiseProject.Application.Repositories
         Task<IEnumerable<Agency>> GetAgencyExpiredAsync();
         Task<IEnumerable<Agency>> GetAgencyEduLicenseExpiredAsync();
         Task<string?> GetAgencyManagerUserIdByAgencyIdAsync(Guid agencyId);
+        Task<List<Agency>> GetAllAsync1(Expression<Func<Agency, bool>> predicate);
     }
 }
