@@ -103,23 +103,25 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-        public async Task<ApiResponse<bool>> CreatePackageAsync(CreatePackageModel createPackageModel) 
+        public async Task<ApiResponse<PackageViewModel>> CreatePackageAsync(CreatePackageModel createPackageModel) 
         {
-            var response = new ApiResponse<bool>(); 
+            var response = new ApiResponse<PackageViewModel>(); 
             try 
             {
                 ValidationResult validationResult =await _createPackageValidator.ValidateAsync(createPackageModel);
-                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<PackageViewModel>(validationResult);
                 var package = _mapper.Map<Package>(createPackageModel);
+
+                var packageModel = _mapper.Map<PackageViewModel>(package);
                 await _unitOfWork.PackageRepository.AddAsync(package);
 
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-                if (isSuccess) ResponseHandler.Failure<bool>("Failed to create package");
-                response = ResponseHandler.Success(true);
+                if (isSuccess) ResponseHandler.Failure<PackageViewModel>("Failed to create package");
+                response = ResponseHandler.Success(packageModel);
 
             }catch(Exception ex)
             {
-                response = ResponseHandler.Failure<bool>(ex.Message);
+                response = ResponseHandler.Failure<PackageViewModel>(ex.Message);
             }
             return response;
         }

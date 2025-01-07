@@ -158,7 +158,7 @@ namespace FranchiseProject.Infrastructures
                 q.AddTrigger(opts => opts
                     .ForJob(monthlyRevenueShareJobKey)
                     .WithIdentity("CreateMonthlyRevenueSharePaymentJob-trigger")
-                    .StartAt(currentTime)
+                    .StartAt(currentTime.AddDays(2))
                     .WithCronSchedule("0 0 10 * * ?", cron => cron.InTimeZone(vietnamTimeZone)) 
                 );
             });

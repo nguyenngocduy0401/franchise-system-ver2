@@ -29,7 +29,7 @@ namespace FranchiseProject.API.Controllers
         [Authorize(Roles = AppRole.Manager)]
         [SwaggerOperation(Summary = "tạo mới gói nhượng quyền{Authorize = Manager}")]
         [HttpPost()]
-        public async Task<ApiResponse<bool>> CreatePackageAsync(CreatePackageModel createPackageModel)
+        public async Task<ApiResponse<PackageViewModel>> CreatePackageAsync(CreatePackageModel createPackageModel)
         {
             return await _packageService.CreatePackageAsync(createPackageModel);
         }

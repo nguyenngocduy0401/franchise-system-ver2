@@ -11,7 +11,7 @@ namespace FranchiseProject.Application.Interfaces
     public interface IPackageService
     {
         Task<ApiResponse<List<PackageViewModel>>> GetAllStandardPackageByAsync();
-        Task<ApiResponse<bool>> CreatePackageAsync(CreatePackageModel createPackageModel);
+        Task<ApiResponse<PackageViewModel>> CreatePackageAsync(CreatePackageModel createPackageModel);
         Task<ApiResponse<bool>> UpdatePackageAsync(Guid id, UpdatePackageModel updatePackageModel);
         Task<ApiResponse<PackageViewModel>> GetPackageByIdAsync(Guid id);
         Task<ApiResponse<bool>> DeletePackageByIdAsync(Guid id);
