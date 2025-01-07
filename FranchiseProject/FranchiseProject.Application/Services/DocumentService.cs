@@ -285,6 +285,7 @@ namespace FranchiseProject.Application.Services
                     return ResponseHandler.Success<bool>(false, "Không tìm thấy giấy tờ liên quan !");
                 }
                 documents.Appoved = true;
+                documents.Status=DocumentStatus.Active
                  _unitOfWork.DocumentRepository.Update(documents);
                await _unitOfWork.SaveChangeAsync();
 
