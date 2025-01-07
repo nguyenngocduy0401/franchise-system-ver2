@@ -57,11 +57,11 @@ namespace FranchiseProject.Application.Services
 
                 ValidationResult validationResult = await _validator.ValidateAsync(document);
                 if (!validationResult.IsValid) if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
-              
+
                 var doc = _mapper.Map<Document>(document);
-              
+
                 doc.Appoved = document.Approved;
-                              
+
                 doc.Type = document.DocumentType;
                 await _unitOfWork.DocumentRepository.AddAsync(doc);
                 var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
@@ -108,9 +108,9 @@ namespace FranchiseProject.Application.Services
                 Expression<Func<Document, bool>> filter = d =>
                     (!filterModel.AgencyId.HasValue || d.AgencyId == filterModel.AgencyId) &&
                     (!filterModel.Type.HasValue || d.Type == filterModel.Type) &&
-                    (d.Status == filterModel.Status)&&
-                    (d.Appoved==true);
-           
+                    (d.Status == filterModel.Status) &&
+                    (d.Appoved == true);
+
 
                 var documents = await _unitOfWork.DocumentRepository.GetFilterAsync(
                     filter: filter,
@@ -145,7 +145,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<bool>();
             try
             {
-               
+
 
                 var document = await _unitOfWork.DocumentRepository.GetExistByIdAsync(documentId);
                 if (document == null) return ResponseHandler.Success(false, "Tài liệu không khả dụng!");
@@ -230,7 +230,7 @@ namespace FranchiseProject.Application.Services
             }
         }
 
-        public async Task<ApiResponse<DocumentViewModel>> GetDocumentbyAgencyId(Guid agencyId,DocumentType type)
+        public async Task<ApiResponse<DocumentViewModel>> GetDocumentbyAgencyId(Guid agencyId, DocumentType type)
         {
             var response = new ApiResponse<DocumentViewModel>();
             try
@@ -271,6 +271,28 @@ namespace FranchiseProject.Application.Services
             catch (Exception ex)
             {
                 return ResponseHandler.Failure<List<DocumentViewModel>>($"Lỗi truy xuất : {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse<bool>> UpdateDocument(Guid agencyId, DocumentType type)
+        {
+            try
+            {
+                var documents = await _unitOfWork.DocumentRepository.GetMostRecentAgreeSignByAgencyIdAsync(agencyId, type);
+
+                if (documents == null)
+                {
+                    return ResponseHandler.Success<bool>(false, "Không tìm thấy giấy tờ liên quan !");
+                }
+                documents.Appoved = true;
+                 _unitOfWork.DocumentRepository.Update(documents);
+               await _unitOfWork.SaveChangeAsync();
+
+                return ResponseHandler.Success(true, "Truy xuất thành công");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<bool>($"Lỗi truy xuất : {ex.Message}");
             }
         }
     }

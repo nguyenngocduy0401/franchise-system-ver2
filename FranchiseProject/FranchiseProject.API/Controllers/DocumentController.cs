@@ -71,5 +71,13 @@ namespace FranchiseProject.API.Controllers
         {
             return await _documentService.GetAllDocumentsByAgencyIdAsync(id);
         }
+
+        [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
+        [SwaggerOperation(Summary = "Duyệt tài liệu {Authorize = Manager, Admin,SystemTechnician, AgencyManager}")]
+        [HttpPut("")]
+        public async Task<ApiResponse<bool>> UpdateDocument(Guid id, DocumentType type)
+        {
+            return await _documentService.UpdateDocument(id, type);
+        }
     }
 }
