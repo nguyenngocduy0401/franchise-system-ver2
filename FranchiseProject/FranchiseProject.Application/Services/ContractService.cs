@@ -123,6 +123,11 @@ namespace FranchiseProject.Application.Services
                 contract.DepositPercentage = create.DepositPercentage;
                 contract.Status = ContractStatusEnum.None;
                 contract.ContractCode = await GenerateUniqueContractCode();
+                var package = await _unitOfWork.PackageRepository.GetExistByIdAsync(create.PackageId.Value);
+                if (package == null)
+                {
+                    return ResponseHandler.Success<bool>(false, "Không tìm thấy gói đăng kí !");
+                }
                // contract.FrachiseFee = franchiseFee.Sum(f => f.FeeAmount);
                  _unitOfWork.ContractRepository.Update(contract);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
@@ -328,7 +333,8 @@ namespace FranchiseProject.Application.Services
                         Status = c.Status,
                         RevenueSharePercentage = c.RevenueSharePercentage,
 
-                        AgencyName = c.Agency != null ? c.Agency.Name : string.Empty
+                        AgencyName = c.Agency != null ? c.Agency.Name : string.Empty,
+                        UsedAccountCount=c.UsedAccountCount
                     }).ToList(),
                     TotalItemsCount = contracts.TotalItemsCount,
                     PageIndex = contracts.PageIndex,
@@ -368,7 +374,8 @@ namespace FranchiseProject.Application.Services
                     ContractCode=contract.ContractCode,
                     ContractDocumentImageURL = contract.ContractDocumentImageURL,
                     RevenueSharePercentage = contract.RevenueSharePercentage,
-                    AgencyName = contract.Agency != null ? contract.Agency.Name : string.Empty
+                    AgencyName = contract.Agency != null ? contract.Agency.Name : string.Empty,
+                    UsedAccountCount=contract.UsedAccountCount
 
                 };
 

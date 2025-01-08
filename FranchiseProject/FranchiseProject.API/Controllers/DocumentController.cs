@@ -28,7 +28,7 @@ namespace FranchiseProject.API.Controllers
             return await _documentService.DeleteDocumentAsync(id);
         }
 
-       [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin+"," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
+      // [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin+"," + AppRole.SystemTechnician + "," + AppRole.AgencyManager)]
         [SwaggerOperation(Summary = "Tạo mới tài liệu {Authorize = Manager, Admin,SystemTechnician}")]
         [HttpPost]
         public async Task<ApiResponse<bool>> CreateDocumentAsync(UploadDocumentViewModel uploadDocumentModel)
@@ -50,7 +50,7 @@ namespace FranchiseProject.API.Controllers
         {
             return await _documentService.GetDocumentByIdAsync(id);
         }
-        [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician+","+AppRole.AgencyManager)]
+      //  [Authorize(Roles = AppRole.Manager + "," + AppRole.Admin + "," + AppRole.SystemTechnician+","+AppRole.AgencyManager)]
         [SwaggerOperation(Summary = "Tìm kiếm tài liệu{Authorize = Manager, Admin,SystemTechnician,AgencyManager}")]
         [HttpGet()]
         public async Task<ApiResponse<Pagination<DocumentViewModel>>> FilterDocumentAsync([FromQuery] FilterDocumentViewModel filterDocumentModel)

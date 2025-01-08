@@ -235,7 +235,11 @@ namespace FranchiseProject.Application.Services
                 class1.CurrentEnrollment++;
                 _unitOfWork.PaymentRepository.Update(payment);
                 _unitOfWork.RegisterCourseRepository.Update(rc);
-
+                //cập nhật số account 
+                var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(user.AgencyId.Value);
+                contract.UsedAccountCount++;
+                _unitOfWork.ContractRepository.Update(contract);
+              
                 // Gửi email
                 var startDate = classScheduleEarliest.Date.Value.ToString("dd/MM/yyyy");
                 var endDate = classScheduleLatest.Date.Value.ToString("dd/MM/yyyy");

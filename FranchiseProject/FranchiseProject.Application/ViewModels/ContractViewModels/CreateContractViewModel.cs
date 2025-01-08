@@ -16,6 +16,7 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModels
         public double? RevenueSharePercentage { get; set; } //lớn hơn 0 bé hon 100
        
         public string? AgencyId { get; set; }
+        public Guid? PackageId { get; set; }
     }
 }
     

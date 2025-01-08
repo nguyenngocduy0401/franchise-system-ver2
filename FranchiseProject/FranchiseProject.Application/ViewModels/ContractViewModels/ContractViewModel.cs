@@ -25,5 +25,6 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModels
         public double? RevenueSharePercentage { get; set; }
         public ContractStatusEnum? Status { get; set; }
         public string? AgencyName { get; set; }
+        public int? UsedAccountCount { get; set; }
     }
 }
