@@ -12,7 +12,8 @@ namespace FranchiseProject.Domain.Enums
         Advance_Payment=2,      // Đã thanh toán 1 phần tiền  
         Completed = 1,          //hoàn thành thanh toán
         Late_Payment=3,//Qua han thanh toan
-        Refund =4           
+        Refund =4,
+        RequestRefund =5,
 
     }
 }

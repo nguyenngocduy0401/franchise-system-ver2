@@ -341,7 +341,7 @@ namespace FranchiseProject.Application.Services
                     quiz.StartTime <= currentTime &&
                     currentTime <= quiz.StartTime.Value.AddMinutes((double)quiz.Duration))
                 {
-                    return ResponseHandler.Failure<bool>("Đang trong thời gian diễn ra bài kiểm tra không thể sửa đổi câu hỏi!");
+                    return ResponseHandler.Success(false,"Đang trong thời gian diễn ra bài kiểm tra không thể sửa đổi câu hỏi!");
                 }
 
 

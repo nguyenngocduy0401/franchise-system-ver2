@@ -246,16 +246,21 @@ namespace FranchiseProject.Application.Services
                 var slot = await _unitOfWork.SlotRepository.GetExistByIdAsync((Guid)classSchedules.FirstOrDefault().SlotId);
 
                 Dictionary<string, string> dayOfWeekMap = new Dictionary<string, string>
-        {
-            { "Sunday", "Chủ nhật" },
-            { "Monday", "Thứ hai" },
-            { "Tuesday", "Thứ ba" },
-            { "Wednesday", "Thứ tư" },
-            { "Thursday", "Thứ năm" },
-            { "Friday", "Thứ sáu" },
-            { "Saturday", "Thứ bảy" }
-        };
-                string vietnameseDayOfWeek = dayOfWeekMap.ContainsKey(class1.DayOfWeek) ? dayOfWeekMap[class1.DayOfWeek] : "None";
+                {
+                    { "Sunday", "Chủ nhật" },
+                    { "Monday", "Thứ hai" },
+                    { "Tuesday", "Thứ ba" },
+                    { "Wednesday", "Thứ tư" },
+                    { "Thursday", "Thứ năm" },
+                    { "Friday", "Thứ sáu" },
+                    { "Saturday", "Thứ bảy" }
+                };
+                //string vietnameseDayOfWeek = dayOfWeekMap.ContainsKey(class1.DayOfWeek) ? dayOfWeekMap[class1.DayOfWeek] : "None";
+                string vietnameseDayOfWeek = string.Join(", ",
+                class1.DayOfWeek.Split(',').Select(day =>
+                    dayOfWeekMap.ContainsKey(day.Trim()) ? dayOfWeekMap[day.Trim()] : "None"
+                )
+            );
                 var studentDayOfWeek = vietnameseDayOfWeek + "-" + slot?.StartTime + "-" + slot?.EndTime;
 
                 var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(user.AgencyId.Value);
