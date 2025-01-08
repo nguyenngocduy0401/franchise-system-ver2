@@ -198,6 +198,7 @@ namespace FranchiseProject.API
             services.AddTransient<IValidator<UpdateUserByLoginModel>, UpdateUserByLoginValidator>();
             services.AddTransient<IValidator<UpdatePackageModel>, UpdatePackageValidator>();
             services.AddTransient<IValidator<CreatePackageModel>, CreatePackageValidator>();
+            services.AddTransient<IValidator<CreateContractLicenseModel>, CreateContractLicenseValidator>();
             #endregion
             return services;
         }

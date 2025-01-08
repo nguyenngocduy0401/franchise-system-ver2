@@ -16,6 +16,8 @@ using Microsoft.Extensions.Configuration;
 using System;
 using Org.BouncyCastle.Pqc.Crypto.Falcon;
 using FranchiseProject.Application.Repositories;
+using Microsoft.AspNetCore.Http.HttpResults;
+using System.Net.WebSockets;
 
 namespace FranchiseProject.Application.Services
 {
@@ -26,10 +28,14 @@ namespace FranchiseProject.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IValidator<CreateContractViewModel> _validator;
         private readonly IValidator<UpdateContractViewModel> _validatorUpdate;
+        private readonly IValidator<CreateContractLicenseModel> _createContractLicenseValidator;
         private readonly IPdfService _pdfService;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
-        public ContractService(IConfiguration configuration,IValidator<UpdateContractViewModel> validatorUpdate, IEmailService emailService, IPdfService pdfService, IMapper mapper, IUnitOfWork unitOfWork, IValidator<CreateContractViewModel> validator, IClaimsService claimsService)
+        public ContractService(IConfiguration configuration,IValidator<UpdateContractViewModel> validatorUpdate, IEmailService emailService,
+            IPdfService pdfService, IMapper mapper, IUnitOfWork unitOfWork, 
+            IValidator<CreateContractViewModel> validator, IClaimsService claimsService,
+            IValidator<CreateContractLicenseModel> createContractLicenseValidator)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -39,6 +45,7 @@ namespace FranchiseProject.Application.Services
             _emailService = emailService;
             _validatorUpdate = validatorUpdate;
             _configuration = configuration;
+            _createContractLicenseValidator = createContractLicenseValidator;
         }
         public async Task NotifyCustomersOfExpiringContracts()
         {
@@ -74,44 +81,26 @@ namespace FranchiseProject.Application.Services
 
             }
         }
-
         public async Task<ApiResponse<bool>> UploadContractAsync(CreateContractViewModel create)
         {
             var response = new ApiResponse<bool>();
             try
             {
-                FluentValidation.Results.ValidationResult validationResult = await _validator.ValidateAsync(create);
-                if (!validationResult.IsValid)
-                {
-                    response.isSuccess = false;
-                    response.Message = string.Join(", ", validationResult.Errors.Select(error => error.ErrorMessage));
-                    return response;
-                }
+                var validationResult = await _validator.ValidateAsync(create);
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
                 var agencyId = Guid.Parse(create.AgencyId);
                 var existAgency = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
-                if (existAgency == null)
-                {
-                    response.Data = false;
-                    response.isSuccess = true;
-                    response.Message = "Không tìm thấy đối tác ";
-                    return response;
-                }
-                if (existAgency.Status != AgencyStatusEnum.Processing)
-                {
-                    response.Data = false;
-                    response.isSuccess = true;
-                    response.Message = "Đối tác chưa thể đăng kí nhượng quyền.";
-                    return response;
-                }
+                if (existAgency == null) return ResponseHandler.Success(false,"Không tìm thấy đối tác");
+
+                if (existAgency.Status != AgencyStatusEnum.Processing) return ResponseHandler.Success(false, "Đối tác chưa thể đăng kí nhượng quyền.");
+
                 var activeContract = await _unitOfWork.ContractRepository.GetActiveContractByAgencyIdAsync(agencyId);
 
-                if (activeContract != null)
-                {
-                    response.Data = false;
-                    response.isSuccess = true;
-                    response.Message = "Đối tác đã có hợp đồng đang trong thời hạn.";
-                    return response;
-                }
+                if (activeContract != null) return ResponseHandler.Success(false, "Đối tác đã có hợp đồng đang trong thời hạn.");
+
+                var package = await _unitOfWork.PackageRepository.GetExistByIdAsync((Guid)create.PackageId);
+                if(package == null) return ResponseHandler.Success(false, "Không tìm thấy gối bản quyền phù hợp!");
+
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
                 contract.ContractCode = await GenerateUniqueContractCode();
                 var franchiseFee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
@@ -123,24 +112,83 @@ namespace FranchiseProject.Application.Services
                 contract.DepositPercentage = create.DepositPercentage;
                 contract.Status = ContractStatusEnum.None;
                 contract.ContractCode = await GenerateUniqueContractCode();
-                var package = await _unitOfWork.PackageRepository.GetExistByIdAsync(create.PackageId.Value);
-                if (package == null)
-                {
-                    return ResponseHandler.Success<bool>(false, "Không tìm thấy gói đăng kí !");
-                }
-               // contract.FrachiseFee = franchiseFee.Sum(f => f.FeeAmount);
+                contract.FrachiseFee = franchiseFee.Sum(f => f.FeeAmount);
+                contract.Total = contract.FrachiseFee + package.Price;
+
                  _unitOfWork.ContractRepository.Update(contract);
                 var isSuccess = await _unitOfWork.SaveChangeAsync();
                 if (isSuccess > 0)
                 {
                     var emailResponse = await _emailService.SendContractEmailAsync(existAgency.Email, contract.ContractDocumentImageURL);
-                    if (!emailResponse.isSuccess)
-                    {
-                        response.Message = "Tải lên thành công, nhưng không thể gửi email đính kèm hợp đồng.";
-                    }
-                    response.Data = true;
-                    response.isSuccess = true;
-                    response.Message = "Tải lên thành công !";
+                    if (!emailResponse.isSuccess) return ResponseHandler.Success(true, "Tải lên thành công, nhưng không thể gửi email đính kèm hợp đồng.");
+
+
+                    response = ResponseHandler.Success(true, "Tải lên thành công !");
+                }
+                else
+                {
+                    throw new Exception("Create unsuccesfully ");
+                }
+            }
+            catch (DbException ex)
+            {
+                response.isSuccess = false;
+                response.Message = ex.Message;
+
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+        public async Task<ApiResponse<bool>> UploadContractLicenseAsync(CreateContractLicenseModel create) 
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var validationResult = await _createContractLicenseValidator.ValidateAsync(create);
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+                var agencyId = create.AgencyId;
+                var existAgency = await _unitOfWork.AgencyRepository.GetByIdAsync((Guid)agencyId);
+                if (existAgency == null) return ResponseHandler.Success(false, "Không tìm thấy đối tác");
+
+                if (existAgency.Status != AgencyStatusEnum.Processing) return ResponseHandler.Success(false, "Đối tác chưa thể đăng kí nhượng quyền.");
+
+                var activeContract = await _unitOfWork.ContractRepository.GetActiveContractByAgencyIdAsync((Guid)agencyId);
+
+                if (activeContract != null) return ResponseHandler.Success(false, "Đối tác đã có hợp đồng đang trong thời hạn.");
+
+                var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync((Guid)agencyId);
+                contract.ContractCode = await GenerateUniqueContractCode();
+                var franchiseFee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
+                contract.Title = create.Title;
+                contract.StartTime = create.StartTime;
+                contract.EndTime = create.EndTime;
+                contract.ContractDocumentImageURL = create.ContractDocumentImageURL;
+                contract.RevenueSharePercentage = create.RevenueSharePercentage;
+                contract.DepositPercentage = create.DepositPercentage;
+                contract.Status = ContractStatusEnum.None;
+                contract.ContractCode = await GenerateUniqueContractCode();
+
+                contract.FrachiseFee = franchiseFee.Sum(f => f.FeeAmount);
+                var packageFee= create.CreatePackageModel.Price;
+                contract.Total=contract.FrachiseFee+packageFee;// Tong gia tri hop dong
+
+                var package = _mapper.Map<Package>(create.CreatePackageModel);
+                await _unitOfWork.PackageRepository.AddAsync(package);
+
+                contract.PackageId = package.Id; 
+                _unitOfWork.ContractRepository.Update(contract);
+                var isSuccess = await _unitOfWork.SaveChangeAsync();
+                if (isSuccess > 0)
+                {
+                    var emailResponse = await _emailService.SendContractEmailAsync(existAgency.Email, contract.ContractDocumentImageURL);
+                    if (!emailResponse.isSuccess) return ResponseHandler.Success(true, "Tải lên thành công, nhưng không thể gửi email đính kèm hợp đồng.");
+                    
+
+                    response = ResponseHandler.Success(true , "Tải lên thành công !");
                 }
                 else
                 {
@@ -355,9 +403,6 @@ namespace FranchiseProject.Application.Services
 
             return response;
         }
-
-
-
         private List<ContractViewModel> MapContractsToViewModels(List<Contract> contracts)
         {
             var contractViewModels = new List<ContractViewModel>();
@@ -418,7 +463,6 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
-
         public async Task<ApiResponse<ContractViewModel>> GetContractbyAgencyId(Guid agencyId)
         {
             var response = new ApiResponse<ContractViewModel>();
@@ -440,8 +484,6 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<ContractViewModel>($"Lỗi truy xuất hợp đồng: {ex.Message}");
             }
         }
-
-
         public async Task<ApiResponse<string>> UploadContractTemplateAsync(IFormFile file)
         {
             try
@@ -472,10 +514,6 @@ namespace FranchiseProject.Application.Services
                 return ResponseHandler.Failure<string>($"Lỗi khi tải lên template hợp đồng: {ex.Message}");
             }
         }
-
-
-
-
         public async Task<ApiResponse<string>> DownloadContractAsPdfAsync(Guid agencyId)
         {
             try

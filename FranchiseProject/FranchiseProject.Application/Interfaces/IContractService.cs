@@ -13,6 +13,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IContractService
     {
+        Task<ApiResponse<bool>> UploadContractLicenseAsync(CreateContractLicenseModel create);
         Task NotifyCustomersOfExpiringContracts();
         Task<ApiResponse<bool>> UploadContractAsync(CreateContractViewModel create);
         Task<ApiResponse<bool>> UpdateContractAsync(UpdateContractViewModel update, string id);
