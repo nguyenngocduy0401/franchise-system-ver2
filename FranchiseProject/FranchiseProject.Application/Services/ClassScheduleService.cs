@@ -172,23 +172,14 @@ namespace FranchiseProject.Application.Services
                 {
                     if (selectedDaysOfWeek.Contains((DayOfWeekEnum)startDate.DayOfWeek))
                     {
-                        var existingSchedule = await _unitOfWork.ClassScheduleRepository
-                            .GetExistingScheduleAsync(startDate.ToDateTime(TimeOnly.MinValue), createClassScheduleDateRangeViewModel.Room, Guid.Parse(createClassScheduleDateRangeViewModel.SlotId));
-
-                        if (existingSchedule != null)
-                        {
-                            response.Data = false;
-                            response.isSuccess = true;
-                            response.Message = $"Lịch học đã tồn tại vào ngày {startDate:yyyy-MM-dd}, phòng {createClassScheduleDateRangeViewModel.Room}, slot {createClassScheduleDateRangeViewModel.SlotId}!";
-                            return response;
-                        }
+                       
 
                         var classSchedule = new ClassSchedule
                         {
                             ClassId = Guid.Parse(createClassScheduleDateRangeViewModel.ClassId),
                             SlotId = Guid.Parse(createClassScheduleDateRangeViewModel.SlotId),
                             Date = startDate.ToDateTime(TimeOnly.MinValue),
-                            Room = createClassScheduleDateRangeViewModel.Room,
+                         
                             Url=createClassScheduleDateRangeViewModel.Url
                         };
 

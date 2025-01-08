@@ -14,7 +14,7 @@ namespace FranchiseProject.Application.Repositories
         Task<List<ClassSchedule>> GetAllClassScheduleAsync(Expression<Func<ClassSchedule, bool>> predicate);
 
         Task<IEnumerable<ClassSchedule>> GetAllClassScheduleAsync(Expression<Func<ClassSchedule, bool>> filter = null, string includeProperties = "");
-        Task<ClassSchedule?> GetEarliestClassScheduleByClassIdAsync(Guid classId);
+        Task<ClassSchedule> GetEarliestClassScheduleByClassIdAsync(Guid classId);
         Task<List<ClassSchedule>> GetClassSchedulesByClassIdsAsync(List<Guid> classIds, Expression<Func<ClassSchedule, bool>> predicate = null);
         Task<ClassSchedule?> GetClassScheduleWithDetailsAsync(Guid id);
         Task<ClassSchedule> GetFirstOrDefaultAsync(Expression<Func<ClassSchedule, bool>> predicate);

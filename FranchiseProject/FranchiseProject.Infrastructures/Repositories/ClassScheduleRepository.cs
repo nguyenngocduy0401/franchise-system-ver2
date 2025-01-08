@@ -58,12 +58,13 @@ namespace FranchiseProject.Infrastructures.Repositories
 
             return await query.ToListAsync();
         }
-        public async Task<ClassSchedule?> GetEarliestClassScheduleByClassIdAsync(Guid classId)
+        public async Task<ClassSchedule> GetEarliestClassScheduleByClassIdAsync(Guid classId)
         {
-            return await _dbContext.ClassSchedules
+            var result = await _dbContext.ClassSchedules
                 .Where(cs => cs.ClassId == classId && cs.Date != null)
                 .OrderBy(cs => cs.Date)
                 .FirstOrDefaultAsync();
+            return result;
         }
         public async Task<ClassSchedule?> GetLatestClassScheduleByClassIdAsync(Guid classId)
         {

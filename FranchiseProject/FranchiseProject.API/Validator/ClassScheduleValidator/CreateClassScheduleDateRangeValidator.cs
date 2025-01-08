@@ -7,9 +7,7 @@ namespace FranchiseProject.API.Validator.ClassScheduleValidator
     {
         public CreateClassScheduleDateRangeValidator()
         {
-            RuleFor(x => x.Room)
-                .NotEmpty()
-                .WithMessage("Phòng không được để trống!");
+     
 
             RuleFor(x => x.startDate)
                 .Must(BeAValidStartDate)
