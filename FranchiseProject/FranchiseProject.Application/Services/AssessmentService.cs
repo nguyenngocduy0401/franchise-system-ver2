@@ -187,7 +187,7 @@ namespace FranchiseProject.Application.Services
             {
                 var studentId = _claimsService.GetCurrentUserId.ToString();
                 var assessments = await _unitOfWork.AssessmentRepository.GetAssessmentsByClassIdAsync(classId, studentId);
-                if (assessments != null && assessments.Any()) return ResponseHandler.Success(new AssessmentStudentViewModel());
+                if (assessments == null || !assessments.Any()) return ResponseHandler.Success(new AssessmentStudentViewModel());
                 var course = (await _unitOfWork.CourseRepository.FindAsync(c => c.Id == assessments.FirstOrDefault().CourseId, "Syllabus")).FirstOrDefault();
                 var classSchedules = await _unitOfWork.ClassScheduleRepository.FindAsync(e => e.ClassId == classId && e.IsDeleted != true);
                 var assessmentStudentViewModel = new AssessmentStudentViewModel();
