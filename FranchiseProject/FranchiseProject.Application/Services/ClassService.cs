@@ -964,15 +964,23 @@ namespace FranchiseProject.Application.Services
 
             try
             {
+                var classViewModels = new List<ClassByLoginViewModel>();
                 var currentUserId = _claimsService.GetCurrentUserId.ToString();
                 var classes = await _unitOfWork.ClassRepository.GetClassesByUserIdAsync(currentUserId);
-
-                var classViewModels = classes.Select(c => new ClassByLoginViewModel
+                foreach (var classe in classes)
                 {
-                    ClassId = c.Id,
-                    ClassName = c.Name,
-                    CourseId = c.CourseId,
-                }).ToList();
+                    var startDate = await _unitOfWork.ClassScheduleRepository.GetEarliestClassScheduleByClassIdAsync(classe.Id);
+                    var endDate = await _unitOfWork.ClassScheduleRepository.GetLatestClassScheduleByClassIdAsync(classe.Id);
+                    classViewModels.Add(new ClassByLoginViewModel
+                    {
+                        ClassId = classe.Id,
+                        ClassName = classe.Name,
+                        CourseId = classe.CourseId,
+                        StartDate= startDate.Date,
+                        EndDate=endDate.Date
+                    });
+                }
+        
 
                 return ResponseHandler.Success<List<ClassByLoginViewModel>>(classViewModels, "Successfully retrieved classes");
             }
