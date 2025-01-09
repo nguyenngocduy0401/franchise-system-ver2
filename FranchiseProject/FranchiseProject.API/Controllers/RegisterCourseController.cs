@@ -19,7 +19,10 @@ namespace FranchiseProject.API.Controllers
         {
             _registerCourseService = registerCourseService;
         }
-
+        [Authorize()]
+        [SwaggerOperation(Summary = "Học sinh yêu cầu hoàn tiền{Authorize}")]
+        [HttpPatch("~/api/v1/users/mine/courses/{id}/register-courses/status")]
+        public async Task<ApiResponse<bool>> UpdateRegisterCourseDateTimeAsync(Guid id) => await _registerCourseService.RequestRefundByCourseIdAsync(id);
         [SwaggerOperation(Summary = "học sinh đăng kí khóa học ")]
         [HttpPost]
         public async Task<ApiResponse<string>> RegisterCourseAsync(RegisterCourseViewModel model)=>await _registerCourseService.RegisterCourseAsync(model);

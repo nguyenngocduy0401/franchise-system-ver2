@@ -33,5 +33,6 @@ namespace FranchiseProject.Domain.Entity
         public DateTime? PaidDate { get; set; }
         public DateTime? LastUrlGenerationTime { get; set; }
         public DateTime? ExpirationDate { get; set; }
+        public DateOnly? ToDate { get; set; }
     }
 }

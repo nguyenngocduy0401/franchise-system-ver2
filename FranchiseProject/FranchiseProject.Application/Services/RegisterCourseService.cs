@@ -74,7 +74,30 @@ namespace FranchiseProject.Application.Services
             _notificationService = notificationService;
         }
 
+        public async Task<ApiResponse<bool>> RequestRefundByCourseIdAsync(Guid courseId)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var studentId = _claimsService.GetCurrentUserId.ToString();
+                var registerCourse = (await _unitOfWork.RegisterCourseRepository
+                    .FindAsync(e => e.UserId == studentId && e.CourseId == courseId))
+                    .OrderByDescending(e => e.DateTime)
+                    .FirstOrDefault();
+                if (registerCourse == null) return ResponseHandler.Success(false, "Khoá học hiện không khả dụng!");
+                if (registerCourse.StudentPaymentStatus == StudentPaymentStatusEnum.RequestRefund) return ResponseHandler.Success(false, "Đã yêu cầu hoàn tiền trước đó!");
 
+                registerCourse.StudentPaymentStatus = StudentPaymentStatusEnum.RequestRefund;
+                _unitOfWork.RegisterCourseRepository.Update(registerCourse);
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (!isSuccess) throw new Exception("Update fail!");
+                return ResponseHandler.Success(true);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.Failure<bool>(ex.Message);
+            }
+        }
         public async Task<ApiResponse<string>> RegisterCourseAsync(RegisterCourseViewModel model)
         {
             var response = new ApiResponse<string>();
@@ -232,6 +255,7 @@ namespace FranchiseProject.Application.Services
                 rc.UserId = user.Id;
                 var payment = await _unitOfWork.PaymentRepository.GetExistByIdAsync(paymentId);
                 payment.UserId = user.Id;
+                payment.ToDate = classRoom.ToDate;
                 class1.CurrentEnrollment++;
                 _unitOfWork.PaymentRepository.Update(payment);
                 _unitOfWork.RegisterCourseRepository.Update(rc);

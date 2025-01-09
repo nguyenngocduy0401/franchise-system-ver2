@@ -335,14 +335,21 @@ namespace FranchiseProject.Application.Services
                         var agencyregister = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
                         if (agencyregister != null)
                         {
+                            var user1 = await _unitOfWork.UserRepository.GetAgencyManagerByAgencyIdAsync(agencyId);
+                            user1.Status = UserStatusEnum.active;
+                           await _userManager.UpdateAsync(user1);
                             var emailMessage = new MessageModel
                             {
                                 To = agency.Email,
-                                Subject = "Đăng ký thành công  [futuretech-noreply]",
-                                Body = $"<p>Chào {agency.Name},</p>" +
-                                 $"<p>Thông tin của bạn đang được xử lý và chúng tôi sẽ liên hệ với bạn sớm nhất có thể.</p>" +
-                                 $"<p>Trân trọng,</p>" +
-                                 $"<p>Đội ngũ Futuretech</p>"
+                                Subject = "Chúc mừng! Bạn đã trở thành đối tác chính thức [futuretech-noreply]",
+                                Body = $@"<p>Chào {agency.Name},</p>
+                      <p>Chúng tôi rất vui mừng thông báo rằng bạn đã chính thức trở thành đối tác của Futuretech!</p>
+                      <p>Đây là một bước quan trọng trong sự hợp tác giữa chúng ta, và chúng tôi rất mong được làm việc cùng bạn để đạt được những thành công to lớn.</p>
+                      <p>Với tư cách là đối tác chính thức, bạn sẽ được tiếp cận với các nguồn lực, hỗ trợ và cơ hội độc quyền từ Futuretech.</p>
+                      <p>Nếu bạn có bất kỳ câu hỏi hoặc cần hỗ trợ, đừng ngần ngại liên hệ với chúng tôi.</p>
+                      <p>Một lần nữa, xin chúc mừng và chào đón bạn đến với Futuretech!</p>
+                      <p>Trân trọng,</p>
+                      <p>Đội ngũ Futuretech</p>"
                             };
                             bool emailSent = await _emailService.SendEmailAsync(emailMessage);
                             if (!emailSent)

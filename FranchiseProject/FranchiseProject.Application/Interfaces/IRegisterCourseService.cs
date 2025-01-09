@@ -13,6 +13,7 @@ namespace FranchiseProject.Application.Interfaces
 {
     public interface IRegisterCourseService
     {
+        Task<ApiResponse<bool>> RequestRefundByCourseIdAsync(Guid courseId);
         Task<ApiResponse<string>> RegisterCourseAsync(RegisterCourseViewModel model);
         Task<ApiResponse<bool>> UpdateStatusStudentAsync(string studentId, string courseId, StudentCourseStatusEnum status);
         Task<ApiResponse<StudentRegisterViewModel>> GetStudentRegisterByIdAsync(string id, string courseId);

@@ -8,11 +8,14 @@ using System.Threading.Tasks;
 
 namespace FranchiseProject.Application.Repositories
 {
-    public interface IPaymentRepository:IGenericRepository<Payment>
+    public interface IPaymentRepository : IGenericRepository<Payment>
     {
         Task<List<Payment>> GetAllAsync(Expression<Func<Payment, bool>> filter);
         Task<Payment?> GetFirstOrDefaultAsync(Expression<Func<Payment, bool>> filter);
         Task<List<Payment>> GetPaymentsByAgencyIdAndDateRange(Guid agencyId, DateTime startDate, DateTime endDate);
         Task<double> CalculateAgencyRevenue(Guid agencyId, DateTime startDate, DateTime endDate);
+        Task<double> GetTotalRefundsForAgencyInPeriod(Guid agencyId, DateTime startDate, DateTime endDate);
+        Task<double> GetTotalRevenueForAgencyInPeriod(Guid agencyId, DateTime startDate, DateTime endDate);
+
     }
 }

@@ -50,8 +50,8 @@ namespace FranchiseProject.Infrastructures.Repositories
         {
             var payments = await _dbContext.Payments
                 .Where(p => p.AgencyId == agencyId &&
-                            p.CreationDate >= startDate &&
-                            p.CreationDate <= endDate &&
+                            p.ToDate.Value >= DateOnly.FromDateTime(startDate) &&
+                            p.ToDate.Value <= DateOnly.FromDateTime(endDate) &&
                             p.Status == PaymentStatus.Completed)
                 .ToListAsync();
 
@@ -64,6 +64,27 @@ namespace FranchiseProject.Infrastructures.Repositories
                 .Sum(p => p.Amount ?? 0);
 
             return revenue - refunds;
+        }
+        public async Task<double> GetTotalRevenueForAgencyInPeriod(Guid agencyId, DateTime startDate, DateTime endDate)
+        {
+            return await _dbContext.Payments
+                .Where(p => p.AgencyId == agencyId &&
+                            p.ToDate.Value >= DateOnly.FromDateTime(startDate)  &&
+                            p.ToDate.Value <= DateOnly.FromDateTime(endDate) &&
+                            p.Status == PaymentStatus.Completed &&
+                            p.Type != PaymentTypeEnum.Refund)
+                .SumAsync(p => p.Amount ?? 0);
+        }
+
+        public async Task<double> GetTotalRefundsForAgencyInPeriod(Guid agencyId, DateTime startDate, DateTime endDate)
+        {
+            return await _dbContext.Payments
+                .Where(p => p.AgencyId == agencyId &&
+                            p.ToDate.Value >= DateOnly.FromDateTime(startDate) &&
+                            p.ToDate.Value <= DateOnly.FromDateTime(endDate) &&
+                            p.Status == PaymentStatus.Completed &&
+                            p.Type == PaymentTypeEnum.Refund)
+                .SumAsync(p => p.Amount ?? 0);
         }
     }
 }
