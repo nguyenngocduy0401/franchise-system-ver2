@@ -45,10 +45,10 @@ namespace FranchiseProject.Application.Services
 
                 var attendances = await _unitOfWork.AttendanceRepository.GetAllAsync(a => a.ClassScheduleId == classScheduleId);
                 var classSchedule = await _unitOfWork.ClassScheduleRepository.GetByIdAsync(classScheduleId);
-                if (classSchedule.Date.Value.Date != DateTime.Today)
-                {
-                    return ResponseHandler.Success<bool>(false,"Lịch học không phải ngày hôm nay, không thể điểm danh.");
-                }
+                //if (classSchedule.Date.Value.Date != DateTime.Today)
+                //{
+                //    return ResponseHandler.Success<bool>(false,"Lịch học không phải ngày hôm nay, không thể điểm danh.");
+                //}
                 var currentTime = DateTime.Now.TimeOfDay;
                 
                 var slot = await _unitOfWork.SlotRepository.GetByIdAsync(classSchedule.SlotId.Value);
@@ -60,10 +60,10 @@ namespace FranchiseProject.Application.Services
                 var attendanceStartTime = slot.StartTime.Value.Add(TimeSpan.FromMinutes(-60));
                 var attendanceEndTime = slot.EndTime.Value.Add(TimeSpan.FromMinutes(60));
 
-                if (currentTime < attendanceStartTime || currentTime > attendanceEndTime)
-                {
-                    return ResponseHandler.Success<bool>(false, "Chỉ có thể điểm danh trong khoảng thời gian từ 60 phút trước giờ bắt đầu đến 60 phút sau giờ kết thúc.");
-                }
+                //if (currentTime < attendanceStartTime || currentTime > attendanceEndTime)
+                //{
+                //    return ResponseHandler.Success<bool>(false, "Chỉ có thể điểm danh trong khoảng thời gian từ 60 phút trước giờ bắt đầu đến 60 phút sau giờ kết thúc.");
+                //}
 
 
                 var currentStudentIds = attendances.Select(a => a.UserId).ToList();

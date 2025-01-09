@@ -14,11 +14,16 @@ namespace FranchiseProject.Application.ViewModels.PaymentViewModel
         public Guid? Id { get; set; }
         public string? Title { get; set; }
         public string? Description { get; set; }
-        public double? Amount { get; set; }
+        public double? Amount { get; set; }// Số tiền cần trả 
         public PaymentStatus? Status { get; set; }
         public Guid? AgencyId { get; set; }
         public string? PaymentUrl { get; set; }
         public DateTime? PaidDate { get; set; }
+        public DateTime? CreattionDate { get; set; }
+        public double? Revenue { get; set; }//Doanh thu gộp
+        public double? RevenueSharePercentage { get; set; }
+        public double? ActualProfits { get; set; }//Lợi nhuận thực tế 
+        public double? Refunds { get; set; }//Hoàn tiền
 
     }
 }

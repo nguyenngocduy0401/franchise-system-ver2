@@ -31,7 +31,7 @@ namespace FranchiseProject.Application.Jobs
 
             foreach (var agency in activeAgencies)
             {
-                var revenue = await _unitOfWork.PaymentRepository.CalculateAgencyRevenue(agency.Id, startDate, endDate);
+                var revenue = await _unitOfWork.PaymentRepository.CalculateAgencyRevenue(agency.Id, startDate, endDate);//hàm tính tiền 
 
                 var model = new CreatePaymentMontlyViewModel
                 {
