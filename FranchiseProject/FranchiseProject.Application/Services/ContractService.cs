@@ -488,7 +488,7 @@ namespace FranchiseProject.Application.Services
                     orderBy: q => q.OrderByDescending(c => c.CreationDate),
                     pageIndex: filterContractModel.PageIndex,
                     pageSize: filterContractModel.PageSize,
-                    includeProperties: "Agency"
+                    includeProperties: "Agency,Package"
                 );
 
                 var contractViewModels = new Pagination<ContractViewModel>
@@ -566,7 +566,6 @@ namespace FranchiseProject.Application.Services
         }
         public async Task<ApiResponse<ContractViewModel>> GetContractByIdAsync(string id)
         {
-            var response = new ApiResponse<ContractViewModel>();
             try
             {
                 var contract = await _unitOfWork.ContractRepository.GetByIdAsync(Guid.Parse(id));
@@ -575,8 +574,23 @@ namespace FranchiseProject.Application.Services
                     return ResponseHandler.Success<ContractViewModel>(null, "Không tìm thấy hợp đồng");
                 }
 
-                var contractViewModel = _mapper.Map<ContractViewModel>(contract);
-                contractViewModel.AgencyName = contract.Agency?.Name;
+                var contractViewModel = new ContractViewModel
+                {
+                    Id = contract.Id,
+                    Title = contract.Title,
+                    ContractCode = contract.ContractCode,
+                    StartTime = contract.StartTime,
+                    EndTime = contract.EndTime,
+                    DepositPercentage = contract.DepositPercentage,
+                    FrachiseFee = contract.FrachiseFee,
+                    Total = contract.Total,
+                    PaidAmount = contract.PaidAmount,
+                    ContractDocumentImageURL = contract.ContractDocumentImageURL,
+                    RevenueSharePercentage = contract.RevenueSharePercentage,
+                    Status = contract.Status,
+                    AgencyName = contract.Agency?.Name,
+                    UsedAccountCount = contract.UsedAccountCount
+                };
 
                 if (contract.Package != null)
                 {
@@ -600,17 +614,34 @@ namespace FranchiseProject.Application.Services
         }
         public async Task<ApiResponse<ContractViewModel>> GetContractbyAgencyId(Guid agencyId)
         {
-            var response = new ApiResponse<ContractViewModel>();
             try
             {
-                var contract =await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
+                var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
                 if (contract == null)
                 {
                     return ResponseHandler.Success<ContractViewModel>(null, "Không tìm thấy hợp đồng");
                 }
-                var contractViewModel = _mapper.Map<ContractViewModel>(contract);
-                var agency =await _unitOfWork.AgencyRepository.GetByIdAsync(contract.AgencyId.Value);
-                contractViewModel.AgencyName = agency.Name;
+
+                var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(contract.AgencyId.Value);
+
+                var contractViewModel = new ContractViewModel
+                {
+                    Id = contract.Id,
+                    Title = contract.Title,
+                    ContractCode = contract.ContractCode,
+                    StartTime = contract.StartTime,
+                    EndTime = contract.EndTime,
+                    DepositPercentage = contract.DepositPercentage,
+                    FrachiseFee = contract.FrachiseFee,
+                    Total = contract.Total,
+                    PaidAmount = contract.PaidAmount,
+                    ContractDocumentImageURL = contract.ContractDocumentImageURL,
+                    RevenueSharePercentage = contract.RevenueSharePercentage,
+                    Status = contract.Status,
+                    AgencyName = agency?.Name,
+                    UsedAccountCount = contract.UsedAccountCount
+                };
+
                 if (contract.Package != null)
                 {
                     contractViewModel.PackageViewModel = new PackageViewModel
@@ -623,6 +654,7 @@ namespace FranchiseProject.Application.Services
                         Status = contract.Package.Status
                     };
                 }
+
                 return ResponseHandler.Success(contractViewModel, "Truy xuất hợp đồng thành công");
             }
             catch (Exception ex)
