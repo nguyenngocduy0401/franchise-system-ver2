@@ -58,7 +58,7 @@ namespace FranchiseProject.API.Controllers
         [HttpGet("financial-report/{agencyId}/{year}/excel")]
         public async Task<ApiResponse<string>> GetFileExcelAgencyFinancialReportAsync(Guid agencyId, int year)
     => await _agencyDashboardService.GetFileExcelAgencyFinancialReportAsync(agencyId, year);
-        [Authorize(Roles = AppRole.AgencyManager)]
+        [Authorize(Roles = AppRole.AgencyManager + "," + AppRole.Manager)]
         [SwaggerOperation(Summary = "Tạo báo cáo tài chính hàng tháng cho đại lý theo tháng  {Authorize = AgencyManager}")]
         [HttpGet("monthly-financial-report")]
         public async Task<ApiResponse<string>> GetAgencyMonthlyFinancialReport([FromQuery] Guid agencyId, [FromQuery] int month, [FromQuery] int year)
