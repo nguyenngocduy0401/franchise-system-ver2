@@ -38,7 +38,7 @@ namespace FranchiseProject.Infrastructures.Repositories
         public async Task<Contract> GetMostRecentContractByAgencyIdAsync(Guid agencyId)
         {
             return await _dbContext.Contracts
-                .Where(c => c.AgencyId == agencyId )
+                .Where(c => c.AgencyId == agencyId).Include(c => c.Package)
                 .OrderByDescending(c => c.CreationDate)
                 .FirstOrDefaultAsync();
         }
