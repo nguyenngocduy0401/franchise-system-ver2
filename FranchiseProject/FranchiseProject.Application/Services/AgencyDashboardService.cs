@@ -61,49 +61,63 @@ namespace FranchiseProject.Application.Services
                 {
                     return ResponseHandler.Success<List<CourseRevenueViewModel>>(null, "Không tìm thấy hợp đồng !");
                 }
-                foreach (var course in courseList)
+
+                var courseGroups = courseList.GroupBy(c => c.Code);
+
+                foreach (var courseGroup in courseGroups)
                 {
-                    var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id, contract.AgencyId.Value);
                     var totalRevenue = 0.0;
                     var studentCount = 0;
                     var totalRefunds = 0.0;
-                    var validRegistrations = filteredRegisterCourses
-                        .Where(r => r.CreationDate.Date <= endDate.Date)
-                        .ToList();
-                    foreach (var registration in validRegistrations)
+
+                    foreach (var course in courseGroup)
                     {
-                        studentCount++;
-                        var payments = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByRegisterCourseIdAsync(registration.Id);
-                        foreach (var payment in payments)
+                        var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id, contract.AgencyId.Value);
+                        var validRegistrations = filteredRegisterCourses
+                            .Where(r => r.CreationDate.Date <= endDate.Date)
+                            .ToList();
+
+                        foreach (var registration in validRegistrations)
                         {
-                            if (payment.ToDate.HasValue && payment.ToDate.Value >= DateOnly.FromDateTime(startDate) && payment.ToDate.HasValue && payment.ToDate.Value <= DateOnly.FromDateTime(endDate))
+                            studentCount++;
+                            var payments = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByRegisterCourseIdAsync(registration.Id);
+                            foreach (var payment in payments)
                             {
-                                if (payment.Type == PaymentTypeEnum.Refund)
+                                if (payment.ToDate.HasValue && payment.ToDate.Value >= DateOnly.FromDateTime(startDate) && payment.ToDate.HasValue && payment.ToDate.Value <= DateOnly.FromDateTime(endDate))
                                 {
-                                    totalRefunds += payment.Amount ?? 0;
-                                }
-                                else
-                                {
-                                    totalRevenue += payment.Amount ?? 0;
+                                    if (payment.Type == PaymentTypeEnum.Refund)
+                                    {
+                                        totalRefunds += payment.Amount ?? 0;
+                                    }
+                                    else
+                                    {
+                                        totalRevenue += payment.Amount ?? 0;
+                                    }
                                 }
                             }
                         }
                     }
+
                     var monthlyFee = totalRevenue * contract.RevenueSharePercentage;
                     var actualProfits = totalRevenue - totalRefunds - monthlyFee;
 
+                    // Sử dụng thông tin từ phiên bản mới nhất của khóa học
+                    var latestCourse = courseGroup.OrderByDescending(c => c.CreationDate).First();
+
                     courseRevenueList.Add(new CourseRevenueViewModel
                     {
-                        CourseId = course.Id,
+                        CourseId = latestCourse.Id,
                         StudentCount = studentCount,
-                        CourseCode = course.Code,
-                        CourseName = course.Name,
+                        CourseCode = latestCourse.Code,
+                        CourseName = latestCourse.Name,
                         TotalRevenue = totalRevenue,
                         MonthlyFee = monthlyFee,
                         Refunds = totalRefunds,
-                        ActualProfits = actualProfits
+                        ActualProfits = actualProfits,
+                      
                     });
                 }
+
                 response = ResponseHandler.Success(courseRevenueList, "Tính doanh thu khóa học thành công!");
             }
             catch (Exception ex)
@@ -119,7 +133,7 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var agencyId = AgencyId;
-                var courseRevenueList = new List<CourseRevenueViewModel>();
+                var courseRevenueDict = new Dictionary<string, CourseRevenueViewModel>();
                 var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(agencyId);
                 var courseList = await _unitOfWork.CourseRepository.GetAllAsync();
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
@@ -127,49 +141,59 @@ namespace FranchiseProject.Application.Services
                 {
                     return ResponseHandler.Success<List<CourseRevenueViewModel>>(null, "Không tìm thấy hợp đồng !");
                 }
+
                 foreach (var course in courseList)
                 {
                     var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id, contract.AgencyId.Value);
-                    var totalRevenue = 0.0;
-                    var totalRefunds = 0.0;
-                    var studentCount = 0;
                     var validRegistrations = filteredRegisterCourses
                         .Where(r => r.CreationDate.Date <= endDate.Date)
                         .ToList();
+
                     foreach (var registration in validRegistrations)
                     {
-                        studentCount++;
                         var payments = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByRegisterCourseIdAsync(registration.Id);
                         foreach (var payment in payments)
                         {
                             if (payment.CreationDate.Date >= startDate.Date && payment.CreationDate.Date <= endDate.Date)
                             {
+                                if (!courseRevenueDict.ContainsKey(course.Code))
+                                {
+                                    courseRevenueDict[course.Code] = new CourseRevenueViewModel
+                                    {
+                                        CourseId = course.Id,
+                                        CourseCode = course.Code,
+                                        CourseName = course.Name,
+                                        StudentCount = 0,
+                                        TotalRevenue = 0,
+                                        Refunds = 0,
+                                        MonthlyFee = 0,
+                                        ActualProfits = 0
+                                    };
+                                }
+
+                                var courseRevenue = courseRevenueDict[course.Code];
+                                courseRevenue.StudentCount++;
+
                                 if (payment.Type == PaymentTypeEnum.Refund)
                                 {
-                                    totalRefunds += payment.Amount ?? 0;
+                                    courseRevenue.Refunds += payment.Amount ?? 0;
                                 }
                                 else
                                 {
-                                    totalRevenue += payment.Amount ?? 0;
+                                    courseRevenue.TotalRevenue += payment.Amount ?? 0;
                                 }
                             }
                         }
                     }
-                    var monthlyFee = totalRevenue * contract.RevenueSharePercentage;
-                    var actualProfits = totalRevenue - totalRefunds - monthlyFee;
-
-                    courseRevenueList.Add(new CourseRevenueViewModel
-                    {
-                        CourseId = course.Id,
-                        StudentCount = studentCount,
-                        CourseCode = course.Code,
-                        CourseName = course.Name,
-                        TotalRevenue = totalRevenue,
-                        MonthlyFee = monthlyFee,
-                        Refunds = totalRefunds,
-                        ActualProfits = actualProfits
-                    });
                 }
+
+                foreach (var courseRevenue in courseRevenueDict.Values)
+                {
+                    courseRevenue.MonthlyFee = courseRevenue.TotalRevenue * contract.RevenueSharePercentage;
+                    courseRevenue.ActualProfits = courseRevenue.TotalRevenue - courseRevenue.Refunds - courseRevenue.MonthlyFee;
+                }
+
+                var courseRevenueList = courseRevenueDict.Values.ToList();
                 response = ResponseHandler.Success(courseRevenueList, "Tính doanh thu khóa học thành công!");
             }
             catch (Exception ex)

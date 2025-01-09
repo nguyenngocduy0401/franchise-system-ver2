@@ -112,16 +112,26 @@ namespace FranchiseProject.Infrastructures.Repositories
                     .Where(rc => rc.UserId==userId&&rc.CourseId==courseId&&rc.StudentCourseStatus==StudentCourseStatusEnum.Waitlisted).FirstOrDefaultAsync();
         }
 
-        public async Task<bool> ExistsWithinLast24HoursAsync(string name,string email, string phoneNumber, string courseId)
+        public async Task<bool> ExistsWithinLast24HoursAsync(string name, string email, string phoneNumber, string courseId)
         {
-            var twentyFourHoursAgo = DateTime.Now.AddHours(-24);
-            return await _dbSet.AnyAsync(r =>
-                r.User.Email == email &&
+            var courseGuid = Guid.Parse(courseId);
+
+            // Check for existing successful registration with the same name, phone number, email, and course ID
+            var existingSuccessfulRegistration = await _dbSet.AnyAsync(r =>
+                r.User.FullName == name &&
                 r.User.PhoneNumber == phoneNumber &&
-                r.CourseId == Guid.Parse(courseId) &&
-                r.User.FullName==name &&
-                r.CreationDate >= twentyFourHoursAgo);
+                r.User.Email == email &&
+                r.CourseId == courseGuid &&
+                r.StudentCourseStatus == StudentCourseStatusEnum.Enrolled);
+
+            if (existingSuccessfulRegistration)
+            {
+                return true; // A successful registration already exists
+            }else         
+
+            return false;
         }
+
         public async Task<List<RegisterCourse>> GetRegisterCoursesByAgencyIdAndDateRange(Guid agencyId, DateTime startDate, DateTime endDate)
         {
             return await _dbContext.RegisterCourses

@@ -147,6 +147,128 @@ namespace FranchiseProject.Application.Services
             }
             return response;
         }
+     /*   public async Task<ApiResponse<bool>> UploadContractAsync(CreateContractViewModel create)
+        {
+            var response = new ApiResponse<bool>();
+            try
+            {
+                var validationResult = await _validator.ValidateAsync(create);
+                if (!validationResult.IsValid) return ValidatorHandler.HandleValidation<bool>(validationResult);
+
+                var agencyId = Guid.Parse(create.AgencyId);
+                var existAgency = await _unitOfWork.AgencyRepository.GetByIdAsync(agencyId);
+                if (existAgency == null) return ResponseHandler.Success(false, "Không tìm thấy đối tác");
+
+                var activeContract = await _unitOfWork.ContractRepository.GetActiveContractByAgencyIdAsync(agencyId);
+                var isRenewal = false;
+                decimal totalAmount = 0;
+
+                if (activeContract != null)
+                {
+                    var daysUntilExpiration = (activeContract.EndTime - DateTime.Now).TotalDays;
+                    if (daysUntilExpiration <= 30 || daysUntilExpiration < 0)
+                    {
+                        isRenewal = true;
+                    }
+                    else
+                    {
+                        return ResponseHandler.Success(false, "Đối tác đã có hợp đồng đang trong thời hạn và chưa đến thời gian gia hạn.");
+                    }
+                }
+                else if (existAgency.Status != AgencyStatusEnum.Processing)
+                {
+                    return ResponseHandler.Success(false, "Đối tác chưa thể đăng kí nhượng quyền.");
+                }
+
+                var package = await _unitOfWork.PackageRepository.GetExistByIdAsync((Guid)create.PackageId);
+                if (package == null) return ResponseHandler.Success(false, "Không tìm thấy gói bản quyền phù hợp!");
+
+                var franchiseFee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
+                var franchiseFeesTotal = franchiseFee.Sum(f => f.FeeAmount);
+
+                if (isRenewal)
+                {
+                    totalAmount = franchiseFeesTotal * 0.2m;
+                }
+                else
+                {
+                    totalAmount = franchiseFeesTotal + package.Price;
+                }
+
+                var newContract = new Contract
+                {
+                    AgencyId = agencyId,
+                    PackageId = create.PackageId,
+                    Title = create.Title,
+                    StartTime = create.StartTime,
+                    EndTime = create.EndTime,
+                    ContractDocumentImageURL = create.ContractDocumentImageURL,
+                    RevenueSharePercentage = create.RevenueSharePercentage,
+                    DepositPercentage = create.DepositPercentage,
+                    Status = ContractStatusEnum.None,
+                    ContractCode = await GenerateUniqueContractCode(),
+                    FrachiseFee = franchiseFeesTotal,
+                    Total = totalAmount
+                };
+
+                await _unitOfWork.ContractRepository.AddAsync(newContract);
+                var isSuccess = await _unitOfWork.SaveChangeAsync();
+
+                if (isSuccess > 0)
+                {
+                    var emailSubject = isRenewal ? "Gia hạn hợp đồng thành công" : "Tạo hợp đồng mới thành công";
+                    var emailBody = isRenewal
+                        ? $@"<p>Chào {existAgency.Name},</p>
+                     <p>Chúc mừng bạn đã gia hạn hợp đồng thành công với Futuretech.</p>
+                     <p>Chi tiết hợp đồng mới:</p>
+                     <ul>
+                         <li>Ngày bắt đầu: {newContract.StartTime:dd/MM/yyyy}</li>
+                         <li>Ngày kết thúc: {newContract.EndTime:dd/MM/yyyy}</li>
+                         <li>Tổng phí gia hạn: {totalAmount:N0} VNĐ</li>
+                     </ul>
+                     <p>Cảm ơn bạn đã tiếp tục tin tưởng và hợp tác cùng Futuretech.</p>"
+                        : $@"<p>Chào {existAgency.Name},</p>
+                     <p>Chúc mừng bạn đã tạo hợp đồng mới thành công với Futuretech.</p>
+                     <p>Chi tiết hợp đồng:</p>
+                     <ul>
+                         <li>Ngày bắt đầu: {newContract.StartTime:dd/MM/yyyy}</li>
+                         <li>Ngày kết thúc: {newContract.EndTime:dd/MM/yyyy}</li>
+                         <li>Tổng phí: {totalAmount:N0} VNĐ</li>
+                     </ul>
+                     <p>Chúng tôi rất mong đợi sự hợp tác thành công giữa Futuretech và đối tác.</p>";
+
+                    var emailMessage = new MessageModel
+                    {
+                        To = existAgency.Email,
+                        Subject = $"{emailSubject} [futuretech-noreply]",
+                        Body = emailBody
+                    };
+
+                    var emailResponse = await _emailService.SendEmailAsync(emailMessage);
+                    if (!emailResponse)
+                    {
+                        return ResponseHandler.Success(true, $"{(isRenewal ? "Gia hạn" : "Tạo")} hợp đồng thành công, nhưng không thể gửi email thông báo.");
+                    }
+
+                    response = ResponseHandler.Success(true, $"{(isRenewal ? "Gia hạn" : "Tạo")} hợp đồng thành công!");
+                }
+                else
+                {
+                    throw new Exception($"{(isRenewal ? "Gia hạn" : "Tạo")} hợp đồng không thành công");
+                }
+            }
+            catch (DbException ex)
+            {
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                response.isSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }*/
         public async Task<ApiResponse<bool>> UploadContractLicenseAsync(CreateContractLicenseModel create)
         {
             var response = new ApiResponse<bool>();

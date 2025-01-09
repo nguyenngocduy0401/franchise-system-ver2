@@ -253,6 +253,7 @@ namespace FranchiseProject.Application.Services
                 //cap nhat thanh toan
                 rc.StudentPaymentStatus = StudentPaymentStatusEnum.Completed;
                 rc.UserId = user.Id;
+                rc.StudentCourseStatus = StudentCourseStatusEnum.Enrolled;
                 var payment = await _unitOfWork.PaymentRepository.GetExistByIdAsync(paymentId);
                 payment.UserId = user.Id;
                 payment.ToDate = classRoom.ToDate;
