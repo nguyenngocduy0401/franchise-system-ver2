@@ -98,7 +98,7 @@ namespace FranchiseProject.Application.Services
                         }
                     }
 
-                    var monthlyFee = totalRevenue * contract.RevenueSharePercentage;
+                    var monthlyFee = totalRevenue * (contract.RevenueSharePercentage/100);
                     var actualProfits = totalRevenue - totalRefunds - monthlyFee;
 
                     // Sử dụng thông tin từ phiên bản mới nhất của khóa học
@@ -110,11 +110,12 @@ namespace FranchiseProject.Application.Services
                         StudentCount = studentCount,
                         CourseCode = latestCourse.Code,
                         CourseName = latestCourse.Name,
-                        TotalRevenue = totalRevenue,
-                        MonthlyFee = monthlyFee,
-                        Refunds = totalRefunds,
-                        ActualProfits = actualProfits,
-                      
+                        TotalRevenue = Math.Round(totalRevenue, 2),
+                        MonthlyFee = monthlyFee.HasValue ? (double?)Math.Round((decimal)monthlyFee.Value, 2) : null,
+                        Refunds = Math.Round(totalRefunds, 2),
+                        ActualProfits = actualProfits.HasValue ? (double?)Math.Round((decimal)actualProfits.Value, 2) : null,
+
+
                     });
                 }
 
@@ -132,8 +133,9 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<List<CourseRevenueViewModel>>();
             try
             {
+               
                 var agencyId = AgencyId;
-                var courseRevenueDict = new Dictionary<string, CourseRevenueViewModel>();
+                var courseRevenueList = new List<CourseRevenueViewModel>();
                 var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(agencyId);
                 var courseList = await _unitOfWork.CourseRepository.GetAllAsync();
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
@@ -142,64 +144,70 @@ namespace FranchiseProject.Application.Services
                     return ResponseHandler.Success<List<CourseRevenueViewModel>>(null, "Không tìm thấy hợp đồng !");
                 }
 
-                foreach (var course in courseList)
+                var courseGroups = courseList.GroupBy(c => c.Code);
+
+                foreach (var courseGroup in courseGroups)
                 {
-                    var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id, contract.AgencyId.Value);
-                    var validRegistrations = filteredRegisterCourses
-                        .Where(r => r.CreationDate.Date <= endDate.Date)
-                        .ToList();
+                    var totalRevenue = 0.0;
+                    var studentCount = 0;
+                    var totalRefunds = 0.0;
 
-                    foreach (var registration in validRegistrations)
+                    foreach (var course in courseGroup)
                     {
-                        var payments = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByRegisterCourseIdAsync(registration.Id);
-                        foreach (var payment in payments)
+                        var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id, contract.AgencyId.Value);
+                        var validRegistrations = filteredRegisterCourses
+                            .Where(r => r.CreationDate.Date <= endDate.Date)
+                            .ToList();
+
+                        foreach (var registration in validRegistrations)
                         {
-                            if (payment.CreationDate.Date >= startDate.Date && payment.CreationDate.Date <= endDate.Date)
+                            studentCount++;
+                            var payments = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByRegisterCourseIdAsync(registration.Id);
+                            foreach (var payment in payments)
                             {
-                                if (!courseRevenueDict.ContainsKey(course.Code))
+                                if (payment.ToDate.HasValue && payment.ToDate.Value >= DateOnly.FromDateTime(startDate) && payment.ToDate.HasValue && payment.ToDate.Value <= DateOnly.FromDateTime(endDate))
                                 {
-                                    courseRevenueDict[course.Code] = new CourseRevenueViewModel
+                                    if (payment.Type == PaymentTypeEnum.Refund)
                                     {
-                                        CourseId = course.Id,
-                                        CourseCode = course.Code,
-                                        CourseName = course.Name,
-                                        StudentCount = 0,
-                                        TotalRevenue = 0,
-                                        Refunds = 0,
-                                        MonthlyFee = 0,
-                                        ActualProfits = 0
-                                    };
-                                }
-
-                                var courseRevenue = courseRevenueDict[course.Code];
-                                courseRevenue.StudentCount++;
-
-                                if (payment.Type == PaymentTypeEnum.Refund)
-                                {
-                                    courseRevenue.Refunds += payment.Amount ?? 0;
-                                }
-                                else
-                                {
-                                    courseRevenue.TotalRevenue += payment.Amount ?? 0;
+                                        totalRefunds += payment.Amount ?? 0;
+                                    }
+                                    else
+                                    {
+                                        totalRevenue += payment.Amount ?? 0;
+                                    }
                                 }
                             }
                         }
                     }
+
+                    var monthlyFee = totalRevenue * (contract.RevenueSharePercentage / 100);
+                    var actualProfits = totalRevenue - totalRefunds - monthlyFee;
+
+                    // Sử dụng thông tin từ phiên bản mới nhất của khóa học
+                    var latestCourse = courseGroup.OrderByDescending(c => c.CreationDate).First();
+
+                    courseRevenueList.Add(new CourseRevenueViewModel
+                    {
+                        CourseId = latestCourse.Id,
+                        StudentCount = studentCount,
+                        CourseCode = latestCourse.Code,
+                        CourseName = latestCourse.Name,
+                        TotalRevenue = Math.Round(totalRevenue, 2),
+                        MonthlyFee = monthlyFee.HasValue ? (double?)Math.Round((decimal)monthlyFee.Value, 2) : null,
+                        Refunds = Math.Round(totalRefunds, 2),
+                        ActualProfits = actualProfits.HasValue ? (double?)Math.Round((decimal)actualProfits.Value, 2) : null,
+
+
+                    });
                 }
 
-                foreach (var courseRevenue in courseRevenueDict.Values)
-                {
-                    courseRevenue.MonthlyFee = courseRevenue.TotalRevenue * contract.RevenueSharePercentage;
-                    courseRevenue.ActualProfits = courseRevenue.TotalRevenue - courseRevenue.Refunds - courseRevenue.MonthlyFee;
-                }
-
-                var courseRevenueList = courseRevenueDict.Values.ToList();
                 response = ResponseHandler.Success(courseRevenueList, "Tính doanh thu khóa học thành công!");
             }
             catch (Exception ex)
             {
                 response = ResponseHandler.Failure<List<CourseRevenueViewModel>>($"Lỗi khi tính doanh thu khóa học: {ex.Message}");
             }
+
             return response;
         }
         public async Task<ApiResponse<double>> GetTotalRevenueFromRegisterCourseAsync(DateTime startDate, DateTime endDate)
