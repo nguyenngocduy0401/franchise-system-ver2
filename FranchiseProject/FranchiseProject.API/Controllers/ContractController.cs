@@ -20,14 +20,14 @@ namespace FranchiseProject.API.Controllers
             _contractService = contractService;
         }
         [SwaggerOperation(Summary = "upload hợp đồng bao gồm license {Authorize = Manager,Admin}")]
-        [HttpPut("/packages")]
+        [HttpPost("/packages")]
         [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
         public async Task<ApiResponse<bool>> UploadContractLicenseAsync(CreateContractLicenseModel create)
         {
             return await _contractService.UploadContractLicenseAsync(create);
         }
         [SwaggerOperation(Summary = "upload hợp đồng {Authorize = Manager,Admin}")]
-        [HttpPut("")]
+        [HttpPost("")]
         [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
         public async Task<ApiResponse<bool>> UploadContractAsync(CreateContractViewModel create)
         {
