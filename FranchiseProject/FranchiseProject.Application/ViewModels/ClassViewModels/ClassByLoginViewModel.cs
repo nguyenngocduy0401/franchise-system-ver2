@@ -11,5 +11,7 @@ namespace FranchiseProject.Application.ViewModels.ClassViewModels
         public Guid? ClassId { get; set; }
         public string? ClassName { get; set; }
         public Guid? CourseId { get; set; }
+         public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }
