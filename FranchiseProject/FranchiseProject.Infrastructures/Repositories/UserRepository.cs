@@ -241,5 +241,23 @@ namespace FranchiseProject.Infrastructures.Repositories
                                  .Where(u => u.UserRoles.Any(ur => ur.Role.Name == "Instructor"))
                                  .FirstOrDefaultAsync();
         }
+        public async Task<User> GetAgencyManagerByAgencyIdAsync(Guid agencyId)
+        {
+            var agencyManagerRole = await _roleManager.FindByNameAsync(AppRole.AgencyManager);
+
+            if (agencyManagerRole == null)
+            {
+                throw new Exception("AgencyManager role not found.");
+            }
+
+            var user = await _dbContext.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .Where(u => u.AgencyId == agencyId &&
+                            u.UserRoles.Any(ur => ur.RoleId == agencyManagerRole.Id))
+                .FirstOrDefaultAsync();
+
+            return user;
+        }
     }
 }
