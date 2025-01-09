@@ -86,5 +86,10 @@ namespace FranchiseProject.Infrastructures.Repositories
                             p.Type == PaymentTypeEnum.Refund)
                 .SumAsync(p => p.Amount ?? 0);
         }
+        public async Task<Payment?> GetPaymentByRegisterCourseIdAndUserId(Guid registerCourseId, string userId)
+        {
+            return await _dbContext.Payments
+                .FirstOrDefaultAsync(p => p.RegisterCourseId == registerCourseId && p.UserId == userId);
+        }
     }
 }

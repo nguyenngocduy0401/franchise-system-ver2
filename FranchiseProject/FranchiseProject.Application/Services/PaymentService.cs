@@ -424,10 +424,10 @@ namespace FranchiseProject.Application.Services
 
                     refundAmount = course.Price.GetValueOrDefault();
                 }
-                var paymentsRc = await _unitOfWork.PaymentRepository.GetAllAsync(p => p.RegisterCourseId == model.RegisterCourseId && p.UserId == userId);
+                var paymentsRc = await _unitOfWork.PaymentRepository.GetPaymentByRegisterCourseIdAndUserId(model.RegisterCourseId, registerCourse.UserId);
 
-                var originalPayment = paymentsRc.FirstOrDefault();
-                if (originalPayment == null)
+                
+                if (paymentsRc == null)
                 {
                     return ResponseHandler.Failure<bool>("Original payment not found.");
                 }
@@ -445,7 +445,7 @@ namespace FranchiseProject.Application.Services
                     RegisterCourseId = model.RegisterCourseId,
                     AgencyId = user.AgencyId,
                     ImageURL = model.ImageUrl,
-                    ToDate= originalPayment.ToDate ,
+                    ToDate= paymentsRc.ToDate ,
                 };
 
                 await _unitOfWork.PaymentRepository.AddAsync(refundPayment);
@@ -454,7 +454,9 @@ namespace FranchiseProject.Application.Services
                 registerCourse.StudentPaymentStatus = StudentPaymentStatusEnum.Refund;
                 registerCourse.StudentCourseStatus = StudentCourseStatusEnum.Cancel;
                 await _unitOfWork.RegisterCourseRepository.UpdateAsync(registerCourse);
-
+                //class 
+                classE.CurrentEnrollment--;
+                 _unitOfWork.ClassRepository.Update(classE);
                 //  ClassRoom
                 await _unitOfWork.ClassRoomRepository.DeleteAsync(classRoom);
 

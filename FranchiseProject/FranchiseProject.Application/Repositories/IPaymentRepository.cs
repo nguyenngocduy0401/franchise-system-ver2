@@ -16,6 +16,7 @@ namespace FranchiseProject.Application.Repositories
         Task<double> CalculateAgencyRevenue(Guid agencyId, DateTime startDate, DateTime endDate);
         Task<double> GetTotalRefundsForAgencyInPeriod(Guid agencyId, DateTime startDate, DateTime endDate);
         Task<double> GetTotalRevenueForAgencyInPeriod(Guid agencyId, DateTime startDate, DateTime endDate);
+        Task<Payment?> GetPaymentByRegisterCourseIdAndUserId(Guid registerCourseId, string userId);
 
     }
 }

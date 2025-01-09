@@ -359,7 +359,7 @@ namespace FranchiseProject.Application.Services
                     response.Message = "Đối tác chưa thể đăng kí nhượng quyền.";
                     return response;
                 }
-                var activeContract = await _unitOfWork.ContractRepository.GetActiveContractByAgencyIdAsync(AgencyId);
+           /*     var activeContract = await _unitOfWork.ContractRepository.GetActiveContractByAgencyIdAsync(AgencyId);
 
                 if (activeContract != null)
                 {
@@ -367,7 +367,7 @@ namespace FranchiseProject.Application.Services
                     response.isSuccess = true;
                     response.Message = "Đối tác đã có hợp đồng đang trong thời hạn.";
                     return response;
-                }
+                }*/
                 var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(AgencyId);
                // contract.ContractCode = await GenerateUniqueContractCode();
                 var franchiseFee = await _unitOfWork.FranchiseFeesRepository.GetAllAsync();
