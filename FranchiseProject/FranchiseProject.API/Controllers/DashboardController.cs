@@ -2,6 +2,7 @@
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Services;
 using FranchiseProject.Application.ViewModels.DashBoard;
+using FranchiseProject.Application.ViewModels.DashBoardViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -17,6 +18,12 @@ namespace FranchiseProject.API.Controllers
         {
             _dashboardService = dashboardService;
          
+        }
+        [SwaggerOperation(Summary = "Phân tích doanh thu")]
+        [HttpGet("revenues")]
+        public async Task<ApiResponse<AdminDashboardModel>> AdminCourseRevenueDashboardAsync(DateOnly from, DateOnly to, bool year, int topCourse =5)
+        {
+            return await _dashboardService.AdminCourseRevenueDashboardAsync(from, to, year, topCourse);
         }
         //  [Authorize(Roles = AppRole.Admin)]
         [SwaggerOperation(Summary = "Phân tích doanh thu hàng tháng cho một năm cụ thể")]
