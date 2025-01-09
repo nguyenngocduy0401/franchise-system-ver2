@@ -255,6 +255,7 @@ namespace FranchiseProject.Application.Services
                 rc.UserId = user.Id;
                 var payment = await _unitOfWork.PaymentRepository.GetExistByIdAsync(paymentId);
                 payment.UserId = user.Id;
+                payment.ToDate = classRoom.ToDate;
                 class1.CurrentEnrollment++;
                 _unitOfWork.PaymentRepository.Update(payment);
                 _unitOfWork.RegisterCourseRepository.Update(rc);

@@ -424,7 +424,13 @@ namespace FranchiseProject.Application.Services
 
                     refundAmount = course.Price.GetValueOrDefault();
                 }
+                var paymentsRc = await _unitOfWork.PaymentRepository.GetAllAsync(p => p.RegisterCourseId == model.RegisterCourseId && p.UserId == userId);
 
+                var originalPayment = paymentsRc.FirstOrDefault();
+                if (originalPayment == null)
+                {
+                    return ResponseHandler.Failure<bool>("Original payment not found.");
+                }
 
                 var refundPayment = new Payment
                 {
@@ -438,7 +444,8 @@ namespace FranchiseProject.Application.Services
                     UserId = userId,
                     RegisterCourseId = model.RegisterCourseId,
                     AgencyId = user.AgencyId,
-                    ImageURL = model.ImageUrl
+                    ImageURL = model.ImageUrl,
+                    ToDate= originalPayment.ToDate ,
                 };
 
                 await _unitOfWork.PaymentRepository.AddAsync(refundPayment);
@@ -569,7 +576,6 @@ namespace FranchiseProject.Application.Services
                     Type = PaymentTypeEnum.MonthlyDue,
                     Method = PaymentMethodEnum.BankTransfer,
                     Status = PaymentStatus.NotCompleted,
-            
                     AgencyId = model.AgencyId,
                     CreationDate = DateTime.Now,
                     ExpirationDate = DateTime.Now.AddDays(5)
@@ -609,17 +615,36 @@ namespace FranchiseProject.Application.Services
 
                 var paymentViewModels = new Pagination<PaymentMonthlydueViewModel>
                 {
-                    Items = payments.Items.Select(p => new PaymentMonthlydueViewModel
+                    Items = await Task.WhenAll(payments.Items.Select(async p =>
                     {
-                        Id=p.Id,
-                        Title = p.Title,
-                        Description = p.Description,
-                        Amount = p.Amount,
-                        Status = p.Status,
-                        AgencyId = p.AgencyId,
-                        PaymentUrl = p.PaymentUrl,
-                        PaidDate = p.Status == PaymentStatus.Completed ? p.PaidDate : null
-                    }).ToList(),
+                        var month = p.CreationDate.Month;
+                        var year = p.CreationDate.Year;
+                        var startDate = new DateTime(year, month, 1);
+                        var endDate = startDate.AddMonths(1).AddDays(-1);
+                        // Calculate monthly revenue, actual profits, and refunds
+                        var monthlyRevenue = await _unitOfWork.PaymentRepository.CalculateAgencyRevenue(p.AgencyId.Value, startDate, endDate);
+                        var monthlyRefunds = await _unitOfWork.PaymentRepository.GetTotalRefundsForAgencyInPeriod(p.AgencyId.Value, startDate, endDate);
+                        var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(p.AgencyId.Value);
+                        var revenueSharePercentage = contract.RevenueSharePercentage;
+                        var actualProfits = monthlyRevenue * (1 - revenueSharePercentage) - monthlyRefunds;
+
+                        return new PaymentMonthlydueViewModel
+                        {
+                            Id = p.Id,
+                            Title = p.Title,
+                            Description = p.Description,
+                            Amount = p.Amount,
+                            Status = p.Status,
+                            AgencyId = p.AgencyId,
+                            PaymentUrl = p.PaymentUrl,
+                            PaidDate = p.Status == PaymentStatus.Completed ? p.PaidDate : null,
+                            CreattionDate = p.CreationDate,
+                            Revenue = monthlyRevenue,
+                            RevenueSharePercentage = revenueSharePercentage,
+                            ActualProfits = actualProfits,
+                            Refunds = monthlyRefunds
+                        };
+                    })),
                     TotalItemsCount = payments.TotalItemsCount,
                     PageIndex = payments.PageIndex,
                     PageSize = payments.PageSize
