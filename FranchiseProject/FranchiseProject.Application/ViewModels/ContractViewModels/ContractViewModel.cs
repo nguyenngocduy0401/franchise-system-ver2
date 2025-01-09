@@ -1,4 +1,5 @@
-﻿using FranchiseProject.Domain.Entity;
+﻿using FranchiseProject.Application.ViewModels.PackageViewModels;
+using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Org.BouncyCastle.Bcpg.OpenPgp;
 using System;
@@ -26,5 +27,6 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModels
         public ContractStatusEnum? Status { get; set; }
         public string? AgencyName { get; set; }
         public int? UsedAccountCount { get; set; }
+        public PackageViewModel? PackageViewModel { get; set; }
     }
 }

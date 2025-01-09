@@ -18,6 +18,7 @@ using Org.BouncyCastle.Pqc.Crypto.Falcon;
 using FranchiseProject.Application.Repositories;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Net.WebSockets;
+using FranchiseProject.Application.ViewModels.PackageViewModels;
 
 namespace FranchiseProject.Application.Services
 {
@@ -380,9 +381,17 @@ namespace FranchiseProject.Application.Services
                         FrachiseFee = c.FrachiseFee,
                         Status = c.Status,
                         RevenueSharePercentage = c.RevenueSharePercentage,
-
                         AgencyName = c.Agency != null ? c.Agency.Name : string.Empty,
-                        UsedAccountCount=c.UsedAccountCount
+                        UsedAccountCount = c.UsedAccountCount,
+                        PackageViewModel = c.Package != null ? new PackageViewModel
+                        {
+                            Id = c.Package.Id,
+                            Name = c.Package.Name,
+                            Description = c.Package.Description,
+                            Price = c.Package.Price,
+                            NumberOfUsers = c.Package.NumberOfUsers,
+                            Status = c.Package.Status
+                        } : null
                     }).ToList(),
                     TotalItemsCount = contracts.TotalItemsCount,
                     PageIndex = contracts.PageIndex,
@@ -435,33 +444,33 @@ namespace FranchiseProject.Application.Services
             try
             {
                 var contract = await _unitOfWork.ContractRepository.GetByIdAsync(Guid.Parse(id));
-                var agency = await _unitOfWork.AgencyRepository.GetByIdAsync(contract.AgencyId.Value);
                 if (contract == null)
                 {
-                    response.Data = null;
-                    response.isSuccess = true;
-                    response.Message = "Không tìm thấy hợp đồng";
-                    return response;
-
+                    return ResponseHandler.Success<ContractViewModel>(null, "Không tìm thấy hợp đồng");
                 }
 
                 var contractViewModel = _mapper.Map<ContractViewModel>(contract);
-                contractViewModel.AgencyName = agency?.Name;
-                response.Data = contractViewModel;
-                response.isSuccess = true;
-                response.Message = "Truy xuất thành công ";
-            }
-            catch (DbException ex)
-            {
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                contractViewModel.AgencyName = contract.Agency?.Name;
+
+                if (contract.Package != null)
+                {
+                    contractViewModel.PackageViewModel = new PackageViewModel
+                    {
+                        Id = contract.Package.Id,
+                        Name = contract.Package.Name,
+                        Description = contract.Package.Description,
+                        Price = contract.Package.Price,
+                        NumberOfUsers = contract.Package.NumberOfUsers,
+                        Status = contract.Package.Status
+                    };
+                }
+
+                return ResponseHandler.Success(contractViewModel, "Truy xuất thành công");
             }
             catch (Exception ex)
             {
-                response.isSuccess = false;
-                response.Message = ex.Message;
+                return ResponseHandler.Failure<ContractViewModel>($"Lỗi khi truy xuất hợp đồng: {ex.Message}");
             }
-            return response;
         }
         public async Task<ApiResponse<ContractViewModel>> GetContractbyAgencyId(Guid agencyId)
         {
@@ -476,7 +485,18 @@ namespace FranchiseProject.Application.Services
                 var contractViewModel = _mapper.Map<ContractViewModel>(contract);
                 var agency =await _unitOfWork.AgencyRepository.GetByIdAsync(contract.AgencyId.Value);
                 contractViewModel.AgencyName = agency.Name;
-
+                if (contract.Package != null)
+                {
+                    contractViewModel.PackageViewModel = new PackageViewModel
+                    {
+                        Id = contract.Package.Id,
+                        Name = contract.Package.Name,
+                        Description = contract.Package.Description,
+                        Price = contract.Package.Price,
+                        NumberOfUsers = contract.Package.NumberOfUsers,
+                        Status = contract.Package.Status
+                    };
+                }
                 return ResponseHandler.Success(contractViewModel, "Truy xuất hợp đồng thành công");
             }
             catch (Exception ex)
