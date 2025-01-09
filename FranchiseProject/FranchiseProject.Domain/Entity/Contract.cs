@@ -21,7 +21,7 @@ namespace FranchiseProject.Domain.Entity
         public double? RevenueSharePercentage { get; set; }
         public double? FrachiseFee { get; set; }
         public int? UsedAccountCount { get; set; }
-        public double? RefundAmount { get; set; }
+      //  public double? RefundAmount { get; set; }
         public ContractStatusEnum? Status { get; set; }
         public Guid? PackageId { get; set; }
         [ForeignKey("PackageId")]

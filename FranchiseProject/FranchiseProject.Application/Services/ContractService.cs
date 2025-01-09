@@ -117,7 +117,8 @@ namespace FranchiseProject.Application.Services
                     Status = ContractStatusEnum.None,
                     ContractCode = await GenerateUniqueContractCode(),
                     FrachiseFee = franchiseFee.Sum(f => f.FeeAmount),
-                    Total = franchiseFee.Sum(f => f.FeeAmount) + package.Price
+                    Total = franchiseFee.Sum(f => f.FeeAmount) + package.Price,
+                    UsedAccountCount=0
                 };
 
                 await _unitOfWork.ContractRepository.AddAsync(newContract);
@@ -301,7 +302,8 @@ namespace FranchiseProject.Application.Services
                     DepositPercentage = create.DepositPercentage,
                     Status = ContractStatusEnum.None,
                     FrachiseFee = franchiseFee.Sum(f => f.FeeAmount),
-                    Total = franchiseFee.Sum(f => f.FeeAmount) + packageFee
+                    Total = franchiseFee.Sum(f => f.FeeAmount) + packageFee,
+                    UsedAccountCount = 0
                 };
 
                 var package = _mapper.Map<Package>(create.CreatePackageModel);
