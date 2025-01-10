@@ -15,5 +15,8 @@ namespace FranchiseProject.Application.ViewModels.AssessmentViewModels
         public string? Certification { get; set; }
         public double MinAvgMarkToPass { get; set; }
         public double AverageScore { get; set; }
+        public Guid? CourseId { get; set; }
+        public string? CourseName { get; set; }
+        public DateTime? TimeCompleted { get; set; }
     }
 }

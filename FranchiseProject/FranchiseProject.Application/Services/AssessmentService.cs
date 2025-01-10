@@ -189,8 +189,12 @@ namespace FranchiseProject.Application.Services
                 var assessments = await _unitOfWork.AssessmentRepository.GetAssessmentsByClassIdAsync(classId, studentId);
                 if (assessments == null || !assessments.Any()) return ResponseHandler.Success(new AssessmentStudentViewModel());
                 var course = (await _unitOfWork.CourseRepository.FindAsync(c => c.Id == assessments.FirstOrDefault().CourseId, "Syllabus")).FirstOrDefault();
+                if (course == null) return ResponseHandler.Success<AssessmentStudentViewModel>(null, "Khoá học hiện không khả dụng!");
                 var classSchedules = await _unitOfWork.ClassScheduleRepository.FindAsync(e => e.ClassId == classId && e.IsDeleted != true);
                 var assessmentStudentViewModel = new AssessmentStudentViewModel();
+                //điền tên khóa học vào model
+                assessmentStudentViewModel.CourseId = course.Id;
+                assessmentStudentViewModel.CourseName = course.Name;
 
                 foreach (var assessment in assessments)
                 {
@@ -367,6 +371,9 @@ namespace FranchiseProject.Application.Services
                 assessmentStudentViewModel.MinAvgMarkToPass = minAvgMarkToPass;
 
                 var lastClassSchedule = classSchedules.OrderByDescending(c => c.Date).FirstOrDefault();
+                //thời gian hoàn thành khóa học
+                assessmentStudentViewModel.TimeCompleted = (DateTime)lastClassSchedule.Date;
+
 
                 if (lastClassSchedule != null && lastClassSchedule.Date <= _currentTime.GetCurrentTime())
 
@@ -432,8 +439,12 @@ namespace FranchiseProject.Application.Services
                 var assessments = await _unitOfWork.AssessmentRepository.GetAssessmentsByClassIdAsync(classId, studentId);
                 if (assessments != null && assessments.Any()) return ResponseHandler.Success(new AssessmentStudentViewModel());
                 var course = (await _unitOfWork.CourseRepository.FindAsync(c => c.Id == assessments.FirstOrDefault().CourseId, "Syllabus")).FirstOrDefault();
+                if (course == null) return ResponseHandler.Success<AssessmentStudentViewModel>(null, "Khoá học hiện không khả dụng!");
                 var classSchedules = await _unitOfWork.ClassScheduleRepository.FindAsync(e => e.ClassId == classId && e.IsDeleted != true);
                 var assessmentStudentViewModel = new AssessmentStudentViewModel();
+                //điền tên khóa học vào model
+                assessmentStudentViewModel.CourseId = course.Id;
+                assessmentStudentViewModel.CourseName = course.Name;
 
                 foreach (var assessment in assessments)
                 {
@@ -604,10 +615,13 @@ namespace FranchiseProject.Application.Services
                     totalWeightedScore += (assessmentStudentViewModel.AssessmentAttendanceView.Score * assessmentStudentViewModel.AssessmentAttendanceView.Weight);
                     totalWeight += assessmentStudentViewModel.AssessmentAttendanceView.Weight;
                 }
-
                 assessmentStudentViewModel.AverageScore = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
                 var minAvgMarkToPass = course?.Syllabus?.MinAvgMarkToPass ?? 0;
                 assessmentStudentViewModel.MinAvgMarkToPass = minAvgMarkToPass;
+
+                var lastClassSchedule = classSchedules.OrderByDescending(c => c.Date).FirstOrDefault();
+                //thời gian hoàn thành khóa học
+                assessmentStudentViewModel.TimeCompleted = (DateTime)lastClassSchedule.Date;
 
                 response = ResponseHandler.Success(assessmentStudentViewModel);
 
