@@ -5,6 +5,7 @@ using FluentValidation.Results;
 using FranchiseProject.Application.Commons;
 using FranchiseProject.Application.Interfaces;
 using FranchiseProject.Application.Utils;
+using FranchiseProject.Application.ViewModels.AgenciesViewModels;
 using FranchiseProject.Application.ViewModels.RefreshTokenViewModels;
 using FranchiseProject.Application.ViewModels.UserViewModels;
 using FranchiseProject.Domain.Entity;
@@ -84,6 +85,20 @@ namespace FranchiseProject.Application.Services
                     };
                     _unitOfWork.RefreshTokenRepository.UpdateRefreshToken(refreshTokenEntity);
                     var storeRedis = await _redisService.StoreJwtTokenAsync(user.UserName, token.AccessToken);
+
+
+                    var agencyUser = new AgencyUserViewModel();
+                    if (user.AgencyId.HasValue) 
+                    {
+                        var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(user.AgencyId.Value);
+                        if (agency != null) 
+                        {
+                            agencyUser.Name = agency.Name;
+                            agencyUser.Address = agency.Address + ", " + agency.Ward + ", "+ agency.District + ", " + agency.City;
+                        }
+                        userViewModel.Agency = agencyUser;
+                    }
+                    
                     var userLoginViewModel = new UserLoginViewModel
                     {
                         RefreshTokenModel = token,

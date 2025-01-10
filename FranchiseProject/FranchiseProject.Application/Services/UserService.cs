@@ -493,8 +493,21 @@ namespace FranchiseProject.Application.Services
                 }
 
                 var userViewModel = _mapper.Map<UserViewModel>(user);
-                userViewModel.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
 
+                var agencyUser = new AgencyUserViewModel();
+                if (user.AgencyId.HasValue)
+                {
+                    var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(user.AgencyId.Value);
+                    if (agency != null)
+                    {
+                        agencyUser.Name = agency.Name;
+                        agencyUser.Address = agency.Address + ", " + agency.Ward + ", " + agency.District + ", " + agency.City;
+                    }
+                    userViewModel.Agency = agencyUser;
+                }
+
+                userViewModel.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+                
                 response.Data = userViewModel;
                 response.isSuccess = true;
                 response.Message = "Successful!";

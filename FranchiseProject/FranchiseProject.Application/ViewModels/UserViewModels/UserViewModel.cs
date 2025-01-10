@@ -1,4 +1,5 @@
-﻿using FranchiseProject.Domain.Entity;
+﻿using FranchiseProject.Application.ViewModels.AgenciesViewModels;
+using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -24,5 +25,6 @@ namespace FranchiseProject.Application.ViewModels.UserViewModels
         public DateTime? CreateAt { get; set; }
         public string? Gender { get; set; }
         public Guid? AgencyId { get; set; }
+        public AgencyUserViewModel? Agency {  get; set; }
     }
 }
