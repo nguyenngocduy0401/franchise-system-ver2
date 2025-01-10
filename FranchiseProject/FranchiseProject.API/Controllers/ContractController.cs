@@ -59,7 +59,7 @@ namespace FranchiseProject.API.Controllers
 
         [SwaggerOperation(Summary = "Truy xuất hợp đồng (StarTime,EndTime) {Authorize = Manager,Admin}")]
         [HttpGet("")]
-        [Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
+        //[Authorize(Roles = AppRole.Admin + "," + AppRole.Manager + "," + AppRole.AgencyManager)]
         public Task<ApiResponse<Pagination<ContractViewModel>>> FilterContractAsync([FromQuery] FilterContractViewModel filter)
         {
             return _contractService.FilterContractViewModelAsync(filter);

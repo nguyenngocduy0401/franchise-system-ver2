@@ -123,6 +123,11 @@ namespace FranchiseProject.Application.Services
                 var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(Guid.Parse(model.AgencyId));
                 if (agency == null) return ResponseHandler.Success<string>(null, "Trung tâm không khả dụng!");
 
+                var contract = await _unitOfWork.ContractRepository.GetActiveContractByAgencyIdAsync(agency.Id);
+                if (contract.UsedAccountCount+1 > contract.UsedAccountCount)
+                {
+                    return ResponseHandler.Success<string>(null, "Hiện tại không thể đăng kí vui lòng thử lại sau!");
+                }
                 // Tạo tài khoản người dùng
                 var newUser = new User
                 {

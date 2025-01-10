@@ -64,7 +64,7 @@ namespace FranchiseProject.Infrastructures
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentClassConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AssignmentSubmitConfiguration).Assembly);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserChapterMaterialConfiguration).Assembly);
-            modelBuilder.Entity<Contract>().HasData(
+           /* modelBuilder.Entity<Contract>().HasData(
                      new Contract
                      {
                          Id = Guid.Parse("550EE872-EA09-42A0-B9AC-809890DEBAFB"),
@@ -159,7 +159,7 @@ namespace FranchiseProject.Infrastructures
                     Description = "Các khóa học chuyên sâu về lập trình, bao gồm các kỹ thuật lập trình phức tạp, thiết kế hệ thống, lập trình đa luồng, và tối ưu hóa hiệu suất ứng dụng."
                 }
             );
-            #endregion
+            #endregion*/
            /* #region Syllabus
             modelBuilder.Entity<Syllabus>().HasData(
                 new Syllabus
@@ -349,7 +349,7 @@ namespace FranchiseProject.Infrastructures
             #endregion*/
 
         
-            #region FrachiseFee
+           /* #region FrachiseFee
             modelBuilder.Entity<FranchiseFees>().HasData(
                      new FranchiseFees
                      {
@@ -357,7 +357,7 @@ namespace FranchiseProject.Infrastructures
                          FeeAmount=360000000
                      }
                          );
-            #endregion
+            #endregion*/
 
             modelBuilder.HasAnnotation("TriggerSetup", true);
         }

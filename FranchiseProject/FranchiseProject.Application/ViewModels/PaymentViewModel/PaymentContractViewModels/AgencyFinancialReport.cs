@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FranchiseProject.Application.ViewModels.AgencyDashboardViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,6 @@ namespace FranchiseProject.Application.ViewModels.PaymentViewModel.PaymentContra
         public double? Refunds { get; set; }//Hoàn tiền
         public double? ActualProfits { get; set; }//Lợi nhuận thực tế 
         public string? OffsettingPeriod { get; set; }//Kỳ bù trừ
+        public  List<CourseRevenueViewModel>? CourseRevenueViews { get; set; }
     }
 }

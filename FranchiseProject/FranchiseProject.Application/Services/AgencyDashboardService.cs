@@ -497,7 +497,75 @@ namespace FranchiseProject.Application.Services
             }
         }
 
+        //--------------------------------------
+        private async Task<List<CourseRevenueViewModel>> GetCourseRevenueForAgency1(Guid agencyId, DateTime startDate, DateTime endDate)
+        {
+            var courseRevenueList = new List<CourseRevenueViewModel>();
+            var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(agencyId);
+            var courseList = await _unitOfWork.CourseRepository.GetAllAsync();
+            var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
 
+            if (contract == null)
+            {
+                return courseRevenueList;
+            }
+
+            var courseGroups = courseList.GroupBy(c => c.Code);
+
+            foreach (var courseGroup in courseGroups)
+            {
+                var totalRevenue = 0.0;
+                var studentCount = 0;
+                var totalRefunds = 0.0;
+
+                foreach (var course in courseGroup)
+                {
+                    var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id, contract.AgencyId.Value);
+                    var validRegistrations = filteredRegisterCourses
+                        .Where(r => r.CreationDate.Date <= endDate.Date)
+                        .ToList();
+
+                    foreach (var registration in validRegistrations)
+                    {
+                        studentCount++;
+                        var payments = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByRegisterCourseIdAsync(registration.Id);
+                        foreach (var payment in payments)
+                        {
+                            if (payment.ToDate.HasValue && payment.ToDate.Value >= DateOnly.FromDateTime(startDate) && payment.ToDate.HasValue && payment.ToDate.Value <= DateOnly.FromDateTime(endDate))
+                            {
+                                if (payment.Type == PaymentTypeEnum.Refund)
+                                {
+                                    totalRefunds += payment.Amount ?? 0;
+                                }
+                                else
+                                {
+                                    totalRevenue += payment.Amount ?? 0;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                var monthlyFee = totalRevenue * (contract.RevenueSharePercentage / 100);
+                var actualProfits = totalRevenue - totalRefunds - monthlyFee;
+
+                var latestCourse = courseGroup.OrderByDescending(c => c.CreationDate).First();
+
+                courseRevenueList.Add(new CourseRevenueViewModel
+                {
+                    CourseId = latestCourse.Id,
+                    StudentCount = studentCount,
+                    CourseCode = latestCourse.Code,
+                    CourseName = latestCourse.Name,
+                    TotalRevenue = Math.Round(totalRevenue, 2),
+                    MonthlyFee = monthlyFee.HasValue ? (double?)Math.Round((decimal)monthlyFee.Value, 2) : null,
+                    Refunds = Math.Round(totalRefunds, 2),
+                    ActualProfits = actualProfits.HasValue ? (double?)Math.Round((decimal)actualProfits.Value, 2) : null,
+                });
+            }
+
+            return courseRevenueList;
+        }
         public async Task<ApiResponse<string>> GetFileExcelAgencyMonthlyFinancialReportAsync(Guid agencyId, int month, int year)
         {
             try
@@ -521,7 +589,7 @@ namespace FranchiseProject.Application.Services
 
                 var nextMonth = month == 12 ? 1 : month + 1;
                 var nextYear = month == 12 ? year + 1 : year;
-
+                var courseRevenueList = await GetCourseRevenueForAgency1(agencyId, startDate, endDate);
                 var report = new AgencyFinancialReport
                 {
                     FiscalPeriod = $"Tháng {month}/{year}",
@@ -529,7 +597,8 @@ namespace FranchiseProject.Application.Services
                     ProfitsReceived = Math.Round(profitsReceived, 2),
                     Refunds = Math.Round(refunds, 2),
                     ActualProfits = Math.Round(actualProfits, 2),
-                    OffsettingPeriod = $"Tháng {nextMonth}/{nextYear}"
+                    OffsettingPeriod = $"Tháng {nextMonth}/{nextYear}",
+                    CourseRevenueViews = courseRevenueList
                 };
 
                 // Generate Excel file
@@ -549,7 +618,7 @@ namespace FranchiseProject.Application.Services
             }
         }
 
-        private byte[] GenerateMonthlyExcelFile(AgencyFinancialReport data, string agencyName, int month, int year)
+        /*private byte[] GenerateMonthlyExcelFile(AgencyFinancialReport data, string agencyName, int month, int year)
         {
             using (var package = new ExcelPackage())
             {
@@ -598,6 +667,104 @@ namespace FranchiseProject.Application.Services
                 worksheet.Cells["B3:E3"].Style.Numberformat.Format = "#,##0.00";
 
                 // Auto-fit columns
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                return package.GetAsByteArray();
+            }
+        }*/
+        private byte[] GenerateMonthlyExcelFile(AgencyFinancialReport data, string agencyName, int month, int year)
+        {
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add($"{agencyName} Financial Report {month}/{year}");
+
+                // Add report title
+                worksheet.Cells["A1:F1"].Merge = true;
+                worksheet.Cells["A1"].Value = $"Báo Cáo Tài Chính Cho {agencyName} - Tháng {month}/{year}";
+                worksheet.Cells["A1"].Style.Font.Bold = true;
+                worksheet.Cells["A1"].Style.Font.Size = 16;
+                worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells["A1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                worksheet.Cells["A1"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells["A1"].Style.Fill.BackgroundColor.SetColor(Color.DarkBlue);
+                worksheet.Cells["A1"].Style.Font.Color.SetColor(Color.White);
+
+                // Add column headers for revenue table
+                worksheet.Cells["A2"].Value = "Kỳ Tài Chính";
+                worksheet.Cells["B2"].Value = "Doanh Thu (VND)";
+                worksheet.Cells["C2"].Value = "Lợi Nhuận Nhận Được (VND)";
+                worksheet.Cells["D2"].Value = "Hoàn Tiền (VND)";
+                worksheet.Cells["E2"].Value = "Lợi Nhuận Thực Tế (VND)";
+                worksheet.Cells["F2"].Value = "Kỳ Bù Trừ";
+
+                // Format column headers
+                worksheet.Cells["A2:F2"].Style.Font.Bold = true;
+                worksheet.Cells["A2:F2"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells["A2:F2"].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
+                worksheet.Cells["A2:F2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells["A2:F2"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                worksheet.Cells["A2:F2"].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells["A2:F2"].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells["A2:F2"].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells["A2:F2"].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
+                // Add data for revenue table
+                worksheet.Cells["A3"].Value = data.FiscalPeriod;
+                worksheet.Cells["B3"].Value = data.Revenue;
+                worksheet.Cells["C3"].Value = data.ProfitsReceived;
+                worksheet.Cells["D3"].Value = data.Refunds;
+                worksheet.Cells["E3"].Value = data.ActualProfits;
+                worksheet.Cells["F3"].Value = data.OffsettingPeriod;
+
+                // Format data cells for revenue table
+                worksheet.Cells["A3:F3"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells["B3:E3"].Style.Numberformat.Format = "#,##0.00";
+
+                // Add CourseRevenueViews table
+                int startRow = 5; // Start two rows below the revenue table
+
+                // Add title for CourseRevenueViews table
+                worksheet.Cells[$"A{startRow}:G{startRow}"].Merge = true;
+                worksheet.Cells[$"A{startRow}"].Value = "Chi Tiết Doanh Thu Theo Khóa Học";
+                worksheet.Cells[$"A{startRow}"].Style.Font.Bold = true;
+                worksheet.Cells[$"A{startRow}"].Style.Font.Size = 14;
+                worksheet.Cells[$"A{startRow}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+                // Add column headers for CourseRevenueViews table
+                startRow++;
+                worksheet.Cells[$"A{startRow}"].Value = "Mã Khóa Học";
+                worksheet.Cells[$"B{startRow}"].Value = "Tên Khóa Học";
+                worksheet.Cells[$"C{startRow}"].Value = "Số Lượng Học Viên";
+                worksheet.Cells[$"D{startRow}"].Value = "Tổng Doanh Thu (VND)";
+                worksheet.Cells[$"E{startRow}"].Value = "Phí Hàng Tháng (VND)";
+                worksheet.Cells[$"F{startRow}"].Value = "Hoàn Tiền (VND)";
+                worksheet.Cells[$"G{startRow}"].Value = "Lợi Nhuận Thực Tế (VND)";
+
+                // Format column headers for CourseRevenueViews table
+                worksheet.Cells[$"A{startRow}:G{startRow}"].Style.Font.Bold = true;
+                worksheet.Cells[$"A{startRow}:G{startRow}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[$"A{startRow}:G{startRow}"].Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                worksheet.Cells[$"A{startRow}:G{startRow}"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+                // Add data for CourseRevenueViews table
+                startRow++;
+                foreach (var course in data.CourseRevenueViews)
+                {
+                    worksheet.Cells[$"A{startRow}"].Value = course.CourseCode;
+                    worksheet.Cells[$"B{startRow}"].Value = course.CourseName;
+                    worksheet.Cells[$"C{startRow}"].Value = course.StudentCount;
+                    worksheet.Cells[$"D{startRow}"].Value = course.TotalRevenue;
+                    worksheet.Cells[$"E{startRow}"].Value = course.MonthlyFee;
+                    worksheet.Cells[$"F{startRow}"].Value = course.Refunds;
+                    worksheet.Cells[$"G{startRow}"].Value = course.ActualProfits;
+
+                    // Format numeric cells
+                    worksheet.Cells[$"D{startRow}:G{startRow}"].Style.Numberformat.Format = "#,##0.00";
+
+                    startRow++;
+                }
+
+                // Auto-fit columns for the entire worksheet
                 worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
                 return package.GetAsByteArray();
