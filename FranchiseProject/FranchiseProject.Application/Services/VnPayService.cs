@@ -417,7 +417,7 @@ namespace FranchiseProject.Application.Services
             var vnpayAmount = Convert.ToInt64(amount * 100);
             var vnpayLocale = "vn";
             var vnpayCreateDate = _currentTime.GetCurrentTime().ToString("yyyyMMddHHmmss");
-            var vnpayExpireDate = _currentTime.GetCurrentTime().AddMinutes(15).ToString("yyyyMMddHHmmss");
+            var vnpayExpireDate = _currentTime.GetCurrentTime().AddDays(15).ToString("yyyyMMddHHmmss");
 
             var vnpayData = new Dictionary<string, string>
     {
