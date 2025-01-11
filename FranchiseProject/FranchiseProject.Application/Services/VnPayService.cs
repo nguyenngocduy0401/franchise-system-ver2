@@ -358,7 +358,7 @@ namespace FranchiseProject.Application.Services
     {
         {"vnp_Version", "2.1.0"},
         {"vnp_Command", "pay"},
-        {"vnp_TmnCode", agencyVnPayInfo.TmnCode}, // Use agency-specific TmnCode
+        {"vnp_TmnCode",  _vnPayConfig.TmnCode}, // Use agency-specific TmnCode
         {"vnp_Amount", vnpayAmount.ToString()},
         {"vnp_CreateDate", vnpayCreateDate},
         {"vnp_CurrCode", "VND"},
