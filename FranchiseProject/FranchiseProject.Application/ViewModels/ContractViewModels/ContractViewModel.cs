@@ -28,5 +28,6 @@ namespace FranchiseProject.Application.ViewModels.ContractViewModels
         public string? AgencyName { get; set; }
         public int? UsedAccountCount { get; set; }
         public PackageViewModel? PackageViewModel { get; set; }
+        public Guid? AgencyId { get; set; }
     }
 }

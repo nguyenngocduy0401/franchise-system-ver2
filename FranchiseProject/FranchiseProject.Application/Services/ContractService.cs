@@ -510,6 +510,7 @@ namespace FranchiseProject.Application.Services
                         Status = c.Status,
                         RevenueSharePercentage = c.RevenueSharePercentage,
                         AgencyName = c.Agency != null ? c.Agency.Name : string.Empty,
+                        AgencyId = c.AgencyId,
                         UsedAccountCount = c.UsedAccountCount,
                         PackageViewModel = c.Package != null ? new PackageViewModel
                         {
@@ -591,7 +592,7 @@ namespace FranchiseProject.Application.Services
                     RevenueSharePercentage = contract.RevenueSharePercentage,
                     Status = contract.Status,
                     AgencyName = contract.Agency?.Name,
-                    UsedAccountCount = contract.UsedAccountCount
+                    UsedAccountCount = contract.UsedAccountCount,AgencyId=contract.AgencyId
                 };
 
                 if (contract.Package != null)
@@ -642,6 +643,7 @@ namespace FranchiseProject.Application.Services
                     Status = contract.Status,
                     AgencyName = agency?.Name,
                     UsedAccountCount = contract.UsedAccountCount
+                    ,AgencyId=contract.AgencyId
                 };
 
                 if (contract.Package != null)
