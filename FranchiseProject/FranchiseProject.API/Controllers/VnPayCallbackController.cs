@@ -52,8 +52,8 @@ namespace FranchiseProject.API.Controllers
                 return payment.Type switch
                 {
                     PaymentTypeEnum.Course => Redirect($"http://localhost:5173/course-payment-success"),
-                    PaymentTypeEnum.Contract => Redirect($"http://localhost:5173/contract-payment-success"),
-                    PaymentTypeEnum.MonthlyDue => Redirect($"http://localhost:5173/monthly-due-payment-success"),
+                    PaymentTypeEnum.Contract => Redirect($"http://localhost:5174/agency-manager/contract-payment-success"),
+                    PaymentTypeEnum.MonthlyDue => Redirect($"http://localhost:5174/agency-manager/monthly-due-payment-success"),
                     _ => Redirect($"http://localhost:5173/payment-success")
                 };
             }

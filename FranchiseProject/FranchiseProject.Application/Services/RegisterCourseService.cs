@@ -124,7 +124,8 @@ namespace FranchiseProject.Application.Services
                 if (agency == null) return ResponseHandler.Success<string>(null, "Trung tâm không khả dụng!");
 
                 var contract = await _unitOfWork.ContractRepository.GetActiveContractByAgencyIdAsync(agency.Id);
-                if (contract.UsedAccountCount+1 > contract.UsedAccountCount)
+                var package = await _unitOfWork.PackageRepository.GetExistByIdAsync(contract.PackageId.Value);
+                if (contract.UsedAccountCount+1 > package.NumberOfUsers)
                 {
                     return ResponseHandler.Success<string>(null, "Hiện tại không thể đăng kí vui lòng thử lại sau!");
                 }

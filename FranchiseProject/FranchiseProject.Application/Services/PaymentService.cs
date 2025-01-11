@@ -628,7 +628,7 @@ namespace FranchiseProject.Application.Services
                         var monthlyRefunds = await _unitOfWork.PaymentRepository.GetTotalRefundsForAgencyInPeriod(p.AgencyId.Value, startDate, endDate);
                         var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(p.AgencyId.Value);
                         var revenueSharePercentage = contract.RevenueSharePercentage;
-                        var actualProfits = monthlyRevenue * (1 - revenueSharePercentage) - monthlyRefunds;
+                        var actualProfits =( monthlyRevenue   - monthlyRefunds) * (1 - revenueSharePercentage/100);
 
                         return new PaymentMonthlydueViewModel
                         {

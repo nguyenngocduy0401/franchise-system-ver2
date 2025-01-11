@@ -597,7 +597,7 @@ namespace FranchiseProject.Application.Services
                     ProfitsReceived = Math.Round(profitsReceived, 2),
                     Refunds = Math.Round(refunds, 2),
                     ActualProfits = Math.Round(actualProfits, 2),
-                    OffsettingPeriod = $"Tháng {nextMonth}/{nextYear}",
+                 //   OffsettingPeriod = $"Tháng {nextMonth}/{nextYear}",
                     CourseRevenueViews = courseRevenueList
                 };
 
@@ -690,12 +690,12 @@ namespace FranchiseProject.Application.Services
                 worksheet.Cells["A1"].Style.Font.Color.SetColor(Color.White);
 
                 // Add column headers for revenue table
-                worksheet.Cells["A2"].Value = "Kỳ Tài Chính";
+                worksheet.Cells["A2"].Value = "Tháng";
                 worksheet.Cells["B2"].Value = "Doanh Thu (VND)";
                 worksheet.Cells["C2"].Value = "Lợi Nhuận Nhận Được (VND)";
                 worksheet.Cells["D2"].Value = "Hoàn Tiền (VND)";
                 worksheet.Cells["E2"].Value = "Lợi Nhuận Thực Tế (VND)";
-                worksheet.Cells["F2"].Value = "Kỳ Bù Trừ";
+              //  worksheet.Cells["F2"].Value = "Kỳ Bù Trừ";
 
                 // Format column headers
                 worksheet.Cells["A2:F2"].Style.Font.Bold = true;
