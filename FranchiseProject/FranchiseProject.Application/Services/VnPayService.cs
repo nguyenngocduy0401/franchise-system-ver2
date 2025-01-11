@@ -439,7 +439,7 @@ namespace FranchiseProject.Application.Services
             var orderedData = new SortedList<string, string>(vnpayData);
             var hashData = string.Join("&", orderedData.Select(kv => $"{WebUtility.UrlEncode(kv.Key)}={WebUtility.UrlEncode(kv.Value)}"));
 
-            var secureHash = ComputeHmacSha512(agencyVnPayInfo.HashSecret, hashData); // Use agency-specific HashSecret
+            var secureHash = ComputeHmacSha512(_vnPayConfig.HashSecret, hashData); // Use agency-specific HashSecret
             vnpayData.Add("vnp_SecureHash", secureHash);
 
             var paymentUrl = _vnPayConfig.PaymentUrl + "?" + string.Join("&", vnpayData.Select(kv => $"{kv.Key}={WebUtility.UrlEncode(kv.Value)}"));
