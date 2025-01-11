@@ -358,7 +358,7 @@ namespace FranchiseProject.Application.Services
     {
         {"vnp_Version", "2.1.0"},
         {"vnp_Command", "pay"},
-        {"vnp_TmnCode",  _vnPayConfig.TmnCode}, // Use agency-specific TmnCode
+        {"vnp_TmnCode",  agencyVnPayInfo.TmnCode}, // Use agency-specific TmnCode
         {"vnp_Amount", vnpayAmount.ToString()},
         {"vnp_CreateDate", vnpayCreateDate},
         {"vnp_CurrCode", "VND"},
@@ -403,12 +403,12 @@ namespace FranchiseProject.Application.Services
         public async Task<string> CreatePaymentUrlForCourse(Guid agencyId,double amount,Guid paymnentId)
         {
             var agency = await _unitOfWork.AgencyRepository.GetExistByIdAsync(agencyId);
-           var agencyVnPayInfo = await _unitOfWork.AgencyVnPayInfoRepository.GetByAgencyIdAsync(agencyId);
+           //var agencyVnPayInfo = await _unitOfWork.AgencyVnPayInfoRepository.GetByAgencyIdAsync(agencyId);
 
-            if (agency == null  || agencyVnPayInfo == null)
-            {
-                throw new ArgumentException("Agency, Course, or Agency VNPay info not found");
-            }
+           // if (agency == null  || agencyVnPayInfo == null)
+           // {
+           //     throw new ArgumentException("Agency, Course, or Agency VNPay info not found");
+           // }
 
        
            
@@ -423,7 +423,7 @@ namespace FranchiseProject.Application.Services
     {
         {"vnp_Version", "2.1.0"},
         {"vnp_Command", "pay"},
-        {"vnp_TmnCode", agencyVnPayInfo.TmnCode}, // Use agency-specific TmnCode
+        {"vnp_TmnCode", _vnPayConfig.TmnCode}, // Use agency-specific TmnCode
         {"vnp_Amount", vnpayAmount.ToString()},
         {"vnp_CreateDate", vnpayCreateDate},
         {"vnp_CurrCode", "VND"},
