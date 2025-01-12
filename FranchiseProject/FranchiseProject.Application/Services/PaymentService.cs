@@ -18,6 +18,7 @@ using FranchiseProject.Domain.Entity;
 using FranchiseProject.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -41,8 +42,9 @@ namespace FranchiseProject.Application.Services
         private readonly UserManager<User> _userManager;
         private readonly IUserService _userService;
         private readonly IVnPayService _vnPayService;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public PaymentService(IUserService userService, UserManager<User> userManager, IUnitOfWork unitOfWork, IMapper mapper, IValidator<CreateStudentPaymentViewModel> validator
+        public PaymentService(IServiceScopeFactory serviceScopeFactory,IUserService userService, UserManager<User> userManager, IUnitOfWork unitOfWork, IMapper mapper, IValidator<CreateStudentPaymentViewModel> validator
             , IEmailService emailService, IHubContext<NotificationHub> hubContext, IClaimsService claimsService, IVnPayService vnPayService)
         {
             _claimsService = claimsService;
@@ -54,6 +56,7 @@ namespace FranchiseProject.Application.Services
             _userManager = userManager;
             _userService = userService;
             _vnPayService = vnPayService;
+            _serviceScopeFactory= serviceScopeFactory;
         }
         #endregion
         public async Task<ApiResponse<bool>> CreatePaymentStudent(CreateStudentPaymentViewModel create, StudentPaymentStatusEnum status)
@@ -615,22 +618,26 @@ namespace FranchiseProject.Application.Services
                     pageSize: filterModel.PageSize
                 );
 
-                var paymentViewModels = new Pagination<PaymentMonthlydueViewModel>
+                var paymentViewModels = new List<PaymentMonthlydueViewModel>();
+
+                foreach (var p in payments.Items)
                 {
-                    Items = await Task.WhenAll(payments.Items.Select(async p =>
+                    using (var scope = _serviceScopeFactory.CreateScope())
                     {
+                        var scopedUnitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
                         var month = p.CreationDate.Month;
                         var year = p.CreationDate.Year;
                         var startDate = new DateTime(year, month, 1);
                         var endDate = startDate.AddMonths(1).AddDays(-1);
-                        // Calculate monthly revenue, actual profits, and refunds
-                        var monthlyRevenue = await _unitOfWork.PaymentRepository.CalculateAgencyRevenue(p.AgencyId.Value, startDate, endDate);
-                        var monthlyRefunds = await _unitOfWork.PaymentRepository.GetTotalRefundsForAgencyInPeriod(p.AgencyId.Value, startDate, endDate);
-                        var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(p.AgencyId.Value);
-                        var revenueSharePercentage = contract.RevenueSharePercentage;
-                        var actualProfits =( monthlyRevenue   - monthlyRefunds) * (1 - revenueSharePercentage/100);
 
-                        return new PaymentMonthlydueViewModel
+                        var monthlyRevenue = await scopedUnitOfWork.PaymentRepository.CalculateAgencyRevenue(p.AgencyId.Value, startDate, endDate);
+                        var monthlyRefunds = await scopedUnitOfWork.PaymentRepository.GetTotalRefundsForAgencyInPeriod(p.AgencyId.Value, startDate, endDate);
+                        var contract = await scopedUnitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(p.AgencyId.Value);
+                        var revenueSharePercentage = contract.RevenueSharePercentage;
+                        var actualProfits = (monthlyRevenue - monthlyRefunds) * (1 - revenueSharePercentage / 100);
+
+                        paymentViewModels.Add(new PaymentMonthlydueViewModel
                         {
                             Id = p.Id,
                             Title = p.Title,
@@ -645,14 +652,19 @@ namespace FranchiseProject.Application.Services
                             RevenueSharePercentage = revenueSharePercentage,
                             ActualProfits = actualProfits,
                             Refunds = monthlyRefunds
-                        };
-                    })),
+                        });
+                    }
+                }
+
+                var paginatedResult = new Pagination<PaymentMonthlydueViewModel>
+                {
+                    Items = paymentViewModels,
                     TotalItemsCount = payments.TotalItemsCount,
                     PageIndex = payments.PageIndex,
                     PageSize = payments.PageSize
                 };
 
-                response = ResponseHandler.Success(paymentViewModels, "Lọc thanh toán hàng tháng thành công!");
+                response = ResponseHandler.Success(paginatedResult, "Lọc thanh toán hàng tháng thành công!");
             }
             catch (Exception ex)
             {

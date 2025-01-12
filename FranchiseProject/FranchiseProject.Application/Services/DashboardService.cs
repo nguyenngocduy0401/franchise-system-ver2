@@ -26,102 +26,209 @@ namespace FranchiseProject.Application.Services
             _unitOfWork = unitOfWork;
             _firebaseService = firebaseService;
         }
+        /*  public async Task<ApiResponse<AdminDashboardModel>> AdminCourseRevenueDashboardAsync(DateOnly from, DateOnly to, bool year, int topCourse)
+          {
+              var response = new ApiResponse<AdminDashboardModel>();
+              try
+              {
+                  var fromDate = from.ToDateTime(new TimeOnly(0, 0));  // Chuyển từ DateOnly sang DateTime
+                  var toDate = to.ToDateTime(new TimeOnly(23, 59));
+                  // Lọc dữ liệu thanh toán đã hoàn thành và loại là MonthlyDue, đồng thời lọc theo ngày từ "from" đến "to"
+                  var queryCourse = _unitOfWork.PaymentRepository.GetTableAsTracking()
+                      .AsNoTracking()
+                      .Where(x => x.Status == PaymentStatus.Completed && x.Type == PaymentTypeEnum.MonthlyDue)
+                      .Where(x => x.PaidDate >= fromDate && x.PaidDate <= toDate);  // So sánh DateOnly với DateOnly
+                  var adminDashboardModel = new AdminDashboardModel();
+                  List<AdminCourseRevenueDashboard> revenueStatistics;
+
+                  // Nếu year == true, nhóm theo năm
+                  if (year)
+                  {
+                      revenueStatistics = await queryCourse
+                          .GroupBy(x => x.PaidDate.Value.Year)
+                          .Select(g => new AdminCourseRevenueDashboard
+                          {
+                              Year = g.Key,
+                              Month = 0,  // Không cần tháng, chỉ cần năm
+                              Revenue = (double)g.Sum(x => x.Amount)  // Tổng doanh thu theo năm
+                          })
+                          .ToListAsync();
+                      adminDashboardModel.totalCourseRevenue = revenueStatistics.Sum(r => r.Revenue);
+                      adminDashboardModel.adminCourseRevenueDashboards = revenueStatistics;
+                  }
+                  else
+                  { 
+
+                      revenueStatistics = await queryCourse
+                          .GroupBy(x => new { x.PaidDate.Value.Year, x.PaidDate.Value.Month })
+                          .Select(g => new AdminCourseRevenueDashboard
+                          {
+                              Year = g.Key.Year,
+                              Month = g.Key.Month,
+                              Revenue = (double)g.Sum(x => x.Amount)  
+                          })
+                          .ToListAsync();
+                      adminDashboardModel.totalCourseRevenue = revenueStatistics.Sum(r => r.Revenue);
+                      adminDashboardModel.adminCourseRevenueDashboards = revenueStatistics;
+                  }
+
+                  var queryContract = _unitOfWork.PaymentRepository.GetTableAsTracking()
+                      .AsNoTracking()
+                      .Where(x => x.Status == PaymentStatus.Completed && x.Type == PaymentTypeEnum.Contract)
+                      .Where(x => x.PaidDate >= fromDate && x.PaidDate <= toDate); 
+                  List<AdminContractRevenueDashboard> revenueContractStatistics;
+
+
+                  if (year)
+                  {
+                      revenueContractStatistics = await queryCourse
+                          .GroupBy(x => x.PaidDate.Value.Year)
+                          .Select(g => new AdminContractRevenueDashboard
+                          {
+                              Year = g.Key,
+                              Month = 0,  
+                              Revenue = (double)g.Sum(x => x.Amount) 
+                          })
+                          .ToListAsync();
+                      adminDashboardModel.totalContractRevenue = revenueContractStatistics.Sum(r => r.Revenue);
+                      adminDashboardModel.adminContractRevenueDashboard = revenueContractStatistics;
+                  }
+                  else
+                  {
+                      revenueContractStatistics = await queryCourse
+                          .GroupBy(x => new { x.PaidDate.Value.Year, x.PaidDate.Value.Month })
+                          .Select(g => new AdminContractRevenueDashboard
+                          {
+                              Year = g.Key.Year,
+                              Month = g.Key.Month,
+                              Revenue = (double)g.Sum(x => x.Amount)  
+                          })
+                          .ToListAsync();
+                      adminDashboardModel.totalContractRevenue = revenueStatistics.Sum(r => r.Revenue);
+                      adminDashboardModel.adminContractRevenueDashboard = revenueContractStatistics;
+                  }
+
+                  var topCourses = await _unitOfWork.RegisterCourseRepository.GetTableAsTracking()
+                  .AsNoTracking()
+                  .Where(rc => !rc.Course.IsDeleted && rc.CreationDate >= fromDate && rc.CreationDate <= toDate) // Loại bỏ các khóa học đã bị xóa
+                  .GroupBy(rc => new { rc.Course.Code})
+                  .Select(g => new CourseDashboardModel
+                  {
+                      Code = g.Key.Code,
+                      Name = g.OrderByDescending(x => x.Course.Version).FirstOrDefault().Course.Name, // Lấy tên từ phiên bản mới nhất,
+                      NumberOfRegisters = g.Count() // Đếm số lượng đăng ký
+                  })
+                  .OrderByDescending(c => c.NumberOfRegisters) // Sắp xếp giảm dần theo số lượng đăng ký
+                  .Take(5) // Lấy top 5 khóa học
+                  .ToListAsync();
+                  adminDashboardModel.courseDashboardModels = topCourses;
+                  return ResponseHandler.Success(adminDashboardModel, "Revenue statistics retrieved successfully.");
+              }
+              catch (Exception ex)
+              {
+                  return ResponseHandler.Failure<AdminDashboardModel>($"Error retrieving revenue statistics: {ex.Message}");
+              }
+          }*/
+
         public async Task<ApiResponse<AdminDashboardModel>> AdminCourseRevenueDashboardAsync(DateOnly from, DateOnly to, bool year, int topCourse)
         {
             var response = new ApiResponse<AdminDashboardModel>();
             try
             {
-                var fromDate = from.ToDateTime(new TimeOnly(0, 0));  // Chuyển từ DateOnly sang DateTime
+                var fromDate = from.ToDateTime(new TimeOnly(0, 0));
                 var toDate = to.ToDateTime(new TimeOnly(23, 59));
-                // Lọc dữ liệu thanh toán đã hoàn thành và loại là MonthlyDue, đồng thời lọc theo ngày từ "from" đến "to"
+
+                var adminDashboardModel = new AdminDashboardModel();
+
+                // Query for Course payments (Type == PaymentTypeEnum.Course)
                 var queryCourse = _unitOfWork.PaymentRepository.GetTableAsTracking()
                     .AsNoTracking()
-                    .Where(x => x.Status == PaymentStatus.Completed && x.Type == PaymentTypeEnum.MonthlyDue)
-                    .Where(x => x.PaidDate >= fromDate && x.PaidDate <= toDate);  // So sánh DateOnly với DateOnly
-                var adminDashboardModel = new AdminDashboardModel();
-                List<AdminCourseRevenueDashboard> revenueStatistics;
+                    .Where(x => x.Status == PaymentStatus.Completed && x.Type == PaymentTypeEnum.Course)
+                    .Where(x => x.PaidDate >= fromDate && x.PaidDate <= toDate);
 
-                // Nếu year == true, nhóm theo năm
+                List<AdminCourseRevenueDashboard> courseRevenueStatistics;
+
                 if (year)
                 {
-                    revenueStatistics = await queryCourse
+                    courseRevenueStatistics = await queryCourse
                         .GroupBy(x => x.PaidDate.Value.Year)
                         .Select(g => new AdminCourseRevenueDashboard
                         {
                             Year = g.Key,
-                            Month = 0,  // Không cần tháng, chỉ cần năm
-                            Revenue = (double)g.Sum(x => x.Amount)  // Tổng doanh thu theo năm
+                            Month = 0,
+                            Revenue = (double)g.Sum(x => x.Amount)
                         })
                         .ToListAsync();
-                    adminDashboardModel.totalCourseRevenue = revenueStatistics.Sum(r => r.Revenue);
-                    adminDashboardModel.adminCourseRevenueDashboards = revenueStatistics;
                 }
                 else
-                { 
-                
-                    revenueStatistics = await queryCourse
+                {
+                    courseRevenueStatistics = await queryCourse
                         .GroupBy(x => new { x.PaidDate.Value.Year, x.PaidDate.Value.Month })
                         .Select(g => new AdminCourseRevenueDashboard
                         {
                             Year = g.Key.Year,
                             Month = g.Key.Month,
-                            Revenue = (double)g.Sum(x => x.Amount)  
+                            Revenue = (double)g.Sum(x => x.Amount)
                         })
                         .ToListAsync();
-                    adminDashboardModel.totalCourseRevenue = revenueStatistics.Sum(r => r.Revenue);
-                    adminDashboardModel.adminCourseRevenueDashboards = revenueStatistics;
                 }
 
-                var queryContract = _unitOfWork.PaymentRepository.GetTableAsTracking()
+                adminDashboardModel.adminCourseRevenueDashboards = courseRevenueStatistics;
+                adminDashboardModel.totalCourseRevenue = courseRevenueStatistics.Sum(r => r.Revenue);
+
+                // Query for MonthlyDue payments (Type == PaymentTypeEnum.MonthlyDue)
+                var queryMonthlyDue = _unitOfWork.PaymentRepository.GetTableAsTracking()
                     .AsNoTracking()
-                    .Where(x => x.Status == PaymentStatus.Completed && x.Type == PaymentTypeEnum.Contract)
-                    .Where(x => x.PaidDate >= fromDate && x.PaidDate <= toDate); 
-                List<AdminContractRevenueDashboard> revenueContractStatistics;
+                    .Where(x => x.Status == PaymentStatus.Completed && x.Type == PaymentTypeEnum.MonthlyDue)
+                    .Where(x => x.PaidDate >= fromDate && x.PaidDate <= toDate);
 
-               
+                List<AdminContractRevenueDashboard> monthlyDueRevenueStatistics;
+
                 if (year)
                 {
-                    revenueContractStatistics = await queryCourse
+                    monthlyDueRevenueStatistics = await queryMonthlyDue
                         .GroupBy(x => x.PaidDate.Value.Year)
                         .Select(g => new AdminContractRevenueDashboard
                         {
                             Year = g.Key,
-                            Month = 0,  
-                            Revenue = (double)g.Sum(x => x.Amount) 
+                            Month = 0,
+                            Revenue = (double)g.Sum(x => x.Amount)
                         })
                         .ToListAsync();
-                    adminDashboardModel.totalContractRevenue = revenueContractStatistics.Sum(r => r.Revenue);
-                    adminDashboardModel.adminContractRevenueDashboard = revenueContractStatistics;
                 }
                 else
                 {
-                    revenueContractStatistics = await queryCourse
+                    monthlyDueRevenueStatistics = await queryMonthlyDue
                         .GroupBy(x => new { x.PaidDate.Value.Year, x.PaidDate.Value.Month })
                         .Select(g => new AdminContractRevenueDashboard
                         {
                             Year = g.Key.Year,
                             Month = g.Key.Month,
-                            Revenue = (double)g.Sum(x => x.Amount)  
+                            Revenue = (double)g.Sum(x => x.Amount)
                         })
                         .ToListAsync();
-                    adminDashboardModel.totalContractRevenue = revenueStatistics.Sum(r => r.Revenue);
-                    adminDashboardModel.adminContractRevenueDashboard = revenueContractStatistics;
                 }
 
+                adminDashboardModel.adminContractRevenueDashboard = monthlyDueRevenueStatistics;
+                adminDashboardModel.totalContractRevenue = monthlyDueRevenueStatistics.Sum(r => r.Revenue);
+
+                // Query for top courses
                 var topCourses = await _unitOfWork.RegisterCourseRepository.GetTableAsTracking()
-                .AsNoTracking()
-                .Where(rc => !rc.Course.IsDeleted && rc.CreationDate >= fromDate && rc.CreationDate <= toDate) // Loại bỏ các khóa học đã bị xóa
-                .GroupBy(rc => new { rc.Course.Code})
-                .Select(g => new CourseDashboardModel
-                {
-                    Code = g.Key.Code,
-                    Name = g.OrderByDescending(x => x.Course.Version).FirstOrDefault().Course.Name, // Lấy tên từ phiên bản mới nhất,
-                    NumberOfRegisters = g.Count() // Đếm số lượng đăng ký
-                })
-                .OrderByDescending(c => c.NumberOfRegisters) // Sắp xếp giảm dần theo số lượng đăng ký
-                .Take(5) // Lấy top 5 khóa học
-                .ToListAsync();
+                    .AsNoTracking()
+                    .Where(rc => !rc.Course.IsDeleted && rc.CreationDate >= fromDate && rc.CreationDate <= toDate)
+                    .GroupBy(rc => new { rc.Course.Code })
+                    .Select(g => new CourseDashboardModel
+                    {
+                        Code = g.Key.Code,
+                        Name = g.OrderByDescending(x => x.Course.Version).FirstOrDefault().Course.Name,
+                        NumberOfRegisters = g.Count()
+                    })
+                    .OrderByDescending(c => c.NumberOfRegisters)
+                    .Take(topCourse)
+                    .ToListAsync();
+
                 adminDashboardModel.courseDashboardModels = topCourses;
+
                 return ResponseHandler.Success(adminDashboardModel, "Revenue statistics retrieved successfully.");
             }
             catch (Exception ex)

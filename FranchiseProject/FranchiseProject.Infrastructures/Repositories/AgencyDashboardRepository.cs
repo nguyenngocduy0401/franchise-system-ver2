@@ -82,6 +82,28 @@ namespace FranchiseProject.Infrastructures.Repositories
             var registerCourse= await _dbContext.RegisterCourses.Where (rc=>rc.CourseId == courseId && rc.User.AgencyId == agencyId).ToListAsync();
             return registerCourse;
         }
+        public async Task<List<RegisterCourse>> GetRegisterCoursesByConditionsAsync(DateTime endDate, Guid agencyId, Guid courseId)
+        {
+            return await (from rc in _dbContext.RegisterCourses
+                          join u in _dbContext.Users on rc.UserId equals u.Id
+                          where rc.CreationDate <= endDate
+                                && u.AgencyId == agencyId
+                                && rc.CourseId == courseId
+                          select rc)
+                         .ToListAsync();
+        }
+        public async Task<List<Payment>> GetPaymentsByConditionsAsync(DateTime startDate, DateTime endDate, Guid agencyId, Guid courseId)
+        {
+            return await (from p in _dbContext.Payments
+                          join rc in _dbContext.RegisterCourses on p.RegisterCourseId equals rc.Id
+                          where p.ToDate >= DateOnly.FromDateTime(startDate.Date)
+                                && p.ToDate <= DateOnly.FromDateTime(endDate.Date)
+                                && p.AgencyId == agencyId
+                                && rc.CourseId == courseId
+                          select p)
+                         .ToListAsync();
+        }
+
     }
 }
 

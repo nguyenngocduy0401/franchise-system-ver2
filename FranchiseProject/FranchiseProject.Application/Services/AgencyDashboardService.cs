@@ -19,6 +19,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace FranchiseProject.Application.Services
 {
@@ -33,7 +34,7 @@ namespace FranchiseProject.Application.Services
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
         private readonly IFirebaseRepository _firebaseService;
-        public AgencyDashboardService(IFirebaseRepository firebaseService,IValidator<UpdateClassViewModel> validatorUpdate, IMapper mapper, IUnitOfWork unitOfWork, IClaimsService claimsService, IValidator<CreateClassViewModel> validator, UserManager<User> userManager, RoleManager<Role> roleManager)
+        public AgencyDashboardService(IFirebaseRepository firebaseService, IValidator<UpdateClassViewModel> validatorUpdate, IMapper mapper, IUnitOfWork unitOfWork, IClaimsService claimsService, IValidator<CreateClassViewModel> validator, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -69,38 +70,34 @@ namespace FranchiseProject.Application.Services
                     var totalRevenue = 0.0;
                     var studentCount = 0;
                     var totalRefunds = 0.0;
-
+                    var totalPayment = 0;
                     foreach (var course in courseGroup)
                     {
-                        var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id, contract.AgencyId.Value);
-                        var validRegistrations = filteredRegisterCourses
-                            .Where(r => r.CreationDate.Date <= endDate.Date)
-                            .ToList();
+                        var paymentes = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByConditionsAsync(startDate, endDate, contract.AgencyId.Value, course.Id);
 
-                        foreach (var registration in validRegistrations)
+
+
+                        foreach (var payment in paymentes)
                         {
-                            studentCount++;
-                            var payments = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByRegisterCourseIdAsync(registration.Id);
-                            foreach (var payment in payments)
+
+                            if (payment.Type == PaymentTypeEnum.Refund)
                             {
-                                if (payment.ToDate.HasValue && payment.ToDate.Value >= DateOnly.FromDateTime(startDate) && payment.ToDate.HasValue && payment.ToDate.Value <= DateOnly.FromDateTime(endDate))
-                                {
-                                    if (payment.Type == PaymentTypeEnum.Refund)
-                                    {
-                                        totalRefunds += payment.Amount ?? 0;
-                                    }
-                                    else
-                                    {
-                                        totalRevenue += payment.Amount ?? 0;
-                                    }
-                                }
+                                totalRefunds += payment.Amount ?? 0;
+                                studentCount++;
                             }
+                            else
+                            {
+                                studentCount++;
+                                totalRevenue += payment.Amount ?? 0;
+                            }
+
                         }
                     }
 
-                    var monthlyFee = totalRevenue * (contract.RevenueSharePercentage/100);
-                    var actualProfits = totalRevenue - totalRefunds - monthlyFee;
 
+                    var monthlyFee = totalRevenue * (contract.RevenueSharePercentage / 100);
+                    var actualProfits = totalRevenue - totalRefunds - monthlyFee;
+                    var check = totalPayment;
                     // Sử dụng thông tin từ phiên bản mới nhất của khóa học
                     var latestCourse = courseGroup.OrderByDescending(c => c.CreationDate).First();
 
@@ -133,7 +130,7 @@ namespace FranchiseProject.Application.Services
             var response = new ApiResponse<List<CourseRevenueViewModel>>();
             try
             {
-               
+
                 var agencyId = AgencyId;
                 var courseRevenueList = new List<CourseRevenueViewModel>();
                 var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(agencyId);
@@ -151,38 +148,34 @@ namespace FranchiseProject.Application.Services
                     var totalRevenue = 0.0;
                     var studentCount = 0;
                     var totalRefunds = 0.0;
-
+                    var totalPayment = 0;
                     foreach (var course in courseGroup)
                     {
-                        var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id, contract.AgencyId.Value);
-                        var validRegistrations = filteredRegisterCourses
-                            .Where(r => r.CreationDate.Date <= endDate.Date)
-                            .ToList();
+                        var paymentes = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByConditionsAsync(startDate, endDate, contract.AgencyId.Value, course.Id);
 
-                        foreach (var registration in validRegistrations)
+
+
+                        foreach (var payment in paymentes)
                         {
-                            studentCount++;
-                            var payments = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByRegisterCourseIdAsync(registration.Id);
-                            foreach (var payment in payments)
+
+                            if (payment.Type == PaymentTypeEnum.Refund)
                             {
-                                if (payment.ToDate.HasValue && payment.ToDate.Value >= DateOnly.FromDateTime(startDate) && payment.ToDate.HasValue && payment.ToDate.Value <= DateOnly.FromDateTime(endDate))
-                                {
-                                    if (payment.Type == PaymentTypeEnum.Refund)
-                                    {
-                                        totalRefunds += payment.Amount ?? 0;
-                                    }
-                                    else
-                                    {
-                                        totalRevenue += payment.Amount ?? 0;
-                                    }
-                                }
+                                totalRefunds += payment.Amount ?? 0;
+                                studentCount++;
                             }
+                            else
+                            {
+                                studentCount++;
+                                totalRevenue += payment.Amount ?? 0;
+                            }
+
                         }
                     }
 
+
                     var monthlyFee = totalRevenue * (contract.RevenueSharePercentage / 100);
                     var actualProfits = totalRevenue - totalRefunds - monthlyFee;
-
+                    var check = totalPayment;
                     // Sử dụng thông tin từ phiên bản mới nhất của khóa học
                     var latestCourse = courseGroup.OrderByDescending(c => c.CreationDate).First();
 
@@ -338,12 +331,12 @@ namespace FranchiseProject.Application.Services
 
                     var report = new AgencyFinancialReport
                     {
-                        FiscalPeriod = "Tháng" +" "+ month,
+                        FiscalPeriod = "Tháng" + " " + month,
                         Revenue = Math.Round(revenue, 2),
                         ProfitsReceived = Math.Round(profitsReceived, 2),
                         Refunds = Math.Round(refunds, 2),
                         ActualProfits = Math.Round(actualProfits, 2),
-                        OffsettingPeriod = "Tháng" +" "+ (month + 1 > 12 ? 1 : month + 1).ToString()
+                        OffsettingPeriod = "Tháng" + " " + (month + 1 > 12 ? 1 : month + 1).ToString()
                     };
 
                     reports.Add(report);
@@ -504,12 +497,6 @@ namespace FranchiseProject.Application.Services
             var registerCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCoursesByAgencyIdAsync(agencyId);
             var courseList = await _unitOfWork.CourseRepository.GetAllAsync();
             var contract = await _unitOfWork.ContractRepository.GetMostRecentContractByAgencyIdAsync(agencyId);
-
-            if (contract == null)
-            {
-                return courseRevenueList;
-            }
-
             var courseGroups = courseList.GroupBy(c => c.Code);
 
             foreach (var courseGroup in courseGroups)
@@ -517,38 +504,35 @@ namespace FranchiseProject.Application.Services
                 var totalRevenue = 0.0;
                 var studentCount = 0;
                 var totalRefunds = 0.0;
-
+                var totalPayment = 0;
                 foreach (var course in courseGroup)
                 {
-                    var filteredRegisterCourses = await _unitOfWork.AgencyDashboardRepository.GetRegisterCourseByCourseIdAsync(course.Id, contract.AgencyId.Value);
-                    var validRegistrations = filteredRegisterCourses
-                        .Where(r => r.CreationDate.Date <= endDate.Date)
-                        .ToList();
+                    var paymentes = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByConditionsAsync(startDate, endDate, contract.AgencyId.Value, course.Id);
 
-                    foreach (var registration in validRegistrations)
+
+
+                    foreach (var payment in paymentes)
                     {
-                        studentCount++;
-                        var payments = await _unitOfWork.AgencyDashboardRepository.GetPaymentsByRegisterCourseIdAsync(registration.Id);
-                        foreach (var payment in payments)
+
+                        if (payment.Type == PaymentTypeEnum.Refund)
                         {
-                            if (payment.ToDate.HasValue && payment.ToDate.Value >= DateOnly.FromDateTime(startDate) && payment.ToDate.HasValue && payment.ToDate.Value <= DateOnly.FromDateTime(endDate))
-                            {
-                                if (payment.Type == PaymentTypeEnum.Refund)
-                                {
-                                    totalRefunds += payment.Amount ?? 0;
-                                }
-                                else
-                                {
-                                    totalRevenue += payment.Amount ?? 0;
-                                }
-                            }
+                            totalRefunds += payment.Amount ?? 0;
+                            studentCount++;
                         }
+                        else
+                        {
+                            studentCount++;
+                            totalRevenue += payment.Amount ?? 0;
+                        }
+
                     }
                 }
 
+
                 var monthlyFee = totalRevenue * (contract.RevenueSharePercentage / 100);
                 var actualProfits = totalRevenue - totalRefunds - monthlyFee;
-
+                var check = totalPayment;
+                // Sử dụng thông tin từ phiên bản mới nhất của khóa học
                 var latestCourse = courseGroup.OrderByDescending(c => c.CreationDate).First();
 
                 courseRevenueList.Add(new CourseRevenueViewModel
@@ -563,6 +547,8 @@ namespace FranchiseProject.Application.Services
                     ActualProfits = actualProfits.HasValue ? (double?)Math.Round((decimal)actualProfits.Value, 2) : null,
                 });
             }
+
+           
 
             return courseRevenueList;
         }
@@ -597,7 +583,7 @@ namespace FranchiseProject.Application.Services
                     ProfitsReceived = Math.Round(profitsReceived, 2),
                     Refunds = Math.Round(refunds, 2),
                     ActualProfits = Math.Round(actualProfits, 2),
-                 //   OffsettingPeriod = $"Tháng {nextMonth}/{nextYear}",
+                    //   OffsettingPeriod = $"Tháng {nextMonth}/{nextYear}",
                     CourseRevenueViews = courseRevenueList
                 };
 
@@ -695,7 +681,7 @@ namespace FranchiseProject.Application.Services
                 worksheet.Cells["C2"].Value = "Lợi Nhuận Nhận Được (VND)";
                 worksheet.Cells["D2"].Value = "Hoàn Tiền (VND)";
                 worksheet.Cells["E2"].Value = "Lợi Nhuận Thực Tế (VND)";
-              //  worksheet.Cells["F2"].Value = "Kỳ Bù Trừ";
+                //  worksheet.Cells["F2"].Value = "Kỳ Bù Trừ";
 
                 // Format column headers
                 worksheet.Cells["A2:F2"].Style.Font.Bold = true;

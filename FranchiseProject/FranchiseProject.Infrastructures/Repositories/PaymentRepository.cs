@@ -46,25 +46,43 @@ namespace FranchiseProject.Infrastructures.Repositories
                             p.CreationDate <= endDate)
                 .ToListAsync();
         }
+        //public async Task<double> CalculateAgencyRevenue(Guid agencyId, DateTime startDate, DateTime endDate)
+        //{
+        //    var payments = await _dbContext.Payments
+        //        .Where(p => p.AgencyId == agencyId &&
+        //                    p.ToDate.Value >= DateOnly.FromDateTime(startDate) &&
+        //                    p.ToDate.Value <= DateOnly.FromDateTime(endDate) &&
+        //                    p.Status == PaymentStatus.Completed)
+        //        .ToListAsync();
+
+        //    var revenue = payments
+        //        .Where(p => p.Type != PaymentTypeEnum.Refund)
+        //        .Sum(p => p.Amount ?? 0);
+
+        //    var refunds = payments
+        //        .Where(p => p.Type == PaymentTypeEnum.Refund)
+        //        .Sum(p => p.Amount ?? 0);
+
+        //    return revenue - refunds;
+        //}
         public async Task<double> CalculateAgencyRevenue(Guid agencyId, DateTime startDate, DateTime endDate)
         {
-            var payments = await _dbContext.Payments
+            var totalAmountQuery = _dbContext.Payments
                 .Where(p => p.AgencyId == agencyId &&
-                            p.ToDate.Value >= DateOnly.FromDateTime(startDate) &&
-                            p.ToDate.Value <= DateOnly.FromDateTime(endDate) &&
-                            p.Status == PaymentStatus.Completed)
-                .ToListAsync();
+                         p.ToDate.HasValue &&
+                    p.ToDate.Value >= DateOnly.FromDateTime(startDate.Date) &&
+                    p.ToDate.Value <= DateOnly.FromDateTime(endDate.Date) &&
+                            p.Type == PaymentTypeEnum.Course); // Lọc theo loại payment, giống như SQL
 
-            var revenue = payments
-                .Where(p => p.Type != PaymentTypeEnum.Refund)
-                .Sum(p => p.Amount ?? 0);
+            // Tính tổng số tiền (Amount) cho các bản ghi thỏa mãn điều kiện, sau đó nhân với 28%
+            var totalAmount = await totalAmountQuery
+                .SumAsync(p => p.Amount ?? 0);
 
-            var refunds = payments
-                .Where(p => p.Type == PaymentTypeEnum.Refund)
-                .Sum(p => p.Amount ?? 0);
+            var calculatedRevenue = totalAmount ; // Tính 28% tổng Amount
 
-            return revenue - refunds;
+            return calculatedRevenue;
         }
+
         public async Task<double> GetTotalRevenueForAgencyInPeriod(Guid agencyId, DateTime startDate, DateTime endDate)
         {
             return await _dbContext.Payments
