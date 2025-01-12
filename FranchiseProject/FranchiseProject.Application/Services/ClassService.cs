@@ -1041,8 +1041,8 @@ namespace FranchiseProject.Application.Services
                                 {
                                     StartTime = DateTime.Now.AddYears(1),
                                     Quantity = 0,
-                                    Title = "Bài kiểm cuối khóa số " + (i + 1),
-                                    Description = "Bài kiểm cuối khóa số " + (i + 1),
+                                    Title = "Bài kiểm tra cuối khóa số " + (i + 1),
+                                    Description = "Bài kiểm tra cuối khóa số " + (i + 1),
                                     Type = QuizTypeEnum.Compulsory,
                                     AssessmentId = assessment.Id
                                 };
