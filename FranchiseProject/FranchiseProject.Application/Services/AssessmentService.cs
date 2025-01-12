@@ -316,8 +316,8 @@ namespace FranchiseProject.Application.Services
                             }
                         case AssessmentTypeEnum.Attendance:
                             {
-                                var totalDaysAttended = (await _unitOfWork.ClassScheduleRepository.FindAsync(e => e.ClassId == classId && e.IsDeleted != true)).Count();
-                                var attendedDays = classSchedules.Count();
+                                var totalDaysAttended = classSchedules.Count();
+                                var attendedDays = (await _unitOfWork.AttendanceRepository.GetStudentPresentAttendanceByClassIdAsync(classId, studentId)).Count();
                                 var score = 0;
                                 if (totalDaysAttended != 0) score = (attendedDays / totalDaysAttended) * 10;
 
