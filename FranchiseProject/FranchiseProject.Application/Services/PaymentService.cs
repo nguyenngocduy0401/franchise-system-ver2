@@ -394,7 +394,7 @@ namespace FranchiseProject.Application.Services
 
                 if (classE != null)
                 {
-                    var classStartDate = await _unitOfWork.ClassScheduleRepository.GetFirstOrDefaultAsync(cs => cs.ClassId == classRoom.ClassId);
+                    var classStartDate = await _unitOfWork.ClassScheduleRepository.GetEarliestClassScheduleByClassIdAsync(classRoom.ClassId.Value);
                     if (classStartDate != null && classStartDate.Date.HasValue)
                     {
                         var currentDate = DateTime.Now;
@@ -406,9 +406,13 @@ namespace FranchiseProject.Application.Services
 
                         if (daysUntilStart > 10)
                         {
-                            refundAmount = course.Price.GetValueOrDefault() * 0.8m; // 80% refund
+                            refundAmount = course.Price.GetValueOrDefault(); // 80% refund
                         }
-                        else if (daysUntilStart > 5)
+                        else if (daysUntilStart < 10 && daysUntilStart > 5)
+                        {
+                            refundAmount = course.Price.GetValueOrDefault() * 0.8m;
+                        }
+                        else if (daysUntilStart < 5)
                         {
                             refundAmount = course.Price.GetValueOrDefault() * 0.5m; // 50% refund
                         }
@@ -514,7 +518,7 @@ namespace FranchiseProject.Application.Services
 
                 if (classE != null)
                 {
-                    var classStartDate = await _unitOfWork.ClassScheduleRepository.GetFirstOrDefaultAsync(cs => cs.ClassId == classRoom.ClassId);
+                    var classStartDate = await _unitOfWork.ClassScheduleRepository.GetEarliestClassScheduleByClassIdAsync(classRoom.ClassId.Value);
                     if (classStartDate != null && classStartDate.Date.HasValue)
                     {
                         var currentDate = DateTime.Now;
@@ -526,9 +530,13 @@ namespace FranchiseProject.Application.Services
 
                         if (daysUntilStart > 10)
                         {
-                            refundAmount = course.Price.GetValueOrDefault() * 0.8m; // 80% refund
+                            refundAmount = course.Price.GetValueOrDefault() ; // 80% refund
                         }
-                        else if (daysUntilStart > 5)
+                        else  if(daysUntilStart<10 && daysUntilStart > 5)
+                        {
+                            refundAmount = course.Price.GetValueOrDefault() * 0.8m;
+                        }
+                        else if (daysUntilStart < 5)
                         {
                             refundAmount = course.Price.GetValueOrDefault() * 0.5m; // 50% refund
                         }
