@@ -438,7 +438,6 @@ namespace FranchiseProject.Application.Services
                 {
                     return ResponseHandler.Failure<bool>("Original payment not found.");
                 }
-
                 var refundPayment = new Payment
                 {
                     Title = $"Hoàn tiền khóa học {registerCourse.Course.Name}",
@@ -448,7 +447,7 @@ namespace FranchiseProject.Application.Services
                     Method = PaymentMethodEnum.Direct,
                     Status = PaymentStatus.Completed,
                     CreationDate = DateTime.UtcNow,
-                    UserId = userId,
+                    UserId = registerCourse.UserId,
                     RegisterCourseId = model.RegisterCourseId,
                     AgencyId = user.AgencyId,
                     ImageURL = model.ImageUrl,
