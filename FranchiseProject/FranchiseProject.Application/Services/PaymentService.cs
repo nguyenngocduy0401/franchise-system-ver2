@@ -626,8 +626,10 @@ namespace FranchiseProject.Application.Services
                     {
                         var scopedUnitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                        var month = p.CreationDate.Month;
-                        var year = p.CreationDate.Year;
+                        DateTime creationDate = p.CreationDate;
+                        DateTime newDate = creationDate.AddMonths(-1);
+                        var month = newDate.Month;
+                        var year = newDate.Year;
                         var startDate = new DateTime(year, month, 1);
                         var endDate = startDate.AddMonths(1).AddDays(-1);
 
